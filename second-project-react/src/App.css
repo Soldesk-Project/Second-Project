@@ -5,7 +5,7 @@ body {
   color: white;
 }
 .login-background {
-  background-image: url('./images/018_19201080.png');
+  background-image: url('../public/images/018_19201080.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
