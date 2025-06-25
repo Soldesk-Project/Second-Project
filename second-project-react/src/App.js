@@ -1,13 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginForm from './components/login/LoginForm';
+import LoginForm from './pages/login/LoginForm';
 import MainPage from './pages/MainPage';
 import './App.css';
-import KakaoCallback from './components/login/KakaoCallback';
-import ServerSelect from './components/login/ServerSelect';
-import SignUp from './components/login/SignUp';
-import FindId from './components/login/FindId';
-import FindPw from './components/login/FindPw';
+import KakaoCallback from './pages/login/KakaoCallback';
+import ServerSelect from './pages/login/ServerSelect';
+import SignUp from './pages/login/SignUp';
+import FindId from './pages/login/FindId';
+import FindPw from './pages/login/FindPw';
 
 function App() {
   return (

@@ -1,0 +1,74 @@
+/* 전체 컨테이너 */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* 상단 바 */
+.top-nav {
+  height: 60px;
+  background-color: #333;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  font-weight: bold;
+}
+
+/* 메인 영역: 좌측 묶음 + 우측 친구 목록 */
+.main-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  padding: 10px;
+  color: black;
+}
+
+/* 좌측 묶음: 유저 + 로비 + 채팅 */
+.main-left {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding-right: 10px;
+}
+
+/* 우측 친구 목록 */
+.friend-list {
+  width: 200px;
+  background-color: rgb(130, 130, 218);
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* 상단 컨텐츠: 유저정보 + 중앙 */
+.main-content {
+  display: flex;
+  flex: 1;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+
+/* 하단 채팅창 */
+.chat-box {
+  height: 150px;
+  background-color: #eaeaea;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* 유저 정보 영역 */
+.user-info {
+  width: 200px;
+  background-color: #f0f0f0;
+}
+
+/* 중앙 로비 영역 */
+.lobby-center {
+  flex: 1;
+  background-color: #ffffff;
+}
+
+
+
+
