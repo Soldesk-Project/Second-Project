@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginForm from './pages/login/LoginForm';
 import MainPage from './pages/MainPage';
-import './App.css';
 import KakaoCallback from './pages/login/KakaoCallback';
 import ServerSelect from './pages/login/ServerSelect';
 import SignUp from './pages/login/SignUp';

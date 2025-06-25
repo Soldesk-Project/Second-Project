@@ -6,9 +6,8 @@ const ServerSelect = () => {
 
     const ServerStyle = {
         textAlign: "center",
-        
         borderRadius: "20px",
-        marginBottom: "10px",
+        marginBottom: "15px",
         backgroundColor: "rgba(57, 72, 102, 1)",
     };
 
@@ -22,7 +21,7 @@ const ServerSelect = () => {
     return (
         <div className="login-background login-container">
             <div className="login-box">
-                <img src='/images/logo.png' alt='로고이미지' className='logoImg' style={{width: '100px', display: 'block', margin: '0 auto'}}/>
+                <img src='/images/logo.png' alt='로고이미지' className='logo-img'/>
                 {
                     server.map( (server, index) => (
                         <div key={index} style={ServerStyle} onClick={(e) => handleServer(e, index)}>
