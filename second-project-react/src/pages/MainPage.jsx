@@ -1,9 +1,13 @@
 import React from 'react';
+import Header from '../layout/Header';
 
 const MainPage = () => {
   return (
     <div>
-      <p>메인페이지</p>
+      <Header/>
+      <div className='main-body'>
+        메인페이지
+      </div>
     </div>
   );
 };

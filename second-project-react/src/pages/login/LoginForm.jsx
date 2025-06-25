@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import '../../css/loginForm.css';
 
 const LoginForm = () => {
   const [id, setId] = useState('');
@@ -12,6 +13,7 @@ const LoginForm = () => {
     //임시계정
     if (id === 'admin' && pw === '1234') {
       navigate('/server');
+      // navigate('/main');
     } else {
       alert('아이디 또는 비밀번호가 틀렸습니다.');
     }

@@ -10,8 +10,9 @@ const KakaoCallback = () => {
     if(code){
       axios.post("http://localhost:9099/api/kakao/login", {code})
         .then(res => {
-          console.log(res.dadta);
+          console.log(res.data);
           navigate("/main");
+           
         })
         .catch(err => {
           console.log("로그인 실패", err);
