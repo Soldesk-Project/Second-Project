@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../layout/Header';
 import '../css/MainPage.css';
+import RoomList from '../components/RoomList';
 
 const MainPage = () => {
   return (
@@ -19,7 +20,7 @@ const MainPage = () => {
             <div className='user-info'>유저 정보쪽</div>
 
             {/* 중앙 영역 (필터, 방 리스트 등) */}
-            <div className='lobby-center'>중앙 영역</div>
+            <div className='lobby-center'><RoomList/></div>
 
           </div>
 

@@ -11,7 +11,7 @@ const KakaoCallback = () => {
       axios.post("http://localhost:9099/api/kakao/login", {code})
         .then(res => {
           console.log(res.data);
-          navigate("/main");
+          navigate("/server");
            
         })
         .catch(err => {

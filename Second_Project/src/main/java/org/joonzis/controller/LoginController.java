@@ -65,6 +65,8 @@ public class LoginController {
 		conn.setRequestMethod("POST");
 		conn.setDoOutput(true);
 		
+		conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+		
 		String param = "grant_type=authorization_code"
 				+ "&client_id=" + CLIENT_ID
 				+ "&redirect_uri=" + REDIRECT_URI

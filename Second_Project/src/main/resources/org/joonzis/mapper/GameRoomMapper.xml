@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.joonzis.mapper.GameRoomMapper">
+	
+	<insert id="createGameRoom" parameterType="org.joonzis.domain.GameRoomDTO">
+	    INSERT INTO gameroom (
+	      gameroom_no, title, category, game_mode, is_private, pwd
+	    ) VALUES (
+	      gameroom_seq.NEXTVAL,
+	      #{title},
+	      #{category},
+	      #{game_mode},
+	      #{is_private},
+	      #{pwd}
+	    )
+	 </insert>
+</mapper>
