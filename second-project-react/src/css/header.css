@@ -2,11 +2,13 @@
   margin: 0;
   padding: 0;
 }
-.header ul{
+.header-category{
   list-style-type: none;
   overflow: hidden;
   width: 100%;
   height: 70px;
+  display: flex;
+  align-items: center;
 }
 .header li{
   float: left;
@@ -24,16 +26,20 @@
   color: black;
   font-weight: bold;
 }
-.logo{
-  width: 300px;
-  height: 200px;
-}
-.logo img{
+.header-logo{
   overflow: hidden;
+  margin: 0 40px;
 }
-
-/* li p:hover{
-  background-color: cadetblue;
-  color: coral;
-  font-weight: bold;
-} */
+.header-search{
+  width: 700px;
+  height: 40px;
+  border-radius: 20px;
+  padding: 0 20px;
+  border: none;
+  margin: 0 40px;
+}
+.header-enter, .header-signout{
+  width: 50px;  
+  height: 50px;
+  margin: 0 15px;
+}

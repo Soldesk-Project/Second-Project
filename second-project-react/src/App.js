@@ -8,7 +8,7 @@ import SignUp from './pages/login/SignUp';
 import FindId from './pages/login/FindId';
 import FindPw from './pages/login/FindPw';
 
-function App() {
+function App() {  
   return (
     <Router>
       <Routes>
