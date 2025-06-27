@@ -4,6 +4,7 @@
 
 <mapper namespace="org.joonzis.mapper.GameRoomMapper">
 	
+	<!-- 게임방 생성 -->
 	<insert id="createGameRoom" parameterType="org.joonzis.domain.GameRoomDTO">
 	    INSERT INTO gameroom (
 	      gameroom_no, title, category, game_mode, is_private, pwd
@@ -13,7 +14,12 @@
 	      #{category},
 	      #{game_mode},
 	      #{is_private},
-	      #{pwd}
+	      #{pwd, jdbcType=VARCHAR}
 	    )
 	 </insert>
+	 
+	 <!-- 게임 방 정보 가져오기 -->
+	 <select id="showRoom" resultType="org.joonzis.domain.GameRoomDTO">
+	 	SELECT * FROM gameroom
+	 </select>
 </mapper>

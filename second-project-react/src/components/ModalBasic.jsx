@@ -27,10 +27,10 @@ const ModalBasic = ({ setModalOpen }) => {
     const roomData = {
       title,
       category,
-      mode,
-      isPrivate: isPrivate ? 'Y' : 'N',
+      game_mode : mode,
+      is_private : isPrivate ? 'Y' : 'N',
       limit,
-      roomPassword: isPrivate ? password : null
+      pwd : isPrivate ? password : null
     };
 
     try {
@@ -78,7 +78,7 @@ const ModalBasic = ({ setModalOpen }) => {
             <td>
               <select value={mode} onChange={(e) => setMode(e.target.value)}>
                 <option value="normal">일반</option>
-                <option value="quiz">퀴즈</option>
+                <option value="rank">랭크</option>
               </select>
             </td>
           </tr>

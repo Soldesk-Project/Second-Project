@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,8 +36,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @CrossOrigin(origins = "*")
 public class LoginController {
 	
-	private final String CLIENT_ID = "99ddb7e910a924e51b633490da611ead";
-	private final String REDIRECT_URI = "http://localhost:3000/kakao/callback";
+	@Value("${kakao.client-id}")
+    private String clientId;
+
+    @Value("${kakao.redirect-uri}")
+    private String redirectUri;
 	
 	@ResponseBody
 	@PostMapping("/kakao/login")
@@ -68,8 +72,8 @@ public class LoginController {
 		conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 		
 		String param = "grant_type=authorization_code"
-				+ "&client_id=" + CLIENT_ID
-				+ "&redirect_uri=" + REDIRECT_URI
+				+ "&client_id=" + clientId
+				+ "&redirect_uri=" + redirectUri
 				+ "&code=" + code;
 		
 		try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()))) {
