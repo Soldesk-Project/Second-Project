@@ -8,6 +8,7 @@ import SignUp from './pages/login/SignUp';
 import FindId from './pages/login/FindId';
 import FindPw from './pages/login/FindPw';
 import Shop from './pages/Shop';
+import Achievements from './pages/Achievements';
 
 function App() {  
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/kakao/callback" element={<KakaoCallback />} />
         <Route path="/main/:serverNo" element={<MainPage />} />
         <Route path="/shop" element={<Shop />} />
+        <Route path="/achievements" element={<Achievements />} />
       </Routes>
     </Router>
   );

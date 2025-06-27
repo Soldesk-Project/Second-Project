@@ -25,9 +25,9 @@ const Header = () => {
     <div className='header'>
       <ul className='header-category'>
         <li><div><img src="/images/logo.png" alt="로고" onClick={clickToGoMain} className='logo-img header-logo'/></div></li>
-        <li><span onClick={clickToGo}>문제풀이</span></li>
+        <li><span onClick={clickToGoMain}>문제풀이</span></li>
         <li><span onClick={clickToGo}>도감</span></li>
-        <li><span onClick={clickToGo}>업적</span></li>
+        <li><span data-name="achievements" onClick={clickToGo}>업적</span></li>
         <li><span data-name="shop" onClick={clickToGo}>상점</span></li>
         <li><span onClick={clickToGo}>고객센터</span></li>
         <li><input type="text" className='header-search' placeholder='search...'/></li>
