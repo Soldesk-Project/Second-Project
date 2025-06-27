@@ -7,6 +7,7 @@ import ServerSelect from './pages/login/ServerSelect';
 import SignUp from './pages/login/SignUp';
 import FindId from './pages/login/FindId';
 import FindPw from './pages/login/FindPw';
+import Shop from './pages/Shop';
 
 function App() {  
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/findPw" element={<FindPw />} />
         <Route path="/kakao/callback" element={<KakaoCallback />} />
         <Route path="/main/:serverNo" element={<MainPage />} />
+        <Route path="/shop" element={<Shop />} />
       </Routes>
     </Router>
   );
