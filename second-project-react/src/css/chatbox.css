@@ -1,0 +1,22 @@
+.chat-screen{
+  height: 165px;
+  background-color: lightgrey;
+}
+.chat-input{
+  display: flex;
+}
+.chat-input input{
+  flex-grow: 1;
+  height: 20px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+.chat-input .emojiBtn{
+  height: 36px;
+  width: 36px;
+  margin-right: 5px;
+}
+.chat-input .sendBtn{
+  height: 36px;
+  width: 100px;
+}
