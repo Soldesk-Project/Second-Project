@@ -17,7 +17,7 @@ const ServerUserList = () => {
     }
 
     // 새 WebSocket 연결
-    socketRef.current = new WebSocket("ws://localhost:9099/ws/server");
+    socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/server");
 
     socketRef.current.onopen = () => {
       // 서버 입장 메시지 전송
