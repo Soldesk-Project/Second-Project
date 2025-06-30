@@ -2,6 +2,7 @@ import React from 'react';
 import Header from '../layout/Header';
 import '../css/MainPage.css';
 import RoomList from '../components/RoomList';
+import ServerUserList from '../components/ServerUserList';
 
 const MainPage = () => {
   return (
@@ -33,7 +34,7 @@ const MainPage = () => {
           {/* 랭킹 목록 */}
           <div className='user-ranking'>유저 랭킹</div>
           {/* 우측 친구 목록 */}
-          <div className='friend-list'>친구 목록</div>
+          <div className='friend-list'><ServerUserList/></div>
         </div>
 
       </div>

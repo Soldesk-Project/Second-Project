@@ -11,7 +11,7 @@ const ServerSelect = () => {
         backgroundColor: "rgba(57, 72, 102, 1)",
     };
 
-    const server = ["1서버","2서버","3서버","4서버","5서버","6서버","7서버","8서버","9서버"];
+    const server = ["1서버","2서버","3서버"];
 
     const handleServer = (e, index) => {
         let serverNo = index + 1;

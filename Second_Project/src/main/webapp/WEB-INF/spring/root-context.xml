@@ -45,7 +45,8 @@
 	<context:component-scan base-package="org.joonzis.service"/>
 	
 	<!-- WebSocket을 위한 ServerEndpointExporter 빈 등록 -->
-	<context:component-scan base-package="org.joonzis.websoket" />
+	<context:component-scan base-package="org.joonzis.websocket" />
     <bean class="org.springframework.web.socket.server.standard.ServerEndpointExporter"/>
     
+    <bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"/>
 </beans>
