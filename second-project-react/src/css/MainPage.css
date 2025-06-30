@@ -34,10 +34,28 @@
   padding-right: 20px;
 }
 
-/* 우측 친구 목록 */
-.friend-list {
-  width: 350px;
+/* 우측 묶음: 유저목록 + 랭킹 */
+.main-right {
+  width: 300px;
+  background-color: lightgrey;
+  box-sizing: border-box;
+}
+
+/* 유저 랭킹 */
+.user-ranking {
+  height: 35vh;
   background-color: #394866;
+  color: white;
+  padding: 10px;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+
+/* 친구 목록 */
+.friend-list {
+  height: 53vh;
+  background-color: #394866;
+  color: white;
   padding: 10px;
   box-sizing: border-box;
 }
@@ -47,7 +65,7 @@
   display: flex;
   flex: 1;
   gap: 20px;
-  padding-bottom: 10px;
+  padding-bottom: 20px;
 }
 
 /* 하단 채팅창 */
@@ -60,7 +78,7 @@
 
 /* 유저 정보 영역 */
 .user-info {
-  width: 400px;
+  width: 350px;
   background-color: #394866;
 }
 

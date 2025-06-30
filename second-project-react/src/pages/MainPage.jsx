@@ -28,9 +28,13 @@ const MainPage = () => {
           <div className='chat-box'>채팅창</div>
 
         </div>
-
-        {/* 우측 친구 목록 */}
-        <div className='friend-list'>친구 목록</div>
+        {/* 우측 유저 목록/랭킹 목록 */}
+        <div className='main-right'>
+          {/* 랭킹 목록 */}
+          <div className='user-ranking'>유저 랭킹</div>
+          {/* 우측 친구 목록 */}
+          <div className='friend-list'>친구 목록</div>
+        </div>
 
       </div>
 
