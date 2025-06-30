@@ -1,8 +1,9 @@
 import React from 'react';
 import Header from '../layout/Header';
-import AchievementsList from '../components/AchievementsList';
+import ItemList from '../components/ItemList';
+import Loading from '../components/Loading';
 
-const Achievements = () => {
+const ItemBook = () => {
   return (
     <div className="main-container"> {/* 공간 부터 나눴음*/}
 
@@ -18,8 +19,8 @@ const Achievements = () => {
             {/* 좌측 유저 정보, 최근 플레이 목록 */}
             <div className='user-info'>유저 정보쪽</div>
 
-            {/* 중앙 영역 (필터, 방 리스트 등) */}
-            <div className='lobby-center'><AchievementsList/></div>
+            {/* 중앙 영역 (필터, 방 리스트 등) // 일단 로딩 같이 있음 */}
+            <div className='lobby-center'><ItemList/><Loading/></div>
 
           </div>
 
@@ -37,4 +38,4 @@ const Achievements = () => {
   );
 };
 
-export default Achievements;
+export default ItemBook;

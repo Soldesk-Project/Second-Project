@@ -9,6 +9,7 @@ import FindId from './pages/login/FindId';
 import FindPw from './pages/login/FindPw';
 import Shop from './pages/Shop';
 import Achievements from './pages/Achievements';
+import ItemBook from './pages/ItemBook';
 
 function App() {  
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/main/:serverNo" element={<MainPage />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/achievements" element={<Achievements />} />
+        <Route path="/itemBook" element={<ItemBook />} />
       </Routes>
     </Router>
   );
