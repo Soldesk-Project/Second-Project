@@ -12,14 +12,9 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
 	@Autowired
     private ServerUserWebSocketHandler serverUserHandler;
-	
-	@Autowired
-    private UserStatusWebSocketHandler userStatusHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-    	registry.addHandler(new EchoHandler(), "/ws/echo").setAllowedOrigins("*");
-        registry.addHandler(userStatusHandler, "/ws/status").setAllowedOrigins("*");
         registry.addHandler(serverUserHandler, "/ws/server").setAllowedOrigins("*");
     }
 }
