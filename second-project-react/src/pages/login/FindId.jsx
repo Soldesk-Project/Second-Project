@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import '../../css/findId.css';
 import { useNavigate } from 'react-router-dom';
 
-const FindId = () => {
-  const [email, setEmail] = useState('');
-  const [domain, setDomain] = useState('');
+export default function FindId() {
+  const [emailId, setEmailId] = useState('');
+  const [emailDomain, setEmailDomain] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    //임시계정
-    if (email === 'admin' && domain === 'naver.com') {
-      navigate('/server', { state: { userEmail: email } });
+    const full = `${emailId}@${emailDomain}`;
+    if (full === 'admin@naver.com') {
+      navigate('/server', { state: { userEmail: full } });
     } else {
       alert('이메일로 확인된 아이디가 없습니다');
     }
@@ -18,72 +18,79 @@ const FindId = () => {
 
   const handleButtonOption = (e) => {
     const { name } = e.target;
-    switch (name) {
-      case 'signUp':
-        navigate('/signUp');
-        break;
-      case 'findId':
-        navigate('/findId');
-        break;
-      case 'findPw':
-        navigate('/findPw');
-        break;
-      case 'login':
-        navigate('/');
-        break;
-      default:
-        break;
-    }
+    if (name === 'login') navigate('/');
+    else if (name === 'signUp') navigate('/signUp');
+    else if (name === 'findId') navigate('/findId');
+    else if (name === 'findPw') navigate('/findPw');
   };
 
-    return (
+  return (
     <div className="login-background login-container">
-        <img src='images/logo.png' alt='logo' name="login" onClick={handleButtonOption}/>
+      <img
+        src="images/logo.png"
+        alt="logo"
+        name="login"
+        onClick={handleButtonOption}
+      />
       <div className="findId-box">
-        <div className='findId_submit'>
-          
-          <h1>CotePlay에 어서오세요. </h1>
-          <h4>Let's align our constellations!
-          문구는 뭐 대애충 아무거나 환영글... </h4><br/>
+        <div className="findId_submit">
+          <h1>CotePlay에 어서오세요.</h1>
+          <h4>Let's align our constellations!</h4>
           <div className="login-options">
-            <div className='login-option_1'>
+            <div className="login-option_1">
               <button name="signUp" onClick={handleButtonOption}>Join</button>
             </div>
-            <div className='login-option_2'>
+            <div className="login-option_2">
               <button name="findId" onClick={handleButtonOption}>Find id</button>
-              <p>/</p>
+              <span>/</span>
               <button name="findPw" onClick={handleButtonOption}>Find password</button>
             </div>
           </div>
-          <div className='email_box'>
-            <input
-                type="text"
-                placeholder="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-            />
-            <p>@</p>
-            <select className='domain_box'>
-                <option>naver.com</option>
-                <option>gmail.com</option>
-                <option>apple.com</option>
-                <option>daum.com</option>
-                <option>hanmail.com</option>
-                <option>직접입력</option>
-            </select>
-          </div>
-          <button onClick={handleLogin} className='findIdButton'>Find Result</button>
 
-        </div>
-        <div className='login-image'>
-          <img 
-            src='images/loginpage_image.png'
-            alt='로그인화면 이미지'
+          <div className="email_box">
+            <input
+              type="text"
+              placeholder="이메일을 입력하세요."
+              value={emailId}
+              onChange={(e) => setEmailId(e.target.value)}
+              style={{ width: '45%' }}
             />
+            <div
+              style={{
+                width: '10%',
+                height: '31px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              @
+            </div>
+            <input
+              list="email-domains"
+              placeholder="직접 입력"
+              value={emailDomain}
+              onChange={(e) => setEmailDomain(e.target.value)}
+              style={{ width: '45%' }}
+            />
+            <datalist id="email-domains">
+              <option value="naver.com" />
+              <option value="gmail.com" />
+              <option value="hanmail.net" />
+            </datalist>
+          </div>
+
+          <button onClick={handleLogin} className="findIdButton">
+            Find Result
+          </button>
+        </div>
+        <div className="login-image">
+          <img
+            src="images/loginpage_image.png"
+            alt="로그인 화면 이미지"
+          />
         </div>
       </div>
     </div>
-    );
-};
-
-export default FindId;
+  );
+}

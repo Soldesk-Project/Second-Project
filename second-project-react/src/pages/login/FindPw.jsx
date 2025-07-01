@@ -4,37 +4,25 @@ import { useNavigate } from 'react-router-dom';
 
 const FindPw = () => {
   const [id, setId] = useState('');
-  const [email, setEmail] = useState('');
-  const [domain, setDomain] = useState('');
+  const [emailId, setEmailId] = useState('');
+  const [emailDomain, setEmailDomain] = useState('');
   const navigate = useNavigate();
-
-  const handleLogin = () => {
-    //임시계정
-    if (id === 'admin' && email === 'admin' && domain === 'naver.com') {
-      navigate('/server', { state: { userEmail: email } });
+ 
+  const handleFind = () => {
+    // 예: id와 email이 둘 다 있어야 동작
+    if (id === 'admin' && emailId === 'admin@naver.com') {
+      navigate('/reset-password');
     } else {
-      alert('아이디와 이메일로 확인된 비밀번호가 없습니다');
+      alert('일치하는 계정이 없습니다.');
     }
   };
-
+ 
   const handleButtonOption = (e) => {
     const { name } = e.target;
-    switch (name) {
-      case 'signUp':
-        navigate('/signUp');
-        break;
-      case 'findId':
-        navigate('/findId');
-        break;
-      case 'findPw':
-        navigate('/findPw');
-        break;
-      case 'login':
-        navigate('/');
-        break;
-      default:
-        break;
-    }
+    if (name === 'login') navigate('/');
+    else if (name === 'signUp') navigate('/signUp');
+    else if (name === 'findId') navigate('/findId');
+    else if (name === 'findPw') navigate('/findPw');
   };
 
     return (
@@ -66,22 +54,37 @@ const FindPw = () => {
           </div>
           <div className='email_box'>
             <input
-                type="text"
-                placeholder="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="이메일을 입력하세요."
+              value={emailId}
+              onChange={(e) => setEmailId(e.target.value)}
+              style={{ width: '45%' }}
             />
-            <p>@</p>
-            <select className='domain_box'>
-                <option>naver.com</option>
-                <option>gmail.com</option>
-                <option>apple.com</option>
-                <option>daum.com</option>
-                <option>hanmail.com</option>
-                <option>직접입력</option>
-            </select>
+            <div
+              style={{
+                width: '10%',
+                height: '31px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              @
+            </div>
+            <input
+              list="email-domains"
+              placeholder="직접 입력"
+              value={emailDomain}
+              onChange={(e) => setEmailDomain(e.target.value)}
+              style={{ width: '45%' }}
+            />
+            <datalist id="email-domains">
+              <option value="naver.com" />
+              <option value="gmail.com" />
+              <option value="hanmail.net" />
+            </datalist>
           </div>
-          <button onClick={handleLogin} className='findPwButton'>Find Result</button>
+          <button onClick={handleFind} className='findPwButton'>Find Result</button>
 
         </div>
         <div className='login-image'>
