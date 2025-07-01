@@ -1,17 +1,17 @@
 import React from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../css/header.css';
+import { useSelector } from 'react-redux';
 
 const Header = () => {
-  const server=useParams();
+  const server = useSelector((state) => state.user.server);
   const nav=useNavigate();
   const clickToGoMain=()=>{
-    nav('/main/'+server.serverNo)
+    nav('/main/'+ server);
   }
   const clickToGo=(e)=>{
     const name = e.target.dataset.name;
     nav(`/${name}`);
-    // nav(`/${name}/${server.serverNo}`);
   }
   const bb=()=>{
     console.log(123);

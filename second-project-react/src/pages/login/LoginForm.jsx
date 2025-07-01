@@ -2,28 +2,31 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../css/loginForm.css';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../store/userSlice';
+
 
 const LoginForm = () => {
   const [id, setId] = useState('');
   const [pw, setPw] = useState('');
   const navigate = useNavigate();
-  
+  const dispatch = useDispatch();
+
   const KAKAO_CLIENT_ID = "99ddb7e910a924e51b633490da611ead";
   const REDIRECT_URI = "http://localhost:3000/kakao/callback";
-
+  
   const handleLogin = async () => {
     try {
       const response = await axios.post('/api/login', {
         user_id: id,
         user_pw: pw,
-      },{
+      }, {
         withCredentials: true
       });
-      
+
       alert('로그인 성공');
-      navigate('/server', { state: response.data });
-      
-      // navigate('/server', { state: { userNick: response.data.user_nick } });
+      dispatch(setUser(response.data));  // ✅ 유저 정보 저장
+      navigate('/server');
     } catch (error) {
       console.error('로그인 실패:', error);
       alert('아이디 또는 비밀번호가 틀렸습니다.');
