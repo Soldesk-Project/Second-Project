@@ -13,7 +13,7 @@ const ServerSelect = () => {
         marginTop: "25px",
     };
     
-    const server = ["1서버","2서버","3서버","4서버","5서버"];
+    const server = ["1서버","2서버","3서버"];
 
     const handleServer = (e, index) => {
         let serverNo = index + 1;
