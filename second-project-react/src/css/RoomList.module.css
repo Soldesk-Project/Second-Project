@@ -8,11 +8,22 @@
 .createBtn {
   padding: 8px 16px;
   border: none;
-  background-color: #394866;
+  background-image: url('../../public/images/Submit.png');
   border-radius: 50px;
   color: white;
   cursor: pointer;
-  flex: 1;
+  flex: 0.4;
+}
+
+.roomListSearch{
+  width: 780px;
+  height: 40px;
+  background-color: rgba(0, 0, 0, 0.85);  /* 검정 배경 */
+  color: #fff;             /* 흰 글씨 */
+  border: 1px solid #444;  /* 경계선 색상도 어둡게 조정 */
+  border-radius: 20px;
+  margin: 0 10px;
+  padding-left: 20px;
 }
 
 .roomListBody {
@@ -20,10 +31,10 @@
   flex-direction: column;
   gap: 10px;
   padding: 10px;
-  background-color: #394866;
+  background-color: #0A0D17;
   border-radius: 10px;
   color: white;
-  height: 546px;
+  height: 503px;
 }
 
 .roomCard {

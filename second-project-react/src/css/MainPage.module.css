@@ -8,7 +8,7 @@
 /* 상단 바 */
 .top_nav {
   height: 70px;
-  background-color: #394866;
+  background-color: #0A0D17;
   color: white;
   display: flex;
   align-items: center;
@@ -23,7 +23,7 @@
   overflow: hidden;
   padding: 20px 20px;
   color: black;
-  background-color: #D8DCE5;
+  background-color: white;
 }
 
 /* 좌측 묶음: 유저정보 + 로비 + 채팅 */
@@ -38,7 +38,6 @@
 .body_right {
   width: 300px;
   height: 100%;
-  background-color: lightgrey;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -47,18 +46,20 @@
 /* 유저 랭킹 */
 .user_ranking {
   height: calc(60% - 12px);
-  background-color: #394866;
+  background-color: #0A0D17;
   color: white;
   box-sizing: border-box;
   margin-bottom: 20px;
+  border-radius: 10px;
 }
 
 /* 유저 목록 */
 .user_list {
   height: calc(40% - 8px);
-  background-color: #394866;
+  background-color: #0A0D17;
   color: white;
   box-sizing: border-box;
+  border-radius: 10px;
 }
 
 /* 상단 컨텐츠: 유저정보 + 중앙 */
@@ -72,15 +73,17 @@
 /* 하단 채팅창 */
 .chat_box {
   height: 250px;
-  background-color: #394866;
+  background-color: #0A0D17;
   padding: 10px;
   box-sizing: border-box;
+  border-radius: 10px;
 }
 
 /* 유저 정보 영역 */
 .user_info {
   width: 350px;
-  background-color: #394866;
+  background-color: #0A0D17;
+  border-radius: 10px;
 }
 
 /* 중앙 로비 영역 */

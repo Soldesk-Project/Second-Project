@@ -10,7 +10,7 @@ const Chatbox = () => {
 
       </div>
       <div className="chat-input">
-        <input type="text" id="chatInput"/>
+        <input type="text" id="chatInput" placeholder='메세지를 입력하세요.'/>
         <button id="emojiBtn" className="emojiBtn">😊</button>
         <button id="sendBtn" className="sendBtn">전달</button>
       </div>
