@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import styles from "../css/ServerUserList.module.css";
 
 const ServerUserList = ({ server, userId }) => {
   const [users, setUsers] = useState([]); // 현재 서버에 접속한 유저 목록
@@ -49,14 +50,18 @@ const ServerUserList = ({ server, userId }) => {
   }, [server, userId]);
 
   return (
-     <div>
-      <h3>{`현재 접속 서버: ${server}`}</h3>
-      <h4>접속 유저 목록:</h4>
-      {users.length > 0 ? (
-        <ul>{users.map((u) => <li key={u}>{u}</li>)}</ul>
-      ) : (
-        <p>현재 접속 유저가 없습니다.</p>
-      )}
+    <div className={styles.container}>
+      <div className={styles.header}>{`${server}서버 - 유저 목록`}</div>
+      <div className={styles.userList}>
+        {
+          users.length > 0 ? 
+          (
+            users.map((user) => <div key={user}>{user}</div>)
+          ) : (
+            <p>현재 접속 유저가 없습니다.</p>
+          )
+        }
+      </div>
     </div>
   );
 };
