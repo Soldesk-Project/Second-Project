@@ -1,0 +1,27 @@
+.container {
+    text-align: center;
+    margin: 10px;
+    height: calc(100% - 20px); /* 상하 마진(10px + 10px) 제외 */
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    font-size: 25px;
+    padding-bottom: 10px;
+    flex-shrink: 0; /* 헤더가 높이를 유지하도록 */
+}
+
+.userList {
+    flex-grow: 1; /* 남은 높이를 모두 차지 */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+}
+
+.user {
+    border: 1px solid black;
+    height: 30px; /* 각 user 요소의 고정 높이 (필요 시 조정) */
+    line-height: 30px; /* 텍스트 세로 중앙 정렬 */
+}

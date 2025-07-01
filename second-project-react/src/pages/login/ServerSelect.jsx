@@ -5,19 +5,17 @@ import '../../css/serverSelect.css';
 const ServerSelect = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { userId } = location.state || {};
-
     const ServerStyle = {
         textAlign: "center",
         borderRadius: "20px",
         marginTop: "25px",
     };
-
-    const server = ["1서버","2서버","3서버","4서버","5서버"];
+    
+    const server = ["1서버","2서버","3서버"];
 
     const handleServer = (e, index) => {
         let serverNo = index + 1;
-        navigate(`/main/${serverNo}`, { state: { userId } });
+        navigate(`/main/${serverNo}`, { state: location.state });
     }
     
     return (

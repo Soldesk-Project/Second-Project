@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../css/signUp.css';
+import axios from 'axios';
 
 const SignUp = () => {
     const navigate = useNavigate();
 
     const [users, setUsers] = useState({
-        nickName : '',
-        id : '',
-        pw : '',
-        email : '',
+        user_nick : '',
+        user_id : '',
+        user_pw : '',
+        user_email : '',
     });
 
     const [emailId, setEmailId] = useState('');
@@ -35,21 +36,28 @@ const SignUp = () => {
 
     const updateEmail = (id, domain) => {
         const fullEmail = domain ? `${id}@${domain}` : id;
-        setUsers((prev) => ({ ...prev, email: fullEmail }));
+        setUsers((prev) => ({ ...prev, user_email: fullEmail }));
     };
 
     const resetInputs = () => {
         setUsers({
-            nickName : '',
-            id : '',
-            pw : '',
-            email : '',
+            user_nick : '',
+            user_id : '',
+            user_pw : '',
+            user_email : '',
         });
         setEmailId('');
         setEmailDomain('');
     }
 
-    const registerUser = () => {
+    const registerUser = async () => {
+        const resp = await axios.post('/api/signUp', users);
+        if(resp.status === 200){
+            alert('회원가입 성공');
+            navigate('/');
+        }else{
+            new Error('데이터 실패...');
+        }
         console.log(users);
     }
 
@@ -63,6 +71,7 @@ const SignUp = () => {
 
     return (
         <div className="login-background login-container">
+<<<<<<< HEAD
                 <img src='/images/logo.png' alt='로고이미지' onClick={moveToLogin}/>
             <div className="signUp-box">
                 <div className='signUp_submit'>
@@ -70,6 +79,38 @@ const SignUp = () => {
                     <h1>CotePlay에 어서오세요. </h1>
                     <h4>Let's align our constellations!
                     문구는 뭐 대애충 아무거나 환영글... </h4><br/>
+=======
+            <div className="login-box">
+                <img src='/images/logo.png' alt='로고이미지' className='logo-img'/>
+                <input
+                    type="text"
+                    name='user_nick'
+                    placeholder="닉네임을 입력하세요."
+                    value={users.user_nick}
+                    onChange={handleInputChange}
+                />
+                <input
+                    type="text"
+                    name='user_id'
+                    placeholder="아이디을 입력하세요."
+                    value={users.user_id}
+                    onChange={handleInputChange}
+                />
+                <input
+                    type="password"
+                    name='user_pw'
+                    placeholder="비밀번호을 입력하세요."
+                    value={users.user_pw}
+                    onChange={handleInputChange}
+                />
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    gap: '5px',
+                    marginBottom: '1rem'
+                }}>
+>>>>>>> 3959660d8d073ab8451a120da3da054e503331e7
                     <input
                         type="text"
                         name='nickName'

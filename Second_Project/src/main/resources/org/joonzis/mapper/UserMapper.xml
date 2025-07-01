@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.joonzis.mapper.UserMapper">
+	 
+	 <!-- 게임 방 정보 가져오기 -->
+	 <select id="getUserRankingList" resultType="org.joonzis.domain.UsersDTO">
+	 <![CDATA[
+       SELECT USER_ID, USER_POINT, USER_NICK
+		FROM (
+		    SELECT USER_ID, USER_POINT, USER_NICK
+		    FROM USERS
+		    ORDER BY USER_POINT DESC
+		)
+		WHERE ROWNUM <= 10
+	]]>
+    </select>
+</mapper>

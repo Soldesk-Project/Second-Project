@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.joonzis.mapper.MemberMapper">
+	
+	<!-- 회원가입 -->
+	<insert id="insertMember">
+		INSERT INTO USERS (USER_NO, USER_NICK, USER_ID, USER_PW, USER_EMAIL, USER_DATE)
+		VALUES (SEQ_USERS.NEXTVAL, #{user_nick}, #{user_id}, #{user_pw}, #{user_email}, sysdate)
+	</insert>
+	
+	<!-- 로그인 -->
+	<select id="selectUserByIdAndPw" resultType="org.joonzis.domain.UsersDTO">
+        SELECT *
+        FROM users
+        WHERE user_id = #{user_id}
+          AND user_pw = #{user_pw}
+    </select>
+</mapper>

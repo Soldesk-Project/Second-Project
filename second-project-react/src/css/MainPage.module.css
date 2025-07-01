@@ -1,0 +1,90 @@
+/* 전체 컨테이너 */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* 상단 바 */
+.top_nav {
+  height: 70px;
+  background-color: #394866;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  font-weight: bold;
+}
+
+/* 메인 영역: 좌측 묶음 + 우측 유저 목록 */
+.body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  padding: 20px 20px;
+  color: black;
+  background-color: #D8DCE5;
+}
+
+/* 좌측 묶음: 유저정보 + 로비 + 채팅 */
+.body_left {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding-right: 20px;
+}
+
+/* 우측 묶음: 유저목록 + 랭킹 */
+.body_right {
+  width: 300px;
+  height: 100%;
+  background-color: lightgrey;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 유저 랭킹 */
+.user_ranking {
+  height: calc(60% - 12px);
+  background-color: #394866;
+  color: white;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+
+/* 유저 목록 */
+.user_list {
+  height: calc(40% - 8px);
+  background-color: #394866;
+  color: white;
+  box-sizing: border-box;
+}
+
+/* 상단 컨텐츠: 유저정보 + 중앙 */
+.body_content {
+  display: flex;
+  flex: 1;
+  gap: 20px;
+  padding-bottom: 20px;
+}
+
+/* 하단 채팅창 */
+.chat_box {
+  height: 250px;
+  background-color: #394866;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* 유저 정보 영역 */
+.user_info {
+  width: 350px;
+  background-color: #394866;
+}
+
+/* 중앙 로비 영역 */
+.lobby_center {
+  flex: 1;
+  /* background-color: #394866; */
+}

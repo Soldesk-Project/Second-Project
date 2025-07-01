@@ -1,50 +1,51 @@
-.container {
-  padding: 20px;
-  background-color: #2f3a56;
-  border-radius: 10px;
-  color: white;
-}
-
-.header {
+.roomListHeader {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 20px;
+  /* justify-content: flex-end; */
+  margin-bottom: 10px;
+  gap: 10px;
 }
 
 .createBtn {
   padding: 8px 16px;
   border: none;
-  background-color: #556080;
-  border-radius: 5px;
+  background-color: #394866;
+  border-radius: 50px;
   color: white;
   cursor: pointer;
+  flex: 1;
 }
 
-.roomList {
+.roomListBody {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 10px;
+  background-color: #394866;
+  border-radius: 10px;
+  color: white;
+  height: 546px;
 }
 
-.card {
-  background-color: #3d4866;
+.roomCard {
+  background-color: #8597BD;
   padding: 12px 16px;
   border-radius: 8px;
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
+  gap: 10px;
   align-items: center;
 }
 
-.mode {
+.roomMode {
   font-weight: bold;
-  color: #9ecbff;
+  width: 100px;
 }
 
-.title {
+.roomTitle {
   flex: 1;
   margin: 0 20px;
 }
 
-.meta span {
+.roomMeta span {
   margin-left: 10px;
 }

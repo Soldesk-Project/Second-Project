@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Loading from './Loading';
 
 const ExamOMRViewer = () => {
   const [allQuestions, setAllQuestions] = useState([]);
@@ -13,7 +14,7 @@ const ExamOMRViewer = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const res = await axios.get('/api/questions');
+        const res = await axios.get('/play/questions');
         setAllQuestions(res.data);
         pickRandomQuestion(res.data, []);
       } catch (err) {
@@ -99,7 +100,8 @@ const ExamOMRViewer = () => {
         </div>
       ) : (
         <div style={{ textAlign: 'center', marginTop: '100px' }}>
-          <h2>✅ 모든 문제를 다 풀었습니다!</h2>
+          {/* <h2>✅ 모든 문제를 다 풀었습니다!</h2> */}
+          <Loading/>
         </div>
       )}
     </div>
