@@ -3,6 +3,7 @@ import Header from '../layout/Header';
 import '../css/MainPage.css';
 import RoomList from '../components/RoomList';
 import ServerUserList from '../components/ServerUserList';
+import Chatbox from '../layout/Chatbox';
 
 const MainPage = () => {
   return (
@@ -26,7 +27,7 @@ const MainPage = () => {
           </div>
 
           {/* 하단 채팅창 */}
-          <div className='chat-box'>채팅창</div>
+          <div className='chat-box'><Chatbox/></div>
 
         </div>
         {/* 우측 유저 목록/랭킹 목록 */}
