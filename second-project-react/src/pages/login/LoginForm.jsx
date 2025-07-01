@@ -13,7 +13,7 @@ const LoginForm = () => {
   const handleLogin = () => {
     //임시계정
     if (id === 'admin' && pw === '1234') {
-      navigate('/server');
+      navigate('/server', { state: { userId: id } });
     } else {
       alert('아이디 또는 비밀번호가 틀렸습니다.');
     }

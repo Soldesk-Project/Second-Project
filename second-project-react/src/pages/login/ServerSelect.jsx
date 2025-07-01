@@ -1,8 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const ServerSelect = () => {
+    const location = useLocation();
     const navigate = useNavigate();
+    const { userId } = location.state || {};
 
     const ServerStyle = {
         textAlign: "center",
@@ -15,9 +17,9 @@ const ServerSelect = () => {
 
     const handleServer = (e, index) => {
         let serverNo = index + 1;
-        navigate(`/main/${serverNo}`);
-        
+        navigate(`/main/${serverNo}`, { state: { userId } });
     }
+    
     return (
         <div className="login-background login-container">
             <div className="login-box">

@@ -3,8 +3,17 @@ import Header from '../layout/Header';
 import '../css/MainPage.css';
 import RoomList from '../components/RoomList';
 import ServerUserList from '../components/ServerUserList';
+import { useLocation, useParams } from 'react-router-dom';
 
 const MainPage = () => {
+  const { serverNo } = useParams(); // 서버 번호 URL에서 추출
+  const { state } = useLocation();
+  const userId = state?.userId;
+
+  console.log(serverNo);
+  console.log(userId);
+  
+  
   return (
     <div className="main-container"> {/* 공간 부터 나눴음*/}
 
@@ -34,7 +43,7 @@ const MainPage = () => {
           {/* 랭킹 목록 */}
           <div className='user-ranking'>유저 랭킹</div>
           {/* 우측 친구 목록 */}
-          <div className='friend-list'><ServerUserList/></div>
+          <div className='friend-list'><ServerUserList server={serverNo} userId={userId}/></div>
         </div>
 
       </div>
