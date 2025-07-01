@@ -39,10 +39,10 @@ const RoomList = () => {
     <>
       {modalOpen && <ModalBasic setModalOpen={setModalOpen} />}
       <div className={styles.roomListHeader}>
+        <button onClick={handleOpenModal} className={styles.createBtn}>필터</button>
         <button onClick={handleOpenModal} className={styles.createBtn}>방 생성</button>
-        <button onClick={handleOpenModal} className={styles.createBtn}>방 생성</button>
-        <button onClick={handleOpenModal} className={styles.createBtn}>방 생성</button>
-        <button onClick={handleOpenModal} className={styles.createBtn}>방 생성</button>
+        <button onClick={handleOpenModal} className={styles.createBtn}>빠른매칭</button>
+        <input type="text" className={styles.roomListSearch} placeholder='search...'/>
       </div>
       <div className={styles.roomListBody}>
         {gameRoomList.length === 0 ? (

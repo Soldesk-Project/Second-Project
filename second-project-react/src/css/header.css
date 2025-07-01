@@ -2,6 +2,14 @@
   margin: 0;
   padding: 0;
 }
+
+.header{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .header-category{
   list-style-type: none;
   overflow: hidden;
@@ -10,9 +18,7 @@
   display: flex;
   align-items: center;
 }
-.header li{
-  float: left;
-}
+
 .header li span{
   display: block;
   width: 100px;
@@ -31,14 +37,15 @@
   overflow: hidden;
   margin: 0 40px;
 }
-.header-search{
-  height: 40px;
-  border-radius: 20px;
-  border: none;
-  margin: 0 40px;
-}
 .header-enter, .header-signout{
   width: 50px;  
   height: 50px;
   margin: 0 15px;
+}
+
+.header-box-right{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
