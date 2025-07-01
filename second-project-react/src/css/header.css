@@ -27,14 +27,13 @@
   font-weight: bold;
 }
 .header-logo{
+  width: 200px;
   overflow: hidden;
   margin: 0 40px;
 }
 .header-search{
-  width: 700px;
   height: 40px;
   border-radius: 20px;
-  padding: 0 20px;
   border: none;
   margin: 0 40px;
 }
