@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "../css/ServerUserList.module.css";
+import { useSelector } from "react-redux";
 
-const ServerUserList = ({ server, state }) => {
+const ServerUserList = () => {
   const [users, setUsers] = useState([]); // 현재 서버에 접속한 유저 목록
   const socketRef = useRef(null);
-  const userNick = state.user_nick;
+  const { user, server } = useSelector((state) => state.user);
+  const userNick = user.user_nick;
   
   
   // 서버 또는 userId가 바뀔 때마다 WebSocket 연결 재설정

@@ -3,13 +3,19 @@ import Header from '../layout/Header';
 import styles from '../css/MainPage.module.css';
 import RoomList from '../components/RoomList';
 import ServerUserList from '../components/ServerUserList';
-import { useLocation, useParams } from 'react-router-dom';
 import Chatbox from '../layout/Chatbox';
 import UserRanking from '../components/UserRanking';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { loadUserFromStorage } from '../store/userSlice';
 
 const MainPage = () => {
-  const { serverNo } = useParams(); // 서버 번호 URL에서 추출
-  const { state } = useLocation();
+  const dispatch = useDispatch();
+  const { user, server } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch(loadUserFromStorage());
+  }, []);
   
   return (
     <div className={styles.container}> {/* 공간 부터 나눴음*/}
@@ -40,7 +46,7 @@ const MainPage = () => {
           {/* 랭킹 목록 */}
           <div className={styles.user_ranking}><UserRanking/></div>
           {/* 유저 목록 */}
-          <div className={styles.user_list}><ServerUserList server={serverNo} state={state}/></div>
+          <div className={styles.user_list}><ServerUserList server={server} state={user}/></div>
         </div>
 
       </div>
