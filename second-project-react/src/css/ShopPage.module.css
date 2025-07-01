@@ -1,0 +1,40 @@
+.subTabContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #4c5672;
+  padding: 8px 20px;
+  color: white;
+}
+
+.subTabLeft {
+  display: flex;
+  gap: 15px;
+  font-size: 14px;
+}
+
+.tabItem {
+  cursor: pointer;
+}
+
+.subTabRight {
+  position: absolute;
+  right: 20px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  padding: 100px;
+  background-color: #dadfe8;
+  min-height: 100vh;
+}
+
+.card {
+  background-color: white;
+  border-radius: 10px;
+  height: 300px;
+}

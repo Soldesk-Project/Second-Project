@@ -39,6 +39,7 @@
 	</bean>
 	<tx:annotation-driven/>
 	<context:component-scan base-package="org.joonzis.aop"></context:component-scan>
+	<context:property-placeholder location="classpath:application.properties" />
 	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
 		
 	<mybatis-spring:scan base-package="org.joonzis.mapper"/>

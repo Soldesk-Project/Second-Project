@@ -8,7 +8,6 @@ const ServerUserList = () => {
   const { user, server } = useSelector((state) => state.user);
   const userNick = user.user_nick;
   
-  
   // 서버 또는 userId가 바뀔 때마다 WebSocket 연결 재설정
   useEffect(() => {
     if (!server || !userNick) return;

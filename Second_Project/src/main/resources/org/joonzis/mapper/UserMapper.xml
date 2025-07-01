@@ -7,11 +7,11 @@
 	 <!-- 게임 방 정보 가져오기 -->
 	 <select id="getUserRankingList" resultType="org.joonzis.domain.UsersDTO">
 	 <![CDATA[
-       SELECT USER_ID, USER_POINT, USER_NICK
+       SELECT USER_ID, USER_RANK, USER_NICK
 		FROM (
-		    SELECT USER_ID, USER_POINT, USER_NICK
+		    SELECT USER_ID, USER_RANK, USER_NICK
 		    FROM USERS
-		    ORDER BY USER_POINT DESC
+		    ORDER BY USER_RANK DESC
 		)
 		WHERE ROWNUM <= 10
 	]]>

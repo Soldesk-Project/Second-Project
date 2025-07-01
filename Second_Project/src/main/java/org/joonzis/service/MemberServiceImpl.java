@@ -22,4 +22,16 @@ public class MemberServiceImpl implements MemberService {
 	public UsersDTO isValidUser(String user_id, String user_pw) {
         return mapper.selectUserByIdAndPw(user_id, user_pw);
 	}
+	
+	// 유저 포인트 조회
+	@Override
+	public int getUserPoint(String user_id) {
+		return mapper.getUserPoint(user_id);
+	}
+	
+	// 포인트 구매
+	@Override
+	public void addPoint(String userId, int amount) {
+		mapper.updatePoint(userId, amount);
+	}
 }

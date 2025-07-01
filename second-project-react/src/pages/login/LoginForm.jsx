@@ -23,7 +23,6 @@ const LoginForm = () => {
       }, {
         withCredentials: true
       });
-
       alert('로그인 성공');
       dispatch(setUser(response.data));  // ✅ 유저 정보 저장
       navigate('/server');

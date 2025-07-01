@@ -17,4 +17,18 @@
         WHERE user_id = #{user_id}
           AND user_pw = #{user_pw}
     </select>
+    
+    <!-- 회원 포인트 조회 -->
+    <select id="getUserPoint" resultType="int">
+    	SELECT USER_POINT
+    	FROM USERS
+    	WHERE USER_ID = #{user_id}
+    </select>
+    
+    <!-- 포인트 구매 -->
+    <update id="updatePoint">
+	    UPDATE users
+	    SET user_point = user_point + #{amount}
+	    WHERE user_id = #{userId}
+	</update>
 </mapper>
