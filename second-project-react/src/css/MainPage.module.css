@@ -86,5 +86,5 @@
 /* 중앙 로비 영역 */
 .lobby_center {
   flex: 1;
-  background-color: #394866;
+  /* background-color: #394866; */
 }
