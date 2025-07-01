@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const SignUp = () => {
     const navigate = useNavigate();
 
     const [users, setUsers] = useState({
-        nickName : '',
-        id : '',
-        pw : '',
-        email : '',
+        user_nick : '',
+        user_id : '',
+        user_pw : '',
+        user_email : '',
     });
 
     const [emailId, setEmailId] = useState('');
@@ -34,21 +35,28 @@ const SignUp = () => {
 
     const updateEmail = (id, domain) => {
         const fullEmail = domain ? `${id}@${domain}` : id;
-        setUsers((prev) => ({ ...prev, email: fullEmail }));
+        setUsers((prev) => ({ ...prev, user_email: fullEmail }));
     };
 
     const resetInputs = () => {
         setUsers({
-            nickName : '',
-            id : '',
-            pw : '',
-            email : '',
+            user_nick : '',
+            user_id : '',
+            user_pw : '',
+            user_email : '',
         });
         setEmailId('');
         setEmailDomain('');
     }
 
-    const registerUser = () => {
+    const registerUser = async () => {
+        const resp = await axios.post('/api/signUp', users);
+        if(resp.status === 200){
+            alert('회원가입 성공');
+            navigate('/');
+        }else{
+            new Error('데이터 실패...');
+        }
         console.log(users);
     }
 
@@ -66,23 +74,23 @@ const SignUp = () => {
                 <img src='/images/logo.png' alt='로고이미지' className='logo-img'/>
                 <input
                     type="text"
-                    name='nickName'
+                    name='user_nick'
                     placeholder="닉네임을 입력하세요."
-                    value={users.nickName}
+                    value={users.user_nick}
                     onChange={handleInputChange}
                 />
                 <input
                     type="text"
-                    name='id'
+                    name='user_id'
                     placeholder="아이디을 입력하세요."
-                    value={users.id}
+                    value={users.user_id}
                     onChange={handleInputChange}
                 />
                 <input
                     type="password"
-                    name='pw'
+                    name='user_pw'
                     placeholder="비밀번호을 입력하세요."
-                    value={users.pw}
+                    value={users.user_pw}
                     onChange={handleInputChange}
                 />
                 <div style={{
