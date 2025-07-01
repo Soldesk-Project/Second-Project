@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "../css/ServerUserList.module.css";
 
-const ServerUserList = ({ server, userId }) => {
+const ServerUserList = ({ server, state }) => {
   const [users, setUsers] = useState([]); // 현재 서버에 접속한 유저 목록
   const socketRef = useRef(null);
-
+  const userNick = state.user_nick;
+  
+  
   // 서버 또는 userId가 바뀔 때마다 WebSocket 연결 재설정
   useEffect(() => {
-    if (!server || !userId) return;
+    if (!server || !userNick) return;
 
     // 기존 소켓 연결 종료
     if (socketRef.current) {
@@ -15,20 +17,24 @@ const ServerUserList = ({ server, userId }) => {
     }
 
     // 새 WebSocket 연결
-    socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/server");
+    socketRef.current = new WebSocket("ws://192.168.0.112/ws/server"); // 경민님쪽 연결
+    // socketRef.current = new WebSocket("ws://localhost:9099/ws/server"); // 테스트할때
 
-    socketRef.current.onopen = () => {
+    socketRef.current.onopen = () =>  {
       // 서버 입장 메시지 전송
+      console.log("[Client] WebSocket 연결됨, join 메시지 전송:", { action: "join", server, userNick });
       socketRef.current.send(
-        JSON.stringify({ action: "join", server, userId})
+        JSON.stringify({ action: "join", server, userNick})
       );
     };
 
     socketRef.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
       // 서버별 유저 목록 수신 시
+      console.log("[Client] 서버로부터 메시지 수신:", data);
       if (data.type === "userList" && data.server === server) {
         setUsers(data.users);
+        console.log(users);
       }
     };
 
@@ -47,7 +53,7 @@ const ServerUserList = ({ server, userId }) => {
         socketRef.current.close();
       }
     };
-  }, [server, userId]);
+  }, [server, userNick]);
 
   return (
     <div className={styles.container}>
@@ -56,7 +62,7 @@ const ServerUserList = ({ server, userId }) => {
         {
           users.length > 0 ? 
           (
-            users.map((user) => <div key={user}>{user}</div>)
+            users.map((user) => <div key={user} className={styles.user}>{user}</div>)
           ) : (
             <p>현재 접속 유저가 없습니다.</p>
           )

@@ -10,7 +10,6 @@ import UserRanking from '../components/UserRanking';
 const MainPage = () => {
   const { serverNo } = useParams(); // 서버 번호 URL에서 추출
   const { state } = useLocation();
-  const userId = state?.userId;
   
   return (
     <div className={styles.container}> {/* 공간 부터 나눴음*/}
@@ -41,7 +40,7 @@ const MainPage = () => {
           {/* 랭킹 목록 */}
           <div className={styles.user_ranking}><UserRanking/></div>
           {/* 유저 목록 */}
-          <div className={styles.user_list}><ServerUserList server={serverNo} userId={userId}/></div>
+          <div className={styles.user_list}><ServerUserList server={serverNo} state={state}/></div>
         </div>
 
       </div>

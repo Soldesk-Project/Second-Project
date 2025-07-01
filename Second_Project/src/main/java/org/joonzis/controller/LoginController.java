@@ -121,9 +121,11 @@ public class LoginController {
 	@ResponseBody
 	public ResponseEntity<?> login(@RequestBody UsersDTO dto, HttpSession session) {
 	    System.out.println("🔐 로그인 요청");
-	    if (memberservice.isValidUser(dto.getUser_id(), dto.getUser_pw())) {
-	        session.setAttribute("loginUser", dto.getUser_id()); // 세션에 사용자 ID 저장
-	        return ResponseEntity.ok(Map.of("message", "로그인 성공"));
+	    
+	    UsersDTO user = memberservice.isValidUser(dto.getUser_id(), dto.getUser_pw());
+	    if (user != null) {
+	        session.setAttribute("loginUser", user.getUser_id()); // 세션에 사용자 ID 저장
+	        return ResponseEntity.ok(user);
 	    } else {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("아이디 또는 비밀번호가 틀렸습니다");
 	    }

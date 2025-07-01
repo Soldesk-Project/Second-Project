@@ -8,5 +8,5 @@ public interface MemberService {
 	void insertMember(UsersDTO users);
 	
 	// 로그인
-	boolean isValidUser(String user_id, String user_pw);
+	UsersDTO isValidUser(String user_id, String user_pw);
 }

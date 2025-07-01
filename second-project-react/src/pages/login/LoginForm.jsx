@@ -19,9 +19,11 @@ const LoginForm = () => {
       },{
         withCredentials: true
       });
-
+      
       alert('로그인 성공');
-      navigate('/server', { state: { userId: id } });
+      navigate('/server', { state: response.data });
+      
+      // navigate('/server', { state: { userNick: response.data.user_nick } });
     } catch (error) {
       console.error('로그인 실패:', error);
       alert('아이디 또는 비밀번호가 틀렸습니다.');

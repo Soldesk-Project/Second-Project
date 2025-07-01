@@ -19,8 +19,7 @@ public class MemberServiceImpl implements MemberService {
 
 	// 로그인
 	@Override
-	public boolean isValidUser(String user_id, String user_pw) {
-		UsersDTO user = mapper.selectUserByIdAndPw(user_id, user_pw);
-        return user != null;
+	public UsersDTO isValidUser(String user_id, String user_pw) {
+        return mapper.selectUserByIdAndPw(user_id, user_pw);
 	}
 }

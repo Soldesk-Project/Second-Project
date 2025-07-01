@@ -16,7 +16,7 @@
     flex-grow: 1; /* 남은 높이를 모두 차지 */
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* user 요소들 사이를 균등 분배 */
+    gap: 10px;
     overflow-y: auto;
 }
 
