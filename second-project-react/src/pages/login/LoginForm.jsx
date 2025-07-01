@@ -42,31 +42,43 @@ const LoginForm = () => {
 
   return (
     <div className="login-background login-container">
+        <img src='images/logo.png' alt='logo'/>
       <div className="login-box">
-        <img src='/images/logo.png' alt='로고이미지' className='logo-img'/>
-        <input
-          type="text"
-          placeholder="아이디"
-          value={id}
-          onChange={(e) => setId(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="비밀번호"
-          value={pw}
-          onChange={(e) => setPw(e.target.value)}
-        />
-        <button onClick={handleLogin}>로그인</button>
-        <img 
-          src='images/kakao_login_medium_wide.png' 
-          className='kakao-login' 
-          alt='카카오 로그인' 
-          onClick={handleKakaoLogin}
-        />
-        <div className="login-options">
-            <button name="signUp" onClick={handleButtonOption}>회원가입</button>
-            <button name="findId" onClick={handleButtonOption}>아이디찾기</button>
-            <button name="findPw" onClick={handleButtonOption}>비밀번호찾기</button>
+        <div className='login_submit'>
+          
+          <h1>CotePlay에 어서오세요. </h1>
+          <h4>Let's align our constellations!
+          문구는 뭐 대애충 아무거나 환영글... </h4><br/>
+          <div className="login-options">
+            <div className='login-option_1'>
+              <button name="signUp" onClick={handleButtonOption}>Join</button>
+            </div>
+            <div className='login-option_2'>
+              <button name="findId" onClick={handleButtonOption}>Find id</button>
+              <p>/</p>
+              <button name="findPw" onClick={handleButtonOption}>Find password</button>
+            </div>
+          </div>
+          <input
+            type="text"
+            placeholder="id"
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="password"
+            value={pw}
+            onChange={(e) => setPw(e.target.value)}
+          />
+          <button onClick={handleLogin} className='loginButton'>login</button>
+          <button onClick={handleKakaoLogin} className='kakao-login'>kakao login</button>
+        </div>
+        <div className='login-image'>
+          <img 
+            src='images/loginpage_image.png'
+            alt='로그인화면 이미지'
+            />
         </div>
       </div>
     </div>
