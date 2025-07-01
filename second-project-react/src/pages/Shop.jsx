@@ -3,24 +3,28 @@ import Header from '../layout/Header';
 import styles from '../css/ShopPage.module.css';
 import axios from 'axios';
 import ChargeModal from '../components/ChargeModal';
+import { useSelector } from 'react-redux'; // ✅ Redux 사용
 
 const Shop = () => {
   const tabs = ['테두리', '칭호', '배경', '말풍선', '랜덤박스', '포인트 충전'];
   const [point, setPoint] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  const user_id = 'rudalsfive';
+
+  // ✅ Redux에서 user_id 가져오기
+  const userId = useSelector((state) => state.user.user.user_id);
 
   useEffect(() => {
     const fetchPoint = async () => {
+      if (!userId) return; // userId 없으면 요청 X
       try {
-        const res = await axios.get(`/api/user/point?user_id=${user_id}`);
+        const res = await axios.get(`/api/user/point?user_id=${userId}`);
         setPoint(res.data);
       } catch (err) {
         console.error('포인트 조회 실패:', err);
       }
     };
     fetchPoint();
-  }, []);
+  }, [userId]);
 
   const handleTabClick = (tab) => {
     if (tab === '포인트 충전') {
@@ -32,7 +36,6 @@ const Shop = () => {
     <>
       <div className="top-nav"><Header /></div>
 
-      {/* 하위 탭 + 포인트 표시 */}
       <div className={styles.subTabContainer}>
         <div className={styles.subTabLeft}>
           {tabs.map((tab, idx) => (

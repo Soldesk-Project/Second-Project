@@ -80,23 +80,23 @@ const SignUp = () => {
                     문구는 뭐 대애충 아무거나 환영글... </h4><br/>
                     <input
                         type="text"
-                        name='nickName'
+                        name='user_nick'
                         placeholder="닉네임을 입력하세요."
-                        value={users.nickName}
+                        value={users.user_nick}
                         onChange={handleInputChange}
                     />
                     <input
                         type="text"
-                        name='id'
+                        name='user_id'
                         placeholder="아이디을 입력하세요."
-                        value={users.id}
+                        value={users.user_id}
                         onChange={handleInputChange}
                     />
                     <input
                         type="password"
-                        name='pw'
+                        name='user_pw'
                         placeholder="비밀번호을 입력하세요."
-                        value={users.pw}
+                        value={users.user_pw}
                         onChange={handleInputChange}
                     />
                     <div style={{
