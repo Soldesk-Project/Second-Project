@@ -121,7 +121,6 @@ public class LoginController {
 	@ResponseBody
 	public ResponseEntity<?> login(@RequestBody UsersDTO dto, HttpSession session) {
 	    System.out.println("🔐 로그인 요청");
-
 	    if (memberservice.isValidUser(dto.getUser_id(), dto.getUser_pw())) {
 	        session.setAttribute("loginUser", dto.getUser_id()); // 세션에 사용자 ID 저장
 	        return ResponseEntity.ok(Map.of("message", "로그인 성공"));

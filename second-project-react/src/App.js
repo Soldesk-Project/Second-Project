@@ -10,7 +10,7 @@ import FindPw from './pages/login/FindPw';
 import Shop from './pages/Shop';
 import Achievements from './pages/Achievements';
 import ItemBook from './pages/ItemBook';
-import ExamOMRViewer from './pages/Test';
+import InPlay from './pages/InPlay';
 
 function App() {  
   return (
@@ -26,7 +26,7 @@ function App() {
         <Route path="/shop" element={<Shop />} />
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/itemBook" element={<ItemBook />} />
-        <Route path="/questions" element={<ExamOMRViewer />} />
+        <Route path="/gameRoom/:roomNo" element={<InPlay />} />
       </Routes>
     </Router>
   );

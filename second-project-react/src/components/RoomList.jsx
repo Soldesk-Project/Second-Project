@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import ModalBasic from './ModalBasic';
+import Loading from '../components/Loading';
 import axios from 'axios';
-import '../css/RoomList.module.css'; // CSS 따로 적용
+import styles from '../css/RoomList.module.css'; // CSS 따로 적용
+import { useNavigate } from 'react-router-dom';
 
 const RoomList = () => {
   const [gameRoomList, setGameRoomList] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const nav=useNavigate();
 
   const getGameRoomList = async () => {
     try {
@@ -26,23 +29,32 @@ const RoomList = () => {
     setModalOpen(true);
   };
 
+  const joinRoom=(roomNo)=>{
+    console.log(roomNo);
+    nav('/gameRoom/'+roomNo);
+  }
+
+
   return (
-    <div className="room-list-container">
-      <div className="room-list-header">
-        <button onClick={handleOpenModal} className="create-btn">방 생성</button>
-      </div>
-
+    <>
       {modalOpen && <ModalBasic setModalOpen={setModalOpen} />}
-
-      <div className="room-list-body">
+      <div className={styles.roomListHeader}>
+        <button onClick={handleOpenModal} className={styles.createBtn}>방 생성</button>
+        <button onClick={handleOpenModal} className={styles.createBtn}>방 생성</button>
+        <button onClick={handleOpenModal} className={styles.createBtn}>방 생성</button>
+        <button onClick={handleOpenModal} className={styles.createBtn}>방 생성</button>
+      </div>
+      <div className={styles.roomListBody}>
         {gameRoomList.length === 0 ? (
-          <div className="loading">Loading...</div>
+          <div>방이 없음</div>
+          // <div><Loading /></div>
         ) : (
           gameRoomList.map((room, index) => (
-            <div key={index} className="room-card">
-              <div className="room-mode">{room.game_mode === 'rank' ? 'Rank Mode' : 'Casual Mode'}</div>
-              <div className="room-title">{room.title}</div>
-              <div className="room-meta">
+            <div key={index} className={styles.roomCard} onDoubleClick={()=>joinRoom(room.gameroom_no)}>
+              <span>{room.gameroom_no}</span>
+              <span className={styles.roomMode}>{room.game_mode === 'rank' ? 'Rank Mode' : 'Casual Mode'}</span>
+              <div className={styles.roomTitle}>{room.title}</div>
+              <div className={styles.roomMeta}>
                 <span>{room.limit}명</span>
                 <span>{room.is_private === 'Y' ? '비공개' : '공개'}</span>
               </div>
@@ -50,7 +62,7 @@ const RoomList = () => {
           ))
         )}
       </div>
-    </div>
+    </>
   );
 };
 

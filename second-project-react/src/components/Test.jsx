@@ -13,7 +13,7 @@ const ExamOMRViewer = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const res = await axios.get('/api/questions');
+        const res = await axios.get('/play/questions');
         setAllQuestions(res.data);
         pickRandomQuestion(res.data, []);
       } catch (err) {
