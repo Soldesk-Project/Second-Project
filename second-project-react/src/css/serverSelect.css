@@ -1,0 +1,19 @@
+.login-container{
+  display: flex;
+  flex-direction: column;
+}
+
+.server-box{
+  background-color: rgba(255, 255, 255, 0.04);
+  padding: 1rem;
+  border-radius: 8px;
+  width: 426px;
+  min-height: 330px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  backdrop-filter: blur(5px);
+}
+
+.serverselectBtn{
+  background-image: url('../../public/images/Submit.png');
+  height: 35px;
+}

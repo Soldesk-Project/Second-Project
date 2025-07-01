@@ -1,0 +1,40 @@
+.signUp-box{
+  background-color: rgba(255, 255, 255, 0.04);
+  padding: 1rem;
+  border-radius: 8px;
+  width: 1000px;
+  min-height: 200px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  backdrop-filter: blur(5px);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.signUp_submit{
+  align-content: center;
+  width: 426px;
+  margin-left: 50px;
+}
+
+.signUp_submit input{
+  width: 100%;
+  padding: 15px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: none;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.signUpBtn button{
+  width: 100%;
+  background-image: url('../../public/images/Submit.png');
+  border: none;
+  border-radius: 5px;
+  color: white;
+  padding: 10px;
+}

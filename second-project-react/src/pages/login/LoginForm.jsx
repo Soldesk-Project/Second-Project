@@ -35,6 +35,9 @@ const LoginForm = () => {
       case 'findPw':
         navigate('/findPw');
         break;
+      case 'login':
+        navigate('/');
+        break;
       default:
         break;
     }
@@ -42,7 +45,7 @@ const LoginForm = () => {
 
   return (
     <div className="login-background login-container">
-        <img src='images/logo.png' alt='logo'/>
+        <img src='images/logo.png' alt='logo' name="login" onClick={handleButtonOption}/>
       <div className="login-box">
         <div className='login_submit'>
           
