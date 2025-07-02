@@ -7,6 +7,7 @@ const ServerUserList = () => {
   const socketRef = useRef(null);
   const { user, server } = useSelector((state) => state.user);
   const userNick = user.user_nick;
+  const userNo = user.user_no;
   
   // 서버 또는 userId가 바뀔 때마다 WebSocket 연결 재설정
   useEffect(() => {
@@ -23,9 +24,9 @@ const ServerUserList = () => {
 
     socketRef.current.onopen = () =>  {
       // 서버 입장 메시지 전송
-      console.log("[Client] WebSocket 연결됨, join 메시지 전송:", { action: "join", server, userNick });
+      console.log("[Client] WebSocket 연결됨, join 메시지 전송:", { action: "join", server, userNick, userNo });
       socketRef.current.send(
-        JSON.stringify({ action: "join", server, userNick})
+        JSON.stringify({ action: "join", server, userNick, userNo})
       );
     };
 
@@ -35,7 +36,6 @@ const ServerUserList = () => {
       console.log("[Client] 서버로부터 메시지 수신:", data);
       if (data.type === "userList" && data.server === server) {
         setUsers(data.users);
-        console.log(users);
       }
     };
 
@@ -54,16 +54,21 @@ const ServerUserList = () => {
         socketRef.current.close();
       }
     };
-  }, [server, userNick]);
+  }, [server, userNick, userNo]);
+
+  useEffect(() => {
+    console.log("[Client] users 상태가 갱신됨:", users);
+  }, [users]);
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>{`${server}서버 - 유저 목록`}</div>
       <div className={styles.userList}>
         {
-          users.length > 0 ? 
-          (
-            users.map((user) => <div key={user} className={styles.user}>{user}</div>)
+          users.length > 0 ? (
+            users.map(({ userNick, userNo }) => (
+              <div key={`user-${userNo}`} className={styles.user}>{userNick}</div>
+            ))
           ) : (
             <p>현재 접속 유저가 없습니다.</p>
           )

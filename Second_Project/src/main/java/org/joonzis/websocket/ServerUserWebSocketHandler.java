@@ -1,9 +1,11 @@
 package org.joonzis.websocket;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.log4j.Log4j;
 
+import org.joonzis.websocket.dto.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
@@ -17,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServerUserWebSocketHandler extends TextWebSocketHandler {
 
     // 서버 ID -> (세션 -> 유저ID) 매핑
-    private final Map<String, Map<WebSocketSession, String>> serverSessions = new ConcurrentHashMap<>();
+	private final Map<String, Map<WebSocketSession, UserInfo>> serverSessions = new ConcurrentHashMap<>();
 
     @Autowired
     private ObjectMapper objectMapper; // Jackson 사용
@@ -27,11 +29,12 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         String payload = message.getPayload();
         log.info("[Server] 메시지 수신: " + payload);
         // ✅ JSON을 안전하게 파싱
-        Map<String, String> data = objectMapper.readValue(payload, Map.class);
-
+        Map<String, String> data = objectMapper.readValue(payload, new TypeReference<Map<String, String>>() {});
+        
         String action = data.get("action");
         String server = data.get("server");
         String userNick = data.get("userNick");
+        String userNo = data.get("userNo");
 
         if ("join".equals(action) && server != null && userNick != null) {
             // 1) 기존 세션 제거
@@ -39,7 +42,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
 
             // 2) 새 서버에 세션 추가
             serverSessions.putIfAbsent(server, new ConcurrentHashMap<>());
-            serverSessions.get(server).put(session, userNick);
+            serverSessions.get(server).put(session, new UserInfo(userNick, userNo));
 
             // 3) 해당 서버에 접속한 유저 목록 전송
             broadcastUserList(server);
@@ -58,9 +61,9 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void removeSessionFromAllServers(WebSocketSession session) throws Exception {
-        for (Map.Entry<String, Map<WebSocketSession, String>> entry : serverSessions.entrySet()) {
+    	for (Map.Entry<String, Map<WebSocketSession, UserInfo>> entry : serverSessions.entrySet()) {
             String server = entry.getKey();
-            Map<WebSocketSession, String> sessions = entry.getValue();
+            Map<WebSocketSession, UserInfo> sessions = entry.getValue();
 
             if (sessions.remove(session) != null) {
                 broadcastUserList(server);
@@ -69,10 +72,16 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void broadcastUserList(String server) throws Exception {
-        Map<WebSocketSession, String> sessions = serverSessions.get(server);
+    	Map<WebSocketSession, UserInfo> sessions = serverSessions.get(server);
         if (sessions == null) return;
 
-        List<String> userList = new ArrayList<>(sessions.values());
+        List<Map<String, String>> userList = new ArrayList<>();
+        for (UserInfo userInfo : sessions.values()) {
+            Map<String, String> userMap = new HashMap<>();
+            userMap.put("userNick", userInfo.getUserNick());
+            userMap.put("userNo", userInfo.getUserNo());
+            userList.add(userMap);
+        }
 
         // 응답 JSON 생성
         Map<String, Object> payload = new HashMap<>();
