@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { setUser } from './store/userSlice';
+import styles from '../src/App.css';
 
 import LoginForm from './pages/login/LoginForm';
 import MainPage from './pages/MainPage';
