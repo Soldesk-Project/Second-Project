@@ -31,7 +31,7 @@ public class GameRoomController {
 		return "방 생성 완료";
 	}
 	
-	@GetMapping("/showRoom")
+	@GetMapping("/showRoom")	
 	public List<GameRoomDTO> showRoom() {
 	    return gameRoomService.showRoom();
 	}

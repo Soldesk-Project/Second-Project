@@ -1,0 +1,131 @@
+package org.joonzis.websocket;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import org.joonzis.domain.GameRoomDTO;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class GameRoomWebSocketHandler extends TextWebSocketHandler {
+
+    // 서버별 세션 관리: {서버명: [세션1, 세션2]}
+    private final Map<String, Set<WebSocketSession>> serverSessions = new ConcurrentHashMap<>();
+    
+    // 서버별 유저 목록: {서버명: [유저닉1, 유저닉2]}
+    private final Map<String, Set<String>> serverUsers = new ConcurrentHashMap<>();
+    
+    // 서버별 방 목록: {서버명: [방1, 방2]}
+    private final Map<String, List<GameRoomDTO>> serverRooms = new ConcurrentHashMap<>();
+    
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) {
+        
+    }
+
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        JsonNode json = objectMapper.readTree(message.getPayload());
+        String action = json.get("action").asText();
+        
+        switch (action) {
+            case "join":
+                handleJoin(session, json);
+                break;
+            case "createRoom":
+                handleCreateRoom(session, json);
+                break;
+        }
+    }
+
+    private void handleJoin(WebSocketSession session, JsonNode json) {
+        String server = json.get("server").asText();
+        String userNick = json.get("userNick").asText();
+        
+        // 세션 속성에 서버/닉네임 저장
+        session.getAttributes().put("server", server);
+        session.getAttributes().put("userNick", userNick);
+        
+        // 서버별 세션 및 유저 목록 업데이트
+        serverSessions.computeIfAbsent(server, k -> ConcurrentHashMap.newKeySet()).add(session);
+        serverUsers.computeIfAbsent(server, k -> ConcurrentHashMap.newKeySet()).add(userNick);
+        
+        // 모든 클라이언트에게 유저 목록 브로드캐스트
+        broadcastUserList(server);
+    }
+    private AtomicInteger roomIndex = new AtomicInteger(1);
+    private void handleCreateRoom(WebSocketSession session, JsonNode json) {
+        String server = (String) session.getAttributes().get("server");
+        System.out.println("server......"+server);
+        if (server == null) return;
+
+        // 방 생성 정보 파싱
+        int newRoomNo = roomIndex.getAndIncrement();
+        GameRoomDTO newRoom = new GameRoomDTO(
+    		String.valueOf(newRoomNo), // 임시 ID 생성
+            json.get("title").asText(),
+            json.get("category").asText(),
+            json.get("game_mode").asText(),
+            json.get("is_private").asText(),
+            json.get("limit").asInt(),
+            json.get("pwd") != null ? json.get("pwd").asText() : null
+        );
+        
+        // 서버별 방 목록 업데이트
+        serverRooms.computeIfAbsent(server, k -> new ArrayList<>()).add(newRoom);
+        
+        // 모든 클라이언트에게 방 목록 브로드캐스트
+        broadcastRoomList(server);
+    }
+
+    private void broadcastUserList(String server) {
+        Set<String> users = serverUsers.getOrDefault(server, Collections.emptySet());
+        broadcast(server, Map.of("type", "userList", "users", users));
+    }
+
+    private void broadcastRoomList(String server) {
+        List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
+        broadcast(server, Map.of("type", "roomList", "rooms", rooms));
+    }
+
+    private void broadcast(String server, Object data) {
+        String json;
+        try {
+            json = objectMapper.writeValueAsString(data);
+        } catch (Exception e) {
+            return;
+        }
+        
+        serverSessions.getOrDefault(server, Collections.emptySet()).forEach(session -> {
+            try {
+                if (session.isOpen()) {
+                    session.sendMessage(new TextMessage(json));
+                }
+            } catch (Exception e) {
+                // 에러 처리
+            }
+        });
+    }
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        String server = (String) session.getAttributes().get("server");
+        String userNick = (String) session.getAttributes().get("userNick");
+        
+        if (server != null) {
+            // 세션 및 유저 목록에서 제거
+            serverSessions.getOrDefault(server, Collections.emptySet()).remove(session);
+            serverUsers.getOrDefault(server, Collections.emptySet()).remove(userNick);
+            broadcastUserList(server);
+        }
+    }
+
+
+}

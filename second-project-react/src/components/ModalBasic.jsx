@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import styles from '../css/ModalBasic.module.css';
 
-const ModalBasic = ({ setModalOpen }) => {
+const ModalBasic = ({ setModalOpen, socket, isWsOpen }) => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('engineer_information');
   const [mode, setMode] = useState('normal');
@@ -19,12 +19,17 @@ const ModalBasic = ({ setModalOpen }) => {
   };
 
   const handleCreateRoom = async () => {
+    if (!isWsOpen) {  // 연결 상태 확인
+      alert("웹소켓 연결 대기 중...");
+      return;
+    }
     if (isPrivate && password.trim() === '') {
       alert('비공개 방은 비밀번호를 입력해주세요.');
       return;
     }
 
     const roomData = {
+      action: "createRoom",
       title,
       category,
       game_mode : mode,
@@ -33,17 +38,14 @@ const ModalBasic = ({ setModalOpen }) => {
       pwd : isPrivate ? password : null
     };
 
-    try {
-      const response = await axios.post('/api/createRoom', roomData);
-      if (response.status === 200) {
-        alert('방이 생성되었습니다.');
-        setModalOpen(false);
-      } else {
-        alert('방 생성 실패');
-      }
-    } catch (error) {
-      console.error('방 생성 중 오류 발생:', error);
-      alert('서버 오류가 발생했습니다.');
+    console.log(socket);
+    console.log(socket.readyState);
+    
+    if (socket && socket.readyState === 1) {
+      socket.send(JSON.stringify(roomData));
+      setModalOpen(false);
+    } else {
+      alert("웹소켓 연결이 준비되지 않았습니다.");
     }
   };
 
