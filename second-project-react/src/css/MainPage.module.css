@@ -24,7 +24,7 @@
   padding: 20px 20px;
   color: black;
   background-color: white;
-  background-image: url('../../public/images/mainBackground.png');
+  /* background-image: url('../../public/images/mainBackground.png'); */
 }
 
 /* 좌측 묶음: 유저정보 + 로비 + 채팅 */
@@ -47,8 +47,8 @@
 /* 유저 랭킹 */
 .user_ranking {
   height: calc(60% - 12px);
-  background-color: white;
-  color: black;
+  background-color: rgba(10, 13, 23, 0.8);
+  color: white;
   box-sizing: border-box;
   margin-bottom: 20px;
   border-radius: 10px;
@@ -58,8 +58,8 @@
 /* 유저 목록 */
 .user_list {
   height: calc(40% - 8px);
-  background-color: white;
-  color:black;
+  background-color: rgba(10, 13, 23, 0.8);
+  color:white;
   box-sizing: border-box;
   border-radius: 10px;
   box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.3);
@@ -76,7 +76,7 @@
 /* 하단 채팅창 */
 .chat_box {
   height: 250px;
-  background-color: white;
+  background-color: rgba(10, 13, 23, 0.8);
   padding: 10px;
   box-sizing: border-box;
   border-radius: 10px;
@@ -86,9 +86,10 @@
 /* 유저 정보 영역 */
 .user_info {
   width: 350px;
-  background-color: white;
+  background-color: rgba(10, 13, 23, 0.8);
   border-radius: 10px;
   box-shadow: 0px 1px 3px 1px rgb(0, 0, 0, 0.3);
+  color: white;
 }
 
 /* 중앙 로비 영역 */
