@@ -20,6 +20,8 @@ const UserRanking = () => {
             
             setUserRankingList(data);
             setLoading(false);
+            // console.log(data);   //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
+            
             
         }else{
             new Error('데이터 요청 실패..');

@@ -18,9 +18,10 @@ const LoginForm = () => {
   const handleLogin = async () => {
   try {
     const res = await axios.post('/api/login', { user_id: id, user_pw: pw });
+    console.log(res.data.user);
+    
     localStorage.setItem('token', res.data.token);
-    dispatch(setUser(res.data.user));
-    navigate('/server');
+    navigate('/server', { replace: true });
   } catch (err) {
     alert('로그인 실패');
   }

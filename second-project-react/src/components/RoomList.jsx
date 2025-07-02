@@ -10,7 +10,7 @@ import { Stomp } from '@stomp/stompjs';
 const RoomList = () => {
   // 방 인원수 0명일 때 방 삭제
   // 방 생성 후 바로 입장 되기
-  // 방 현재 인원수 나타내기
+  // 방 헤더 없애고 나가기버튼 만들어서 인원수 나타내기 
 
   const [gameRoomList, setGameRoomList] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -79,7 +79,7 @@ const RoomList = () => {
     }
 
     // console.log(roomNo);
-    nav('/gameRoom/'+roomNo);
+    nav('/gameRoom/'+roomNo, { replace: true });
   }
 
   const handleQuickMatch = async () => {
