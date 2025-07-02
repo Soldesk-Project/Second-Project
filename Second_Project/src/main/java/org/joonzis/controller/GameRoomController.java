@@ -1,10 +1,13 @@
 package org.joonzis.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.joonzis.domain.GameRoomDTO;
 import org.joonzis.service.GameRoomService;
+import org.joonzis.service.match.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +26,9 @@ public class GameRoomController {
 	@Autowired
 	private GameRoomService gameRoomService;
 	
+	@Autowired
+	private MatchService matchService;
+	
 	// 게임방 생성
 	@PostMapping("/createRoom")
 	public String createRoom(@RequestBody GameRoomDTO room) {
@@ -35,4 +41,13 @@ public class GameRoomController {
 	public List<GameRoomDTO> showRoom() {
 	    return gameRoomService.showRoom();
 	}
+	
+	@PostMapping("/match/join")
+	public ResponseEntity<?> joinMatch(@RequestBody Map<String, String> body){
+		String user_id = body.get("userId");
+		matchService.enqueue(user_id);
+		return ResponseEntity.ok("매치 큐 등록");
+	}
+	
+	
 }
