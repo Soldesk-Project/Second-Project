@@ -15,6 +15,7 @@ import Shop from './pages/Shop';
 import Achievements from './pages/Achievements';
 import ItemBook from './pages/ItemBook';
 import InPlay from './pages/InPlay';
+import CustomerServiceCenter from './pages/CustomerServiceCenter';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -51,6 +52,7 @@ function App() {
         <Route path="/achievements" element={<Achievements />} />
         <Route path="/itemBook" element={<ItemBook />} />
         <Route path="/gameRoom/:roomNo" element={<InPlay />} />
+        <Route path="/customer" element={<CustomerServiceCenter />} />
       </Routes>
     </Router>
   );

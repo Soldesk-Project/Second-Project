@@ -35,7 +35,7 @@ const Shop = () => {
 
   return (
     <>
-      <div className="top-nav"><Header /></div>
+      <div className={styles.top_nav}><Header /></div>
 
       <div className={styles.subTabContainer}>
         <div className={styles.subTabLeft}>

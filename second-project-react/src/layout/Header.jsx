@@ -11,6 +11,7 @@ const Header = () => {
   }
   const clickToGo=(e)=>{
     const name = e.target.dataset.name;
+    console.log('navigate to:', name);
     nav(`/${name}`);
   }
   const bb=()=>{
@@ -30,7 +31,7 @@ const Header = () => {
           <li><span data-name="itemBook" onClick={clickToGo}>도감</span></li>
           <li><span data-name="achievements" onClick={clickToGo}>업적</span></li>
           <li><span data-name="shop" onClick={clickToGo}>상점</span></li>
-          <li><span onClick={clickToGo}>고객센터</span></li>
+          <li><span data-name="customer" onClick={clickToGo}>고객센터</span></li>
         </ul>
       </div>
       <div className='header-box-right'>
