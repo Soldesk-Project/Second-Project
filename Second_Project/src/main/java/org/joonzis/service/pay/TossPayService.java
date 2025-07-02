@@ -1,4 +1,4 @@
-package org.joonzis.service;
+package org.joonzis.service.pay;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;

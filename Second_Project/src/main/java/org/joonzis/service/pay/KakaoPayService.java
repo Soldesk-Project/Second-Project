@@ -1,4 +1,4 @@
-package org.joonzis.service;
+package org.joonzis.service.pay;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

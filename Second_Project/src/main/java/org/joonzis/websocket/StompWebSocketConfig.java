@@ -17,6 +17,9 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         // "/app"으로 시작하는 메시지는 @MessageMapping 어노테이션이 달린 컨트롤러 메서드로 라우팅
         config.setApplicationDestinationPrefixes("/app");
+        
+        // 빠른 매칭시 유저에게 알람 전송
+        config.setUserDestinationPrefix("/user");
     }
 
     @Override
@@ -24,5 +27,10 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws-chat")
                 .setAllowedOrigins("http://localhost:3000")
                 .withSockJS();
+        
+        registry.addEndpoint("/ws-match")
+		        .setAllowedOrigins("*")
+		        .setHandshakeHandler(new GameMatchWebSocketHandler())
+		        .withSockJS();
     }
 }

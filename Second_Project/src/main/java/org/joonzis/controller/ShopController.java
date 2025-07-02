@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.joonzis.domain.PaymentDTO;
 import org.joonzis.service.MemberService;
-import org.joonzis.service.PayService;
-import org.joonzis.service.TossPayService;
+import org.joonzis.service.pay.PayService;
+import org.joonzis.service.pay.TossPayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;

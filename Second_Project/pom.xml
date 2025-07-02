@@ -251,7 +251,18 @@
 		  <groupId>io.jsonwebtoken</groupId>
 		  <artifactId>jjwt</artifactId>
 		  <version>0.9.1</version>
-		</dependency>	
+		</dependency>
+		<dependency>
+		  <groupId>org.springframework.data</groupId>
+		  <artifactId>spring-data-redis</artifactId>
+		  <version>1.8.11.RELEASE</version>
+		</dependency>
+		<dependency>
+		  <groupId>biz.paluch.redis</groupId>
+		  <artifactId>lettuce</artifactId>
+		  <version>4.5.0.Final</version> <!-- ✅ 핵심 -->
+		</dependency>
+		
 	</dependencies>
     <build>
         <plugins>

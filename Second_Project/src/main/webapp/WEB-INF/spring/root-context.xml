@@ -51,5 +51,16 @@
 	<context:component-scan base-package="org.joonzis.websocket" />
     <bean class="org.springframework.web.socket.server.standard.ServerEndpointExporter"/>
     
+    <!-- Redis 연결 설정 -->
+	<bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory">
+	    <constructor-arg name="host" value="localhost"/>
+	    <constructor-arg name="port" value="6379"/>
+	</bean>
+	
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+	    <constructor-arg ref="redisConnectionFactory" />
+	</bean>
+    
+    
     <bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"/>
 </beans>

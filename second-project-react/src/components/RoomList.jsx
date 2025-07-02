@@ -3,6 +3,9 @@ import ModalBasic from './ModalBasic';
 import styles from '../css/RoomList.module.css'; // CSS 따로 적용
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import axios from 'axios';
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
 
 const RoomList = () => {
   // 방 인원수 0명일 때 방 삭제
@@ -19,6 +22,8 @@ const RoomList = () => {
   const userNick = user.user_nick;
   const socketRef=useRef(null);
   const nav=useNavigate();
+
+  const stompRef = useRef(null);
 
   useEffect(() => {
     // getGameRoomList();
@@ -70,6 +75,47 @@ const RoomList = () => {
     nav('/gameRoom/'+roomNo);
   }
 
+  const handleQuickMatch = async () => {
+    try {
+      // 1. REST API로 매칭 큐 등록
+      await axios.post('/api/match/join', {
+        userId: user.user_id, // 백엔드에서 이걸 principal로 쓰고 있어야 함
+      });
+
+      console.log('✅ 매칭 큐 등록 완료');
+
+      // 2. STOMP WebSocket 연결
+      const sock = new SockJS('http://192.168.0.112:9099/ws-match?userId=' + user.user_id); // 경로는 WebSocketConfig 기준
+      const stomp = Stomp.over(sock);
+
+      stomp.connect({}, () => {
+        console.log('✅ STOMP 연결 완료');
+
+        // 3. 매칭 알림 구독
+        stomp.subscribe('/user/queue/match', (message) => {
+          const payload = message.body;
+
+          if (payload === 'ACCEPT_MATCH') {
+            console.log('✅ 수락 요청 도착!');
+            // 여기에 수락 모달 띄우기 등 처리
+            alert('4명이 모였습니다! 게임을 수락하시겠습니까?'); // 또는 openAcceptModal()
+          }
+
+          if (payload === 'MATCH_FOUND') {
+            console.log('🎮 매칭 완료! 게임으로 이동');
+            nav('/game');
+          }
+        });
+      });
+
+      stompRef.current = stomp;
+    } catch (err) {
+      console.error('❌ 빠른 매칭 실패:', err);
+      alert('빠른 매칭 중 오류가 발생했습니다!.');
+    }
+  };
+
+
 
   return (
     <>
@@ -77,7 +123,7 @@ const RoomList = () => {
       <div className={styles.roomListHeader}>
         <button onClick={handleOpenModal} className={styles.createBtn}>필터</button>
         <button onClick={handleOpenModal} className={styles.createBtn}>방 생성</button>
-        <button onClick={handleOpenModal} className={styles.createBtn}>빠른매칭</button>
+        <button onClick={handleQuickMatch} className={styles.createBtn}>빠른매칭</button>
         <input type="text" className={styles.roomListSearch} placeholder='search...'/>
       </div>
 
