@@ -17,11 +17,12 @@
   height: 70px;
   display: flex;
   align-items: center;
+  margin-bottom: 0px;
 }
 
 .header li span{
   display: block;
-  width: 100px;
+  width: 110px;
   text-align: center;
   padding: 23px;
   text-decoration: none;

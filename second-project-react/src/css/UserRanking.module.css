@@ -20,7 +20,10 @@
 }
 
 .user {
+<<<<<<< HEAD
+=======
     border: 1px solid white;
+>>>>>>> 09642085d0609deefe550498a86bc5faee81a204
     height: 30px; /* 각 user 요소의 고정 높이 (필요 시 조정) */
     line-height: 28px; /* 텍스트 세로 중앙 정렬 */
     box-sizing: border-box;

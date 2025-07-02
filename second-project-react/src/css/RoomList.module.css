@@ -18,12 +18,12 @@
 .roomListSearch{
   width: 780px;
   height: 40px;
-  background-color: rgba(0, 0, 0, 0.85);  /* 검정 배경 */
-  color: #fff;             /* 흰 글씨 */
-  border: 1px solid #444;  /* 경계선 색상도 어둡게 조정 */
-  border-radius: 20px;
   margin: 0 10px;
   padding-left: 20px;
+  color: black;
+  background-color: white;
+  border: 3px solid black;
+  border-radius: 20px;
 }
 
 .roomListBody {
@@ -31,21 +31,28 @@
   flex-direction: column;
   gap: 10px;
   padding: 10px;
-  background-color: #0A0D17;
+  background-color: white;
   border-radius: 10px;
+<<<<<<< HEAD
+  color: black;
+  height: 530px;
+  box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.3);
+=======
   color: white;
   height: 539px;
   overflow-y: auto;
+>>>>>>> 09642085d0609deefe550498a86bc5faee81a204
 }
 
 .roomCard {
-  background-color: rgba(0, 0, 0, 0.95);
+  background-color: white;
   padding: 12px 16px;
   border-radius: 8px;
   display: flex;
   /* justify-content: space-between; */
   gap: 10px;
   align-items: center;
+  box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.5);
 }
 
 .roomMode {
