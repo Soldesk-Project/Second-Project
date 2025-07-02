@@ -15,4 +15,7 @@ public interface MemberService {
 	
 	// 포인트 구매
 	void addPoint(String userId, int amount);
+	
+	// 유저 정보 조회
+	UsersDTO getUserById(String user_id);
 }

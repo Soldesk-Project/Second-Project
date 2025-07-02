@@ -16,4 +16,7 @@ public interface MemberMapper {
 	
 	// 포인트 구매
 	void updatePoint(@Param("userId") String userId, @Param("amount") int amount);
+	
+	// 유저 정보 조회
+	UsersDTO getUserById(@Param("user_id") String user_id);
 }

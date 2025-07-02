@@ -31,4 +31,11 @@
 	    SET user_point = user_point + #{amount}
 	    WHERE user_id = #{userId}
 	</update>
+	
+	<!-- 유저 정보 조회 -->
+	<select id="getUserById" resultType="org.joonzis.domain.UsersDTO">
+		SELECT *
+		FROM users
+		WHERE user_id = #{user_id}
+	</select>
 </mapper>

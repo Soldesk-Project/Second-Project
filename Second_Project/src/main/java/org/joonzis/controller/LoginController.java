@@ -9,9 +9,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
 import org.joonzis.domain.UsersDTO;
+import org.joonzis.security.JwtUtil;
 import org.joonzis.service.MemberService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,6 +42,9 @@ public class LoginController {
     
     @Autowired
     MemberService memberservice;
+    
+    @Autowired
+    JwtUtil jwtUtil;
 	
 	@ResponseBody
 	@PostMapping("/kakao/login")
@@ -118,16 +122,36 @@ public class LoginController {
 	}
 	
 	@PostMapping("/login")
-	@ResponseBody
-	public ResponseEntity<?> login(@RequestBody UsersDTO dto, HttpSession session) {
-	    System.out.println("🔐 로그인 요청");
-	    
+	public ResponseEntity<?> login(@RequestBody UsersDTO dto) {
 	    UsersDTO user = memberservice.isValidUser(dto.getUser_id(), dto.getUser_pw());
+
 	    if (user != null) {
-	        session.setAttribute("loginUser", user.getUser_id()); // 세션에 사용자 ID 저장
-	        return ResponseEntity.ok(user);
+	        String token = jwtUtil.generateToken(user.getUser_id());
+
+	        // ✅ 토큰과 함께 전체 유저 정보도 응답
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("token", token);
+	        response.put("user", user);  // 전체 정보 포함 (user_pw 포함됨 주의)
+
+	        return ResponseEntity.ok(response);
 	    } else {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("아이디 또는 비밀번호가 틀렸습니다");
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
 	    }
 	}
+	
+	@GetMapping("/auth/me")
+	public ResponseEntity<?> getUser(@RequestHeader("Authorization") String bearer) {
+	    String token = bearer.replace("Bearer ", "");
+	    if (!jwtUtil.validateToken(token)) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("토큰 만료");
+	    }
+
+	    String user_id = jwtUtil.getUserIdFromToken(token);
+	    UsersDTO user = memberservice.getUserById(user_id);
+
+	    return ResponseEntity.ok(user); // 전체 정보 그대로 전달
+	}
+
+
+
 }

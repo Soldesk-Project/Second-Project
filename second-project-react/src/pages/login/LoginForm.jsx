@@ -16,21 +16,14 @@ const LoginForm = () => {
   const REDIRECT_URI = "http://localhost:3000/kakao/callback";
   
   const handleLogin = async () => {
-    try {
-      const response = await axios.post('/api/login', {
-        user_id: id,
-        user_pw: pw,
-      }, {
-        withCredentials: true
-      });
-      alert('로그인 성공');
-      dispatch(setUser(response.data));  // ✅ 유저 정보 저장
-      navigate('/server');
-    } catch (error) {
-      console.error('로그인 실패:', error);
-      alert('아이디 또는 비밀번호가 틀렸습니다.');
-    }
-  };
+  try {
+    const res = await axios.post('/api/login', { user_id: id, user_pw: pw });
+    localStorage.setItem('token', res.data.token);
+    navigate('/server');
+  } catch (err) {
+    alert('로그인 실패');
+  }
+};
 
   const handleKakaoLogin = () => {
     window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;

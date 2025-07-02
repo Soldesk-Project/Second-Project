@@ -1,9 +1,15 @@
 package org.joonzis.controller;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.joonzis.domain.PaymentDTO;
 import org.joonzis.service.MemberService;
 import org.joonzis.service.PayService;
+import org.joonzis.service.TossPayService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,8 +28,12 @@ import lombok.extern.log4j.Log4j;
 @CrossOrigin(origins = "*")
 public class ShopController {
 	
-    @Autowired
-    private PayService kakaoPay;
+	@Autowired
+	@Qualifier("kakaoPayService")
+	private PayService kakaoPay;
+
+	@Autowired
+	private TossPayService tossPayService;
 	
 	@Autowired
 	private MemberService memberservice;
@@ -53,7 +63,7 @@ public class ShopController {
                                              @RequestParam String userId,
                                              @RequestParam int amount) {
         try {
-            kakaoPay.approve(pg_token, userId);
+        	kakaoPay.approve(pg_token, userId);
             memberservice.addPoint(userId, amount); // 포인트 적립
             // 결제 완료 후 React로 리다이렉트
             return ResponseEntity.status(302)
@@ -64,4 +74,29 @@ public class ShopController {
             return new ResponseEntity<>("결제 실패", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
+    @GetMapping("/pay/toss/success")
+    public void tossSuccess(@RequestParam String paymentKey,
+                            @RequestParam String orderId,
+                            @RequestParam int amount,
+                            @RequestParam String userId,
+                            HttpServletResponse response) throws IOException {
+        try {
+            // 🔍 디버깅용 로그 출력
+            System.out.println("🔽 [Toss 결제 성공 redirect 파라미터]");
+            System.out.println("📦 paymentKey: " + paymentKey);
+            System.out.println("📦 orderId: " + orderId);
+            System.out.println("📦 amount: " + amount);
+            System.out.println("📦 userId: " + userId);
+
+            tossPayService.confirmPayment(paymentKey, orderId, amount);
+            memberservice.addPoint(userId, amount);
+
+            response.sendRedirect("http://localhost:3000/shop");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "토스 결제 승인 실패");
+        }
+    }
+
 }

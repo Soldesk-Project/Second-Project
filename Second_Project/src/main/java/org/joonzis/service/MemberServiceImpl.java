@@ -34,4 +34,10 @@ public class MemberServiceImpl implements MemberService {
 	public void addPoint(String userId, int amount) {
 		mapper.updatePoint(userId, amount);
 	}
+
+	// 유저 정보 조회
+	@Override
+	public UsersDTO getUserById(String user_id) {
+		return mapper.getUserById(user_id);
+	}
 }
