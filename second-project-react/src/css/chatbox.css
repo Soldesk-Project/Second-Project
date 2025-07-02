@@ -1,18 +1,59 @@
-.chatbox-log{
+.chatbox-log {
   height: 165px;
-  background-color: white;
-  opacity: 10%;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
   border-top-right-radius: 5px;
   margin-bottom: 6px;
+  position: relative;
+  overflow-y: auto;
+}
+
+/* chatbox-log의 투명한 배경을 위한 가상 요소 */
+.chatbox-log::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  opacity: 0.1;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
+  z-index: -1;
+}
+
+/* chatbox-log 내부의 모든 텍스트 요소를 대상으로 검은색을 적용 */
+/* 각 메시지 유형별로 세분화하여 색상을 제어할 수도 있습니다. */
+.chatbox-log .chat-message span {
+  color: white; /* 모든 텍스트 색상을 검은색으로 설정 */
+  opacity: 1; /* 투명도를 100% (불투명)으로 설정 */
+}
+
+/* 특정 메시지 타입에 따라 색상을 다르게 하고 싶다면 (예: 시스템 메시지) */
+.chatbox-log .system-text {
+  color: red; /* 시스템 메시지는 회색으로 */
+}
+
+.chatbox-log .whisper-text {
+  color: purple; /* 귓속말은 보라색으로 */
+}
+
+.chatbox-log .sender {
+  font-weight: bold; /* 발신자 이름은 볼드 처리 */
+}
+
+.chatbox-log .timestamp {
+  color: #888; /* 타임스탬프는 연한 회색으로 */
+  font-size: 0.8em; /* 글자 크기 작게 */
 }
 .chatbox-input{
   display: flex;
 }
-.chatInput{
+.chatbox-input .chatInput{
   flex-grow: 1;
-  height: 20px;
+  height: 36px;
   margin-right: 5px;
   margin-bottom: 5px;
   background-color: rgba(27, 30, 41, 0.3);
@@ -32,6 +73,4 @@
   background-image: url('../../public/images/Submit.png');
   border-radius: 5px;
   color: white;
-
-  
 }
