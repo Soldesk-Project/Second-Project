@@ -53,13 +53,8 @@
     
     <!-- Redis 연결 설정 -->
 	<bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory">
-<<<<<<< Updated upstream
 	    <property name="hostName" value="192.168.0.112" />
 	    <property name="port" value="6379" />
-=======
-	    <constructor-arg name="host" value="192.168.0.112"/>
-	    <constructor-arg name="port" value="6379"/>
->>>>>>> Stashed changes
 	</bean>
 		
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
