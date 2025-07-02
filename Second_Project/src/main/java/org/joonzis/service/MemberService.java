@@ -1,14 +1,14 @@
 package org.joonzis.service;
 
-import org.joonzis.domain.UsersDTO;
+import org.joonzis.domain.UsersVO;
 
 public interface MemberService {
 	
 	// 회원가입
-	void insertMember(UsersDTO users);
+	void insertMember(UsersVO users);
 	
 	// 로그인
-	UsersDTO isValidUser(String user_id, String user_pw);
+	UsersVO isValidUser(String user_id, String user_pw);
 	
 	// 유저 포인트 조회
 	int getUserPoint(String user_id);
@@ -17,5 +17,5 @@ public interface MemberService {
 	void addPoint(String userId, int amount);
 	
 	// 유저 정보 조회
-	UsersDTO getUserById(String user_id);
+	UsersVO getUserById(String user_id);
 }

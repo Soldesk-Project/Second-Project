@@ -20,7 +20,31 @@
 }
 
 .user {
-    border: 1px solid black;
+    border: 1px solid white;
     height: 30px; /* 각 user 요소의 고정 높이 (필요 시 조정) */
-    line-height: 30px; /* 텍스트 세로 중앙 정렬 */
+    line-height: 28px; /* 텍스트 세로 중앙 정렬 */
+    box-sizing: border-box;
+}
+
+.red_bd {
+    border: 2px solid red;
+}
+
+.yellow_bd {
+    border: 2px solid yellow;
+}
+
+.red_title {
+    color: red;
+}
+
+.yellow_title {
+    color: yellow;
+}
+
+.red_bg {
+    background-color: red;
+}
+.yellow_bg {
+    background-color: yellow;
 }

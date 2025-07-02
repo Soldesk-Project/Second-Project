@@ -9,8 +9,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.joonzis.domain.UsersDTO;
 import org.joonzis.security.JwtUtil;
+import javax.servlet.http.HttpSession;
+
+import org.joonzis.domain.UsersVO;
 import org.joonzis.service.MemberService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,15 +118,17 @@ public class LoginController {
 	}
 	
 	@PostMapping("/signUp")
-	public void signUp(@RequestBody UsersDTO users) {
+	public void signUp(@RequestBody UsersVO users) {
 		log.info("회원가입");
 	    memberservice.insertMember(users);
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody UsersDTO dto) {
-	    UsersDTO user = memberservice.isValidUser(dto.getUser_id(), dto.getUser_pw());
-
+	@ResponseBody
+	public ResponseEntity<?> login(@RequestBody UsersVO dto, HttpSession session) {
+	    System.out.println("🔐 로그인 요청");
+	    
+	    UsersVO user = memberservice.isValidUser(dto.getUser_id(), dto.getUser_pw());
 	    if (user != null) {
 	        String token = jwtUtil.generateToken(user.getUser_id());
 
@@ -147,7 +151,7 @@ public class LoginController {
 	    }
 
 	    String user_id = jwtUtil.getUserIdFromToken(token);
-	    UsersDTO user = memberservice.getUserById(user_id);
+	    UsersVO user = memberservice.getUserById(user_id);
 
 	    return ResponseEntity.ok(user); // 전체 정보 그대로 전달
 	}

@@ -1,15 +1,15 @@
 package org.joonzis.mapper;
 
 import org.apache.ibatis.annotations.Param;
-import org.joonzis.domain.UsersDTO;
+import org.joonzis.domain.UsersVO;
 
 public interface MemberMapper {
 	
 	// 회원가입
-	void insertMember(UsersDTO users);
+	void insertMember(UsersVO users);
 	
 	// 로그인
-	UsersDTO selectUserByIdAndPw(@Param("user_id") String user_id, @Param("user_pw") String user_pw);
+	UsersVO selectUserByIdAndPw(@Param("user_id") String user_id, @Param("user_pw") String user_pw);
 	
 	// 회원 포인트 조회
 	int getUserPoint(@Param("user_id") String user_id);
@@ -18,5 +18,5 @@ public interface MemberMapper {
 	void updatePoint(@Param("userId") String userId, @Param("amount") int amount);
 	
 	// 유저 정보 조회
-	UsersDTO getUserById(@Param("user_id") String user_id);
+	UsersVO getUserById(@Param("user_id") String user_id);
 }

@@ -2,7 +2,7 @@ package org.joonzis.service;
 
 import java.util.List;
 
-import org.joonzis.domain.UsersDTO;
+import org.joonzis.domain.UserInfoDecoDTO;
 import org.joonzis.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ public class UserServiceImpl implements UserService{
 	private UserMapper mapper;	
 
 	@Override
-	public List<UsersDTO> getUserRankingList() {
+	public List<UserInfoDecoDTO> getUserRankingList() {
 		log.info("getUserRankingList...");
 		return mapper.getUserRankingList();
 	}
