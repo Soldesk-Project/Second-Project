@@ -13,7 +13,8 @@ public class RedisAutoStarter implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         try {
             String redisPath = "C:\\Program Files\\Redis\\redis-server.exe";
-            ProcessBuilder builder = new ProcessBuilder(redisPath);
+            String redisConf = "C:\\Program Files\\Redis\\redis.windows.conf";
+            ProcessBuilder builder = new ProcessBuilder(redisPath, redisConf);
             builder.inheritIO();
             redisProcess = builder.start();
             System.out.println("✅ Redis 서버 실행됨");
