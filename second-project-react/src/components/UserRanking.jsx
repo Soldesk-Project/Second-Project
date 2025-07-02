@@ -21,7 +21,6 @@ const UserRanking = () => {
             setUserRankingList(data);
             setLoading(false);
             
-            
         }else{
             new Error('데이터 요청 실패..');
         }

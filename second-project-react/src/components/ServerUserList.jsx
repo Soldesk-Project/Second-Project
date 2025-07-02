@@ -24,7 +24,7 @@ const ServerUserList = () => {
 
     socketRef.current.onopen = () =>  {
       // 서버 입장 메시지 전송
-      // console.log("[Client] WebSocket 연결됨, join 메시지 전송:", { action: "join", server, userNick, userNo });
+      // console.log("[Client] WebSocket 연결됨, join 메시지 전송:", { action: "join", server, userNick, userNo });  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
       socketRef.current.send(
         JSON.stringify({ action: "join", server, userNick, userNo})
       );
@@ -33,14 +33,14 @@ const ServerUserList = () => {
     socketRef.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
       // 서버별 유저 목록 수신 시
-      // console.log("[Client] 서버로부터 메시지 수신:", data);
+      // console.log("[Client] 서버로부터 메시지 수신:", data);  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
       if (data.type === "userList" && data.server === server) {
         setUsers(data.users);
       }
     };
 
     socketRef.current.onclose = () => {
-      // console.log("WebSocket disconnected");
+      // console.log("WebSocket disconnected");  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
       setUsers([]); // 소켓 종료 시 유저 목록 비우기
     };
 
@@ -57,7 +57,7 @@ const ServerUserList = () => {
   }, [server, userNick, userNo]);
 
   useEffect(() => {
-    // console.log("[Client] users 상태가 갱신됨:", users);
+    // console.log("[Client] users 상태가 갱신됨:", users);  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
   }, [users]);
 
   return (

@@ -23,6 +23,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     // 서버별 방 목록: {서버명: [방1, 방2]}
     private final Map<String, List<GameRoomDTO>> serverRooms = new ConcurrentHashMap<>();
     
+    private final Map<String, Map<String, Set<String>>> roomUsers = new ConcurrentHashMap<>();
+    
+    
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -32,19 +35,19 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-    	System.out.println("..............."+message.getPayload());
         JsonNode json = objectMapper.readTree(message.getPayload());
         String action = json.get("action").asText();
-        System.out.println("..............."+action);
         
         switch (action) {
             case "join":
-            	System.out.println("join.......");
                 handleJoin(session, json);
                 break;
             case "createRoom":
                 handleCreateRoom(session, json);
                 break;
+            case "joinRoom":
+            	handleJoinRoom(session, json);
+            	break;
         }
     }
 
@@ -68,9 +71,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     
     private void sendRoomListToSession(String server, WebSocketSession session) {
         List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
-        System.out.println("[DEBUG] Sending room list to " + session.getId() + 
-                " | Server: " + server + 
-                " | Room count: " + rooms.size());
         try {
             String json = objectMapper.writeValueAsString(Map.of("type", "roomList", "rooms", rooms));
             if (session.isOpen()) {
@@ -85,7 +85,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     private AtomicInteger roomIndex = new AtomicInteger(1);
     private void handleCreateRoom(WebSocketSession session, JsonNode json) {
         String server = (String) session.getAttributes().get("server");
-        System.out.println("server......"+server);
         if (server == null) return;
 
         // 방 생성 정보 파싱
@@ -107,6 +106,23 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         broadcastRoomList(server);
     }
 
+    private void handleJoinRoom(WebSocketSession session, JsonNode json) {
+    	 String server = (String) session.getAttributes().get("server");
+	    if (server == null) return;
+
+	    String roomNo = json.get("roomNo").asText();
+	    String userNick = json.get("userNick").asText();
+
+	    // 방 참가자 목록 관리 (예: roomUsers 맵)
+	    roomUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
+	             .computeIfAbsent(roomNo, k -> ConcurrentHashMap.newKeySet())
+	             .add(userNick);
+
+	    broadcastRoomList(server);
+    }	
+    
+    
+    
     private void broadcastUserList(String server) {
         Set<String> users = serverUsers.getOrDefault(server, Collections.emptySet());
         broadcast(server, Map.of("type", "userList", "users", users));
@@ -114,7 +130,25 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
     private void broadcastRoomList(String server) {
         List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
-        broadcast(server, Map.of("type", "roomList", "rooms", rooms));
+        Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
+        List<Map<String, Object>> roomListWithCount = new ArrayList<>();
+        for (GameRoomDTO room : rooms) {
+            Map<String, Object> roomMap = new HashMap<>();
+            roomMap.put("gameroom_no", room.getGameroom_no());
+            roomMap.put("title", room.getTitle());
+            roomMap.put("category", room.getCategory());
+            roomMap.put("game_mode", room.getGame_mode());
+            roomMap.put("is_private", room.getIs_private());
+            roomMap.put("limit", room.getLimit());
+            roomMap.put("pwd", room.getPwd());
+            // 현재 인원수
+            Set<String> users = roomUserMap.getOrDefault(room.getGameroom_no(), Collections.emptySet());
+            roomMap.put("currentCount", users.size());
+            System.out.println("방번호 : "+room.getGameroom_no()+", "+"유저수 : "+users.size());	
+            roomListWithCount.add(roomMap);
+        }
+
+        broadcast(server, Map.of("type", "roomList", "rooms", roomListWithCount));
     }
 
     private void broadcast(String server, Object data) {
