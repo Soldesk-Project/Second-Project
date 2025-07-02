@@ -32,11 +32,14 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+    	System.out.println("..............."+message.getPayload());
         JsonNode json = objectMapper.readTree(message.getPayload());
         String action = json.get("action").asText();
+        System.out.println("..............."+action);
         
         switch (action) {
             case "join":
+            	System.out.println("join.......");
                 handleJoin(session, json);
                 break;
             case "createRoom":
@@ -59,7 +62,26 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         
         // 모든 클라이언트에게 유저 목록 브로드캐스트
         broadcastUserList(server);
+        
+        sendRoomListToSession(server, session);
     }
+    
+    private void sendRoomListToSession(String server, WebSocketSession session) {
+        List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
+        System.out.println("[DEBUG] Sending room list to " + session.getId() + 
+                " | Server: " + server + 
+                " | Room count: " + rooms.size());
+        try {
+            String json = objectMapper.writeValueAsString(Map.of("type", "roomList", "rooms", rooms));
+            if (session.isOpen()) {
+                session.sendMessage(new TextMessage(json));
+            }
+        } catch (Exception e) {
+            // 에러 처리
+        }
+    }
+    
+    
     private AtomicInteger roomIndex = new AtomicInteger(1);
     private void handleCreateRoom(WebSocketSession session, JsonNode json) {
         String server = (String) session.getAttributes().get("server");

@@ -34,7 +34,8 @@
   background-color: #0A0D17;
   border-radius: 10px;
   color: white;
-  height: 503px;
+  height: 539px;
+  overflow-y: auto;
 }
 
 .roomCard {
