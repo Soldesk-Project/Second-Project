@@ -20,7 +20,11 @@ const ServerUserList = () => {
 
     // 새 WebSocket 연결
     socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/server"); // 경민님쪽 연결
+<<<<<<< Updated upstream
     // socketRef.current = new WebSocket("ws://localhost:9099/ws/server"); // 테스트할때
+=======
+    // socketRef.current = new WebSocket("/ws://localhost:9099/ws/server"); // 테스트할때
+>>>>>>> Stashed changes
 
     socketRef.current.onopen = () =>  {
       // 서버 입장 메시지 전송
@@ -33,14 +37,14 @@ const ServerUserList = () => {
     socketRef.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
       // 서버별 유저 목록 수신 시
-      // console.log("[Client] 서버로부터 메시지 수신:", data);  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
+      console.log("[Client] 서버로부터 메시지 수신:", data);  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
       if (data.type === "userList" && data.server === server) {
         setUsers(data.users);
       }
     };
 
     socketRef.current.onclose = () => {
-      // console.log("WebSocket disconnected");  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
+      console.log("WebSocket disconnected");  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
       setUsers([]); // 소켓 종료 시 유저 목록 비우기
     };
 
@@ -57,7 +61,7 @@ const ServerUserList = () => {
   }, [server, userNick, userNo]);
 
   useEffect(() => {
-    // console.log("[Client] users 상태가 갱신됨:", users);  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
+    console.log("[Client] users 상태가 갱신됨:", users);  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
   }, [users]);
 
   return (

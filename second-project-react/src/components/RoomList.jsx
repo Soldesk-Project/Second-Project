@@ -10,7 +10,7 @@ import { Stomp } from '@stomp/stompjs';
 const RoomList = () => {
   // 방 인원수 0명일 때 방 삭제
   // 방 생성 후 바로 입장 되기
-  // 방 현재 인원수 나타내기
+  // 방 헤더 없애고 나가기버튼 만들어서 인원수 나타내기 
 
   const [gameRoomList, setGameRoomList] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -29,7 +29,11 @@ const RoomList = () => {
     }
 
     socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/room");
+<<<<<<< Updated upstream
     // socketRef.current = new WebSocket("ws://localhost:9y099/ws/room");
+=======
+    // socketRef.current = new WebSocket("ws://localhost:9099/ws/room");
+>>>>>>> Stashed changes
 
     socketRef.current.onopen = () => {
       console.log("WebSocket 연결 성공");
@@ -79,7 +83,7 @@ const RoomList = () => {
     }
 
     // console.log(roomNo);
-    nav('/gameRoom/'+roomNo);
+    nav('/gameRoom/'+roomNo, { replace: true });
   }
 
   const handleQuickMatch = async () => {
