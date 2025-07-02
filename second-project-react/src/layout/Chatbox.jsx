@@ -47,7 +47,7 @@ const Chatbox = () => {
 
         console.log(`Attempting to connect with username: ${userNick}, userNo: ${userNo}`);
 
-        const socket = new SockJS('http://localhost:9099/ws-chat');
+        const socket = new SockJS('http://192.168.0.112:9099/ws-chat');
         // STOMP.js 경고 해결: SockJS 인스턴스를 팩토리 함수로 전달
         const client = Stomp.over(() => socket); // <--- 이 부분 수정
 

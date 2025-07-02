@@ -21,7 +21,8 @@ const LoginForm = () => {
     console.log(res.data.user);
     
     localStorage.setItem('token', res.data.token);
-    navigate('/server', { replace: true });
+    dispatch(setUser(res.data.user));
+    navigate('/server');
   } catch (err) {
     alert('로그인 실패');
   }
