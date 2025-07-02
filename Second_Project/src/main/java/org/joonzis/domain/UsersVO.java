@@ -13,7 +13,7 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsersDTO {
+public class UsersVO {
 	private int user_no, user_point, user_rank;
 	private String user_nick, user_id, user_pw, user_email;
 	private Date user_date;

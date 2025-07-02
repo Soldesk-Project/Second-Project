@@ -11,7 +11,8 @@ const Shop = () => {
   const [showModal, setShowModal] = useState(false);
 
   // ✅ Redux에서 user_id 가져오기
-  const userId = useSelector((state) => state.user.user.user_id);
+  const user = useSelector((state) => state.user.user);
+  const userId = user?.user_id;
 
   useEffect(() => {
     const fetchPoint = async () => {

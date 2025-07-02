@@ -4,16 +4,35 @@
 
 <mapper namespace="org.joonzis.mapper.UserMapper">
 	 
+	 <resultMap id="userInfoDecoMap" type="org.joonzis.domain.UserInfoDecoDTO">
+	    <result column="user_no" property="user_no"/>
+	    <result column="user_rank" property="user_rank"/>
+	    <result column="user_nick" property="user_nick"/>
+	    <result column="boundary_class_name" property="boundary_class_name"/>
+	    <result column="title_class_name" property="title_class_name"/>
+	    <result column="background_class_name" property="background_class_name"/>
+	    <result column="balloon_class_name" property="balloon_class_name"/>
+	</resultMap>
+
 	 <!-- 유저 랭킹 가져오기-->
-	 <select id="getUserRankingList" resultType="org.joonzis.domain.UsersDTO">
-	 <![CDATA[
-       SELECT USER_NO, USER_RANK, USER_NICK
-		FROM (
-		    SELECT USER_NO, USER_RANK, USER_NICK
-		    FROM USERS
-		    ORDER BY USER_RANK DESC
-		)
-		WHERE ROWNUM <= 10
-	]]>
-    </select>
+	<select id="getUserRankingList" resultMap="userInfoDecoMap">
+	    <![CDATA[
+	        SELECT *
+			FROM (
+			  SELECT 
+			    U.USER_NO AS user_no,
+			    U.USER_RANK AS user_rank,
+			    U.USER_NICK AS user_nick,
+			    COALESCE(D.BOUNDARY_CLASS_NAME, 'default-boundary') AS boundary_class_name,
+			    COALESCE(D.TITLE_CLASS_NAME, 'default-title') AS title_class_name,
+			    COALESCE(D.BACKGROUND_CLASS_NAME, 'default-background') AS background_class_name,
+			    COALESCE(D.BALLOON_CLASS_NAME, 'default-balloon') AS balloon_class_name
+			  FROM USERS U
+			  LEFT JOIN USER_DECO D ON U.USER_NO = D.USER_NO
+			  ORDER BY U.USER_RANK DESC
+			)
+			WHERE ROWNUM <= 10
+	    ]]>
+	</select>
+
 </mapper>

@@ -2,8 +2,7 @@ package org.joonzis.controller;
 
 import java.util.List;
 
-
-import org.joonzis.domain.UsersDTO;
+import org.joonzis.domain.UserInfoDecoDTO;
 import org.joonzis.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -25,9 +24,9 @@ public class UserController {
 
 	// 유저 랭킹
 	@GetMapping(value = "/ranking", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<UsersDTO> getUserRankingList() {
+    public List<UserInfoDecoDTO> getUserRankingList() {
 		log.info("🔥 getUserRankingList() 호출됨");
-        List<UsersDTO> list = service.getUserRankingList();
-        return list;
+		log.info(service.getUserRankingList());
+        return service.getUserRankingList();
     }
 }

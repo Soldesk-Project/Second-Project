@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import axios from 'axios';
+import { setUser } from './store/userSlice';
+
 import LoginForm from './pages/login/LoginForm';
 import MainPage from './pages/MainPage';
 import KakaoCallback from './pages/login/KakaoCallback';
@@ -14,7 +18,25 @@ import InPlay from './pages/InPlay';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-function App() {  
+function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.get('/api/auth/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then((res) => {
+        dispatch(setUser(res.data)); // ✅ 유저 정보 Redux에 저장
+      })
+      .catch((err) => {
+        console.error('JWT 토큰 복원 실패:', err);
+        localStorage.removeItem('token');
+      });
+    }
+  }, []);
+
   return (
     <Router>
       <Routes>

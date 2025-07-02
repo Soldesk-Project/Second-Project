@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import styles from '../css/ModalBasic.module.css';
 
 const ModalBasic = ({ setModalOpen, socket, isWsOpen }) => {

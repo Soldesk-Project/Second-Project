@@ -1,6 +1,6 @@
 package org.joonzis.service;
 
-import org.joonzis.domain.UsersDTO;
+import org.joonzis.domain.UsersVO;
 import org.joonzis.mapper.MemberMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,13 +13,13 @@ public class MemberServiceImpl implements MemberService {
 	
 	// 회원가입
 	@Override
-	public void insertMember(UsersDTO users) {
+	public void insertMember(UsersVO users) {
 		mapper.insertMember(users);
 	}
 
 	// 로그인
 	@Override
-	public UsersDTO isValidUser(String user_id, String user_pw) {
+	public UsersVO isValidUser(String user_id, String user_pw) {
         return mapper.selectUserByIdAndPw(user_id, user_pw);
 	}
 	
@@ -33,5 +33,11 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public void addPoint(String userId, int amount) {
 		mapper.updatePoint(userId, amount);
+	}
+
+	// 유저 정보 조회
+	@Override
+	public UsersVO getUserById(String user_id) {
+		return mapper.getUserById(user_id);
 	}
 }

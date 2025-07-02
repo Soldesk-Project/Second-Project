@@ -5,6 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 const RoomList = () => {
+  // 방 인원수 0명일 때 방 삭제
+  // 처음메인화면 도달, 새로고침 시 ( 방생성해서 상태 변하기 전까지 ) 리스트 안나옴
+  // 방 생성 후 바로 입장 되기
+  // 방 현재 인원수 나타내기
+
+
+
   const [gameRoomList, setGameRoomList] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [isWsOpen, setIsWsOpen] = useState(false);
@@ -19,8 +26,8 @@ const RoomList = () => {
       socketRef.current.close();
     }
 
-    // socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/server");
-    socketRef.current = new WebSocket("ws://localhost:9099/ws/room");
+    socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/room");
+    // socketRef.current = new WebSocket("ws://localhost:9099/ws/room");
 
     socketRef.current.onopen = () => {
       console.log("WebSocket 연결 성공");
@@ -31,12 +38,13 @@ const RoomList = () => {
     };
 
     socketRef.current.onmessage = (event) => {
+      console.log("Received data:", event.data);
       const data = JSON.parse(event.data);
       if (data.type === "roomList") {
+        console.log("Room list received:", data.rooms);
         setGameRoomList(data.rooms);
         console.log(data.rooms);
       }
-      // 방 생성 성공 시, 방 목록이 자동으로 갱신된다고 가정
     };
 
     socketRef.current.onclose = () => {
@@ -51,7 +59,7 @@ const RoomList = () => {
       if (socketRef.current) socketRef.current.close();
     };
 
-  }, []); 
+  }, [server, userNick]); 
 
   const handleOpenModal = () => {
     setModalOpen(true);
