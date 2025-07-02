@@ -16,7 +16,7 @@ const UserRanking = () => {
             // 3. 게시글 목록 데이터 상태 값에 할당
             setUserRankingList(data);
             setLoading(false);
-            console.log(data);
+            // console.log(data);   //--------------------------------------
             
             
         }else{

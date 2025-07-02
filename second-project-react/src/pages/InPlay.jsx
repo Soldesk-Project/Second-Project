@@ -27,7 +27,7 @@ const InPlay = () => {
 
     socketRef.current.onopen = () =>  {
       // 서버 입장 메시지 전송
-      console.log("[Client] WebSocket 연결됨, join 메시지 전송:", { action: "join", server, userNick, userNo });
+      // console.log("[Client] WebSocket 연결됨, join 메시지 전송:", { action: "join", server, userNick, userNo });
       socketRef.current.send(
         JSON.stringify({ action: "join", server, userNick, userNo})
       );
@@ -36,7 +36,7 @@ const InPlay = () => {
     socketRef.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
       // 서버별 유저 목록 수신 시
-      console.log("[Client] 서버로부터 메시지 수신:", data);
+      // console.log("[Client] 서버로부터 메시지 수신:", data);
       if (data.type === "userList" && data.server === server) {
         setUsers(data.users);
       }

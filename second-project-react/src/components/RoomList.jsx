@@ -9,11 +9,8 @@ import { Stomp } from '@stomp/stompjs';
 
 const RoomList = () => {
   // 방 인원수 0명일 때 방 삭제
-  // 처음메인화면 도달, 새로고침 시 ( 방생성해서 상태 변하기 전까지 ) 리스트 안나옴
   // 방 생성 후 바로 입장 되기
   // 방 현재 인원수 나타내기
-
-
 
   const [gameRoomList, setGameRoomList] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -31,8 +28,8 @@ const RoomList = () => {
       socketRef.current.close();
     }
 
-    socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/room");
-    // socketRef.current = new WebSocket("ws://localhost:9099/ws/room");
+    // socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/room");
+    socketRef.current = new WebSocket("ws://localhost:9099/ws/room");
 
     socketRef.current.onopen = () => {
       console.log("WebSocket 연결 성공");
@@ -43,10 +40,10 @@ const RoomList = () => {
     };
 
     socketRef.current.onmessage = (event) => {
-      console.log("Received data:", event.data);
+      // console.log("Received data:", event.data);
       const data = JSON.parse(event.data);
       if (data.type === "roomList") {
-        console.log("Room list received:", data.rooms);
+        // console.log("Room list received:", data.rooms);
         setGameRoomList(data.rooms);
         console.log(data.rooms);
       }
@@ -71,7 +68,17 @@ const RoomList = () => {
   };
 
   const joinRoom=(roomNo)=>{
-    console.log(roomNo);
+    if (socketRef.current && socketRef.current.readyState === 1) {
+      socketRef.current.send(JSON.stringify({
+        action: "joinRoom",
+        roomNo: roomNo,
+        userNick: userNick
+      }));
+    } else {
+      alert("웹소켓 연결이 준비되지 않았습니다.");
+    }
+
+    // console.log(roomNo);
     nav('/gameRoom/'+roomNo);
   }
 
@@ -140,7 +147,7 @@ const RoomList = () => {
               <span className={styles.roomMode}>{room.game_mode === 'rank' ? 'Rank Mode' : 'Casual Mode'}</span>
               <div className={styles.roomTitle}>{room.title}</div>
               <div className={styles.roomMeta}>
-                <span>{room.limit}명</span>
+                <span>{room.currentCount ?? 0} / {room.limit}명</span>
                 <span>{room.is_private === 'Y' ? '비공개' : '공개'}</span>
               </div>
             </div>
