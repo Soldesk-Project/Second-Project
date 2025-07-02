@@ -108,6 +108,8 @@ const RoomList = () => {
         });
       });
 
+
+
       stompRef.current = stomp;
     } catch (err) {
       console.error('❌ 빠른 매칭 실패:', err);
