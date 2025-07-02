@@ -34,7 +34,10 @@ const MainPage = () => {
           <div className={styles.body_content}>
 
             {/* 좌측 유저 정보, 최근 플레이 목록 */}
-            <div className={styles.user_info}>유저 정보쪽</div>
+            <div className={styles.user_info}>
+              유저 정보쪽
+              <h1> 컬러 안정했어여... 고뇌 중</h1>
+              </div>
 
             {/* 중앙 영역 (필터, 방 리스트 등) */}
             <div className={styles.lobby_center}><RoomList/></div>
