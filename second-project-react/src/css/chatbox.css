@@ -1,4 +1,4 @@
-.chat-screen{
+.chatbox-log{
   height: 165px;
   background-color: white;
   opacity: 10%;
@@ -7,10 +7,10 @@
   border-top-right-radius: 5px;
   margin-bottom: 6px;
 }
-.chat-input{
+.chatbox-input{
   display: flex;
 }
-.chat-input input{
+.chatInput{
   flex-grow: 1;
   height: 20px;
   margin-right: 5px;
@@ -18,14 +18,14 @@
   background-color: rgba(27, 30, 41, 0.3);
   color: white;
 }
-.chat-input .emojiBtn{
+.chatbox-input .emojiBtn{
   height: 36px;
   width: 36px;
   margin-right: 5px;
   border: none;
   border-radius: 5px;
 }
-.chat-input .sendBtn{
+.chatbox-input .sendBtn{
   height: 36px;
   width: 100px;
   border: none;

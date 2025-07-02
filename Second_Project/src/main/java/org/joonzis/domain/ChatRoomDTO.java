@@ -35,13 +35,19 @@ public class ChatRoomDTO {
     private MessageType mType;
 
     @JsonProperty("mSender")
-    private String mSender;
+    private String mSender; // 발신자 닉네임 (표시용)
+
+    @JsonProperty("mSenderNo") // ✅ 발신자 고유 번호 (실제 식별 및 라우팅용)
+    private Long mSenderNo;
 
     @JsonProperty("mContent")
     private String mContent;
 
     @JsonProperty("mReceiver")
-    private String mReceiver;
+    private String mReceiver; // 수신자 닉네임 (귓속말 시 표시용)
+
+    @JsonProperty("mReceiverNo") // ✅ 수신자 고유 번호 (귓속말 라우팅용)
+    private Long mReceiverNo;
 
     @JsonProperty("mTimestamp")
     private String mTimestamp;
