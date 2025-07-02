@@ -23,6 +23,10 @@ const userSlice = createSlice({
       localStorage.removeItem('user');
       localStorage.removeItem('server');
     },
+    clearServer: (state) => {
+      state.server = null;
+      localStorage.removeItem('server');
+    },
     loadUserFromStorage: (state) => {
       const storedUser = localStorage.getItem('user');
       const storedServer = localStorage.getItem('server');
@@ -32,5 +36,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, setServer, clearUser, loadUserFromStorage } = userSlice.actions;
+export const { setUser, setServer, clearUser, clearServer, loadUserFromStorage } = userSlice.actions;
 export default userSlice.reducer;

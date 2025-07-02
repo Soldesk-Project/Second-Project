@@ -2,10 +2,14 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/header.css';
 import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { clearUser, clearServer } from '../store/userSlice';
 
 const Header = () => {
   const server = useSelector((state) => state.user.server);
   const nav=useNavigate();
+  const dispatch = useDispatch();
+
   const clickToGoMain=()=>{
     nav('/main/'+ server);
   }
@@ -14,13 +18,14 @@ const Header = () => {
     console.log('navigate to:', name);
     nav(`/${name}`);
   }
-  const bb=()=>{
-    console.log(123);
-    
+  const serverOut=()=>{
+    dispatch(clearServer());
+    nav('/server');   
   }
-  const cc=()=>{
-    console.log(1231241);
-    
+  const logOut=()=>{
+    dispatch(clearUser());
+    localStorage.clear(); 
+    nav('/');  
   }
   return (
     <div className='header'>
@@ -35,8 +40,8 @@ const Header = () => {
         </ul>
       </div>
       <div className='header-box-right'>
-        <img onClick={bb} className='header-enter' src="/images/door-open.png" alt="서버이동" />
-        <img onClick={cc} className='header-signout' src="/images/signout.png" alt="나가기" />
+        <img onClick={serverOut} className='header-enter' src="/images/door-open.png" alt="서버이동" />
+        <img onClick={logOut} className='header-signout' src="/images/signout.png" alt="나가기" />
       </div>
     </div>
   );  

@@ -19,6 +19,7 @@ const LoginForm = () => {
   try {
     const res = await axios.post('/api/login', { user_id: id, user_pw: pw });
     localStorage.setItem('token', res.data.token);
+    dispatch(setUser(res.data.user));
     navigate('/server');
   } catch (err) {
     alert('로그인 실패');

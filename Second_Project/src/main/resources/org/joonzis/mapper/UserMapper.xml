@@ -34,5 +34,31 @@
 			WHERE ROWNUM <= 10
 	    ]]>
 	</select>
+	
+	<!-- 아이템 겟 테스트 -->
+	<select id="getItemList" resultType="org.joonzis.domain.ItemVO">
+		SELECT * FROM ITEMS
+	</select>
 
+	<!-- 아이템 업데이트 테스트 -->
+	<update id="updateItem" parameterType="org.joonzis.domain.UserDecoUpdateDTO">
+		UPDATE USER_DECO
+	    <set>
+	        <choose>
+	            <when test="item_type == 'background'">
+	                BACKGROUND_CLASS_NAME = #{css_class_name}
+	            </when>
+	            <when test="item_type == 'title'">
+	                TITLE_CLASS_NAME = #{css_class_name}
+	            </when>
+	            <when test="item_type == 'boundary'">
+	                BOUNDARY_CLASS_NAME = #{css_class_name}
+	            </when>
+	            <when test="item_type == 'balloon'">
+	                BALLOON_CLASS_NAME = #{css_class_name}
+	            </when>
+	        </choose>
+	    </set>
+	    WHERE USER_NO = #{user_no}
+	</update>
 </mapper>
