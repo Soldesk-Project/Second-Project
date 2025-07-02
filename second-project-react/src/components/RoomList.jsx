@@ -28,8 +28,8 @@ const RoomList = () => {
       socketRef.current.close();
     }
 
-    // socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/room");
-    socketRef.current = new WebSocket("ws://localhost:9099/ws/room");
+    socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/room");
+    // socketRef.current = new WebSocket("ws://localhost:9y099/ws/room");
 
     socketRef.current.onopen = () => {
       console.log("WebSocket 연결 성공");

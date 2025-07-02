@@ -75,7 +75,7 @@ const InPlay = () => {
     <div className={styles.container}> {/* 공간 부터 나눴음*/}
 
       {/* 상단 바 (로고 + 메뉴 + 검색) */}
-      <div className={styles.top_nav}><Header/></div>
+      {/* <div className={styles.top_nav}><Header/></div> */}
 
       <div className={styles.body}>
 
