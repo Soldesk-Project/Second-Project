@@ -21,12 +21,7 @@ const LoginForm = () => {
     console.log(res.data.user);
     
     localStorage.setItem('token', res.data.token);
-<<<<<<< Updated upstream
-    dispatch(setUser(res.data.user));
-    navigate('/server');
-=======
     navigate('/server', { replace: true });
->>>>>>> Stashed changes
   } catch (err) {
     alert('로그인 실패');
   }
