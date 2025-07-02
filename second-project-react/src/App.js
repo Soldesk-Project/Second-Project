@@ -11,6 +11,8 @@ import Shop from './pages/Shop';
 import Achievements from './pages/Achievements';
 import ItemBook from './pages/ItemBook';
 import InPlay from './pages/InPlay';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function App() {  
   return (
