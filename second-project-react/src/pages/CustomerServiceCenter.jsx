@@ -1,58 +1,70 @@
 import React, { useState } from 'react';
 import Header from '../layout/Header';
-import styles from '../css/customer.css';
+import '../css/customer.css';
+
+const tabs = ['1:1 문의', '문제 제출', '고객 건의', 'Q&A'];
 
 const CustomerServiceCenter = () => {
-  // 탭 메뉴 설정
-  const tabs = ['1:1 문의', 'FAQ'];
   const [activeTab, setActiveTab] = useState(tabs[0]);
 
   return (
     <>
-      {/* 상단 헤더 */}
-      <div className='top-nav'><Header /></div>
+      <div className="top-nav">
+        <Header />
+      </div>
 
-      <div className='container'>
-        {/* 페이지 제목 */}
-        <h1 className='title'>고객센터</h1>
+      {/* 탭 리스트 */}
+      <div role="tablist" className="tab-list">
+        {tabs.map(tab => (
+          <button
+            key={tab}
+            role="tab"
+            aria-selected={activeTab === tab}
+            className={`tab ${activeTab === tab ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
 
-        {/* 탭 네비게이션 */}
-        <div className='tab'>
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              className={`${'tab'} ${activeTab === tab ? styles.active : ''}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
+      {/* 탭 패널 */}
+      <div className="tab-panels">
+        {activeTab === '1:1 문의' && (
+          <section role="tabpanel" className="content">
+            <h2>1:1 문의하기</h2>
+            <textarea
+              className="textarea"
+              placeholder="문의할 내용을 작성해주세요."
+            />
+            <button className="submitButton">제출하기</button>
+          </section>
+        )}
 
-        {/* 탭 콘텐츠 */}
-        <div className='content'>
-          {activeTab === '1:1 문의' && (
-            <div className='inquiryForm'>
-              <h2>1:1 문의하기</h2>
-              <textarea
-                className='textarea'
-                placeholder="문의할 내용을 작성해주세요."
-              />
-              <button className='submitButton'>제출하기</button>
-            </div>
-          )}
+        {activeTab === '문제 제출' && (
+          <section role="tabpanel" className="content">
+            <h2>문제 제출하기</h2>
+            {/* problem submission form */}
+          </section>
+        )}
 
-          {activeTab === 'FAQ' && (
-            <div className='faqList'>
-              <h2>자주 묻는 질문</h2>
-              <ul>
-                <li>Q1. 질문 예시 1?</li>
-                <li>Q2. 질문 예시 2?</li>
-                <li>Q3. 질문 예시 3?</li>
-              </ul>
-            </div>
-          )}
-        </div>
+        {activeTab === '고객 건의' && (
+          <section role="tabpanel" className="content">
+            <h2>고객 건의하기</h2>
+            {/* suggestion form */}
+          </section>
+        )}
+
+        {activeTab === 'Q&A' && (
+          <section role="tabpanel" className="content">
+            <h2>자주 묻는 질문 (Q&amp;A)</h2>
+            <ul className="faqList">
+              <li>Q1. 질문 예시 1?</li>
+              <li>Q2. 질문 예시 2?</li>
+              <li>Q3. 질문 예시 3?</li>
+            </ul>
+          </section>
+        )}
       </div>
     </>
   );

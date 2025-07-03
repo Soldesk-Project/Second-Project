@@ -70,7 +70,7 @@ const UserRanking = () => {
     }, [isModalOpen]);
 
     if(loading) return <div>로딩중</div>;
-    console.log(userRankingList);
+    // console.log(userRankingList);
     
     return (
         <div className={styles.container}>

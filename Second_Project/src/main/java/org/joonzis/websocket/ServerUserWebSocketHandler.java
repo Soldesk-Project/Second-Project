@@ -49,6 +49,9 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
 
             serverSessions.putIfAbsent(server, new ConcurrentHashMap<>());
             serverSessions.get(server).put(session, new UserInfo(userNick, userNo, bgName, blName, bdName, titleName));
+            
+            log.info("[WebSocket] 세션 추가됨. 서버: " + server + ", 세션ID: " + session.getId() 
+            + ", 현재 접속 유저 수: " + serverSessions.get(server).size());
 
             // 3) 해당 서버에 접속한 유저 목록 전송
             broadcastUserList(server);
@@ -62,6 +65,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
                 log.warn("해당 userNo의 유저 정보를 DB에서 찾을 수 없습니다: " + userNo);
                 return;
             }
+            log.info("DB에서 조회한 최신 유저 정보: " + updatedUser);
 
             // 2. 해당 유저가 접속한 서버 찾기
             String userServer = findServerByUserNo(userNo);
@@ -73,17 +77,29 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             // 3. 서버Sessions에 해당 세션(들)의 UserInfo 업데이트
             Map<WebSocketSession, UserInfo> sessions = serverSessions.get(userServer);
             if (sessions != null) {
+            	log.info("해당 서버 접속 세션 수: " + sessions.size());
+                boolean updated = false;
                 for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
                     UserInfo info = entry.getValue();
+                    log.info("세션 " + entry.getKey().getId() + " 유저No: " + info.getUserNo());
                     if (userNo.equals(info.getUserNo())) {
                         // UserInfo 업데이트
+                    	log.info("UserInfo 업데이트 전: " + info);
                         info.setBgName(updatedUser.getBackground_class_name());
                         info.setBlName(updatedUser.getBalloon_class_name());
                         info.setBdName(updatedUser.getBoundary_class_name());
                         info.setTitleName(updatedUser.getTitle_class_name());
+                        log.info("UserInfo 업데이트 후: " + info);
+                        updated = true;
                     }
                 }
+                if (!updated) {
+                    log.warn("해당 userNo에 해당하는 UserInfo가 세션에 존재하지 않음: " + userNo);
+                }
+            } else {
+                log.warn("해당 서버에 접속 세션이 없음: " + userServer);
             }
+            
 
             // 4. 최신 유저 목록 다시 브로드캐스트
             broadcastUserList(userServer);
@@ -95,10 +111,12 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         for (Map.Entry<String, Map<WebSocketSession, UserInfo>> entry : serverSessions.entrySet()) {
             for (UserInfo userInfo : entry.getValue().values()) {
                 if (userNo.equals(userInfo.getUserNo())) {
+                	log.info("findServerByUserNo: userNo=" + userNo + "는 서버 '" + entry.getKey() + "'에 접속 중");
                     return entry.getKey();
                 }
             }
         }
+        log.warn("findServerByUserNo: userNo=" + userNo + "는 어느 서버에도 접속 중이지 않음");
         return null;
     }
     
@@ -143,6 +161,8 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             Map<WebSocketSession, UserInfo> sessions = entry.getValue();
 
             if (sessions.remove(session) != null) {
+            	log.info("[WebSocket] 세션 제거됨. 서버: " + server + ", 세션ID: " + session.getId()
+                + ", 남은 유저 수: " + sessions.size());
                 broadcastUserList(server);
             }
         }
@@ -150,7 +170,10 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
 
     private void broadcastUserList(String server) throws Exception {
     	Map<WebSocketSession, UserInfo> sessions = serverSessions.get(server);
-        if (sessions == null) return;
+    	if (sessions == null) {
+            log.warn("broadcastUserList: 서버에 세션이 없음: " + server);
+            return;
+        }
 
         List<Map<String, String>> userList = new ArrayList<>();
         for (UserInfo userInfo : sessions.values()) {
@@ -173,11 +196,16 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         String json = objectMapper.writeValueAsString(payload);
         TextMessage msg = new TextMessage(json);
 
+        log.info("broadcastUserList: 서버 '" + server + "'에 " + sessions.size() + "개의 세션에 메시지 전송 시작");
         // 모든 세션에 전송
         for (WebSocketSession sess : sessions.keySet()) {
             if (sess.isOpen()) {
+            	log.info("sendMessage to session: " + sess.getId());
                 sess.sendMessage(msg);
+            } else {
+                log.warn("세션 닫힘 상태, 메시지 전송 불가: " + sess.getId());
             }
         }
+        log.info("broadcastUserList: 메시지 전송 완료");
     }
 }
