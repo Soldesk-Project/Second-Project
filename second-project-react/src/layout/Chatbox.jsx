@@ -45,20 +45,20 @@ const Chatbox = () => {
         // --- StrictMode 대응 로직 끝 ---
 
 
-        console.log(`Attempting to connect with username: ${userNick}, userNo: ${userNo}`);
+        // console.log(`Attempting to connect with username: ${userNick}, userNo: ${userNo}`);
 
         const socket = new SockJS('http://192.168.0.112:9099/ws-chat');
         // STOMP.js 경고 해결: SockJS 인스턴스를 팩토리 함수로 전달
         const client = Stomp.over(() => socket); // <--- 이 부분 수정
 
         client.connect({}, frame => {
-            console.log('Connected: ' + frame);
+            // console.log('Connected: ' + frame);
             stompClientInstanceRef.current = client;
 
             // 공개 채팅방 메시지 수신
             client.subscribe('/topic/public', message => {
                 const receivedMessage = JSON.parse(message.body);
-                console.log("공개 메시지 수신:", receivedMessage); // 디버깅용
+                // console.log("공개 메시지 수신:", receivedMessage); // 디버깅용
                 setMessages(prevMessages => [...prevMessages, receivedMessage]);
             });
 
@@ -66,13 +66,13 @@ const Chatbox = () => {
             // 서버에서 닉네임으로 메시지를 라우팅하기 때문에, 클라이언트 구독도 닉네임 기반으로 유지
             client.subscribe(`/user/${userNick}/queue/whisper`, message => {
                 const receivedMessage = JSON.parse(message.body);
-                console.log("귓속말 메시지 수신:", receivedMessage); // 디버깅용
+                // console.log("귓속말 메시지 수신:", receivedMessage); // 디버깅용
                 setMessages(prevMessages => [...prevMessages, receivedMessage]);
             });
 
             // 'addUser' 메시지는 딱 한 번만 서버로 전송합니다.
             if (!hasSentAddUserRef.current) {
-                console.log("Sending addUser message for:", userNick, "UserNo:", userNo);
+                // console.log("Sending addUser message for:", userNick, "UserNo:", userNo);
                 client.send("/app/chat.addUser", {}, JSON.stringify({
                     mType: 'JOIN',
                     mSender: userNick,

@@ -29,10 +29,10 @@ const RoomList = () => {
     }
 
     socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/room");
-    // socketRef.current = new WebSocket("ws://localhost:9y099/ws/room");
+    // socketRef.current = new WebSocket("ws://localhost:9099/ws/room");
 
     socketRef.current.onopen = () => {
-      console.log("WebSocket 연결 성공");
+      // console.log("WebSocket 연결 성공");
       setIsWsOpen(true);  // 연결 성공 상태 업데이트
       socketRef.current.send(
         JSON.stringify({ action: "join", server, userNick})
@@ -45,7 +45,7 @@ const RoomList = () => {
       if (data.type === "roomList") {
         // console.log("Room list received:", data.rooms);
         setGameRoomList(data.rooms);
-        console.log(data.rooms);
+        // console.log(data.rooms);
       }
     };
 

@@ -35,6 +35,10 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         String server = data.get("server");
         String userNick = data.get("userNick");
         String userNo = data.get("userNo");
+        String bgName = data.get("bgName");
+        String blName = data.get("blName");
+        String bdName = data.get("bdName");
+        String titleName = data.get("titleName");
 
         if ("join".equals(action) && server != null && userNick != null) {
             // 1) 기존 세션 제거
@@ -42,7 +46,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
 
             // 2) 새 서버에 세션 추가
             serverSessions.putIfAbsent(server, new ConcurrentHashMap<>());
-            serverSessions.get(server).put(session, new UserInfo(userNick, userNo));
+            serverSessions.get(server).put(session, new UserInfo(userNick, userNo, bgName, blName, bdName, titleName));
 
             // 3) 해당 서버에 접속한 유저 목록 전송
             broadcastUserList(server);
@@ -80,6 +84,10 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             Map<String, String> userMap = new HashMap<>();
             userMap.put("userNick", userInfo.getUserNick());
             userMap.put("userNo", userInfo.getUserNo());
+            userMap.put("bgName", userInfo.getBgName());
+            userMap.put("blName", userInfo.getBlName());
+            userMap.put("bdName", userInfo.getBdName());
+            userMap.put("titleName", userInfo.getTitleName());
             userList.add(userMap);
         }
 

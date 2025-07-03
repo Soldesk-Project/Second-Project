@@ -20,56 +20,8 @@
 }
 
 .user {
-    border: 1px solid white;
+    border: 1px solid black;
     height: 30px; /* 각 user 요소의 고정 높이 (필요 시 조정) */
     line-height: 28px; /* 텍스트 세로 중앙 정렬 */
     box-sizing: border-box;
-}
-
-.red_bd {
-    border: 2px solid red;
-}
-
-.red_title {
-    color: red;
-}
-
-.red_bg {
-    background-color: red;
-}
-
-.yellow_bd {
-    border: 2px solid yellow;
-}
-
-.yellow_title {
-    color: yellow;
-}
-
-.yellow_bg {
-    background-color: yellow;
-}
-
-.white_bd {
-    border: 2px solid white;
-}
-
-.white_title {
-    color: white;
-}
-
-.white_bg {
-    background-color: white;
-}
-
-.black_bd {
-    border: 2px solid black;
-}
-
-.black_title {
-    color: black;
-}
-
-.black_bg {
-    background-color: black;
 }

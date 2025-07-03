@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import styles from '../css/UserRanking.module.css';
+import decoStyles from '../css/Decorations.module.css';
 import TestModal from './TestModal';
 import { useSelector } from 'react-redux';
 
@@ -69,7 +70,8 @@ const UserRanking = () => {
     }, [isModalOpen]);
 
     if(loading) return <div>로딩중</div>;
-
+    console.log(userRankingList);
+    
     return (
         <div className={styles.container}>
             <div className={styles.header}>
@@ -80,9 +82,9 @@ const UserRanking = () => {
                     userRankingList.map(user => (
                         <div
                         key={user.user_no}
-                        className={`${styles.user} ${styles[user.boundary_class_name]} ${styles[user.background_class_name]}`}
+                        className={`${styles.user} ${decoStyles[user.boundary_class_name]} ${decoStyles[user.background_class_name]}`}
                         >
-                        <div className={styles[user.title_class_name]}>
+                        <div className={decoStyles[user.title_class_name]}>
                             {user.user_nick}
                         </div>
                         </div>
