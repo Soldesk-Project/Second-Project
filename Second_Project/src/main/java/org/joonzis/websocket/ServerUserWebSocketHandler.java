@@ -123,25 +123,68 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
     public void notifyUserStyleUpdate(String userNo) throws Exception {
     	log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
         String server = findServerByUserNo(userNo);
-        if (server == null) return;
 
-        // DB에서 최신 유저 정보 조회 및 세션 업데이트
+        // DB에서 최신 유저 정보 조회
         UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));
         if (updatedUser == null) return;
 
-        Map<WebSocketSession, UserInfo> sessions = serverSessions.get(server);
-        if (sessions != null) {
-            for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
-                UserInfo info = entry.getValue();
-                if (userNo.equals(info.getUserNo())) {
-                    info.setBgName(updatedUser.getBackground_class_name());
-                    info.setBlName(updatedUser.getBalloon_class_name());
-                    info.setBdName(updatedUser.getBoundary_class_name());
-                    info.setTitleName(updatedUser.getTitle_class_name());
-                }
+        boolean updated = false;
+
+        // server를 찾은 경우 해당 서버에만
+        if (server != null) {
+            Map<WebSocketSession, UserInfo> sessions = serverSessions.get(server);
+            updated = updateUserStyleInSessions(sessions, userNo, updatedUser);
+            if (updated) {
+                broadcastUserList(server);
+                return;
             }
         }
-        broadcastUserList(server);
+
+        // server를 못 찾았거나, 세션에서 못 찾았을 때 → 모든 서버에 fallback 시도
+        for (String s : serverSessions.keySet()) {
+            Map<WebSocketSession, UserInfo> sessions = serverSessions.get(s);
+            if (updateUserStyleInSessions(sessions, userNo, updatedUser)) {
+                log.warn("fallback broadcast: userNo=" + userNo + "에 대해 서버 '" + s + "'에 적용");
+                broadcastUserList(s);
+            }
+        }
+//    	log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
+//        String server = findServerByUserNo(userNo);
+//        if (server == null) return;
+//
+//        // DB에서 최신 유저 정보 조회 및 세션 업데이트
+//        UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));
+//        if (updatedUser == null) return;
+//
+//        Map<WebSocketSession, UserInfo> sessions = serverSessions.get(server);
+//        if (sessions != null) {
+//            for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
+//                UserInfo info = entry.getValue();
+//                if (userNo.equals(info.getUserNo())) {
+//                    info.setBgName(updatedUser.getBackground_class_name());
+//                    info.setBlName(updatedUser.getBalloon_class_name());
+//                    info.setBdName(updatedUser.getBoundary_class_name());
+//                    info.setTitleName(updatedUser.getTitle_class_name());
+//                }
+//            }
+//        }
+//        broadcastUserList(server);
+    }
+    
+    private boolean updateUserStyleInSessions(Map<WebSocketSession, UserInfo> sessions, String userNo, UserInfoDecoDTO updatedUser) {
+        if (sessions == null) return false;
+        boolean updated = false;
+        for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
+            UserInfo info = entry.getValue();
+            if (userNo.equals(info.getUserNo())) {
+                info.setBgName(updatedUser.getBackground_class_name());
+                info.setBlName(updatedUser.getBalloon_class_name());
+                info.setBdName(updatedUser.getBoundary_class_name());
+                info.setTitleName(updatedUser.getTitle_class_name());
+                updated = true;
+            }
+        }
+        return updated;
     }
     
     @Override
