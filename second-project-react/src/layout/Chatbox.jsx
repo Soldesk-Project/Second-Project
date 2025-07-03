@@ -10,6 +10,8 @@ const Chatbox = () => {
     const [messageInput, setMessageInput] = useState('');
     const [isWhisperMode, setIsWhisperMode] = useState(false);
     const [whisperTarget, setWhisperTarget] = useState('');
+    // TODO: 귓속말 대상의 userNo를 저장하는 상태 추가 (서버 연동을 위해 필요)
+    // const [whisperTargetNo, setWhisperTargetNo] = useState(null); 
     const chatLogRef = useRef(null);
 
     // 'addUser' 메시지를 서버에 한 번만 전송했는지 추적하는 플래그입니다.
@@ -18,7 +20,7 @@ const Chatbox = () => {
     // Redux에서 사용자 정보 가져오기
     const currentUser = useSelector((state) => state.user.user);
     const userNick = currentUser?.user_nick; // 사용자 닉네임
-    const userNo = currentUser?.user_no;     // 사용자 번호 (새로 추가)
+    const userNo = currentUser?.user_no;     // 사용자 번호
 
     // 1. WebSocket 연결 및 구독 로직
     useEffect(() => {
@@ -29,52 +31,53 @@ const Chatbox = () => {
         }
 
         // --- 중요: StrictMode 대응 로직 시작 ---
+        // 이미 연결되어 있다면 다시 연결 시도하지 않음
         if (stompClientInstanceRef.current && stompClientInstanceRef.current.connected) {
             console.log("STOMP Client already connected for username:", userNick, ". Skipping re-initialization.");
+            // StrictMode에서 두 번째 렌더링 시에도 addUser가 보내지지 않았다면 여기서 보낼 수 있도록 조정
+            if (!hasSentAddUserRef.current) {
+                console.log("Strict Mode: Re-sending addUser message on second render cycle for:", userNick);
+                stompClientInstanceRef.current.send("/app/serverChat.addUser", {}, JSON.stringify({
+                    mType: 'SERVER_JOIN', // 서버 MessageType과 일치
+                    mSender: userNick,
+                    mSenderNo: userNo
+                }));
+                hasSentAddUserRef.current = true;
+            }
             return;
-        }
-
-        if (stompClientInstanceRef.current && !stompClientInstanceRef.current.connected) {
-             console.log("Existing STOMP client in ref is not connected, attempting to disconnect for clean start.");
-             stompClientInstanceRef.current.disconnect(() => {
-                 console.log("Previous STOMP client disconnected for clean start.");
-                 stompClientInstanceRef.current = null;
-             });
-             return; // 다음 렌더링 사이클에서 다시 연결 시도
         }
         // --- StrictMode 대응 로직 끝 ---
 
-
-        // console.log(`Attempting to connect with username: ${userNick}, userNo: ${userNo}`);
+        console.log(`Attempting to connect with username: ${userNick}, userNo: ${userNo}`);
 
         const socket = new SockJS('http://192.168.0.112:9099/ws-chat');
-        // STOMP.js 경고 해결: SockJS 인스턴스를 팩토리 함수로 전달
-        const client = Stomp.over(() => socket); // <--- 이 부분 수정
+        const client = Stomp.over(() => socket); // SockJS 인스턴스를 팩토리 함수로 전달
 
         client.connect({}, frame => {
-            // console.log('Connected: ' + frame);
+            console.log('Connected: ' + frame);
             stompClientInstanceRef.current = client;
 
-            // 공개 채팅방 메시지 수신
-            client.subscribe('/topic/public', message => {
+            // 공개 채팅방 메시지 수신 (서버: /serverChat/public)
+            client.subscribe('/serverChat/public', message => {
                 const receivedMessage = JSON.parse(message.body);
-                // console.log("공개 메시지 수신:", receivedMessage); // 디버깅용
+                console.log("공개 메시지 수신:", receivedMessage); // 디버깅용
                 setMessages(prevMessages => [...prevMessages, receivedMessage]);
             });
 
-            // 귓속말 채팅방 메시지 수신
-            // 서버에서 닉네임으로 메시지를 라우팅하기 때문에, 클라이언트 구독도 닉네임 기반으로 유지
-            client.subscribe(`/user/${userNick}/queue/whisper`, message => {
+            // 귓속말 채팅방 메시지 수신 (서버: /user/{userNo}/queue/messages)
+            // 구독 목적지를 서버 컨트롤러의 convertAndSendToUser와 일치시킵니다.
+            client.subscribe(`/user/${userNo}/queue/messages`, message => {
                 const receivedMessage = JSON.parse(message.body);
-                // console.log("귓속말 메시지 수신:", receivedMessage); // 디버깅용
+                console.log("귓속말 메시지 수신:", receivedMessage); // 디버깅용
                 setMessages(prevMessages => [...prevMessages, receivedMessage]);
             });
 
             // 'addUser' 메시지는 딱 한 번만 서버로 전송합니다.
             if (!hasSentAddUserRef.current) {
-                // console.log("Sending addUser message for:", userNick, "UserNo:", userNo);
-                client.send("/app/chat.addUser", {}, JSON.stringify({
-                    mType: 'JOIN',
+                console.log("Sending addUser message for:", userNick, "UserNo:", userNo);
+                // 서버의 @MessageMapping("/serverChat.addUser")와 mType: 'SERVER_JOIN'과 일치시킴
+                client.send("/app/serverChat.addUser", {}, JSON.stringify({
+                    mType: 'SERVER_JOIN', // 서버 MessageType과 일치
                     mSender: userNick,
                     mSenderNo: userNo // UserNo 포함하여 전송
                 }));
@@ -95,9 +98,9 @@ const Chatbox = () => {
             const currentClient = stompClientInstanceRef.current;
             if (currentClient && currentClient.connected) {
                 console.log("Disconnecting STOMP client in cleanup for username:", userNick);
-                // LEAVE 메시지 전송 (선택 사항: 서버에서 세션 끊김 감지 시 자동 처리될 수도 있음)
-                currentClient.send("/app/chat.addUser", {}, JSON.stringify({
-                    mType: 'LEAVE',
+                // LEAVE 메시지 전송 (서버: /app/serverChat.leaveUser)
+                currentClient.send("/app/serverChat.leaveUser", {}, JSON.stringify({
+                    mType: 'SERVER_LEAVE', // 서버 MessageType과 일치
                     mSender: userNick,
                     mSenderNo: userNo // UserNo 포함하여 전송
                 }));
@@ -108,7 +111,7 @@ const Chatbox = () => {
                 console.log("STOMP client not connected or already disconnected in cleanup for username:", userNick);
             }
             stompClientInstanceRef.current = null;
-            hasSentAddUserRef.current = false;
+            hasSentAddUserRef.current = false; // 클린업 시 플래그 초기화
         };
     }, [userNick, userNo]); // userNick과 userNo가 변경될 때만 이펙트가 다시 실행되도록 의존성 설정
 
@@ -132,17 +135,22 @@ const Chatbox = () => {
                                 String(now.getSeconds()).padStart(2, '0');
 
             if (isWhisperMode && whisperTarget.trim()) {
-                stompClientInstanceRef.current.send("/app/chat.sendWhisper", {}, JSON.stringify({
-                    mType: 'WHISPER',
+                // TODO: whisperTarget(닉네임)에 해당하는 userNo를 찾아 mReceiverNo로 함께 전송해야 합니다.
+                // 현재 코드로는 mReceiverNo를 보낼 수 없어 서버에서 귓속말 라우팅이 어려울 수 있습니다.
+                // 임시로 mReceiverNo는 주석 처리합니다.
+                stompClientInstanceRef.current.send("/app/whisperChat.sendMessage", {}, JSON.stringify({ // 서버의 @MessageMapping과 일치
+                    mType: 'WHISPER_CHAT', // 서버 MessageType과 일치
                     mSender: userNick,
-                    mSenderNo: userNo, // mSenderNo 포함
+                    mSenderNo: userNo,
                     mContent: messageInput,
-                    mReceiver: whisperTarget, // mReceiverNo는 서버에서 처리 (닉네임 기반)
+                    mReceiver: whisperTarget,
+                    // mReceiverNo: whisperTargetNo, // <-- 귓속말 대상의 userNo (필요 시 추가)
                     mTimestamp: timestamp
                 }));
             } else {
-                stompClientInstanceRef.current.send("/app/chat.sendMessage", {}, JSON.stringify({
-                    mType: 'CHAT',
+                // 서버의 @MessageMapping("/serverChat.sendMessage")와 mType: 'SERVER_CHAT'과 일치시킴
+                stompClientInstanceRef.current.send("/app/serverChat.sendMessage", {}, JSON.stringify({
+                    mType: 'SERVER_CHAT', // 서버 MessageType과 일치
                     mSender: userNick,
                     mSenderNo: userNo, // mSenderNo 포함
                     mContent: messageInput,
@@ -167,6 +175,7 @@ const Chatbox = () => {
         setIsWhisperMode(prev => !prev);
         if (!isWhisperMode) {
             setWhisperTarget('');
+            // setWhisperTargetNo(null); // 귓속말 모드 해제 시 대상 번호도 초기화
         }
     };
 
@@ -194,10 +203,10 @@ const Chatbox = () => {
 
             <div className="chatbox-log" ref={chatLogRef}>
                 {messages.map((msg, index) => (
-                    <div key={index} className={`chat-message ${msg.mSender === userNick ? 'my-message' : ''} ${msg.mType === 'WHISPER' ? 'whisper' : ''} ${msg.mType === 'JOIN' || msg.mType === 'LEAVE' ? 'system-message' : ''}`}>
-                        {msg.mType === 'JOIN' || msg.mType === 'LEAVE' ? (
+                    <div key={index} className={`chat-message ${msg.mSender === userNick ? 'my-message' : ''} ${msg.mType === 'WHISPER_CHAT' ? 'whisper' : ''} ${msg.mType === 'SERVER_JOIN' || msg.mType === 'SERVER_LEAVE' ? 'system-message' : ''}`}>
+                        {msg.mType === 'SERVER_JOIN' || msg.mType === 'SERVER_LEAVE' ? (
                             <span className="system-text">{msg.mContent} <span className="timestamp">[{msg.mTimestamp}]</span></span>
-                        ) : msg.mType === 'WHISPER' ? (
+                        ) : msg.mType === 'WHISPER_CHAT' ? (
                             <>
                                 <span className="whisper-text">
                                     [귓속말] {msg.mSender === userNick ? `To ${msg.mReceiver}` : `From ${msg.mSender}`}:
@@ -205,7 +214,7 @@ const Chatbox = () => {
                                 <span className="message-content">{msg.mContent}</span>
                                 <span className="timestamp">[{msg.mTimestamp}]</span>
                             </>
-                        ) : (
+                        ) : ( // SERVER_CHAT (일반 메시지)
                             <>
                                 <span className="sender">{msg.mSender}:</span>
                                 <span className="message-content">{msg.mContent}</span>
