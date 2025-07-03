@@ -48,6 +48,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             case "joinRoom":
             	handleJoinRoom(session, json);
             	break;
+            case "leaveRoom":
+            	handleLeaveRoom(session, json);
+            	break;
         }
     }
 
@@ -85,6 +88,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     private AtomicInteger roomIndex = new AtomicInteger(1);
     private void handleCreateRoom(WebSocketSession session, JsonNode json) {
         String server = (String) session.getAttributes().get("server");
+        String userNick = (String) session.getAttributes().get("userNick");
         if (server == null) return;
 
         // 방 생성 정보 파싱
@@ -102,8 +106,23 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         // 서버별 방 목록 업데이트
         serverRooms.computeIfAbsent(server, k -> new ArrayList<>()).add(newRoom);
         
+        roomUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
+        	.computeIfAbsent(newRoom.getGameroom_no(), k -> ConcurrentHashMap.newKeySet())
+        	.add(userNick);
         // 모든 클라이언트에게 방 목록 브로드캐스트
         broadcastRoomList(server);
+        
+        try {
+            String msg = objectMapper.writeValueAsString(Map.of(
+                "type", "roomCreated",
+                "gameroom_no", newRoom.getGameroom_no()
+            ));
+            if (session.isOpen()) {
+            	session.sendMessage(new TextMessage(msg));
+            }
+        } catch (Exception e) {
+        	System.out.println(e);
+        }
     }
 
     private void handleJoinRoom(WebSocketSession session, JsonNode json) {
@@ -121,7 +140,31 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	    broadcastRoomList(server);
     }	
     
-    
+    private void handleLeaveRoom(WebSocketSession session, JsonNode json) {
+        String server = (String) session.getAttributes().get("server");
+        String userNick = (String) session.getAttributes().get("userNick");
+        if (server == null || userNick == null) return;
+
+        String roomNo = json.get("roomNo").asText();
+
+        // 방 참가자 목록에서 유저 제거
+        Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
+        if (roomUserMap.containsKey(roomNo)) {
+            Set<String> users = roomUserMap.get(roomNo);
+            users.remove(userNick);
+
+            // 방 인원이 0명이면 방 삭제
+            if (users.isEmpty()) {
+                roomUserMap.remove(roomNo);
+                List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
+                rooms.removeIf(room -> room.getGameroom_no().equals(roomNo));
+            }
+        }
+
+        // 방 목록, 유저 목록 전체 브로드캐스트
+        broadcastRoomList(server);
+        broadcastUserList(server);
+    }
     
     private void broadcastUserList(String server) {
         Set<String> users = serverUsers.getOrDefault(server, Collections.emptySet());
@@ -175,11 +218,26 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         String server = (String) session.getAttributes().get("server");
         String userNick = (String) session.getAttributes().get("userNick");
         
-        if (server != null) {
+        if (server != null && userNick != null) {
             // 세션 및 유저 목록에서 제거
             serverSessions.getOrDefault(server, Collections.emptySet()).remove(session);
             serverUsers.getOrDefault(server, Collections.emptySet()).remove(userNick);
+            
+            
+            Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
+            List<String> emptyRooms = new ArrayList<>();
+            
+            if (!emptyRooms.isEmpty()) {
+                List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
+                for (String roomNo : emptyRooms) {
+                    roomUserMap.remove(roomNo); // 참가자 목록에서 삭제
+                    rooms.removeIf(room -> room.getGameroom_no().equals(roomNo)); // 방 목록에서 삭제
+                }
+            }
+                      
+            
             broadcastUserList(server);
+            broadcastRoomList(server);
         }
     }
 

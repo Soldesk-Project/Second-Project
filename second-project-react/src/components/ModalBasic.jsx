@@ -36,13 +36,11 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen }) => {
       limit,
       pwd : isPrivate ? password : null
     };
-
-    console.log(socket);
-    console.log(socket.readyState);
     
     if (socket && socket.readyState === 1) {
       socket.send(JSON.stringify(roomData));
       setModalOpen(false);
+      
     } else {
       alert("웹소켓 연결이 준비되지 않았습니다.");
     }

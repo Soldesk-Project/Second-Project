@@ -10,7 +10,7 @@ import { Stomp } from '@stomp/stompjs';
 const RoomList = () => {
   // 방 인원수 0명일 때 방 삭제
   // 방 생성 후 바로 입장 되기
-  // 방 헤더 없애고 나가기버튼 만들어서 인원수 나타내기 
+  // 방 헤더 없애고 나가기버튼 만들어서 인원수 나타내기
 
   const [gameRoomList, setGameRoomList] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -40,13 +40,18 @@ const RoomList = () => {
     };
 
     socketRef.current.onmessage = (event) => {
-      // console.log("Received data:", event.data);
       const data = JSON.parse(event.data);
       if (data.type === "roomList") {
-        // console.log("Room list received:", data.rooms);
         setGameRoomList(data.rooms);
-        // console.log(data.rooms);
       }
+      if (data.type === "roomCreated") {
+        socketRef.current.send(JSON.stringify({
+          action: "joinRoom",
+          roomNo: data.gameroom_no,
+          userNick: userNick
+        }));
+        nav('/gameRoom/' + data.gameroom_no);
+      }   
     };
 
     socketRef.current.onclose = () => {
@@ -77,9 +82,7 @@ const RoomList = () => {
     } else {
       alert("웹소켓 연결이 준비되지 않았습니다.");
     }
-
-    // console.log(roomNo);
-    nav('/gameRoom/'+roomNo, { replace: true });
+    nav('/gameRoom/'+roomNo);
   }
 
   const handleQuickMatch = async () => {
