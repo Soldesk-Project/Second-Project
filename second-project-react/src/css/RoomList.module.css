@@ -12,11 +12,10 @@
   border-radius: 50px;
   color: white;
   cursor: pointer;
-  flex: 0.4;
+  flex: 0 0 auto;
 }
 
 .roomListSearch{
-  width: 780px;
   height: 40px;
   margin: 0 10px;
   padding-left: 20px;
@@ -24,6 +23,8 @@
   background-color: white;
   border: 3px solid black;
   border-radius: 20px;
+  flex: 1 1 0;      /* grow:1, shrink:1, basis:0 */
+  min-width: 200px;
 }
 
 .roomListBody {
@@ -31,10 +32,10 @@
   flex-direction: column;
   gap: 10px;
   padding: 10px;
-  background-color: rgba(10, 13, 23, 0.8);;
+  background-color: rgba(255, 255 , 255, 0.1);
   border-radius: 10px;
   color: black;
-  height: 448px;
+  height: 523px;
   box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.3);
   overflow-y: auto;
 }
