@@ -1,0 +1,7 @@
+.AchievementsList-box{
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  flex: 1;            /* 남은 공간을 전부 차지 */
+  min-height: 0;      /* overflow 컨트롤을 위해 종종 필요 */
+  overflow:auto;
+}

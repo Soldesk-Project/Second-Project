@@ -1,3 +1,15 @@
+.body_left,
+.body_content,
+.lobby_center {
+  min-height: 0;
+}
+
+.lobby_center {
+  flex: 1;                    /* .body_content 안에서 남은 공간 차지 */
+  display: flex;              /* flex 컨테이너로 전환 */
+  flex-direction: column;     /* 세로 쌓기 */
+}
+
 /* 전체 컨테이너 */
 .container {
   display: flex;
