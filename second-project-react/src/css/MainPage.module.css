@@ -23,8 +23,13 @@
   overflow: hidden;
   padding: 20px 20px;
   color: black;
+  width: 100%;
   background-color: white;
-  background-image: url('../../public/images/mainBackground.png');
+  background-image: url('../../public/images/violet2.png');
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  background-position: center top;
+
 }
 
 /* 좌측 묶음: 유저정보 + 로비 + 채팅 */
