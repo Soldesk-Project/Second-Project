@@ -146,6 +146,11 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         if (server == null || userNick == null) return;
 
         String roomNo = json.get("roomNo").asText();
+        
+        System.out.println("방 나가기 로직 타는지 테스트");
+        System.out.println(roomNo+".------------.");
+        
+        
 
         // 방 참가자 목록에서 유저 제거
         Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
@@ -226,6 +231,15 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             
             Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
             List<String> emptyRooms = new ArrayList<>();
+            
+            for (Map.Entry<String, Set<String>> entry : roomUserMap.entrySet()) {
+                Set<String> users = entry.getValue();
+                users.remove(userNick);
+                // 방 인원이 0명이면 삭제 대상에 추가
+                if (users.isEmpty()) {
+                    emptyRooms.add(entry.getKey());
+                }
+            }
             
             if (!emptyRooms.isEmpty()) {
                 List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
