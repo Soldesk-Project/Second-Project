@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { setUser } from './store/userSlice';
-import styles from '../src/App.css';
 
 import LoginForm from './pages/login/LoginForm';
 import MainPage from './pages/MainPage';
@@ -19,6 +18,7 @@ import InPlay from './pages/InPlay';
 import CustomerServiceCenter from './pages/CustomerServiceCenter';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { WebSocketProvider } from './util/WebSocketProvider';
 
 function App() {
   const dispatch = useDispatch();
@@ -42,22 +42,24 @@ function App() {
   return (
     // <MemoryRouter initialEntries={["/"]}></MemoryRouter>
     // <Router> 대신 위에거 넣으면 히스토리를 메모리에서만 관리해서 유저가 히스토리 이동이 불가능해짐
-    <Router>
-      <Routes>
-        <Route path="/" element={<LoginForm />} />
-        <Route path="/server" element={<ServerSelect />} />
-        <Route path="/signUp" element={<SignUp />} />
-        <Route path="/findId" element={<FindId />} />
-        <Route path="/findPw" element={<FindPw />} />
-        <Route path="/kakao/callback" element={<KakaoCallback />} />
-        <Route path="/main/:serverNo" element={<MainPage />} />
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/achievements" element={<Achievements />} />
-        <Route path="/itemBook" element={<ItemBook />} />
-        <Route path="/gameRoom/:roomNo" element={<InPlay />} />
-        <Route path="/customer" element={<CustomerServiceCenter />} />
-      </Routes>
-    </Router>
+    <WebSocketProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LoginForm />} />
+          <Route path="/server" element={<ServerSelect />} />
+          <Route path="/signUp" element={<SignUp />} />
+          <Route path="/findId" element={<FindId />} />
+          <Route path="/findPw" element={<FindPw />} />
+          <Route path="/kakao/callback" element={<KakaoCallback />} />
+          <Route path="/main/:serverNo" element={<MainPage />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/achievements" element={<Achievements />} />
+          <Route path="/itemBook" element={<ItemBook />} />
+          <Route path="/gameRoom/:roomNo" element={<InPlay />} />
+          <Route path="/customer" element={<CustomerServiceCenter />} />
+        </Routes>
+      </Router>
+    </WebSocketProvider>
   );
 }
 

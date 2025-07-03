@@ -107,8 +107,8 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         serverRooms.computeIfAbsent(server, k -> new ArrayList<>()).add(newRoom);
         
         roomUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
-        	.computeIfAbsent(newRoom.getGameroom_no(), k -> ConcurrentHashMap.newKeySet())
-        	.add(userNick);
+	             .computeIfAbsent(newRoom.getGameroom_no(), k -> ConcurrentHashMap.newKeySet())
+	        	 .add(userNick);
         // 모든 클라이언트에게 방 목록 브로드캐스트
         broadcastRoomList(server);
         
@@ -146,12 +146,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         if (server == null || userNick == null) return;
 
         String roomNo = json.get("roomNo").asText();
-        
-        System.out.println("방 나가기 로직 타는지 테스트");
-        System.out.println(roomNo+".------------.");
-        
-        
-
+      
         // 방 참가자 목록에서 유저 제거
         Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
         if (roomUserMap.containsKey(roomNo)) {
@@ -241,12 +236,21 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
                 }
             }
             
-            if (!emptyRooms.isEmpty()) {
-                List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
-                for (String roomNo : emptyRooms) {
-                    roomUserMap.remove(roomNo); // 참가자 목록에서 삭제
-                    rooms.removeIf(room -> room.getGameroom_no().equals(roomNo)); // 방 목록에서 삭제
-                }
+            List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
+
+            // 각 빈 방마다 개별적으로 유예 시간 후 삭제 체크
+            for (String roomNo : emptyRooms) {
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Set<String> checkUsers = roomUserMap.get(roomNo);
+                        if (checkUsers == null || checkUsers.isEmpty()) {
+                            roomUserMap.remove(roomNo);
+                            rooms.removeIf(room -> room.getGameroom_no().equals(roomNo));
+                            broadcastRoomList(server);
+                        }
+                    }
+                }, 5000); // 5초 후 체크
             }
                       
             
