@@ -6,7 +6,7 @@ import ChargeModal from '../components/ChargeModal';
 import { useSelector } from 'react-redux';
 
 const Shop = () => {
-  // 1) 포인트 충전 탭은 tabs 배열에서 뺍니다
+  // 1) 포인트 충전 탭은 tabs 배열에서 제외함
   const allTabs = ['테두리', '칭호', '배경', '말풍선', '랜덤박스'];
   const [activeTab, setActiveTab] = useState(allTabs[0]);
   const [items, setItems]   = useState([]);
@@ -68,8 +68,7 @@ const Shop = () => {
           </div>
         </div>
 
-      {/* 콘텐츠 영역 */}
-
+      {/* 상품 영역 */}
         <div className={styles.shopMaingrid}>
           <div className={styles.grid}>
             {items.length
