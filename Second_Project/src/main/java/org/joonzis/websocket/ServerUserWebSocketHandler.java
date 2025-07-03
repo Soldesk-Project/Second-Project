@@ -59,7 +59,6 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         else if ("updateStyle".equals(action) && userNo != null) {
             log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
 
-            // 1. 유저 최신 정보 DB에서 조회
             UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));
             if (updatedUser == null) {
                 log.warn("해당 userNo의 유저 정보를 DB에서 찾을 수 없습니다: " + userNo);
@@ -67,42 +66,33 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             }
             log.info("DB에서 조회한 최신 유저 정보: " + updatedUser);
 
-            // 2. 해당 유저가 접속한 서버 찾기
             String userServer = findServerByUserNo(userNo);
             if (userServer == null) {
                 log.warn("userNo=" + userNo + "가 접속한 서버를 찾을 수 없음");
                 return;
             }
 
-            // 3. 서버Sessions에 해당 세션(들)의 UserInfo 업데이트
             Map<WebSocketSession, UserInfo> sessions = serverSessions.get(userServer);
             if (sessions != null) {
-            	log.info("해당 서버 접속 세션 수: " + sessions.size());
                 boolean updated = false;
                 for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
                     UserInfo info = entry.getValue();
-                    log.info("세션 " + entry.getKey().getId() + " 유저No: " + info.getUserNo());
                     if (userNo.equals(info.getUserNo())) {
-                        // UserInfo 업데이트
-                    	log.info("UserInfo 업데이트 전: " + info);
                         info.setBgName(updatedUser.getBackground_class_name());
                         info.setBlName(updatedUser.getBalloon_class_name());
                         info.setBdName(updatedUser.getBoundary_class_name());
                         info.setTitleName(updatedUser.getTitle_class_name());
-                        log.info("UserInfo 업데이트 후: " + info);
                         updated = true;
                     }
                 }
-                if (!updated) {
+                if (updated) {
+                    broadcastUserList(userServer);
+                } else {
                     log.warn("해당 userNo에 해당하는 UserInfo가 세션에 존재하지 않음: " + userNo);
                 }
             } else {
                 log.warn("해당 서버에 접속 세션이 없음: " + userServer);
             }
-            
-
-            // 4. 최신 유저 목록 다시 브로드캐스트
-            broadcastUserList(userServer);
         }
     }
     
@@ -121,30 +111,33 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
     }
     
     public void notifyUserStyleUpdate(String userNo) throws Exception {
-    	log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
-        String server = findServerByUserNo(userNo);
-
-        // DB에서 최신 유저 정보 조회
-        UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));
-        if (updatedUser == null) return;
+        log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
+        
+        String server = findServerByUserNo(userNo);  // ① 서버 탐색
+        UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));  // ② DB 조회
+        log.info(updatedUser);
+        if (updatedUser == null) return;  // ❗ A: 여기서 return 되면 그 이후 실행 안 됨
 
         boolean updated = false;
 
-        // server를 찾은 경우 해당 서버에만
         if (server != null) {
-        	log.info("[Server] 찾음 해당 서버만 적용");
+            log.info("[Server] 찾음 해당 서버만 적용");
             Map<WebSocketSession, UserInfo> sessions = serverSessions.get(server);
             updated = updateUserStyleInSessions(sessions, userNo, updatedUser);
             if (updated) {
                 broadcastUserList(server);
-                return;
+                return; // ❗ B: 여기서 return 되면 fallback은 실행 안 됨
             }
         }
 
-        // server를 못 찾았거나, 세션에서 못 찾았을 때 → 모든 서버에 fallback 시도
+        // ✅ 기대하는 fallback
         for (String s : serverSessions.keySet()) {
-        	log.info("[Server] 못 찾음 모든 서버에 적용 시도");
+            log.info("[Server] 못 찾음 모든 서버에 적용 시도: server=" + s);
             Map<WebSocketSession, UserInfo> sessions = serverSessions.get(s);
+            for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
+                log.info("유저 확인: sessionUserNo=" + entry.getValue().getUserNo());
+            }
+
             if (updateUserStyleInSessions(sessions, userNo, updatedUser)) {
                 log.warn("fallback broadcast: userNo=" + userNo + "에 대해 서버 '" + s + "'에 적용");
                 broadcastUserList(s);
@@ -157,7 +150,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         boolean updated = false;
         for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
             UserInfo info = entry.getValue();
-            if (userNo.equals(info.getUserNo())) {
+            if (userNo.equals(String.valueOf(info.getUserNo()))) {
                 info.setBgName(updatedUser.getBackground_class_name());
                 info.setBlName(updatedUser.getBalloon_class_name());
                 info.setBdName(updatedUser.getBoundary_class_name());

@@ -1,9 +1,10 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styles from '../css/UserRanking.module.css';
 import decoStyles from '../css/Decorations.module.css';
 import TestModal from './TestModal';
 import { useSelector } from 'react-redux';
+import { WebSocketContext } from '../util/WebSocketProvider';
 
 const UserRanking = () => {
 
@@ -13,6 +14,7 @@ const UserRanking = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { user } = useSelector((state) => state.user);
     const user_no = user.user_no;
+    const sockets = useContext(WebSocketContext);
 
     const getUserRankingList = async () => {
         const resp = await axios.get('/user/ranking');
@@ -41,7 +43,7 @@ const UserRanking = () => {
         }
     }
 
-    const sendItemNameToBackend = async (css_class_name,item_type) => {
+    const sendItemNameToBackend = async (css_class_name, item_type) => {
         try {
             const resp = await axios.post('/user/item/select', { 
                 css_class_name, 
@@ -49,10 +51,22 @@ const UserRanking = () => {
                 user_no
             });
             if (resp.status === 200) {
-            console.log('아이템 전송 성공:', css_class_name);
-            getUserRankingList();
+                console.log('아이템 전송 성공:', css_class_name);
+                getUserRankingList();
+
+                // ✅ WebSocket을 통해 서버에 style 업데이트 요청
+                const socket = sockets['server'];
+                if (socket && socket.readyState === 1) {
+                    socket.send(JSON.stringify({
+                        action: 'updateStyle',
+                        userNo: user_no
+                    }));
+                } else {
+                    console.warn("WebSocket 연결이 아직 열려 있지 않음");
+                }
+
             } else {
-            console.error('아이템 전송 실패:', resp.status);
+                console.error('아이템 전송 실패:', resp.status);
             }
         } catch (error) {
             console.error('아이템 전송 중 에러:', error);
