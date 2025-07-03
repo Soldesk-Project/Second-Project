@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.log4j.Log4j;
 
-import org.joonzis.websocket.dto.UserInfo;
+import org.joonzis.domain.UserInfoDecoDTO;
+import org.joonzis.service.UserService;
+import org.joonzis.websocket.util.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
@@ -21,14 +23,16 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
     // 서버 ID -> (세션 -> 유저ID) 매핑
 	private final Map<String, Map<WebSocketSession, UserInfo>> serverSessions = new ConcurrentHashMap<>();
 
+	@Autowired
+    private UserService userService;
+	
     @Autowired
     private ObjectMapper objectMapper; // Jackson 사용
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
-        log.info("[Server] 메시지 수신: " + payload);
-        // ✅ JSON을 안전하게 파싱
+        
         Map<String, String> data = objectMapper.readValue(payload, new TypeReference<Map<String, String>>() {});
         
         String action = data.get("action");
@@ -41,16 +45,85 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         String titleName = data.get("titleName");
 
         if ("join".equals(action) && server != null && userNick != null) {
-            // 1) 기존 세션 제거
             removeSessionFromAllServers(session);
 
-            // 2) 새 서버에 세션 추가
             serverSessions.putIfAbsent(server, new ConcurrentHashMap<>());
             serverSessions.get(server).put(session, new UserInfo(userNick, userNo, bgName, blName, bdName, titleName));
 
             // 3) 해당 서버에 접속한 유저 목록 전송
             broadcastUserList(server);
         }
+        else if ("updateStyle".equals(action) && userNo != null) {
+            log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
+
+            // 1. 유저 최신 정보 DB에서 조회
+            UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));
+            if (updatedUser == null) {
+                log.warn("해당 userNo의 유저 정보를 DB에서 찾을 수 없습니다: " + userNo);
+                return;
+            }
+
+            // 2. 해당 유저가 접속한 서버 찾기
+            String userServer = findServerByUserNo(userNo);
+            if (userServer == null) {
+                log.warn("userNo=" + userNo + "가 접속한 서버를 찾을 수 없음");
+                return;
+            }
+
+            // 3. 서버Sessions에 해당 세션(들)의 UserInfo 업데이트
+            Map<WebSocketSession, UserInfo> sessions = serverSessions.get(userServer);
+            if (sessions != null) {
+                for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
+                    UserInfo info = entry.getValue();
+                    if (userNo.equals(info.getUserNo())) {
+                        // UserInfo 업데이트
+                        info.setBgName(updatedUser.getBackground_class_name());
+                        info.setBlName(updatedUser.getBalloon_class_name());
+                        info.setBdName(updatedUser.getBoundary_class_name());
+                        info.setTitleName(updatedUser.getTitle_class_name());
+                    }
+                }
+            }
+
+            // 4. 최신 유저 목록 다시 브로드캐스트
+            broadcastUserList(userServer);
+        }
+    }
+    
+    // userNo에 해당하는 서버 찾기 메서드 구현
+    private String findServerByUserNo(String userNo) {
+        for (Map.Entry<String, Map<WebSocketSession, UserInfo>> entry : serverSessions.entrySet()) {
+            for (UserInfo userInfo : entry.getValue().values()) {
+                if (userNo.equals(userInfo.getUserNo())) {
+                    return entry.getKey();
+                }
+            }
+        }
+        return null;
+    }
+    
+    public void notifyUserStyleUpdate(String userNo) throws Exception {
+    	log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
+        String server = findServerByUserNo(userNo);
+        if (server == null) return;
+
+        // DB에서 최신 유저 정보 조회 및 세션 업데이트
+        UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));
+        if (updatedUser == null) return;
+
+        Map<WebSocketSession, UserInfo> sessions = serverSessions.get(server);
+        if (sessions != null) {
+            for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
+                UserInfo info = entry.getValue();
+                if (userNo.equals(info.getUserNo())) {
+                    info.setBgName(updatedUser.getBackground_class_name());
+                    info.setBlName(updatedUser.getBalloon_class_name());
+                    info.setBdName(updatedUser.getBoundary_class_name());
+                    info.setTitleName(updatedUser.getTitle_class_name());
+                }
+            }
+        }
+        broadcastUserList(server);
     }
     
     @Override

@@ -1,4 +1,4 @@
-package org.joonzis.websocket.dto;
+package org.joonzis.websocket.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -6,6 +6,7 @@ import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDecoDTO;
 import org.joonzis.service.UserService;
+import org.joonzis.websocket.ServerUserWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,6 +28,9 @@ public class UserController {
 	
 	@Autowired
     private UserService service;
+	
+	 @Autowired
+    private ServerUserWebSocketHandler webSocketHandler;
 
 	// 유저 랭킹
 	@GetMapping(value = "/ranking", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -47,6 +51,12 @@ public class UserController {
 	public ResponseEntity<?> updateItem(@RequestBody UserDecoUpdateDTO UserDecoUpdateDTO) {
 		boolean success = service.updateItem(UserDecoUpdateDTO);
 	    if (success) {
+	    	try {
+	    		log.info("DB업데이트 완료");
+                webSocketHandler.notifyUserStyleUpdate(String.valueOf(UserDecoUpdateDTO.getUser_no()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 	        return ResponseEntity.ok("업데이트 성공");
 	    } else {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업데이트 실패");

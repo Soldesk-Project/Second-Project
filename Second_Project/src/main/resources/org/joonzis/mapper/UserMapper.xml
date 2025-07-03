@@ -61,4 +61,11 @@
 	    </set>
 	    WHERE USER_NO = #{user_no}
 	</update>
+	
+	<select id="getUserInfoByUserNo" resultType="org.joonzis.domain.UserInfoDecoDTO">
+		SELECT *
+		FROM users u
+		JOIN user_deco d ON u.user_no = d.user_no
+		WHERE u.user_no = #{user_no}
+	</select>
 </mapper>
