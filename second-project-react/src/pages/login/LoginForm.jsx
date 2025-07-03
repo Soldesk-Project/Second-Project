@@ -16,6 +16,10 @@ const LoginForm = () => {
   const REDIRECT_URI = "http://localhost:3000/kakao/callback";
   
   const handleLogin = async () => {
+    if (!id || !pw) {
+    alert('ID와 비밀번호를 입력해주세요.');
+    return;
+    }
   try {
     const res = await axios.post('/api/login', { user_id: id, user_pw: pw });
     console.log(res.data.user);
@@ -52,6 +56,12 @@ const LoginForm = () => {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleLogin();
+    }
+  };
+
   return (
     <div className="login-background login-container">
         <img src='images/logo.png' alt='logo' name="login" onClick={handleButtonOption}/>
@@ -76,12 +86,14 @@ const LoginForm = () => {
             placeholder="id"
             value={id}
             onChange={(e) => setId(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
           <input
             type="password"
             placeholder="password"
             value={pw}
             onChange={(e) => setPw(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
           <button onClick={handleLogin} className='loginButton'>login</button>
           <button onClick={handleKakaoLogin} className='kakao-login'>kakao login</button>

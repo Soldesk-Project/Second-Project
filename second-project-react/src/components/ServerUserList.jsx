@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "../css/ServerUserList.module.css";
+import decoStyles from '../css/Decorations.module.css';
 import { useSelector } from "react-redux";
 
 const ServerUserList = () => {
@@ -8,6 +9,10 @@ const ServerUserList = () => {
   const { user, server } = useSelector((state) => state.user);
   const userNick = user.user_nick;
   const userNo = user.user_no;
+  const bgName = user.background_class_name;
+  const blName = user.balloon_class_name;
+  const bdName = user.boundary_class_name;
+  const titleName = user.title_class_name;
   
   // 서버 또는 userId가 바뀔 때마다 WebSocket 연결 재설정
   useEffect(() => {
@@ -26,21 +31,21 @@ const ServerUserList = () => {
       // 서버 입장 메시지 전송
       // console.log("[Client] WebSocket 연결됨, join 메시지 전송:", { action: "join", server, userNick, userNo });  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
       socketRef.current.send(
-        JSON.stringify({ action: "join", server, userNick, userNo})
+        JSON.stringify({ action: "join", server, userNick, userNo, bgName, blName, bdName, titleName})
       );
     };
 
     socketRef.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
       // 서버별 유저 목록 수신 시
-      console.log("[Client] 서버로부터 메시지 수신:", data);  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
+      // console.log("[Client] 서버로부터 메시지 수신:", data);  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
       if (data.type === "userList" && data.server === server) {
         setUsers(data.users);
       }
     };
 
     socketRef.current.onclose = () => {
-      console.log("WebSocket disconnected");  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
+      // console.log("WebSocket disconnected");  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
       setUsers([]); // 소켓 종료 시 유저 목록 비우기
     };
 
@@ -57,18 +62,25 @@ const ServerUserList = () => {
   }, [server, userNick, userNo]);
 
   useEffect(() => {
-    console.log("[Client] users 상태가 갱신됨:", users);  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
+    // console.log("[Client] users 상태가 갱신됨:", users);  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
   }, [users]);
-
+  
   return (
     <div className={styles.container}>
       <div className={styles.header}>{`${server}서버 - 유저 목록`}</div>
       <div className={styles.userList}>
         {
           users.length > 0 ? (
-            users.map(({ userNick, userNo }) => (
-              <div key={`user-${userNo}`} className={styles.user}>{userNick}</div>
+            users.map(({ userNick, userNo, bgName, titleName, bdName }) => (
+              <div 
+                key={`user-${userNo}`} 
+                className={`${styles.user} ${decoStyles[bgName]} ${decoStyles[bdName]}`}>
+                  <div className={`${decoStyles[titleName]}`}>
+                    {userNick}
+                  </div>
+              </div>
             ))
+            
           ) : (
             <p>현재 접속 유저가 없습니다.</p>
           )

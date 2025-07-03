@@ -1,0 +1,47 @@
+.red_bd {
+    border: 2px solid red !important;
+}
+
+.red_title {
+    color: red !important;
+}
+
+.red_bg {
+    background-color: red !important;
+}
+
+.yellow_bd {
+    border: 2px solid yellow !important;
+}
+
+.yellow_title {
+    color: yellow !important;
+}
+
+.yellow_bg {
+    background-color: yellow !important;
+}
+
+.white_bd {
+    border: 2px solid white !important;
+}
+
+.white_title {
+    color: white !important;
+}
+
+.white_bg {
+    background-color: white !important;
+}
+
+.black_bd {
+    border: 2px solid black !important;
+}
+
+.black_title {
+    color: black !important;
+}
+
+.black_bg {
+    background-color: black !important;
+}

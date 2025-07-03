@@ -12,6 +12,7 @@ import java.util.Map;
 import org.joonzis.security.JwtUtil;
 import javax.servlet.http.HttpSession;
 
+import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.service.MemberService;
 import org.json.JSONObject;
@@ -125,10 +126,10 @@ public class LoginController {
 	
 	@PostMapping("/login")
 	@ResponseBody
-	public ResponseEntity<?> login(@RequestBody UsersVO dto, HttpSession session) {
+	public ResponseEntity<?> login(@RequestBody UserInfoDTO dto, HttpSession session) {
 	    System.out.println("🔐 로그인 요청");
 	    
-	    UsersVO user = memberservice.isValidUser(dto.getUser_id(), dto.getUser_pw());
+	    UserInfoDTO user = memberservice.isValidUser(dto.getUser_id(), dto.getUser_pw());
 	    if (user != null) {
 	        String token = jwtUtil.generateToken(user.getUser_id());
 
@@ -151,7 +152,7 @@ public class LoginController {
 	    }
 
 	    String user_id = jwtUtil.getUserIdFromToken(token);
-	    UsersVO user = memberservice.getUserById(user_id);
+	    UserInfoDTO user = memberservice.getUserById(user_id);
 
 	    return ResponseEntity.ok(user); // 전체 정보 그대로 전달
 	}

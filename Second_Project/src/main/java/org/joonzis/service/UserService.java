@@ -16,4 +16,7 @@ public interface UserService {
 
 	// 아이템 업데이트 테스트	
 	public boolean updateItem(UserDecoUpdateDTO UserDecoUpdateDTO);
+	
+	// userNo로 유저 정보+css 찾기	
+	public UserInfoDecoDTO getUserInfoByUserNo(int userNo);
 }

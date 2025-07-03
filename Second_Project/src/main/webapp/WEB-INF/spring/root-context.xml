@@ -53,7 +53,10 @@
     
     <!-- Redis 연결 설정 -->
 	<bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory">
+<<<<<<< HEAD
 
+=======
+>>>>>>> b6dfb574601d522ac9471a0a856d4a7b09668867
 	    <property name="hostName" value="192.168.0.112" />
 	    <property name="port" value="6379" />
 

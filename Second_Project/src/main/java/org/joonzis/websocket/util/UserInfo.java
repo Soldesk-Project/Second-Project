@@ -1,4 +1,4 @@
-package org.joonzis.websocket.dto;
+package org.joonzis.websocket.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,4 +14,8 @@ import lombok.ToString;
 public class UserInfo {
 	private String userNick;
     private String userNo;
+    private String bgName;
+    private String blName;
+    private String bdName;
+    private String titleName;
 }

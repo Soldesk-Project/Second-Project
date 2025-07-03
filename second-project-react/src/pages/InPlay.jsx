@@ -4,11 +4,14 @@ import Chatbox from '../layout/Chatbox';
 import Test from '../components/Test';
 import styles from '../css/Inplay.module.css';
 import { useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const InPlay = () => {
   const [play, setPlay]=useState(false);
   const [users, setUsers] = useState([]);
+  const {roomNo}=useParams();
   const socketRef=useRef(null);
+  const nav=useNavigate();
   const { user, server } = useSelector((state) => state.user);
   const userNick = user.user_nick;
   const userNo = user.user_no;
@@ -22,8 +25,8 @@ const InPlay = () => {
     }
 
     // 새 WebSocket 연결
-    socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/server"); // 경민님쪽 연결
-    // socketRef.current = new WebSocket("ws://localhost:9099/ws/play"); // 테스트할때
+    socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/room"); // 경민님쪽 연결
+    // socketRef.current = new WebSocket("ws://localhost:9099/ws/room"); // 테스트할때
 
     socketRef.current.onopen = () =>  {
       // 서버 입장 메시지 전송
@@ -62,15 +65,29 @@ const InPlay = () => {
 
 
 
-
-
-
   const start=()=>{
     setPlay(true);
   }
   const stop=()=>{
     setPlay(false);
   }
+  const leaveRoom=()=>{
+    console.log(roomNo);
+    
+    if (socketRef.current && socketRef.current.readyState === 1) {
+      socketRef.current.send(JSON.stringify({
+        action: "leaveRoom",
+        roomNo: roomNo,
+        userNick: userNick
+      }));
+    } else {
+      alert("웹소켓 연결이 준비되지 않았습니다.");
+    }
+    nav('/main/'+server);
+  }
+
+
+
   return (
     <div className={styles.container}> {/* 공간 부터 나눴음*/}
 
@@ -89,6 +106,7 @@ const InPlay = () => {
               {
                 play?<Test/>:<h2>대기중</h2>
               }
+              <button onClick={leaveRoom}>나가기</button>
             </div>
 
           </div>
