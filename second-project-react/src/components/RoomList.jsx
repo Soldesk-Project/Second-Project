@@ -45,11 +45,11 @@ const RoomList = () => {
         setGameRoomList(data.rooms);
       }
       if (data.type === "roomCreated") {
-        socketRef.current.send(JSON.stringify({
-          action: "joinRoom",
-          roomNo: data.gameroom_no,
-          userNick: userNick
-        }));
+        // socketRef.current.send(JSON.stringify({
+        //   action: "joinRoom",
+        //   roomNo: data.gameroom_no,
+        //   userNick: userNick
+        // }));
         nav('/gameRoom/' + data.gameroom_no);
       }   
     };

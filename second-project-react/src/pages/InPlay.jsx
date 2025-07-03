@@ -25,8 +25,8 @@ const InPlay = () => {
     }
 
     // 새 WebSocket 연결
-    socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/server"); // 경민님쪽 연결
-    // socketRef.current = new WebSocket("ws://localhost:9099/ws/play"); // 테스트할때
+    socketRef.current = new WebSocket("ws://192.168.0.112:9099/ws/room"); // 경민님쪽 연결
+    // socketRef.current = new WebSocket("ws://localhost:9099/ws/room"); // 테스트할때
 
     socketRef.current.onopen = () =>  {
       // 서버 입장 메시지 전송
