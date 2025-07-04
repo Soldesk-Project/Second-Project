@@ -3,10 +3,10 @@ import Header from '../layout/Header';
 import ItemList from '../components/ItemList';
 import Loading from '../components/Loading';
 import styles from '../css/MainPage.module.css';
-import Chatbox from '../layout/Chatbox';
 import UserRanking from '../components/UserRanking';
 import ServerUserList from '../components/ServerUserList';
 import { useLocation, useParams } from 'react-router-dom';
+import ServerChatbox from '../layout/ServerChatbox';
 
 const ItemBook = () => {
   const { serverNo } = useParams(); // 서버 번호 URL에서 추출
@@ -34,7 +34,7 @@ const ItemBook = () => {
           </div>
 
           {/* 하단 채팅창 */}
-          <div className={styles.chat_box}><Chatbox/></div>
+          <div className={styles.chat_box}><ServerChatbox/></div>
 
         </div>
         {/* 우측 랭킹 목록/ 유저 목록 */}

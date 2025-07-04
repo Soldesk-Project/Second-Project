@@ -1,11 +1,11 @@
 import React from 'react';
 import Header from '../layout/Header';
 import AchievementsList from '../components/AchievementsList';
-import Chatbox from '../layout/Chatbox';
 import UserRanking from '../components/UserRanking';
 import ServerUserList from '../components/ServerUserList';
 import { useLocation, useParams } from 'react-router-dom';
 import styles from '../css/MainPage.module.css';
+import ServerChatbox from '../layout/ServerChatbox';
 
 const Achievements = () => {
   const { serverNo } = useParams(); // 서버 번호 URL에서 추출
@@ -33,7 +33,7 @@ const Achievements = () => {
           </div>
 
           {/* 하단 채팅창 */}
-          <div className={styles.chat_box}><Chatbox/></div>
+          <div className={styles.chat_box}><ServerChatbox/></div>
 
         </div>
         {/* 우측 랭킹 목록/ 유저 목록 */}

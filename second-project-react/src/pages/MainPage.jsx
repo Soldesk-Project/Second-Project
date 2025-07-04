@@ -3,11 +3,11 @@ import Header from '../layout/Header';
 import styles from '../css/MainPage.module.css';
 import RoomList from '../components/RoomList';
 import ServerUserList from '../components/ServerUserList';
-import Chatbox from '../layout/Chatbox';
 import UserRanking from '../components/UserRanking';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { loadUserFromStorage } from '../store/userSlice';
+import ServerChatbox from '../layout/ServerChatbox';
 
 const MainPage = () => {
   const dispatch = useDispatch();
@@ -45,7 +45,7 @@ const MainPage = () => {
           </div>
 
           {/* 하단 채팅창 */}
-          <div className={styles.chat_box}><Chatbox/></div>
+          <div className={styles.chat_box}><ServerChatbox/></div>
 
         </div>
         {/* 우측 랭킹 목록/ 유저 목록 */}

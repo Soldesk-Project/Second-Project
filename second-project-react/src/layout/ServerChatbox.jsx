@@ -1,44 +1,39 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import '../css/chatbox.css'; // CSS 파일 경로 확인
-import { useSelector } from 'react-redux'; // Redux useSelector 훅 임포트
+import '../css/chatbox.css'; // 동일한 CSS 사용 가능
+import { useSelector } from 'react-redux';
 
-const Chatbox = () => {
+const ServerChatbox = () => {
     const stompClientInstanceRef = useRef(null);
     const [messages, setMessages] = useState([]);
     const [messageInput, setMessageInput] = useState('');
     const [isWhisperMode, setIsWhisperMode] = useState(false);
     const [whisperTarget, setWhisperTarget] = useState('');
-    // TODO: 귓속말 대상의 userNo를 저장하는 상태 추가 (서버 연동을 위해 필요)
-    // const [whisperTargetNo, setWhisperTargetNo] = useState(null); 
     const chatLogRef = useRef(null);
-
-    // 'addUser' 메시지를 서버에 한 번만 전송했는지 추적하는 플래그입니다.
     const hasSentAddUserRef = useRef(false);
+    const [isConnected, setIsConnected] = useState(false); // 웹소켓 연결 상태를 추적하는 state
 
-    // Redux에서 사용자 정보 가져오기
     const currentUser = useSelector((state) => state.user.user);
-    const userNick = currentUser?.user_nick; // 사용자 닉네임
-    const userNo = currentUser?.user_no;     // 사용자 번호
+    const userNick = currentUser?.user_nick;
+    const userNo = currentUser?.user_no;
 
-    // 1. WebSocket 연결 및 구독 로직
     useEffect(() => {
-        // userNick 또는 userNo가 없으면 (로그인되지 않은 상태) 연결 시도를 하지 않습니다.
+        console.log('--- ServerChatbox useEffect 시작 ---');
+        console.log(`현재 Redux 사용자 정보: userNick=${userNick}, userNo=${userNo}`);
+
         if (!userNick || userNo === undefined || userNo === null) {
-            console.log("User nickname or number not available from Redux. Skipping WebSocket connection.");
+            console.log("WebSocket 연결 스킵: 사용자 닉네임 또는 번호 없음.");
             return;
         }
 
-        // --- 중요: StrictMode 대응 로직 시작 ---
-        // 이미 연결되어 있다면 다시 연결 시도하지 않음
-        if (stompClientInstanceRef.current && stompClientInstanceRef.current.connected) {
-            console.log("STOMP Client already connected for username:", userNick, ". Skipping re-initialization.");
-            // StrictMode에서 두 번째 렌더링 시에도 addUser가 보내지지 않았다면 여기서 보낼 수 있도록 조정
+        // 엄격 모드(StrictMode) 대응 및 이미 연결되어 있다면 재연결 시도하지 않음
+        if (stompClientInstanceRef.current && isConnected) {
+            console.log("STOMP Client 이미 연결됨 (ServerChatbox). 재초기화 스킵.");
             if (!hasSentAddUserRef.current) {
-                console.log("Strict Mode: Re-sending addUser message on second render cycle for:", userNick);
+                console.log("Strict Mode (ServerChatbox): SERVER_JOIN 메시지 재전송.");
                 stompClientInstanceRef.current.send("/app/serverChat.addUser", {}, JSON.stringify({
-                    mType: 'SERVER_JOIN', // 서버 MessageType과 일치
+                    mType: 'SERVER_JOIN',
                     mSender: userNick,
                     mSenderNo: userNo
                 }));
@@ -46,86 +41,103 @@ const Chatbox = () => {
             }
             return;
         }
-        // --- StrictMode 대응 로직 끝 ---
 
-        console.log(`Attempting to connect with username: ${userNick}, userNo: ${userNo}`);
+        console.log(`STOMP Client (ServerChatbox) 연결 시도 중... (userNick: ${userNick}, userNo: ${userNo})`);
 
-        const socket = new SockJS('http://192.168.0.112:9099/ws-chat');
-        const client = Stomp.over(() => socket); // SockJS 인스턴스를 팩토리 함수로 전달
+        const socket = new SockJS('http://192.168.0.112:9099/ws-chat'); // ★ 일반 서버 채팅 엔드포인트
+        const client = Stomp.over(() => socket);
 
         client.connect({}, frame => {
-            console.log('Connected: ' + frame);
+            console.log('STOMP 연결 성공! (ServerChatbox) 프레임:', frame);
             stompClientInstanceRef.current = client;
+            setIsConnected(true); // 연결 성공 시 true로 설정
+            setMessages([]); // 새로운 연결 시 메시지 목록 초기화
+            console.log("stompClientInstanceRef.current (ServerChatbox) 설정됨:", stompClientInstanceRef.current);
 
-            // 공개 채팅방 메시지 수신 (서버: /serverChat/public)
+            // 공개 채팅방 구독
             client.subscribe('/serverChat/public', message => {
                 const receivedMessage = JSON.parse(message.body);
-                console.log("공개 메시지 수신:", receivedMessage); // 디버깅용
+                console.log("공개 메시지 수신 (ServerChatbox):", receivedMessage);
                 setMessages(prevMessages => [...prevMessages, receivedMessage]);
             });
+            console.log("공개 채팅방 구독 완료 (ServerChatbox): /serverChat/public");
 
-            // 귓속말 채팅방 메시지 수신 (서버: /user/{userNo}/queue/messages)
-            // 구독 목적지를 서버 컨트롤러의 convertAndSendToUser와 일치시킵니다.
+            // 귓속말 채팅방 구독
             client.subscribe(`/user/${userNo}/queue/messages`, message => {
                 const receivedMessage = JSON.parse(message.body);
-                console.log("귓속말 메시지 수신:", receivedMessage); // 디버깅용
+                console.log("귓속말 메시지 수신 (ServerChatbox):", receivedMessage);
                 setMessages(prevMessages => [...prevMessages, receivedMessage]);
             });
+            console.log(`귓속말 채팅방 구독 완료 (ServerChatbox): /user/${userNo}/queue/messages`);
 
-            // 'addUser' 메시지는 딱 한 번만 서버로 전송합니다.
+            // 'addUser' 메시지 전송
             if (!hasSentAddUserRef.current) {
-                console.log("Sending addUser message for:", userNick, "UserNo:", userNo);
-                // 서버의 @MessageMapping("/serverChat.addUser")와 mType: 'SERVER_JOIN'과 일치시킴
+                console.log("SERVER_JOIN 메시지 전송 시도 (ServerChatbox):", { mSender: userNick, mSenderNo: userNo });
                 client.send("/app/serverChat.addUser", {}, JSON.stringify({
-                    mType: 'SERVER_JOIN', // 서버 MessageType과 일치
+                    mType: 'SERVER_JOIN',
                     mSender: userNick,
-                    mSenderNo: userNo // UserNo 포함하여 전송
+                    mSenderNo: userNo
                 }));
                 hasSentAddUserRef.current = true;
+                console.log("SERVER_JOIN 메시지 전송 완료 (ServerChatbox).");
             } else {
-                console.log("addUser message already sent for:", userNick, ". Skipping.");
+                console.log("SERVER_JOIN 메시지 이미 전송됨 (ServerChatbox). 스킵.");
             }
 
         }, error => {
-            console.error("STOMP connection error:", error);
+            console.error("STOMP 연결 에러 발생 (ServerChatbox):", error);
             alert("서버 연결에 실패했습니다. 새로고침 해주세요.");
-            stompClientInstanceRef.current = null;
+            stompClientInstanceRef.current = null; // 에러 시 참조 제거
+            setIsConnected(false); // 연결 실패 시 false로 설정
+            console.log("STOMP Client 참조 null로 설정됨 (ServerChatbox, 연결 에러).");
         });
 
         // 클린업 함수
         return () => {
-            console.log("Cleanup function called for username:", userNick);
+            console.log('--- ServerChatbox useEffect 클린업 함수 실행 ---');
+            console.log(`현재 클린업 대상 user: ${userNick}, isConnected: ${isConnected}`);
             const currentClient = stompClientInstanceRef.current;
+
             if (currentClient && currentClient.connected) {
-                console.log("Disconnecting STOMP client in cleanup for username:", userNick);
-                // LEAVE 메시지 전송 (서버: /app/serverChat.leaveUser)
+                console.log("클린업: STOMP Client (ServerChatbox) 연결 해제 시도 중...");
+                // SERVER_LEAVE 메시지 전송
                 currentClient.send("/app/serverChat.leaveUser", {}, JSON.stringify({
-                    mType: 'SERVER_LEAVE', // 서버 MessageType과 일치
+                    mType: 'SERVER_LEAVE',
                     mSender: userNick,
-                    mSenderNo: userNo // UserNo 포함하여 전송
+                    mSenderNo: userNo
                 }));
+                console.log("클린업: SERVER_LEAVE 메시지 전송 완료 (ServerChatbox).");
+
                 currentClient.disconnect(() => {
-                    console.log("STOMP client disconnected successfully in cleanup.");
+                    console.log("클린업: STOMP Client (ServerChatbox) 성공적으로 연결 해제됨.");
+                    stompClientInstanceRef.current = null; // 연결 해제 후 참조 제거
+                    setIsConnected(false); // 연결 해제 시 false로 설정
                 });
             } else {
-                console.log("STOMP client not connected or already disconnected in cleanup for username:", userNick);
+                console.log("클린업: STOMP Client (ServerChatbox)가 연결되어 있지 않거나 이미 해제됨.");
+                stompClientInstanceRef.current = null; // 연결되지 않았어도 확실히 null 설정
+                setIsConnected(false); // 연결되지 않았어도 state 업데이트
             }
-            stompClientInstanceRef.current = null;
             hasSentAddUserRef.current = false; // 클린업 시 플래그 초기화
+            console.log('--- ServerChatbox useEffect 클린업 함수 종료 ---');
         };
-    }, [userNick, userNo]); // userNick과 userNo가 변경될 때만 이펙트가 다시 실행되도록 의존성 설정
+    }, [userNick, userNo]); // userNick과 userNo가 변경될 때만 이펙트 다시 실행
 
-    // 메시지 목록이 업데이트될 때마다 스크롤을 최하단으로 이동하는 useEffect 훅입니다.
+    // 메시지 목록이 업데이트될 때마다 스크롤을 최하단으로 이동
     useEffect(() => {
         if (chatLogRef.current) {
             chatLogRef.current.scrollTop = chatLogRef.current.scrollHeight;
         }
     }, [messages]);
 
-    // 2. 메시지 전송 함수
+    // 메시지 전송 함수
     const sendMessage = () => {
-        // userNick과 userNo가 모두 존재하는지 확인
-        if (stompClientInstanceRef.current && messageInput.trim() && userNick && userNo !== undefined && userNo !== null) {
+        console.log('--- sendMessage 함수 호출 (ServerChatbox) ---');
+        // console.log(`메시지 내용: "${messageInput.trim()}"`); // 디버깅 시 필요
+        // console.log(`현재 userNick: ${userNick}, userNo: ${userNo}`); // 디버깅 시 필요
+        // console.log(`STOMP Client 연결 상태: ${stompClientInstanceRef.current?.connected}, isConnected state: ${isConnected}`); // 디버깅 시 필요
+
+        if (stompClientInstanceRef.current && isConnected && messageInput.trim() && userNick && userNo !== undefined && userNo !== null) {
             const now = new Date();
             const timestamp = now.getFullYear() + '-' +
                                 String(now.getMonth() + 1).padStart(2, '0') + '-' +
@@ -135,51 +147,56 @@ const Chatbox = () => {
                                 String(now.getSeconds()).padStart(2, '0');
 
             if (isWhisperMode && whisperTarget.trim()) {
-                // TODO: whisperTarget(닉네임)에 해당하는 userNo를 찾아 mReceiverNo로 함께 전송해야 합니다.
-                // 현재 코드로는 mReceiverNo를 보낼 수 없어 서버에서 귓속말 라우팅이 어려울 수 있습니다.
-                // 임시로 mReceiverNo는 주석 처리합니다.
-                stompClientInstanceRef.current.send("/app/whisperChat.sendMessage", {}, JSON.stringify({ // 서버의 @MessageMapping과 일치
-                    mType: 'WHISPER_CHAT', // 서버 MessageType과 일치
+                console.log("귓속말 메시지 전송 시도 (ServerChatbox):", { target: whisperTarget, content: messageInput });
+                stompClientInstanceRef.current.send("/app/whisperChat.sendMessage", {}, JSON.stringify({
+                    mType: 'WHISPER_CHAT',
                     mSender: userNick,
                     mSenderNo: userNo,
                     mContent: messageInput,
                     mReceiver: whisperTarget,
-                    // mReceiverNo: whisperTargetNo, // <-- 귓속말 대상의 userNo (필요 시 추가)
                     mTimestamp: timestamp
                 }));
             } else {
-                // 서버의 @MessageMapping("/serverChat.sendMessage")와 mType: 'SERVER_CHAT'과 일치시킴
+                console.log("일반 메시지 전송 시도 (ServerChatbox):", { content: messageInput });
                 stompClientInstanceRef.current.send("/app/serverChat.sendMessage", {}, JSON.stringify({
-                    mType: 'SERVER_CHAT', // 서버 MessageType과 일치
+                    mType: 'SERVER_CHAT',
                     mSender: userNick,
-                    mSenderNo: userNo, // mSenderNo 포함
+                    mSenderNo: userNo,
                     mContent: messageInput,
                     mTimestamp: timestamp
                 }));
             }
             setMessageInput('');
+            console.log("메시지 전송 완료, 입력 필드 초기화 (ServerChatbox).");
         } else {
-            console.warn("메시지 전송 실패: 사용자 닉네임 또는 번호가 유효하지 않거나 메시지 내용이 비어있습니다.");
+            if (!stompClientInstanceRef.current) {
+                console.warn("메시지 전송 실패 (ServerChatbox): STOMP Client 인스턴스가 없습니다.");
+            } else if (!isConnected) {
+                console.warn("메시지 전송 실패 (ServerChatbox): STOMP Client가 연결되어 있지 않습니다.");
+            } else if (!messageInput.trim()) {
+                console.warn("메시지 전송 실패 (ServerChatbox): 메시지 내용이 비어 있습니다.");
+            } else {
+                console.warn("메시지 전송 실패 (ServerChatbox): 사용자 정보(닉네임/번호)가 유효하지 않습니다.");
+            }
         }
     };
 
-    // Enter 키 입력 이벤트를 처리하는 함수입니다.
+    // Enter 키 입력 처리
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
             sendMessage();
         }
     };
 
-    // 3. 귓속말 모드 토글 함수
+    // 귓속말 모드 토글 함수
     const toggleWhisperMode = () => {
         setIsWhisperMode(prev => !prev);
         if (!isWhisperMode) {
             setWhisperTarget('');
-            // setWhisperTargetNo(null); // 귓속말 모드 해제 시 대상 번호도 초기화
         }
+        console.log(`귓속말 모드 토글됨 (ServerChatbox): ${!isWhisperMode ? '활성화' : '비활성화'}`);
     };
 
-    // 4. 컴포넌트 렌더링 (JSX) 부분
     return (
         <div className="chatbox-container">
             <div className="chatbox-header">
@@ -214,7 +231,7 @@ const Chatbox = () => {
                                 <span className="message-content">{msg.mContent}</span>
                                 <span className="timestamp">[{msg.mTimestamp}]</span>
                             </>
-                        ) : ( // SERVER_CHAT (일반 메시지)
+                        ) : (
                             <>
                                 <span className="sender">{msg.mSender}:</span>
                                 <span className="message-content">{msg.mContent}</span>
@@ -234,12 +251,13 @@ const Chatbox = () => {
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder={isWhisperMode ? "귓속말 메시지 입력..." : "메시지 입력..."}
+                    disabled={!isConnected}
                 />
-                <button id="emojiBtn" className="emojiBtn">😊</button>
-                <button id="sendBtn" className="sendBtn" onClick={sendMessage}>전달</button>
+                <button id="emojiBtn" className="emojiBtn" disabled={!isConnected}>😊</button>
+                <button id="sendBtn" className="sendBtn" onClick={sendMessage} disabled={!isConnected}>전달</button>
             </div>
         </div>
     );
 };
 
-export default Chatbox;
+export default ServerChatbox;

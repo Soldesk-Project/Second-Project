@@ -31,6 +31,11 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOrigins("http://localhost:3000") // 클라이언트 도메인 설정
                 .withSockJS();
         
+        // 게임방 전용 WebSocket 엔드포인트
+        registry.addEndpoint("/ws-game-chat")
+                .setAllowedOrigins("http://localhost:3000") // 클라이언트 도메인 설정
+                .withSockJS();
+        
         // 빠른 매칭 관련 WebSocket 엔드포인트 (기존 유지)
         registry.addEndpoint("/ws-match")
                 .setAllowedOrigins("*") // 보안상 특정 Origin 지정 권장
