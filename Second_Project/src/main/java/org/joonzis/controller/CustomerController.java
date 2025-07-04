@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.joonzis.service.InquiryService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.Data;
@@ -34,15 +37,31 @@ public class CustomerController {
         return ResponseEntity.ok(faqList);
     }
 
-    /* 1:1 문의 생성 */
+    @Autowired
+    private InquiryService inquiryService;
+
+    /** 페이징된 1:1 문의 리스트 조회 */
+    @GetMapping("/inquiries")
+    public ResponseEntity<Map<String, Object>> getInquiries(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "15") int size) {
+        Map<String, Object> data = inquiryService.getInquiries(page, size);
+        return ResponseEntity.ok(data);
+    }
+
+    /** 1:1 문의 생성 */
     @PostMapping("/inquiry")
     public ResponseEntity<Map<String, String>> createInquiry(
-            @RequestBody InquiryRequest request) {
-        log.info(String.format("New inquiry from user %d: [%s] %s", 
-            request.getUserId(), request.getSubject(), request.getMessage()));
-        // TODO: 실제 DB 저장 로직 추가
-        return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(Map.of("message", "문의가 정상적으로 접수되었습니다."));
+            @RequestBody Map<String, Object> payload) {
+        Long   userId  = Long.valueOf(payload.get("userId").toString());
+        String subject = (String) payload.get("subject");
+        String message = (String) payload.get("message");
+
+        inquiryService.createInquiry(userId, subject, message);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(Map.of("message", "문의가 정상적으로 접수되었습니다."));
     }
 
     /* FAQ 데이터 DTO */

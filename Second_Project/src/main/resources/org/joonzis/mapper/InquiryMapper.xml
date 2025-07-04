@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.joonzis.mapper.InquiryMapper">
+  <!-- 페이징 조회 -->
+  <select id="selectInquiries" resultType="org.joonzis.domain.InquiryVO">
+    SELECT * FROM (
+      SELECT ROWNUM rn, t.* FROM (
+        SELECT id,
+               user_id    AS userId,
+               subject,
+               message,
+               created_at AS createdAt
+          FROM inquiry
+         ORDER BY created_at DESC
+      ) t
+      WHERE ROWNUM &lt;= #{offset} + #{limit}
+    )
+    WHERE rn &gt; #{offset}
+  </select>
+
+  <!-- 전체 카운트 -->
+  <select id="countInquiries" resultType="int">
+    SELECT COUNT(*) FROM inquiry
+  </select>
+
+  <!-- 등록 -->
+  <insert id="insertInquiry" parameterType="org.joonzis.domain.InquiryVO">
+    INSERT INTO inquiry (
+      id, user_id, subject, message, created_at
+    ) VALUES (
+      seq_inquiry.nextval,
+      #{userId},
+      #{subject},
+      #{message},
+      SYSDATE
+    )
+  </insert>
+</mapper>

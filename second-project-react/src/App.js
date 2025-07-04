@@ -16,6 +16,7 @@ import Achievements from './pages/Achievements';
 import ItemBook from './pages/ItemBook';
 import InPlay from './pages/InPlay';
 import CustomerServiceCenter from './pages/CustomerServiceCenter';
+import CustomerCenterNew from './pages/CustomerCenterNew';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { WebSocketProvider } from './util/WebSocketProvider';
@@ -56,7 +57,8 @@ function App() {
           <Route path="/achievements" element={<Achievements />} />
           <Route path="/itemBook" element={<ItemBook />} />
           <Route path="/gameRoom/:roomNo" element={<InPlay />} />
-          <Route path="/customer" element={<CustomerServiceCenter />} />
+          <Route path="/inquiries" element={<CustomerServiceCenter />} />
+          <Route path="/inquiry" element={<CustomerCenterNew />} />
         </Routes>
       </Router>
     </WebSocketProvider>

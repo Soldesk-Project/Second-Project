@@ -36,7 +36,7 @@ const Header = () => {
           <li><span data-name="itemBook" onClick={clickToGo}>도감</span></li>
           <li><span data-name="achievements" onClick={clickToGo}>업적</span></li>
           <li><span data-name="shop" onClick={clickToGo}>상점</span></li>
-          <li><span data-name="customer" onClick={clickToGo}>고객센터</span></li>
+          <li><span data-name="inquiries" onClick={clickToGo}>고객센터</span></li>
         </ul>
       </div>
       <div className='header-box-right'>

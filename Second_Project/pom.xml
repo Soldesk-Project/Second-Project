@@ -263,6 +263,12 @@
 		  <version>4.5.0.Final</version> <!-- ✅ 핵심 -->
 		</dependency>
 		
+		<dependency>
+		  <groupId>com.fasterxml.jackson.datatype</groupId>
+		  <artifactId>jackson-datatype-jsr310</artifactId>
+		  <version>2.15.2</version> <!-- 사용 중인 Jackson 버전에 맞게 조정 -->
+		</dependency>
+		
 	</dependencies>
     <build>
         <plugins>
