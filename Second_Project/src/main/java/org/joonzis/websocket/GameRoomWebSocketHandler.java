@@ -68,12 +68,31 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         
         // 모든 클라이언트에게 유저 목록 브로드캐스트
         broadcastUserList(server);
+        broadcastRoomList(server); 
         
         sendRoomListToSession(server, session);
     }
     
     private void sendRoomListToSession(String server, WebSocketSession session) {
         List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
+        Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
+        List<Map<String, Object>> roomListWithCount = new ArrayList<>();
+        for (GameRoomDTO room : rooms) {
+            Map<String, Object> roomMap = new HashMap<>();
+            roomMap.put("gameroom_no", room.getGameroom_no());
+            roomMap.put("title", room.getTitle());
+            roomMap.put("category", room.getCategory());
+            roomMap.put("game_mode", room.getGame_mode());
+            roomMap.put("is_private", room.getIs_private());
+            roomMap.put("limit", room.getLimit());
+            roomMap.put("pwd", room.getPwd());
+            // 현재 인원수
+            Set<String> users = roomUserMap.getOrDefault(room.getGameroom_no(), Collections.emptySet());
+            roomMap.put("currentCount", users.size());
+            System.out.println("방번호 : "+room.getGameroom_no()+", "+"유저수 : "+users.size());	
+            roomListWithCount.add(roomMap);
+        }
+               
         try {
             String json = objectMapper.writeValueAsString(Map.of("type", "roomList", "rooms", rooms));
             if (session.isOpen()) {

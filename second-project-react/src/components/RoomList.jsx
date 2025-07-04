@@ -63,18 +63,22 @@ const RoomList = () => {
     setModalOpen(true);
   };
 
-  const joinRoom = (roomNo) => {
+  const joinRoom = (room) => {
     const socket = sockets['room'];
     if (socket && socket.readyState === 1) {
-      socket.send(JSON.stringify({
-        action: "joinRoom",
-        roomNo: roomNo,
-        userNick: userNick
-      }));
+      if(room.limit>room.currentCount){
+        socket.send(JSON.stringify({
+          action: "joinRoom",
+          roomNo: room.gameroom_no,
+          userNick: userNick
+        }));
+        nav('/gameRoom/' + room.gameroom_no);
+      }else{
+        alert("인원수가 가득 찼습니다");
+      }
     } else {
-      alert("웹소켓 연결이 준비되지 않았습니다.");
+      alert("웹소켓 연결이 준비되지 않았습니다.--joinRoom");
     }
-    nav('/gameRoom/' + roomNo);
   };
 
   const handleQuickMatch = async () => {
@@ -123,7 +127,7 @@ const RoomList = () => {
           <div>방이 없음</div>
         ) : (
           gameRoomList.map((room, index) => (
-            <div key={index} className={styles.roomCard} onDoubleClick={() => joinRoom(room.gameroom_no)}>
+            <div key={index} className={styles.roomCard} onDoubleClick={() => joinRoom(room)}>
               <span>{room.gameroom_no}</span>
               <span className={styles.roomMode}>{room.game_mode === 'rank' ? 'Rank Mode' : 'Casual Mode'}</span>
               <div className={styles.roomTitle}>{room.title}</div>

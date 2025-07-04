@@ -61,7 +61,7 @@ const InPlay = () => {
         userNick: userNick
       }));
     } else {
-      alert('웹소켓 연결이 준비되지 않았습니다.');
+      alert('웹소켓 연결이 준비되지 않았습니다.--leaveRoom');
     }
     nav('/main/' + server);
   };
