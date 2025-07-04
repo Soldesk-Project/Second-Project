@@ -42,7 +42,7 @@ const ServerUserList = () => {
     };
 
     socket.onclose = () => {
-      console.log("[Client] WebSocket 연결 종료");
+      // console.log("[Client] WebSocket 연결 종료");
       setUsers([]); // 소켓 종료 시 유저 목록 비우기
     };
 
@@ -57,10 +57,6 @@ const ServerUserList = () => {
       }
     };
   }, [server, userNick, userNo]);
-
-  useEffect(() => {
-    // console.log("[Client] users 상태가 갱신됨:", users);  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
-  }, [users]);
   
   return (
     <div className={styles.container}>

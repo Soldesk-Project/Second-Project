@@ -1,47 +1,35 @@
-.red_bd {
-    border: 2px solid red !important;
-}
+/* boundary color */
+.red_bd { border: 2px solid red !important; }
+.orange_bd { border: 2px solid orange !important; }
+.yellow_bd { border: 2px solid yellow !important; }
+.green_bd { border: 2px solid green !important; }
+.blue_bd { border: 2px solid blue !important; }
+.indigo_bd { border: 2px solid indigo !important; }
+.purple_bd { border: 2px solid purple !important; }
 
-.red_title {
-    color: red !important;
-}
+.white_bd { border: 2px solid white !important; }
+.black_bd { border: 2px solid black !important; }
 
-.red_bg {
-    background-color: red !important;
-}
+/* title(글자색) color */
+.red_title { color: red !important; }
+.orange_title { color: orange !important; }
+.yellow_title { color: yellow !important; }
+.green_title { color: green !important; }
+.blue_title { color: blue !important; }
+.indigo_title { color: indigo !important; }
+.purple_title { color: purple !important; }
 
-.yellow_bd {
-    border: 2px solid yellow !important;
-}
+.white_title { color: white !important; }
+.black_title { color: black !important; }
 
-.yellow_title {
-    color: yellow !important;
-}
-
-.yellow_bg {
-    background-color: yellow !important;
-}
-
-.white_bd {
-    border: 2px solid white !important;
-}
-
-.white_title {
-    color: white !important;
-}
-
-.white_bg {
-    background-color: white !important;
-}
-
-.black_bd {
-    border: 2px solid black !important;
-}
-
-.black_title {
-    color: black !important;
-}
-
-.black_bg {
-    background-color: black !important;
-}
+/* background color */
+.red_bg { background-color: red !important; }
+.orange_bg { background-color: orange !important; }
+.yellow_bg { background-color: yellow !important; }
+.green_bg { background-color: green !important; }
+.blue_bg { background-color: blue !important; }
+.indigo_bg { background-color: indigo !important; }
+.purple_bg { background-color: purple !important; }
+ 
+.white_bg { background-color: white !important; }
+.black_bg { background-color: black !important; }
