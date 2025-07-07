@@ -3,14 +3,14 @@ import Header from '../layout/Header';
 import '../css/customer.css';
 import { useNavigate } from 'react-router-dom';
 
-const CustomerCenterNew = () => {
-
+const CustomerProblemSubmit = () => {
+  
   const navigate = useNavigate();
-
+  
   const Backinquiries = () => {
-    
+      
   }
-
+  
   return (
     <div className='customer-service-center'>
       <div className='top-nav'><Header/></div>
@@ -80,4 +80,4 @@ const CustomerCenterNew = () => {
   );
 };
 
-export default CustomerCenterNew;
+export default CustomerProblemSubmit;

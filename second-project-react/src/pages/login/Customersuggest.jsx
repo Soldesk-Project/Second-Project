@@ -3,7 +3,7 @@ import Header from '../layout/Header';
 import '../css/customer.css';
 import { useNavigate } from 'react-router-dom';
 
-const CustomerCenterNew = () => {
+const Customersuggest = () => {
 
   const navigate = useNavigate();
 
@@ -80,4 +80,4 @@ const CustomerCenterNew = () => {
   );
 };
 
-export default CustomerCenterNew;
+export default Customersuggest;

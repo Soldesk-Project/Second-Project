@@ -112,22 +112,134 @@ const CustomerServiceCenter = () => {
 
         {activeTab === 'FAQ' && (
           <section role="tabpanel" className="content">
-            <h2>자주 묻는 질문</h2>
-            {/* FAQ 렌더링 */}
+            
+            <div className='inquiry-box'>
+              <ul className="inquiry-title">
+                <li>Title</li>
+                <li>Data</li>
+              </ul>
+                {/* FAQ 리스트 */}
+                <ul className="inquiry-list">
+                  {inquiries.map(inq => (
+                    <li key={inq.id} className='inquiry-personal'>
+                      <strong>{inq.subject}</strong> — {inq.createdAt}
+                    </li>
+                  ))}
+                </ul>
+
+              {/* 페이징 */}
+              <div className='list-bottom'>
+                <div className="pagination">
+                  <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    >
+                    이전
+                  </button>
+                  <span>{page} / {totalPages}</span>
+                  <button
+                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    >
+                    다음
+                  </button>
+                </div>
+              </div>
+            </div>
           </section>
         )}
 
         {activeTab === '문제 제출' && (
           <section role="tabpanel" className="content">
-            <h2>문제 제출</h2>
-            {/* 파일 업로드, 설명 입력 폼 등 구현 */}
+            <div className='inquiry-box'>
+              <ul className="inquiry-title">
+                {/* 파일 업로드, 설명 입력 폼 등 구현 */}
+                <li>Title</li>
+                <li>Data</li>
+              </ul>
+                {/* FAQ 리스트 */}
+                <ul className="inquiry-list">
+                  {inquiries.map(inq => (
+                    <li key={inq.id} className='inquiry-personal'>
+                      <strong>{inq.subject}</strong> — {inq.createdAt}
+                    </li>
+                  ))}
+                </ul>
+
+              {/* 페이징 */}
+              <div className='list-bottom'>
+                <div className="pagination">
+                  <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    >
+                    이전
+                  </button>
+                  <span>{page} / {totalPages}</span>
+                  <button
+                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    >
+                    다음
+                  </button>
+                </div>
+
+                {/* 새 건의글 등록 버튼 */}
+                <button
+                  className="InqBtn"
+                  onClick={() => navigate('/inquiry')}
+                  >
+                  건의글 등록
+                </button>
+              </div>
+            </div>
           </section>
         )}
 
         {activeTab === '고객 건의' && (
           <section role="tabpanel" className="content">
-            <h2>고객 건의</h2>
-            {/* 건의사항 입력 폼, 제출 버튼 등 구현 */}
+            <div className='inquiry-box'>
+              <ul className="inquiry-title">
+                <li>Title</li>
+                <li>NickName</li>
+                <li>Data</li>
+              </ul>
+                {/* 건의글 리스트 */}
+                <ul className="inquiry-list">
+                  {inquiries.map(inq => (
+                    <li key={inq.id} className='inquiry-personal'>
+                      <strong>{inq.subject}</strong> — {inq.createdAt}
+                    </li>
+                  ))}
+                </ul>
+
+              {/* 페이징 */}
+              <div className='list-bottom'>
+                <div className="pagination">
+                  <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    >
+                    이전
+                  </button>
+                  <span>{page} / {totalPages}</span>
+                  <button
+                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    >
+                    다음
+                  </button>
+                </div>
+
+                {/* 새 건의글 등록 버튼 */}
+                <button
+                  className="InqBtn"
+                  onClick={() => navigate('/inquiry')}
+                  >
+                  건의글 등록
+                </button>
+              </div>
+            </div>
           </section>
         )}
       </div>
