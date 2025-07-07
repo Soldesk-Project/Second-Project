@@ -1,6 +1,5 @@
 package org.joonzis.websocket;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,7 +25,7 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
     private MatchService matchService;
 
     // userId → session set
-    private final Map<String, Set<WebSocketSession>> sessionMap = new ConcurrentHashMap<>();
+    private static final Map<String, Set<WebSocketSession>> sessionMap = new ConcurrentHashMap<>();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -53,26 +52,12 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
 
         if ("quickMatch".equals(action)) {
             String userId = node.get("userId").asText();
-
             session.getAttributes().put("userId", userId);
             sessionMap.computeIfAbsent(userId, k -> new ConcurrentSkipListSet<>((a, b) -> a.getId().compareTo(b.getId())))
                       .add(session);
 
             matchService.enqueue(userId);
             System.out.println("✅ [매칭 대기열 등록]: " + userId);
-
-            Long size = matchService.queueSize();  // ✅ 현재 큐 사이즈 확인
-            System.out.println("📏 현재 매칭 큐 사이즈: " + size);
-
-            if (size != null && size >= 4) {
-                // 직접 dequeue 실행
-                List<String> matchedUsers = matchService.dequeue(4);
-                System.out.println("🎯 즉시 매칭 대상 → " + matchedUsers);
-
-                for (String uid : matchedUsers) {
-                    sendToUser(uid, Map.of("type", "ACCEPT_MATCH"));
-                }
-            }
         }
     }
 

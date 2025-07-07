@@ -29,10 +29,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public GameRoomWebSocketHandler serverWebSocketHandler() {
         return new GameRoomWebSocketHandler();
     }
-    @Bean
-    public GameMatchWebSocketHandler GameMatchWebSocketHandler() {
-        return new GameMatchWebSocketHandler();
-    }
     
 }
 	

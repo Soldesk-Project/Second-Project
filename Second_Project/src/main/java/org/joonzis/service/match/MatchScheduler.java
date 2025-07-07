@@ -15,31 +15,22 @@ public class MatchScheduler {
     private MatchService matchService;
 
     @Autowired
-    private GameMatchWebSocketHandler gameMatchWebSocketHandler;
+    private GameMatchWebSocketHandler gameMatchHandler;
 
-    @Scheduled(fixedDelay = 5000)
-    public void scheduledCheck() {
-        System.out.println("🕒 [Scheduler] 큐 점검 중...");
-        checkMatchQueue();
-    }
-
+    @Scheduled(fixedDelay = 2000)
     public void checkMatchQueue() {
+        System.out.println("🕒 [Scheduler] 큐 점검 중...");
+
         Long size = matchService.queueSize();
         System.out.println("⏱️ 현재 큐 사이즈: " + size);
 
         if (size != null && size >= 4) {
-            processMatchingIfPossible();
-        }
-    }
+            List<String> users = matchService.peekAndRemove(4);
+            System.out.println("🎯 매칭 대상 → " + users);
 
-    private void processMatchingIfPossible() {
-        List<String> users = matchService.dequeue(4);
-        System.out.println("🎯 dequeue 결과: " + users);
-
-        if (users.size() == 4) {
             for (String userId : users) {
-                gameMatchWebSocketHandler.sendToUser(userId, Map.of("type", "ACCEPT_MATCH"));
                 System.out.println("🔔 수락 알림 전송 → " + userId);
+                gameMatchHandler.sendToUser(userId, Map.of("type", "ACCEPT_MATCH"));
             }
         }
     }
