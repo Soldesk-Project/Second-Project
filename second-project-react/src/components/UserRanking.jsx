@@ -88,6 +88,26 @@ const UserRanking = () => {
         }
     }, [isModalOpen]);
 
+    // ✅ WebSocket 메시지 수신 → 스타일 변경 시 전체 랭킹 다시 불러오기
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleMessage = (event) => {
+            const data = JSON.parse(event.data);
+            // console.log(data);
+            
+            if (data.type === 'styleUpdated') {
+                fetchUserRanking();  // 스타일 변경 감지 시 전체 갱신
+            }
+        };
+
+        socket.addEventListener('message', handleMessage);
+
+        return () => {
+            socket.removeEventListener('message', handleMessage);
+        };
+    }, [socket]);
+
     if (loading) return <div>로딩 중...</div>;
     
     return (
