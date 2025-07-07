@@ -50,14 +50,14 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             serverSessions.putIfAbsent(server, new ConcurrentHashMap<>());
             serverSessions.get(server).put(session, new UserInfo(userNick, userNo, bgName, blName, bdName, titleName));
             
-//            log.info("[WebSocket] 세션 추가됨. 서버: " + server + ", 세션ID: " + session.getId() 
-//            + ", 현재 접속 유저 수: " + serverSessions.get(server).size());
+            log.info("[WebSocket] 세션 추가됨. 서버: " + server + ", 세션ID: " + session.getId() 
+            + ", 현재 접속 유저 수: " + serverSessions.get(server).size());
 
             // 3) 해당 서버에 접속한 유저 목록 전송
             broadcastUserList(server);
         }
         else if ("updateStyle".equals(action) && userNo != null) {
-//            log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
+            log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
 
             UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));
             if (updatedUser == null) {
@@ -87,6 +87,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
                 }
                 if (updated) {
                     broadcastUserList(userServer);
+                    broadcastStyleUpdateToAll(userNo);
                 } else {
 //                    log.warn("해당 userNo에 해당하는 UserInfo가 세션에 존재하지 않음: " + userNo);
                 }
@@ -95,6 +96,27 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             }
         }
     }
+    
+    private void broadcastStyleUpdateToAll(String userNo) throws Exception {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("type", "styleUpdated");
+        payload.put("userNo", userNo);
+
+        String json = objectMapper.writeValueAsString(payload);
+        TextMessage message = new TextMessage(json);
+
+        for (Map<WebSocketSession, UserInfo> sessionMap : serverSessions.values()) {
+            for (WebSocketSession session : sessionMap.keySet()) {
+            	 if (session.isOpen()) {
+                     log.info("Sending styleUpdated to session: " + session.getId());
+                     session.sendMessage(message);
+                 } else {
+                     log.warn("WebSocket session closed: " + session.getId());
+                 }
+            }
+        }
+    }
+
     
     // userNo에 해당하는 서버 찾기 메서드 구현
     private String findServerByUserNo(String userNo) {
@@ -111,7 +133,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
     }
     
     public void notifyUserStyleUpdate(String userNo) throws Exception {
-//        log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
+        log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
         
         String server = findServerByUserNo(userNo);  // ① 서버 탐색
         UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));  // ② DB 조회
