@@ -39,6 +39,7 @@ const GameChatbox = ({ gameroomNo, userNick, userNo }) => {
         // 게임방 전용 STOMP 엔드포인트 사용
         const socket = new SockJS('http://192.168.0.112:9099/ws-game-chat');
         const client = Stomp.over(() => socket);
+        client.debug = () => {};  // 아무 출력도 하지 않음
 
         client.connect({}, frame => {
             stompClientInstanceRef.current = client;
