@@ -1,0 +1,49 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* 필수: 열 비율 고정 */
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 12px;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 공통 열 비율 클래스 */
+.col_title {
+  width: 45%;
+}
+
+.col_content {
+  width: 20%;
+}
+
+.col_reward {
+  width: 15%;
+}
+
+.col_button {
+  width: 20%;
+}
+
+thead th {
+  background-color: #f9f9f9bd;
+  font-weight: bold;
+}
+
+tbody td {
+  background-color: #f9f9f9;
+}
+
+.box {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}

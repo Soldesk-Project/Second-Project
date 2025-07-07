@@ -15,7 +15,7 @@ const Header = () => {
   }
   const clickToGo=(e)=>{
     const name = e.target.dataset.name;
-    console.log('navigate to:', name);
+    // console.log('navigate to:', name);
     nav(`/${name}`);
   }
   const serverOut=()=>{
