@@ -18,7 +18,7 @@ const Customersuggest = () => {
       <div className='inqueries-box'>
 
         <div className='title'>
-          <p>고객 문의</p>
+          <p>고객 건의</p>
         </div>
         <div>
           <p>간단한 설명</p>
@@ -45,8 +45,8 @@ const Customersuggest = () => {
               <input type='text' placeholder='제목을 입력하세요.'/>
             </div>
             <textarea
-              placeholder="1. 문의 내용을 입력하세요."
-              defaultValue="문의 내용"
+              placeholder="1. 건의 내용을 입력하세요."
+              defaultValue="건의 내용"
               maxLength={1000}
             />
           </div>

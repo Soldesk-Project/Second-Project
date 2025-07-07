@@ -20,6 +20,8 @@ import CustomerCenterNew from './pages/CustomerCenterNew';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { WebSocketProvider } from './util/WebSocketProvider';
+import Customersuggest from './pages/Customersuggest';
+import CustomerProblemSubmit from './pages/CustomerProblemSubmit';
 
 function App() {
   const dispatch = useDispatch();
@@ -59,6 +61,8 @@ function App() {
           <Route path="/gameRoom/:roomNo" element={<InPlay />} />
           <Route path="/inquiries" element={<CustomerServiceCenter />} />
           <Route path="/inquiry" element={<CustomerCenterNew />} />
+          <Route path="/suggest" element={<Customersuggest />} />
+          <Route path="/problemsubmit" element={<CustomerProblemSubmit />} />
         </Routes>
       </MemoryRouter>
     </WebSocketProvider>

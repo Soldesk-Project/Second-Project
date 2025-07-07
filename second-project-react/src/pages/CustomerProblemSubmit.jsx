@@ -18,7 +18,7 @@ const CustomerProblemSubmit = () => {
       <div className='inqueries-box'>
 
         <div className='title'>
-          <p>고객 문의</p>
+          <p>문제 제출</p>
         </div>
         <div>
           <p>간단한 설명</p>
@@ -45,14 +45,14 @@ const CustomerProblemSubmit = () => {
               <input type='text' placeholder='제목을 입력하세요.'/>
             </div>
             <textarea
-              placeholder="1. 문의 내용을 입력하세요."
-              defaultValue="문의 내용"
+              placeholder="1. 제출하실 문제를 등록해주세요."
+              defaultValue="제출 문제 내용"
               maxLength={1000}
             />
           </div>
         </div>
           <div className='text-limit'>
-            <p>0자 입력 / 최대 1000자</p>
+            <p>0자 입력 / 최대 10000자</p>
           </div>
 
         <div>
