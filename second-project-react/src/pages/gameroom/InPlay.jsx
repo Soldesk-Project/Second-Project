@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
-import Test from '../components/Test';
-import styles from '../css/Inplay.module.css';
+import Test from '../../components/Test';
+import styles from '../../css/Inplay.module.css';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { WebSocketContext } from '../util/WebSocketProvider';
-import GameChatbox from '../layout/GameChatbox';
+import { WebSocketContext } from '../../util/WebSocketProvider';
+import GameChatbox from '../../layout/GameChatbox';
 
 const InPlay = () => {
   const [play, setPlay] = useState(false);
@@ -24,15 +24,17 @@ const InPlay = () => {
 
     // 이미 연결된 경우 바로 join, 아니면 onopen에서 join
     if (socket.readyState === 1) {
-      socket.send(JSON.stringify({ action: 'join', server, userNick, userNo }));
+      socket.send(JSON.stringify({ action: 'userList', server, roomNo }));
     } else {
       socket.onopen = () => {
-        socket.send(JSON.stringify({ action: 'join', server, userNick, userNo }));
+        socket.send(JSON.stringify({ action: 'userList', server, roomNo  }));
       };
     }
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      console.log(data);
+      
       if (data.type === 'userList' && data.server === server) {
         setUsers(data.users);
       }
