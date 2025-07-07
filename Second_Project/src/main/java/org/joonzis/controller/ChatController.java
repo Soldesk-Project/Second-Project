@@ -1,19 +1,29 @@
 package org.joonzis.controller;
 
-import org.joonzis.domain.ChatRoomDTO; // ChatRoomDTO는 ChatMessageDTO로 이름을 변경하는 것이 의미상 더 좋습니다.
-import org.springframework.messaging.handler.annotation.DestinationVariable; // @DestinationVariable 추가
+import org.joonzis.domain.ChatRoomDTO;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 @Slf4j
 @Controller
@@ -25,7 +35,10 @@ public class ChatController {
     // 현재 활성화된 사용자 세션을 user_no를 기반으로 관리하는 맵 (귓속말 라우팅에 사용될 수 있습니다)
     // key: user_no (Long), value: WebSocket Session ID (String)
     private static final Map<Long, String> activeSessions = new ConcurrentHashMap<>();
-
+    
+    private final Queue<ChatRoomDTO> serverChatLogQueue = new ConcurrentLinkedQueue<>();
+    private final Map<Long, Queue<ChatRoomDTO>> gameChatLogQueues = new ConcurrentHashMap<>();
+    private static final String LOG_BASE_DIR = "./chat_logs/";
 
     // --- 1. 서버 채팅 처리
     // 서버 일반 채팅 메시지 처리
@@ -36,6 +49,8 @@ public class ChatController {
         
         chatMessage.setMType(ChatRoomDTO.MessageType.SERVER_CHAT); // 메시지 타입 명확히 설정
         chatMessage.setMTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        
+        serverChatLogQueue.offer(chatMessage); // 큐에 메시지 추가
         
         // /serverChat/public 목적지로 브로드캐스트
         messagingTemplate.convertAndSend("/serverChat/public", chatMessage);
@@ -66,6 +81,8 @@ public class ChatController {
         chatMessage.setMContent(username != null ? username + "님이 서버 채팅에 입장하셨습니다." : "알 수 없는 사용자님이 입장하셨습니다.");
         chatMessage.setMTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         
+        serverChatLogQueue.offer(chatMessage);
+        
         // /serverChat/public 목적지로 브로드캐스트
         messagingTemplate.convertAndSend("/serverChat/public", chatMessage);
     }
@@ -84,7 +101,9 @@ public class ChatController {
         chatMessage.setMType(ChatRoomDTO.MessageType.SERVER_LEAVE);
         chatMessage.setMContent(username != null ? username + "님이 서버 채팅에서 퇴장하셨습니다." : "알 수 없는 사용자님이 퇴장하셨습니다.");
         chatMessage.setMTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
+        
+        serverChatLogQueue.offer(chatMessage);
+        
         messagingTemplate.convertAndSend("/serverChat/public", chatMessage);
     }
 
@@ -100,6 +119,8 @@ public class ChatController {
         chatMessage.setMType(ChatRoomDTO.MessageType.GAME_CHAT); // 메시지 타입 명확히 설정
         chatMessage.setGameroomNo(gameroomNo); // DTO에 gameroomNo 설정
         chatMessage.setMTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        
+        gameChatLogQueues.computeIfAbsent(gameroomNo, k -> new ConcurrentLinkedQueue<>()).offer(chatMessage);
         
         // 해당 게임룸의 /gameChat/{gameroomNo} 목적지로 브로드캐스트
         messagingTemplate.convertAndSend("/gameChat/" + gameroomNo, chatMessage);
@@ -127,6 +148,8 @@ public class ChatController {
         chatMessage.setMContent(username != null ? username + "님이 게임룸 " + gameroomNo + "에 입장하셨습니다." : "알 수 없는 사용자님이 입장하셨습니다.");
         chatMessage.setMTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         
+        gameChatLogQueues.computeIfAbsent(gameroomNo, k -> new ConcurrentLinkedQueue<>()).offer(chatMessage);
+        
         // 해당 게임룸의 /gameChat/{gameroomNo} 목적지로 브로드캐스트
         messagingTemplate.convertAndSend("/gameChat/" + gameroomNo, chatMessage);
         log.info("User joined game chat: {} (No: {}) in room {}", new Object[]{username, userNo, gameroomNo});
@@ -142,7 +165,9 @@ public class ChatController {
         chatMessage.setGameroomNo(gameroomNo);
         chatMessage.setMContent(username != null ? username + "님이 게임룸 " + gameroomNo + "에서 퇴장하셨습니다." : "알 수 없는 사용자님이 퇴장하셨습니다.");
         chatMessage.setMTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
+        
+        gameChatLogQueues.computeIfAbsent(gameroomNo, k -> new ConcurrentLinkedQueue<>()).offer(chatMessage);
+        
         messagingTemplate.convertAndSend("/gameChat/" + gameroomNo, chatMessage);
         log.info("User left game chat: {} (No: {}) from room {}", new Object[]{username, userNo, gameroomNo});
     }
@@ -166,15 +191,7 @@ public class ChatController {
         chatMessage.setMTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
         // 귓속말 수신자에게 메시지 전송
-        // Spring의 convertAndSendToUser는 기본적으로 UserPrincipal.getName()을 사용자 식별자로 사용합니다.
-        // 현재 코드에서는 DTO의 mReceiver (닉네임) 또는 mReceiverNo (고유 번호) 중 무엇을 사용할지 결정해야 합니다.
-        // 일반적으로는 UserPrincipal에 매핑된 고유 식별자(예: userNo 또는 user ID)를 사용합니다.
-        // 여기서는 mReceiverNo를 활용하여 라우팅합니다. (실제 시스템에서는 mReceiverNo로 해당 유저의 Principal Name을 찾아야 함)
         if (receiverNo != null) {
-            // 이 부분은 receiverNo (DB ID)를 통해 실제 UserPrincipal의 이름을 찾아서 보내야 합니다.
-            // 예시: messagingTemplate.convertAndSendToUser(userNoToPrincipalName.get(receiverNo), "/queue/messages", chatMessage);
-            // 현재는 userNo를 String으로 변환하여 임시로 사용합니다.
-            // 실제 구현에서는 UserPrincipal 관리 로직이 필요합니다.
             messagingTemplate.convertAndSendToUser(String.valueOf(receiverNo), "/queue/messages", chatMessage);
             log.info("Whisper sent to receiver userNo: {}", receiverNo);
         } else {
@@ -186,6 +203,75 @@ public class ChatController {
             messagingTemplate.convertAndSendToUser(String.valueOf(senderNo), "/queue/messages", chatMessage);
             log.info("Whisper sent back to sender userNo: {}", senderNo);
         }
+    }
+    
+ // --- 새로 추가된 부분: 로그 저장 메서드 및 스케줄러/종료 훅 ---
+
+    // 1시간마다 서버 채팅 로그를 파일에 저장
+    // fixedRate = 3600000 (1시간 = 3600초 * 1000밀리초)
+    // @Scheduled 어노테이션을 사용하려면 Spring Boot 메인 클래스에 @EnableScheduling 어노테이션을 추가해야 합니다.
+    @Scheduled(fixedRate = 3600000)
+    public void saveServerChatLogsScheduled() {
+        saveChatLogsToFile(serverChatLogQueue, "server_chat");
+    }
+
+    // 게임방 채팅 로그를 파일에 저장하는 메서드
+    // 이 메서드는 WebSocketEventListener에서 게임방 세션 종료 시 호출될 수 있도록 설계합니다.
+    public void saveGameChatLogs(Long gameroomNo) {
+        Queue<ChatRoomDTO> roomQueue = gameChatLogQueues.get(gameroomNo);
+        if (roomQueue != null) { // 큐가 존재할 경우에만 저장 시도
+            saveChatLogsToFile(roomQueue, "game_chat_" + gameroomNo);
+            gameChatLogQueues.remove(gameroomNo); // 저장 후 해당 게임방 큐 제거
+        }
+    }
+
+    // 모든 채팅 로그를 파일에 저장하는 공통 메서드
+    private void saveChatLogsToFile(Queue<ChatRoomDTO> logQueue, String prefix) {
+        if (logQueue.isEmpty()) {
+            return; // 큐가 비어있으면 저장할 내용이 없음
+        }
+
+        // 로그 파일 디렉토리 생성
+        java.io.File logDir = new java.io.File(LOG_BASE_DIR);
+        if (!logDir.exists()) {
+            logDir.mkdirs(); // 디렉토리가 없으면 생성
+        }
+
+        String fileName = prefix + "_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".log";
+        String filePath = LOG_BASE_DIR + fileName;
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) { // true: append 모드
+            ChatRoomDTO message;
+            while ((message = logQueue.poll()) != null) { // 큐에서 하나씩 꺼내면서 파일에 씀 (poll은 큐에서 제거)
+                // ChatRoomDTO의 내용을 JSON 형식으로 변환하거나, toString()을 오버라이드하여 원하는 형식으로 출력
+                writer.println(message.toString());
+            }
+            log.info("Chat logs saved to: {}", filePath);
+        } catch (IOException e) {
+            log.error("Failed to save chat logs to file {}: {}", filePath, e.getMessage());
+        }
+    }
+
+    // 서버 시작 시 (선택 사항: 이전 로그 파일 정리 등)
+    @PostConstruct
+    public void init() {
+        log.info("ChatController initialized. Log directory: {}", new java.io.File(LOG_BASE_DIR).getAbsolutePath());
+        // 필요하다면 여기서 이전 로그 파일 정리 로직 등을 추가할 수 있습니다.
+    }
+
+    // 서버 종료 시 남아있는 모든 로그 저장
+    @PreDestroy
+    public void onServerShutdown() {
+        log.info("Server is shutting down. Saving remaining chat logs...");
+
+        // 1. 서버 전체 채팅 로그 저장
+        saveChatLogsToFile(serverChatLogQueue, "server_chat_final");
+
+        // 2. 모든 게임방 채팅 로그 저장
+        for (Long gameroomNo : gameChatLogQueues.keySet()) {
+            saveGameChatLogs(gameroomNo); // 각 게임방의 큐를 비우면서 저장
+        }
+        log.info("All remaining chat logs saved during shutdown.");
     }
 
     // NOTE: WebSocketEventListener (STOMP 연결/해제 이벤트 처리)
