@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class ChatController {
                 new Object[]{chatMessage.getMSenderNo(), chatMessage.getMSender(), chatMessage.getMContent()});
         
         chatMessage.setMType(ChatRoomDTO.MessageType.SERVER_CHAT); // 메시지 타입 명확히 설정
-        chatMessage.setMTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        chatMessage.setMTimestamp(Instant.now().toEpochMilli());
         
         serverChatLogQueue.offer(chatMessage); // 큐에 메시지 추가
         
@@ -79,7 +80,7 @@ public class ChatController {
 
         chatMessage.setMType(ChatRoomDTO.MessageType.SERVER_JOIN); // 입장 메시지 타입 설정
         chatMessage.setMContent(username != null ? username + "님이 서버 채팅에 입장하셨습니다." : "알 수 없는 사용자님이 입장하셨습니다.");
-        chatMessage.setMTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        chatMessage.setMTimestamp(Instant.now().toEpochMilli());
         
         serverChatLogQueue.offer(chatMessage);
         
@@ -100,7 +101,7 @@ public class ChatController {
 
         chatMessage.setMType(ChatRoomDTO.MessageType.SERVER_LEAVE);
         chatMessage.setMContent(username != null ? username + "님이 서버 채팅에서 퇴장하셨습니다." : "알 수 없는 사용자님이 퇴장하셨습니다.");
-        chatMessage.setMTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        chatMessage.setMTimestamp(Instant.now().toEpochMilli());
         
         serverChatLogQueue.offer(chatMessage);
         
@@ -118,7 +119,7 @@ public class ChatController {
         
         chatMessage.setMType(ChatRoomDTO.MessageType.GAME_CHAT); // 메시지 타입 명확히 설정
         chatMessage.setGameroomNo(gameroomNo); // DTO에 gameroomNo 설정
-        chatMessage.setMTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        chatMessage.setMTimestamp(Instant.now().toEpochMilli());
         
         gameChatLogQueues.computeIfAbsent(gameroomNo, k -> new ConcurrentLinkedQueue<>()).offer(chatMessage);
         
@@ -146,7 +147,7 @@ public class ChatController {
         chatMessage.setMType(ChatRoomDTO.MessageType.GAME_JOIN); // 입장 메시지 타입 설정
         chatMessage.setGameroomNo(gameroomNo); // DTO에 gameroomNo 설정
         chatMessage.setMContent(username != null ? username + "님이 게임룸 " + gameroomNo + "에 입장하셨습니다." : "알 수 없는 사용자님이 입장하셨습니다.");
-        chatMessage.setMTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        chatMessage.setMTimestamp(Instant.now().toEpochMilli());
         
         gameChatLogQueues.computeIfAbsent(gameroomNo, k -> new ConcurrentLinkedQueue<>()).offer(chatMessage);
         
@@ -164,7 +165,7 @@ public class ChatController {
         chatMessage.setMType(ChatRoomDTO.MessageType.GAME_LEAVE);
         chatMessage.setGameroomNo(gameroomNo);
         chatMessage.setMContent(username != null ? username + "님이 게임룸 " + gameroomNo + "에서 퇴장하셨습니다." : "알 수 없는 사용자님이 퇴장하셨습니다.");
-        chatMessage.setMTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        chatMessage.setMTimestamp(Instant.now().toEpochMilli());
         
         gameChatLogQueues.computeIfAbsent(gameroomNo, k -> new ConcurrentLinkedQueue<>()).offer(chatMessage);
         
@@ -188,7 +189,7 @@ public class ChatController {
                 new Object[]{senderNick, senderNo, receiverNick, receiverNo, content});
 
         chatMessage.setMType(ChatRoomDTO.MessageType.WHISPER_CHAT); // 메시지 타입 명확히 설정
-        chatMessage.setMTimestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        chatMessage.setMTimestamp(Instant.now().toEpochMilli());
 
         // 귓속말 수신자에게 메시지 전송
         if (receiverNo != null) {

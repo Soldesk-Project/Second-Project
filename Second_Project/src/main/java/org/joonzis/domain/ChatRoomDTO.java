@@ -57,5 +57,36 @@ public class ChatRoomDTO {
     private Long mReceiverNo; // 수신자 고유 번호 (귓속말 라우팅용)
 
     @JsonProperty("mTimestamp")
-    private String mTimestamp; // 메시지 전송 시간 (String 대신 Long 타입의 Unix 타임스탬프를 더 권장합니다. Date 객체로 변환 용이)
+    private Long mTimestamp; // 메시지 전송 시간 (Long 타입의 Unix 타임스탬프 - milliseconds)
+    
+    // --- toString() 메서드 오버라이드 ---
+    @Override
+    public String toString() {
+        // 로그 가독성을 높이기 위해 JSON 형식 또는 사용자 정의 텍스트 형식으로 출력
+        // 여기서는 JSON 형식으로 예시를 듭니다. (더 유연한 로깅을 위해 ObjectMapper 사용도 고려)
+        return String.format(
+            "{\"mTimestamp\": %d, \"mType\": \"%s\", \"gameroomNo\": %s, \"mSender\": \"%s\", \"mSenderNo\": %d, \"mContent\": \"%s\", \"mReceiver\": \"%s\", \"mReceiverNo\": %d}",
+            mTimestamp,
+            mType,
+            (gameroomNo != null ? gameroomNo : "null"), // null 값 처리
+            mSender,
+            mSenderNo,
+            mContent != null ? mContent.replace("\"", "\\\"") : "", // 메시지 내용에 따옴표가 있을 경우 이스케이프 처리
+            mReceiver != null ? mReceiver : "null", // null 값 처리
+            mReceiverNo != null ? mReceiverNo : "null" // null 값 처리
+        );
+        /*
+        // 또는 더 읽기 쉬운 단순 텍스트 형식으로
+        return String.format("[%s] type:%s room:%s sender:%s(%d) receiver:%s(%d) content:\"%s\"",
+            (mTimestamp != null ? java.time.Instant.ofEpochMilli(mTimestamp).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : "N/A"),
+            mType,
+            (gameroomNo != null ? gameroomNo : "N/A"),
+            mSender,
+            (mSenderNo != null ? mSenderNo : -1),
+            (mReceiver != null ? mReceiver : "N/A"),
+            (mReceiverNo != null ? mReceiverNo : -1),
+            mContent
+        );
+        */
+    }
 }
