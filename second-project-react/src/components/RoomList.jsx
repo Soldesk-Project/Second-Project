@@ -73,6 +73,8 @@ const RoomList = () => {
       let data;
       try {
         data = JSON.parse(event.data);
+        console.log(data);
+        
       } catch (e) {
         console.warn("🟠 JSON 파싱 실패:", event.data);
         return;
@@ -123,29 +125,50 @@ const RoomList = () => {
   };
   
   const handleQuickMatch = async () => {
+    console.log("🚀 handleQuickMatch 호출됨");
+
     try {
-      await axios.post('/api/match/join', {
-        userId: user.user_id,
-      });
-      
+      // await axios.post('/api/match/join', {
+      //   userId: user.user_id,
+      // });
+
       console.log('✅ 매칭 큐 등록 완료');
-      
+
       const matchSocket = sockets['match'];
-      if (!matchSocket || matchSocket.readyState !== 1) {
-        alert("웹소켓 연결이 준비되지 않았습니다. (빠른 매칭)");
+      console.log(matchSocket);
+      
+      if (!matchSocket) {
+        alert("웹소켓 연결이 존재하지 않습니다.");
         return;
       }
-      
-      matchSocket.send(JSON.stringify({
-        action: 'quickMatch',
-        userId: user.user_id
-      }));
+
+      if (matchSocket.readyState === 1) {
+        console.log("전송완료");
+        
+        // 연결됨 → 바로 전송
+        matchSocket.send(JSON.stringify({
+          action: 'quickMatch',
+          userId: user.user_id
+        }));
+      } else if (matchSocket.readyState === 0) {
+        // 연결 중 → onopen에서만 전송
+        matchSocket.onopen = () => {
+          console.log("🧩 매칭 소켓 연결 완료 (onopen)");
+          matchSocket.send(JSON.stringify({
+            action: 'quickMatch',
+            userId: user.user_id
+          }));
+        };
+      } else {
+        alert("웹소켓이 닫혀있습니다.");
+      }
 
     } catch (err) {
       console.error('❌ 빠른 매칭 실패:', err);
       alert('빠른 매칭 중 오류가 발생했습니다!');
     }
   };
+
   
   
   return (

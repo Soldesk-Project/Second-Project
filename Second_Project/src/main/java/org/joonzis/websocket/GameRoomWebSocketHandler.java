@@ -206,7 +206,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             // 현재 인원수
             Set<String> users = roomUserMap.getOrDefault(room.getGameroom_no(), Collections.emptySet());
             roomMap.put("currentCount", users.size());
-            System.out.println("방번호 : "+room.getGameroom_no()+", "+"유저수 : "+users.size());	
+            //System.out.println("방번호 : "+room.getGameroom_no()+", "+"유저수 : "+users.size());	
             roomListWithCount.add(roomMap);
         }
 
