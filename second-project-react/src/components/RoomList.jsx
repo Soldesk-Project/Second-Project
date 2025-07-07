@@ -3,10 +3,8 @@ import ModalBasic from './ModalBasic';
 import styles from '../css/RoomList.module.css';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import axios from 'axios';
-import SockJS from 'sockjs-client';
-import { Stomp } from '@stomp/stompjs';
 import { WebSocketContext } from '../util/WebSocketProvider';
+import axios from 'axios';
 
 const RoomList = () => {
   const [gameRoomList, setGameRoomList] = useState([]);
@@ -16,14 +14,13 @@ const RoomList = () => {
   const userNick = user.user_nick;
   const nav = useNavigate();
 
-  const stompRef = React.useRef(null);
-  const sockets = useContext(WebSocketContext); // 여러 소켓을 context에서 받아옴
+  const sockets = useContext(WebSocketContext); // 여러 소켓 context
+
 
   useEffect(() => {
     const socket = sockets['room'];
     if (!socket) return;
 
-    // 연결이 이미 되어 있다면 바로 사용, 아니라면 onopen에서 처리
     if (socket.readyState === 1) {
       setIsWsOpen(true);
       socket.send(JSON.stringify({ action: "join", server, userNick }));
@@ -36,82 +33,121 @@ const RoomList = () => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if (data.type === "roomList") {
-        setGameRoomList(data.rooms);
-      }
-      if (data.type === "roomCreated") {
-        socket.send(JSON.stringify({
-          action: "joinRoom",
-          roomNo: data.gameroom_no,
-          userNick: userNick
-        }));
-        nav('/gameRoom/' + data.gameroom_no);
-      }
-    };
 
-    socket.onclose = () => {
-      setIsWsOpen(false);
+      switch (data.type) {
+        case "roomList":
+          setGameRoomList(data.rooms);
+          break;
+          case "roomCreated":
+            socket.send(JSON.stringify({
+              action: "joinRoom",
+            roomNo: data.gameroom_no,
+            userNick
+          }));
+          nav('/gameRoom/' + data.gameroom_no);
+          break;
+          default:
+            break;
+          }
+        };
+        
+        socket.onclose = () => {
+          setIsWsOpen(false);
     };
     socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
+      console.error("WebSocket error (room):", error);
     };
-
-    // cleanup은 필요시만 (Provider에서 관리하므로 여기선 생략)
   }, [server, userNick, sockets]);
 
-  const handleOpenModal = () => {
-    setModalOpen(true);
-  };
+  useEffect(() => {
+    const matchSocket = sockets['match'];
+    if (!matchSocket) return;
 
-  const joinRoom = (room) => {
-    const socket = sockets['room'];
+    if (matchSocket.readyState !== 1) {
+      matchSocket.onopen = () => {
+        console.log("🧩 매칭 소켓 연결 완료");
+      };
+    }
+    
+    matchSocket.onmessage = (event) => {
+      let data;
+      try {
+        data = JSON.parse(event.data);
+      } catch (e) {
+        console.warn("🟠 JSON 파싱 실패:", event.data);
+        return;
+      }
+      
+      switch (data.type) {
+        case "ACCEPT_MATCH":
+          alert('✅ 4명이 모였습니다! 게임을 수락하시겠습니까?');
+          break;
+          case "MATCH_FOUND":
+            nav('/game');
+            break;
+            default:
+              console.log("🟡 알 수 없는 매칭 메시지:", data);
+              break;
+            }
+          };
+          
+          matchSocket.onerror = (err) => {
+            console.error("WebSocket error (match):", err);
+          };
+          
+          matchSocket.onclose = () => {
+            console.log("🛑 매칭 소켓 종료됨");
+          };
+        }, [sockets]);
+        
+        const handleOpenModal = () => {
+          setModalOpen(true);
+        };
+        
+        const joinRoom = (room) => {
+          const socket = sockets['room'];
     if (socket && socket.readyState === 1) {
-      if(room.limit>room.currentCount){
+      if (room.limit > room.currentCount) {
         socket.send(JSON.stringify({
           action: "joinRoom",
           roomNo: room.gameroom_no,
-          userNick: userNick
+          userNick
         }));
         nav('/gameRoom/' + room.gameroom_no);
-      }else{
+      } else {
         alert("인원수가 가득 찼습니다");
       }
     } else {
-      alert("웹소켓 연결이 준비되지 않았습니다.--joinRoom");
+      alert("웹소켓 연결이 준비되지 않았습니다. -- joinRoom");
     }
   };
-
+  
   const handleQuickMatch = async () => {
     try {
       await axios.post('/api/match/join', {
         userId: user.user_id,
       });
-
+      
       console.log('✅ 매칭 큐 등록 완료');
+      
+      const matchSocket = sockets['match'];
+      if (!matchSocket || matchSocket.readyState !== 1) {
+        alert("웹소켓 연결이 준비되지 않았습니다. (빠른 매칭)");
+        return;
+      }
+      
+      matchSocket.send(JSON.stringify({
+        action: 'quickMatch',
+        userId: user.user_id
+      }));
 
-      const sock = new SockJS('http://192.168.0.112:9099/ws-match?userId=' + user.user_id);
-      const stomp = Stomp.over(sock);
-
-      stomp.connect({}, () => {
-        console.log('✅ STOMP 연결 완료');
-        stomp.subscribe('/user/queue/match', (message) => {
-          const payload = message.body;
-          if (payload === 'ACCEPT_MATCH') {
-            alert('4명이 모였습니다! 게임을 수락하시겠습니까?');
-          }
-          if (payload === 'MATCH_FOUND') {
-            nav('/game');
-          }
-        });
-      });
-
-      stompRef.current = stomp;
     } catch (err) {
       console.error('❌ 빠른 매칭 실패:', err);
-      alert('빠른 매칭 중 오류가 발생했습니다!.');
+      alert('빠른 매칭 중 오류가 발생했습니다!');
     }
   };
-
+  
+  
   return (
     <>
       {modalOpen && <ModalBasic setModalOpen={setModalOpen} socket={sockets['room']} isWsOpen={isWsOpen} />}

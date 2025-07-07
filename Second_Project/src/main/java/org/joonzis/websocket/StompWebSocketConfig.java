@@ -28,11 +28,5 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws-game-chat")
                 .setAllowedOrigins("http://localhost:3000", "http://192.168.0.112:9099")
                 .withSockJS();
-
-        // 빠른 매칭 관련 WebSocket 엔드포인트
-        registry.addEndpoint("/ws-match")
-                .setAllowedOrigins("*")
-                .setHandshakeHandler(new GameMatchWebSocketHandler())
-                .withSockJS();
     }
 }

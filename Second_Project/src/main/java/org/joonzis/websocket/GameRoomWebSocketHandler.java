@@ -1,16 +1,24 @@
 package org.joonzis.websocket;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.joonzis.domain.GameRoomDTO;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
@@ -70,38 +78,30 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         broadcastUserList(server);
         broadcastRoomList(server); 
         
-        sendRoomListToSession(server, session);
+        //sendRoomListToSession(server, session);
     }
     
-    private void sendRoomListToSession(String server, WebSocketSession session) {
-        List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
-        Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
-        List<Map<String, Object>> roomListWithCount = new ArrayList<>();
-        for (GameRoomDTO room : rooms) {
-            Map<String, Object> roomMap = new HashMap<>();
-            roomMap.put("gameroom_no", room.getGameroom_no());
-            roomMap.put("title", room.getTitle());
-            roomMap.put("category", room.getCategory());
-            roomMap.put("game_mode", room.getGame_mode());
-            roomMap.put("is_private", room.getIs_private());
-            roomMap.put("limit", room.getLimit());
-            roomMap.put("pwd", room.getPwd());
-            // 현재 인원수
-            Set<String> users = roomUserMap.getOrDefault(room.getGameroom_no(), Collections.emptySet());
-            roomMap.put("currentCount", users.size());
-            System.out.println("방번호 : "+room.getGameroom_no()+", "+"유저수 : "+users.size());	
-            roomListWithCount.add(roomMap);
-        }
-               
-        try {
-            String json = objectMapper.writeValueAsString(Map.of("type", "roomList", "rooms", rooms));
-            if (session.isOpen()) {
-                session.sendMessage(new TextMessage(json));
-            }
-        } catch (Exception e) {
-            // 에러 처리
-        }
-    }
+	/*
+	 * private void sendRoomListToSession(String server, WebSocketSession session) {
+	 * List<GameRoomDTO> rooms = serverRooms.getOrDefault(server,
+	 * Collections.emptyList()); Map<String, Set<String>> roomUserMap =
+	 * roomUsers.getOrDefault(server, Collections.emptyMap()); List<Map<String,
+	 * Object>> roomListWithCount = new ArrayList<>(); for (GameRoomDTO room :
+	 * rooms) { Map<String, Object> roomMap = new HashMap<>();
+	 * roomMap.put("gameroom_no", room.getGameroom_no()); roomMap.put("title",
+	 * room.getTitle()); roomMap.put("category", room.getCategory());
+	 * roomMap.put("game_mode", room.getGame_mode()); roomMap.put("is_private",
+	 * room.getIs_private()); roomMap.put("limit", room.getLimit());
+	 * roomMap.put("pwd", room.getPwd()); // 현재 인원수 Set<String> users =
+	 * roomUserMap.getOrDefault(room.getGameroom_no(), Collections.emptySet());
+	 * roomMap.put("currentCount", users.size());
+	 * System.out.println("방번호 : "+room.getGameroom_no()+", "+"유저수 : "+users.size())
+	 * ; roomListWithCount.add(roomMap); }
+	 * 
+	 * try { String json = objectMapper.writeValueAsString(Map.of("type",
+	 * "roomList", "rooms", rooms)); if (session.isOpen()) { session.sendMessage(new
+	 * TextMessage(json)); } } catch (Exception e) { // 에러 처리 } }
+	 */
     
     
     private AtomicInteger roomIndex = new AtomicInteger(1);

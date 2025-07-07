@@ -25,3 +25,14 @@
     line-height: 28px; /* 텍스트 세로 중앙 정렬 */
     box-sizing: border-box;
 }
+
+.itemGroup {
+  flex: 1 1 45%;
+  min-width: 300px;
+}
+
+.itemButton {
+    border: 1px solid black;
+    background-color: black;
+    margin-right: 20px;
+}

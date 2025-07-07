@@ -22,7 +22,7 @@ const LoginForm = () => {
     }
   try {
     const res = await axios.post('/api/login', { user_id: id, user_pw: pw });
-    console.log(res.data.user);
+    // console.log(res.data.user);
     
     localStorage.setItem('token', res.data.token);
     dispatch(setUser(res.data.user));

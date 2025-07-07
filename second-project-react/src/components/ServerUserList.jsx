@@ -16,24 +16,30 @@ const ServerUserList = () => {
   const titleName = user.title_class_name;
 
   const sockets = useContext(WebSocketContext);
-  
-  // 서버 또는 userId가 바뀔 때마다 WebSocket 연결 재설정
-  useEffect(() => {
-    const socket = sockets['server'];
-    if (!server || !userNick) return;
 
-    // 기존 소켓 연결 종료
-    if (socketRef.current) {
-      socketRef.current.close();
-    }
-    if (socket.readyState === 1) {
-      socket.send(JSON.stringify({ action: "join", server, userNick, userNo, bgName, blName, bdName, titleName}));
+  useEffect(() => {
+    if (!server || !user || !userNick || !userNo) return;
+
+    const socket = sockets['server'];
+    socketRef.current = socket; // 단순 참조만
+
+    const payload = {
+      action: "join",
+      server,
+      userNick,
+      userNo,
+      bgName,
+      blName,
+      bdName,
+      titleName,
+    };
+
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(payload));
     } else {
-      socket.onopen = () => {
-        socket.send(JSON.stringify({ action: "join", server, userNick, userNo, bgName, blName, bdName, titleName}));
-      };
+      socket.onopen = () => socket.send(JSON.stringify(payload));
     }
-    
+
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === "userList" && data.server === server) {
@@ -41,27 +47,13 @@ const ServerUserList = () => {
       }
     };
 
-    socket.onclose = () => {
-      console.log("[Client] WebSocket 연결 종료");
-      setUsers([]); // 소켓 종료 시 유저 목록 비우기
-    };
+    socket.onerror = (e) => console.error("소켓 에러", e);
 
-    socket.onerror = (error) => {
-      console.error("[Client] WebSocket 에러 발생:", error);
-    };
-
-    // 컴포넌트 언마운트 시 연결 종료
     return () => {
-      if (socket) {
-        socket.close();
-      }
+      setUsers([]);
     };
-  }, [server, userNick, userNo]);
+  }, [server, userNick, userNo, bgName, blName, bdName, titleName]);
 
-  useEffect(() => {
-    // console.log("[Client] users 상태가 갱신됨:", users);  //------콘솔 같이 찍혀서 잠시 주석 처리--------------------------------
-  }, [users]);
-  
   return (
     <div className={styles.container}>
       <div className={styles.header}>{`${server}서버 - 유저 목록`}</div>

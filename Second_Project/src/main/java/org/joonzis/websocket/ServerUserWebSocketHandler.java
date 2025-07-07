@@ -50,25 +50,25 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             serverSessions.putIfAbsent(server, new ConcurrentHashMap<>());
             serverSessions.get(server).put(session, new UserInfo(userNick, userNo, bgName, blName, bdName, titleName));
             
-            log.info("[WebSocket] 세션 추가됨. 서버: " + server + ", 세션ID: " + session.getId() 
-            + ", 현재 접속 유저 수: " + serverSessions.get(server).size());
+//            log.info("[WebSocket] 세션 추가됨. 서버: " + server + ", 세션ID: " + session.getId() 
+//            + ", 현재 접속 유저 수: " + serverSessions.get(server).size());
 
             // 3) 해당 서버에 접속한 유저 목록 전송
             broadcastUserList(server);
         }
         else if ("updateStyle".equals(action) && userNo != null) {
-            log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
+//            log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
 
             UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));
             if (updatedUser == null) {
-                log.warn("해당 userNo의 유저 정보를 DB에서 찾을 수 없습니다: " + userNo);
+//                log.warn("해당 userNo의 유저 정보를 DB에서 찾을 수 없습니다: " + userNo);
                 return;
             }
-            log.info("DB에서 조회한 최신 유저 정보: " + updatedUser);
+//            log.info("DB에서 조회한 최신 유저 정보: " + updatedUser);
 
             String userServer = findServerByUserNo(userNo);
             if (userServer == null) {
-                log.warn("userNo=" + userNo + "가 접속한 서버를 찾을 수 없음");
+//                log.warn("userNo=" + userNo + "가 접속한 서버를 찾을 수 없음");
                 return;
             }
 
@@ -88,10 +88,10 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
                 if (updated) {
                     broadcastUserList(userServer);
                 } else {
-                    log.warn("해당 userNo에 해당하는 UserInfo가 세션에 존재하지 않음: " + userNo);
+//                    log.warn("해당 userNo에 해당하는 UserInfo가 세션에 존재하지 않음: " + userNo);
                 }
             } else {
-                log.warn("해당 서버에 접속 세션이 없음: " + userServer);
+//                log.warn("해당 서버에 접속 세션이 없음: " + userServer);
             }
         }
     }
@@ -101,27 +101,27 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         for (Map.Entry<String, Map<WebSocketSession, UserInfo>> entry : serverSessions.entrySet()) {
             for (UserInfo userInfo : entry.getValue().values()) {
                 if (userNo.equals(userInfo.getUserNo())) {
-                	log.info("findServerByUserNo: userNo=" + userNo + "는 서버 '" + entry.getKey() + "'에 접속 중");
+//                	log.info("findServerByUserNo: userNo=" + userNo + "는 서버 '" + entry.getKey() + "'에 접속 중");
                     return entry.getKey();
                 }
             }
         }
-        log.warn("findServerByUserNo: userNo=" + userNo + "는 어느 서버에도 접속 중이지 않음");
+//        log.warn("findServerByUserNo: userNo=" + userNo + "는 어느 서버에도 접속 중이지 않음");
         return null;
     }
     
     public void notifyUserStyleUpdate(String userNo) throws Exception {
-        log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
+//        log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
         
         String server = findServerByUserNo(userNo);  // ① 서버 탐색
         UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));  // ② DB 조회
-        log.info(updatedUser);
+//        log.info(updatedUser);
         if (updatedUser == null) return;  // ❗ A: 여기서 return 되면 그 이후 실행 안 됨
 
         boolean updated = false;
 
         if (server != null) {
-            log.info("[Server] 찾음 해당 서버만 적용");
+//            log.info("[Server] 찾음 해당 서버만 적용");
             Map<WebSocketSession, UserInfo> sessions = serverSessions.get(server);
             updated = updateUserStyleInSessions(sessions, userNo, updatedUser);
             if (updated) {
@@ -132,14 +132,14 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
 
         // ✅ 기대하는 fallback
         for (String s : serverSessions.keySet()) {
-            log.info("[Server] 못 찾음 모든 서버에 적용 시도: server=" + s);
+//            log.info("[Server] 못 찾음 모든 서버에 적용 시도: server=" + s);
             Map<WebSocketSession, UserInfo> sessions = serverSessions.get(s);
             for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
-                log.info("유저 확인: sessionUserNo=" + entry.getValue().getUserNo());
+//                log.info("유저 확인: sessionUserNo=" + entry.getValue().getUserNo());
             }
 
             if (updateUserStyleInSessions(sessions, userNo, updatedUser)) {
-                log.warn("fallback broadcast: userNo=" + userNo + "에 대해 서버 '" + s + "'에 적용");
+//                log.warn("fallback broadcast: userNo=" + userNo + "에 대해 서버 '" + s + "'에 적용");
                 broadcastUserList(s);
             }
         }
@@ -163,7 +163,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
     
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        log.info("[Server] WebSocket 연결 수립: " + session.getId());
+//        log.info("[Server] WebSocket 연결 수립: " + session.getId());
         super.afterConnectionEstablished(session);
     }
 
@@ -178,8 +178,8 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             Map<WebSocketSession, UserInfo> sessions = entry.getValue();
 
             if (sessions.remove(session) != null) {
-            	log.info("[WebSocket] 세션 제거됨. 서버: " + server + ", 세션ID: " + session.getId()
-                + ", 남은 유저 수: " + sessions.size());
+//            	log.info("[WebSocket] 세션 제거됨. 서버: " + server + ", 세션ID: " + session.getId()
+//                + ", 남은 유저 수: " + sessions.size());
                 broadcastUserList(server);
             }
         }
@@ -188,7 +188,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
     private void broadcastUserList(String server) throws Exception {
     	Map<WebSocketSession, UserInfo> sessions = serverSessions.get(server);
     	if (sessions == null) {
-            log.warn("broadcastUserList: 서버에 세션이 없음: " + server);
+//            log.warn("broadcastUserList: 서버에 세션이 없음: " + server);
             return;
         }
 
@@ -213,16 +213,16 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         String json = objectMapper.writeValueAsString(payload);
         TextMessage msg = new TextMessage(json);
 
-        log.info("broadcastUserList: 서버 '" + server + "'에 " + sessions.size() + "개의 세션에 메시지 전송 시작");
+//        log.info("broadcastUserList: 서버 '" + server + "'에 " + sessions.size() + "개의 세션에 메시지 전송 시작");
         // 모든 세션에 전송
         for (WebSocketSession sess : sessions.keySet()) {
             if (sess.isOpen()) {
-            	log.info("sendMessage to session: " + sess.getId());
+//            	log.info("sendMessage to session: " + sess.getId());
                 sess.sendMessage(msg);
             } else {
-                log.warn("세션 닫힘 상태, 메시지 전송 불가: " + sess.getId());
+//                log.warn("세션 닫힘 상태, 메시지 전송 불가: " + sess.getId());
             }
         }
-        log.info("broadcastUserList: 메시지 전송 완료");
+//        log.info("broadcastUserList: 메시지 전송 완료");
     }
 }
