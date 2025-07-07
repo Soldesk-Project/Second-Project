@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
-import Test from '../components/Test';
-import styles from '../css/Inplay.module.css';
+import Test from '../../components/Test';
+import styles from '../../css/Inplay.module.css';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { WebSocketContext } from '../util/WebSocketProvider';
-import GameChatbox from '../layout/GameChatbox';
+import { WebSocketContext } from '../../util/WebSocketProvider';
+import GameChatbox from '../../layout/GameChatbox';
 
 const InPlay = () => {
   const [play, setPlay] = useState(false);

@@ -17,20 +17,23 @@ const LoginForm = () => {
   
   const handleLogin = async () => {
     if (!id || !pw) {
-    alert('ID와 비밀번호를 입력해주세요.');
-    return;
+      alert('ID와 비밀번호를 입력해주세요.');
+      return;
     }
-  try {
-    const res = await axios.post('/api/login', { user_id: id, user_pw: pw });
-    // console.log(res.data.user);
-    
-    localStorage.setItem('token', res.data.token);
-    dispatch(setUser(res.data.user));
-    navigate('/server');
-  } catch (err) {
-    alert('로그인 실패');
-  }
-};
+
+    try {
+      // ✅ 기존 토큰 제거
+      localStorage.removeItem('token');
+
+      const res = await axios.post('/api/login', { user_id: id, user_pw: pw });
+
+      localStorage.setItem('token', res.data.token);
+      dispatch(setUser(res.data.user));
+      navigate('/server');
+    } catch (err) {
+      alert('로그인 실패');
+    }
+  };
 
   const handleKakaoLogin = () => {
     window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;

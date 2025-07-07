@@ -176,8 +176,8 @@ const RoomList = () => {
       {modalOpen && <ModalBasic setModalOpen={setModalOpen} socket={sockets['room']} isWsOpen={isWsOpen} />}
       <div className={styles.roomListHeader}>
         <button onClick={handleOpenModal} className={styles.createBtn}>필터</button>
-        <button onClick={handleOpenModal} className={styles.createBtn}>방 생성</button>
-        <button onClick={handleQuickMatch} className={styles.createBtn}>빠른매칭</button>
+        <button onClick={handleOpenModal} className={styles.createBtn}>일반 게임</button>
+        <button onClick={handleQuickMatch} className={styles.createBtn}>랭크 게임</button>
         <input type="text" className={styles.roomListSearch} placeholder='search...' />
       </div>
 

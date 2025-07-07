@@ -1,9 +1,7 @@
 package org.joonzis.websocket;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.joonzis.service.match.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +22,8 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
     @Autowired
     private MatchService matchService;
 
-    // userId → session set
-    private static final Map<String, Set<WebSocketSession>> sessionMap = new ConcurrentHashMap<>();
+    // userId → WebSocketSession (단일 세션 유지)
+    private static final Map<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -35,9 +33,19 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
             return;
         }
 
+        // 기존 세션이 존재하면 닫기
+        WebSocketSession existingSession = sessionMap.get(userId);
+        if (existingSession != null && existingSession.isOpen()) {
+            try {
+                existingSession.close();
+                System.out.println("🔁 기존 세션 종료: " + existingSession.getId());
+            } catch (Exception e) {
+                System.err.println("❌ 기존 세션 종료 실패: " + e.getMessage());
+            }
+        }
+
+        sessionMap.put(userId, session);
         session.getAttributes().put("userId", userId);
-        sessionMap.computeIfAbsent(userId, k -> new ConcurrentSkipListSet<>((a, b) -> a.getId().compareTo(b.getId())))
-                  .add(session);
 
         System.out.println("🔌 [연결됨] userId: " + userId + ", sessionId: " + session.getId());
     }
@@ -52,9 +60,10 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
 
         if ("quickMatch".equals(action)) {
             String userId = node.get("userId").asText();
+
+            // 세션 등록 갱신
             session.getAttributes().put("userId", userId);
-            sessionMap.computeIfAbsent(userId, k -> new ConcurrentSkipListSet<>((a, b) -> a.getId().compareTo(b.getId())))
-                      .add(session);
+            sessionMap.put(userId, session);
 
             matchService.enqueue(userId);
             System.out.println("✅ [매칭 대기열 등록]: " + userId);
@@ -62,22 +71,16 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
     }
 
     public void sendToUser(String userId, Object messageObject) {
-        Set<WebSocketSession> sessions = sessionMap.get(userId);
-        if (sessions == null || sessions.isEmpty()) {
-            System.out.println("⚠️ 세션 없음 → " + userId);
+        WebSocketSession session = sessionMap.get(userId);
+        if (session == null || !session.isOpen()) {
+            System.out.println("⚠️ 세션 없음 또는 닫힘 → " + userId);
             return;
         }
 
         try {
             String json = objectMapper.writeValueAsString(messageObject);
-            for (WebSocketSession session : sessions) {
-                if (session.isOpen()) {
-                    session.sendMessage(new TextMessage(json));
-                    System.out.println("📤 [전송 완료 → " + userId + "] sessionId: " + session.getId());
-                } else {
-                    System.out.println("⚠️ 닫힌 세션 → " + session.getId());
-                }
-            }
+            session.sendMessage(new TextMessage(json));
+            System.out.println("📤 [전송 완료 → " + userId + "] sessionId: " + session.getId());
         } catch (Exception e) {
             System.err.println("❌ 전송 실패: " + e.getMessage());
         }
@@ -87,13 +90,10 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         String userId = (String) session.getAttributes().get("userId");
         if (userId != null) {
-            Set<WebSocketSession> sessions = sessionMap.get(userId);
-            if (sessions != null) {
-                sessions.remove(session);
+            WebSocketSession currentSession = sessionMap.get(userId);
+            if (currentSession != null && currentSession.getId().equals(session.getId())) {
+                sessionMap.remove(userId);
                 System.out.println("❎ 연결 해제됨 → " + userId + ", sessionId: " + session.getId());
-                if (sessions.isEmpty()) {
-                    sessionMap.remove(userId);
-                }
             }
         }
     }

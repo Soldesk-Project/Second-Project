@@ -14,7 +14,7 @@ import FindPw from './pages/login/FindPw';
 import Shop from './pages/Shop';
 import Achievements from './pages/Achievements';
 import ItemBook from './pages/ItemBook';
-import InPlay from './pages/InPlay';
+import InPlay from './pages/gameroom/InPlay';
 import CustomerServiceCenter from './pages/CustomerServiceCenter';
 import CustomerCenterNew from './pages/CustomerCenterNew';
 import 'bootstrap/dist/css/bootstrap.min.css';
