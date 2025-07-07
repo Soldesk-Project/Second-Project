@@ -56,6 +56,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             case "joinRoom":
             	handleJoinRoom(session, json);
             	break;
+            case "userList":
+            	handleUserList(session, json);
+            	break;
             case "leaveRoom":
             	handleLeaveRoom(session, json);
             	break;
@@ -145,7 +148,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void handleJoinRoom(WebSocketSession session, JsonNode json) {
-    	 String server = (String) session.getAttributes().get("server");
+    	String server = (String) session.getAttributes().get("server");
 	    if (server == null) return;
 
 	    String roomNo = json.get("roomNo").asText();
@@ -183,6 +186,34 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         // 방 목록, 유저 목록 전체 브로드캐스트
         broadcastRoomList(server);
         broadcastUserList(server);
+    }
+    
+    private void handleUserList(WebSocketSession session, JsonNode json) {
+    	String server = (String) session.getAttributes().get("server");
+    	String roomNo = (String) session.getAttributes().get("roomNo");
+    	if (server == null || roomNo == null) return;
+    	
+    	Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
+        Set<String> userNicks = roomUserMap.getOrDefault(roomNo, Collections.emptySet());
+
+        Map<String, Object> payload = Map.of(
+            "type", "userList",
+            "server", server,
+            "roomNo", roomNo,
+            "users", userNicks
+        );
+
+        try {
+            String jsonStr = objectMapper.writeValueAsString(payload);
+            if (session.isOpen()) {
+                session.sendMessage(new TextMessage(jsonStr));
+            }
+        } catch (Exception e) {
+
+        }
+    	
+    	
+    	
     }
     
     private void broadcastUserList(String server) {
