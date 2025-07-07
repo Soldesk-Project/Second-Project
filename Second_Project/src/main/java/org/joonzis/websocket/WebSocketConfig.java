@@ -15,16 +15,23 @@ public class WebSocketConfig implements WebSocketConfigurer {
     private ServerUserWebSocketHandler serverUserHandler;
 	@Autowired
 	private GameRoomWebSocketHandler gameRoomHandler;
+	@Autowired
+	private GameMatchWebSocketHandler gameMatchHandler;
 	
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(serverUserHandler, "/ws/server").setAllowedOrigins("*");
         registry.addHandler(gameRoomHandler, "/ws/room").setAllowedOrigins("*");
+        registry.addHandler(gameMatchHandler, "/ws/match").setAllowedOrigins("*");
     }
     @Bean
     public GameRoomWebSocketHandler serverWebSocketHandler() {
         return new GameRoomWebSocketHandler();
+    }
+    @Bean
+    public GameMatchWebSocketHandler GameMatchWebSocketHandler() {
+        return new GameMatchWebSocketHandler();
     }
     
 }

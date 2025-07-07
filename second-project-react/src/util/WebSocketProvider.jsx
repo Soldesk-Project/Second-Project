@@ -16,6 +16,10 @@ export const WebSocketProvider = ({ children }) => {
     // socketsRef.current['server'] = new WebSocket("ws://localhost:9099/ws/server");
   }
 
+  if(!socketsRef.current['match']){
+    socketsRef.current['match'] = new WebSocket("ws://192.168.0.112:9099/ws/match");
+  }
+
   return (
     <WebSocketContext.Provider value={socketsRef.current}>
       {children}

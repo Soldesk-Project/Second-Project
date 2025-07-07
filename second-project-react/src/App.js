@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, MemoryRouter } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { setUser } from './store/userSlice';
@@ -44,7 +44,7 @@ function App() {
     // <MemoryRouter initialEntries={["/"]}></MemoryRouter>
     // <Router> 대신 위에거 넣으면 히스토리를 메모리에서만 관리해서 유저가 히스토리 이동이 불가능해짐
     <WebSocketProvider>
-      <Router>
+      <MemoryRouter initialEntries={["/"]}>
         <Routes>
           <Route path="/" element={<LoginForm />} />
           <Route path="/server" element={<ServerSelect />} />
@@ -60,7 +60,7 @@ function App() {
           <Route path="/inquiries" element={<CustomerServiceCenter />} />
           <Route path="/inquiry" element={<CustomerCenterNew />} />
         </Routes>
-      </Router>
+      </MemoryRouter>
     </WebSocketProvider>
   );
 }
