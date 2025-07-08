@@ -56,7 +56,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             case "joinRoom":
             	handleJoinRoom(session, json);
             	break;
-            case "userList":
+            case "roomUserList":
             	handleUserList(session, json);
             	break;
             case "leaveRoom":
@@ -189,30 +189,35 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     }
     
     private void handleUserList(WebSocketSession session, JsonNode json) {
-    	String server = (String) session.getAttributes().get("server");
-    	String roomNo = (String) session.getAttributes().get("roomNo");
-    	if (server == null || roomNo == null) return;
+    	System.out.println("handleUserList....");
+//    	String server = (String) session.getAttributes().get("server");
+    	String roomNo = json.get("roomNo").asText();
+    	String server = json.get("server").asText();
+    	if (server == null) return;
+    	System.out.println(roomNo);
     	
     	Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
         Set<String> userNicks = roomUserMap.getOrDefault(roomNo, Collections.emptySet());
-
+        List<String> userList = new ArrayList<>(userNicks);
+        
         Map<String, Object> payload = Map.of(
-            "type", "userList",
+            "type", "roomUserList",
             "server", server,
             "roomNo", roomNo,
-            "users", userNicks
+            "size", userNicks.size(),
+            "userList", userList
         );
-
+        
+        
         try {
             String jsonStr = objectMapper.writeValueAsString(payload);
             if (session.isOpen()) {
                 session.sendMessage(new TextMessage(jsonStr));
             }
         } catch (Exception e) {
-
+        	System.out.println("Error sending roomUserList for roomNo " + roomNo + ": " + e.getMessage());
+            e.printStackTrace();
         }
-    	
-    	
     	
     }
     
