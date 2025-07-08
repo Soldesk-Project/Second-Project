@@ -21,22 +21,31 @@ const InPlay = () => {
   useEffect(() => {
     const socket = sockets['room'];
     if (!socket) return;
+    
+    const joinAndRequestUserList = () => {
+      console.log('joinAndRequestUserList 호출');
+        socket.send(JSON.stringify({ action: 'join', server, userNick }));
+        socket.send(JSON.stringify({ action: 'roomUserList', server, roomNo }));
+    };
 
-    // 이미 연결된 경우 바로 join, 아니면 onopen에서 join
     if (socket.readyState === 1) {
-      socket.send(JSON.stringify({ action: 'userList', server, roomNo }));
+      joinAndRequestUserList();
     } else {
-      socket.onopen = () => {
-        socket.send(JSON.stringify({ action: 'userList', server, roomNo  }));
-      };
+      socket.onopen = joinAndRequestUserList;
     }
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       console.log(data);
       
-      if (data.type === 'userList' && data.server === server) {
-        setUsers(data.users);
+      if (data.type === 'roomUserList' && data.server === server) {
+        const formattedUsers = data.userList.map((nick, index) => ({
+          userNick: nick,
+          userNo: index // 임시로 index를 userNo로 사용, 실제로는 서버에서 제공 필요
+        }));
+        console.log(formattedUsers);
+        
+        setUsers(formattedUsers);
       }
     };
 
@@ -49,7 +58,7 @@ const InPlay = () => {
     };
 
     // Provider에서 소켓을 관리하므로 여기선 cleanup 불필요
-  }, [server, userNick, userNo, sockets]);
+  }, [server, sockets]);
 
   const start = () => setPlay(true);
   const stop = () => setPlay(false);

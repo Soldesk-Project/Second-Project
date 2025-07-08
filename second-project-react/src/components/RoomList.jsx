@@ -4,7 +4,6 @@ import styles from '../css/RoomList.module.css';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { WebSocketContext } from '../util/WebSocketProvider';
-import axios from 'axios';
 
 const RoomList = () => {
   const [gameRoomList, setGameRoomList] = useState([]);
