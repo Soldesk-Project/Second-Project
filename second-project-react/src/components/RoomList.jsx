@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import ModalBasic from './ModalBasic';
+import MatchModal from './MatchModal'; // ✅ 추가
+import axios from 'axios';
 import styles from '../css/RoomList.module.css';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -9,12 +11,13 @@ const RoomList = () => {
   const [gameRoomList, setGameRoomList] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [isWsOpen, setIsWsOpen] = useState(false);
+  const [showMatchModal, setShowMatchModal] = useState(false); // ✅ 추가
+
   const { user, server } = useSelector((state) => state.user);
   const userNick = user.user_nick;
   const nav = useNavigate();
 
-  const sockets = useContext(WebSocketContext); // 여러 소켓 context
-
+  const sockets = useContext(WebSocketContext);
 
   useEffect(() => {
     const socket = sockets['room'];
@@ -32,26 +35,25 @@ const RoomList = () => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-
       switch (data.type) {
         case "roomList":
           setGameRoomList(data.rooms);
           break;
-          case "roomCreated":
-            socket.send(JSON.stringify({
-              action: "joinRoom",
+        case "roomCreated":
+          socket.send(JSON.stringify({
+            action: "joinRoom",
             roomNo: data.gameroom_no,
             userNick
           }));
           nav('/gameRoom/' + data.gameroom_no);
           break;
-          default:
-            break;
-          }
-        };
-        
-        socket.onclose = () => {
-          setIsWsOpen(false);
+        default:
+          break;
+      }
+    };
+
+    socket.onclose = () => {
+      setIsWsOpen(false);
     };
     socket.onerror = (error) => {
       console.error("WebSocket error (room):", error);
@@ -67,46 +69,68 @@ const RoomList = () => {
         console.log("🧩 매칭 소켓 연결 완료");
       };
     }
-    
+
     matchSocket.onmessage = (event) => {
       let data;
       try {
         data = JSON.parse(event.data);
         console.log(data);
-        
       } catch (e) {
         console.warn("🟠 JSON 파싱 실패:", event.data);
         return;
       }
-      
+
       switch (data.type) {
         case "ACCEPT_MATCH":
-          alert('✅ 4명이 모였습니다! 게임을 수락하시겠습니까?');
+          setShowMatchModal(true); // ✅ 모달 열기
           break;
-          case "MATCH_FOUND":
-            nav('/game');
-            break;
-            default:
-              console.log("🟡 알 수 없는 매칭 메시지:", data);
-              break;
-            }
-          };
-          
-          matchSocket.onerror = (err) => {
-            console.error("WebSocket error (match):", err);
-          };
-          
-          matchSocket.onclose = () => {
-            console.log("🛑 매칭 소켓 종료됨");
-          };
-        }, [sockets]);
-        
-        const handleOpenModal = () => {
-          setModalOpen(true);
-        };
-        
-        const joinRoom = (room) => {
-          const socket = sockets['room'];
+        case "MATCH_FOUND":
+          nav('/game');
+          break;
+        default:
+          console.log("🟡 알 수 없는 매칭 메시지:", data);
+          break;
+      }
+    };
+
+    matchSocket.onerror = (err) => {
+      console.error("WebSocket error (match):", err);
+    };
+
+    matchSocket.onclose = () => {
+      console.log("🛑 매칭 소켓 종료됨");
+    };
+  }, [sockets]);
+
+  const handleAccept = () => {
+    const matchSocket = sockets['match'];
+    if (matchSocket && matchSocket.readyState === 1) {
+      matchSocket.send(JSON.stringify({
+        action: 'acceptMatch',
+        userId: user.user_id,
+      }));
+    }
+    setShowMatchModal(false);
+    nav('/game');
+  };
+
+  const handleReject = () => {
+    const matchSocket = sockets['match'];
+    if (matchSocket && matchSocket.readyState === 1) {
+      matchSocket.send(JSON.stringify({
+        action: 'rejectMatch',
+        userId: user.user_id,
+      }));
+    }
+    setShowMatchModal(false);
+  };
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const joinRoom = (room) => {
+    const socket = sockets['room'];
     if (socket && socket.readyState === 1) {
       if (room.limit > room.currentCount) {
         socket.send(JSON.stringify({
@@ -122,37 +146,25 @@ const RoomList = () => {
       alert("웹소켓 연결이 준비되지 않았습니다. -- joinRoom");
     }
   };
-  
+
   const handleQuickMatch = async () => {
     console.log("🚀 handleQuickMatch 호출됨");
 
     try {
-      // await axios.post('/api/match/join', {
-      //   userId: user.user_id,
-      // });
-
-      console.log('✅ 매칭 큐 등록 완료');
-
+      await axios.post('/api/rank/score', { userId: user.user_id });
       const matchSocket = sockets['match'];
-      console.log(matchSocket);
-      
       if (!matchSocket) {
         alert("웹소켓 연결이 존재하지 않습니다.");
         return;
       }
 
       if (matchSocket.readyState === 1) {
-        console.log("전송완료");
-        
-        // 연결됨 → 바로 전송
         matchSocket.send(JSON.stringify({
           action: 'quickMatch',
           userId: user.user_id
         }));
       } else if (matchSocket.readyState === 0) {
-        // 연결 중 → onopen에서만 전송
         matchSocket.onopen = () => {
-          console.log("🧩 매칭 소켓 연결 완료 (onopen)");
           matchSocket.send(JSON.stringify({
             action: 'quickMatch',
             userId: user.user_id
@@ -168,11 +180,13 @@ const RoomList = () => {
     }
   };
 
-  
-  
   return (
     <>
       {modalOpen && <ModalBasic setModalOpen={setModalOpen} socket={sockets['room']} isWsOpen={isWsOpen} />}
+      {showMatchModal && (
+        <MatchModal onAccept={handleAccept} onReject={handleReject} />
+      )}
+
       <div className={styles.roomListHeader}>
         <button onClick={handleOpenModal} className={styles.createBtn}>필터</button>
         <button onClick={handleOpenModal} className={styles.createBtn}>일반 게임</button>

@@ -45,7 +45,7 @@
 	<context:property-placeholder location="classpath:application.properties" />
 	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
 	
-	<task:annotation-driven/>	
+	<!-- <task:annotation-driven/> -->	
 	<mybatis-spring:scan base-package="org.joonzis.mapper"/>
 	<context:component-scan base-package="org.joonzis.service"/>
 	<context:component-scan base-package="org.joonzis.security"/>

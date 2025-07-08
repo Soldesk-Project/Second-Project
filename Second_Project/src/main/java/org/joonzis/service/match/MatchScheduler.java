@@ -24,8 +24,8 @@ public class MatchScheduler {
         Long size = matchService.queueSize();
         System.out.println("⏱️ 현재 큐 사이즈: " + size);
 
-        if (size != null && size >= 4) {
-            List<String> users = matchService.peekAndRemove(4);
+        if (size != null && size >= 2) {
+            List<String> users = matchService.peekAndRemove(2);
             System.out.println("🎯 매칭 대상 → " + users);
 
             for (String userId : users) {

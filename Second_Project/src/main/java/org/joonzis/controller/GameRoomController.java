@@ -1,11 +1,17 @@
 package org.joonzis.controller;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.joonzis.domain.GameRoomDTO;
+import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.service.GameRoomService;
+import org.joonzis.service.MemberService;
 import org.joonzis.service.match.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +31,12 @@ public class GameRoomController {
 	private GameRoomService gameRoomService;
 	
 	@Autowired
+	private MemberService memberService;
+	
+	@Autowired
+    private StringRedisTemplate redisTemplate;
+	
+	@Autowired
 	private MatchService matchService;
 	
 	// 게임방 생성
@@ -38,5 +50,26 @@ public class GameRoomController {
 	@GetMapping("/showRoom")	
 	public List<GameRoomDTO> showRoom() {
 	    return gameRoomService.showRoom();
-	}	
+	}
+	
+	@PostMapping("/rank/score")
+	public ResponseEntity<Integer> loadRank(@RequestBody Map<String, String> payload) {
+	    String userId = payload.get("userId");
+	    UserInfoDTO user = memberService.getUserById(userId);
+	    
+	    redisTemplate.opsForValue().set("rank:" + userId, String.valueOf(user.getUser_rank()));
+	    
+	    return ResponseEntity.ok(user.getUser_rank());
+	}
+	
+	@GetMapping(value = "/match/test", produces = "application/json; charset=UTF-8")
+	public ResponseEntity<?> testMatch() {
+	    List<String> matched = matchService.peekAndRemove(4);
+	    if (!matched.isEmpty()) {
+	        String groupId = UUID.randomUUID().toString();
+	        matchService.startPendingGroup(matched, groupId);
+	        return ResponseEntity.ok(matched);
+	    }
+	    return ResponseEntity.ok("매칭 불가");
+	}
 }
