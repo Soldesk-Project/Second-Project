@@ -5,22 +5,22 @@
 .green_bd { border: 2px solid green !important; }
 .blue_bd { border: 2px solid blue !important; }
 .indigo_bd { border: 2px solid indigo !important; }
-.purple_bd { border: 2px solid purple !important; }
+.violet_bd { border: 2px solid purple !important; }
 
 .white_bd { border: 2px solid white !important; }
 .black_bd { border: 2px solid black !important; }
 
-/* title(글자색) color */
-.red_title { color: red !important; }
-.orange_title { color: orange !important; }
-.yellow_title { color: yellow !important; }
-.green_title { color: green !important; }
-.blue_title { color: blue !important; }
-.indigo_title { color: indigo !important; }
-.purple_title { color: purple !important; }
+/* fontColor color */
+.red_fontColor { color: red !important; }
+.orange_fontColor { color: orange !important; }
+.yellow_fontColor { color: yellow !important; }
+.green_fontColor { color: green !important; }
+.blue_fontColor { color: blue !important; }
+.indigo_fontColor { color: indigo !important; }
+.violet_fontColor { color: purple !important; }
 
-.white_title { color: white !important; }
-.black_title { color: black !important; }
+.white_fontColor { color: white !important; }
+.black_fontColor { color: black !important; }
 
 /* background color */
 .red_bg { background-color: red !important; }
@@ -29,7 +29,7 @@
 .green_bg { background-color: green !important; }
 .blue_bg { background-color: blue !important; }
 .indigo_bg { background-color: indigo !important; }
-.purple_bg { background-color: purple !important; }
+.violet_bg { background-color: purple !important; }
  
 .white_bg { background-color: white !important; }
 .black_bg { background-color: black !important; }

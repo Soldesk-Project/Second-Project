@@ -121,12 +121,12 @@ const UserRanking = () => {
             </div>
 
             <div className={styles.userList}>
-                {userRankingList.map(({ user_no, user_nick, boundary_class_name, background_class_name, title_class_name }) => (
+                {userRankingList.map(({ user_no, user_nick, boundary_class_name, background_class_name, title_class_name, fontcolor_class_name }) => (
                     <div
                         key={user_no}
                         className={`${styles.user} ${decoStyles[boundary_class_name]} ${decoStyles[background_class_name]}`}
                     >
-                        <div className={decoStyles[title_class_name]}>
+                        <div className={decoStyles[fontcolor_class_name]}>
                         {user_nick}
                         </div>
                     </div>
@@ -148,7 +148,8 @@ const UserRanking = () => {
                         <div key={type} className={styles.itemGroup}>
                         <h5 style={{ marginTop: '10px' }}>
                             {type === 'boundary' ? '테두리'
-                            : type === 'title' ? '글자색'
+                            : type === 'title' ? '칭호'
+                            : type === 'fontColor' ? '글자색'
                             : type === 'background' ? '배경'
                             : type === 'balloon' ? '말풍선'
                             : type}

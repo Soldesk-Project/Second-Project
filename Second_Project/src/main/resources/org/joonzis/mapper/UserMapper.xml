@@ -10,6 +10,7 @@
 	    <result column="user_nick" property="user_nick"/>
 	    <result column="boundary_class_name" property="boundary_class_name"/>
 	    <result column="title_class_name" property="title_class_name"/>
+	    <result column="fontcolor_class_name" property="fontcolor_class_name"/>
 	    <result column="background_class_name" property="background_class_name"/>
 	    <result column="balloon_class_name" property="balloon_class_name"/>
 	</resultMap>
@@ -25,6 +26,7 @@
 			    U.USER_NICK AS user_nick,
 			    COALESCE(D.BOUNDARY_CLASS_NAME, 'default-boundary') AS boundary_class_name,
 			    COALESCE(D.TITLE_CLASS_NAME, 'default-title') AS title_class_name,
+			    COALESCE(D.FONTCOLOR_CLASS_NAME, 'default-color') AS fontcolor_class_name,
 			    COALESCE(D.BACKGROUND_CLASS_NAME, 'default-background') AS background_class_name,
 			    COALESCE(D.BALLOON_CLASS_NAME, 'default-balloon') AS balloon_class_name
 			  FROM USERS U
@@ -50,6 +52,9 @@
 	            </when>
 	            <when test="item_type == 'title'">
 	                TITLE_CLASS_NAME = #{css_class_name}
+	            </when>
+	            <when test="item_type == 'fontColor'">
+	                FONTCOLOR_CLASS_NAME = #{css_class_name}
 	            </when>
 	            <when test="item_type == 'boundary'">
 	                BOUNDARY_CLASS_NAME = #{css_class_name}

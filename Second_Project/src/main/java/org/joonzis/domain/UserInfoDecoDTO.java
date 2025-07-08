@@ -20,4 +20,5 @@ public class UserInfoDecoDTO {
     private String title_class_name;
     private String background_class_name;
     private String balloon_class_name;
+    private String fontcolor_class_name;
 }

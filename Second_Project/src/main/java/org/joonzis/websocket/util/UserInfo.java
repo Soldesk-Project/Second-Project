@@ -18,4 +18,5 @@ public class UserInfo {
     private String blName;
     private String bdName;
     private String titleName;
+    private String fontColorName;
 }

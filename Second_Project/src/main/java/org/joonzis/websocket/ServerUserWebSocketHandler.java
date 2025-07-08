@@ -43,12 +43,13 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         String blName = data.get("blName");
         String bdName = data.get("bdName");
         String titleName = data.get("titleName");
+        String fontColorName = data.get("fontColorName");
 
         if ("join".equals(action) && server != null && userNick != null) {
             removeSessionFromAllServers(session);
 
             serverSessions.putIfAbsent(server, new ConcurrentHashMap<>());
-            serverSessions.get(server).put(session, new UserInfo(userNick, userNo, bgName, blName, bdName, titleName));
+            serverSessions.get(server).put(session, new UserInfo(userNick, userNo, bgName, blName, bdName, titleName, fontColorName));
             
             log.info("[WebSocket] 세션 추가됨. 서버: " + server + ", 세션ID: " + session.getId() 
             + ", 현재 접속 유저 수: " + serverSessions.get(server).size());
@@ -82,6 +83,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
                         info.setBlName(updatedUser.getBalloon_class_name());
                         info.setBdName(updatedUser.getBoundary_class_name());
                         info.setTitleName(updatedUser.getTitle_class_name());
+                        info.setFontColorName(updatedUser.getFontcolor_class_name());
                         updated = true;
                     }
                 }
@@ -177,6 +179,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
                 info.setBlName(updatedUser.getBalloon_class_name());
                 info.setBdName(updatedUser.getBoundary_class_name());
                 info.setTitleName(updatedUser.getTitle_class_name());
+                info.setFontColorName(updatedUser.getFontcolor_class_name());
                 updated = true;
             }
         }
@@ -223,6 +226,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             userMap.put("blName", userInfo.getBlName());
             userMap.put("bdName", userInfo.getBdName());
             userMap.put("titleName", userInfo.getTitleName());
+            userMap.put("fontColorName", userInfo.getFontColorName());
             userList.add(userMap);
         }
 

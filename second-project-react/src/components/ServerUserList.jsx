@@ -14,7 +14,8 @@ const ServerUserList = () => {
   const blName = user.balloon_class_name;
   const bdName = user.boundary_class_name;
   const titleName = user.title_class_name;
-
+  const fontColorName = user.fontcolor_class_name;
+  
   const sockets = useContext(WebSocketContext);
 
   useEffect(() => {
@@ -32,6 +33,7 @@ const ServerUserList = () => {
       blName,
       bdName,
       titleName,
+      fontColorName,
     };
 
     if (socket.readyState === WebSocket.OPEN) {
@@ -52,7 +54,7 @@ const ServerUserList = () => {
     return () => {
       setUsers([]);
     };
-  }, [server, userNick, userNo, bgName, blName, bdName, titleName]);
+  }, [server, userNick, userNo, bgName, blName, bdName, titleName, fontColorName]);
 
   return (
     <div className={styles.container}>
@@ -60,11 +62,11 @@ const ServerUserList = () => {
       <div className={styles.userList}>
         {
           users.length > 0 ? (
-            users.map(({ userNick, userNo, bgName, titleName, bdName }) => (
+            users.map(({ userNick, userNo, bgName, titleName, bdName, fontColorName }) => (
               <div 
                 key={`user-${userNo}`} 
                 className={`${styles.user} ${decoStyles[bgName]} ${decoStyles[bdName]}`}>
-                  <div className={`${decoStyles[titleName]}`}>
+                  <div className={`${decoStyles[fontColorName]}`}>
                     {userNick}
                   </div>
               </div>

@@ -5,6 +5,13 @@
   padding: 0;
 }
 
+.wrapper {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 /* 상단 헤더 */
 .top_nav {
     height: 70px;
@@ -14,15 +21,25 @@
     align-items: center;
     padding: 0 20px;
     font-weight: bold;
+    flex-shrink: 0;
 }
 
 /* 탭 리스트 */
 .subTabContainer {
   display: flex;
+  justify-content: center;
   gap: 1rem;
   border-bottom: 2px solid #ddd;
   padding: 0 20px;
-  justify-content: center;
+  flex-shrink: 0;
+  background-color: white;
+}
+
+.scrollArea {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #1f222d;
+  padding: 10px;
 }
 
 /* 왼쪽 탭 그룹 */
@@ -55,17 +72,20 @@
   gap: 0.5rem;
 }
 
+.shopMaingrid {
+  width: 100%;
+  padding: 10px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 30px;
   background-color: #1f222d;
-  width: 1460px;
-  height: 846px;
-  border: 1px solid white;
-  margin-left: 10px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  width: 100%;
+  min-height: 790px;
+  border: 1px solid gray;
+  background-color: gray;
   padding: 10px;
 }
 
@@ -73,6 +93,41 @@
   background-color: white;
   border-radius: 10px;
   height: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+.itemCss {
+  flex: 6;
+  width: 100%;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cssApply {
+  border: 1px solid black;
+}
+
+.itemName {
+  flex: 2;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+.itemPrice {
+  flex: 2;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #555;
 }
 
 .shopMainBox{

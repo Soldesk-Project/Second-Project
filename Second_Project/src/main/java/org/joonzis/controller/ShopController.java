@@ -1,11 +1,15 @@
 package org.joonzis.controller;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.PaymentDTO;
 import org.joonzis.service.MemberService;
+import org.joonzis.service.ShopService;
 import org.joonzis.service.pay.PayService;
 import org.joonzis.service.pay.TossPayService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +41,9 @@ public class ShopController {
 	
 	@Autowired
 	private MemberService memberservice;
+	
+	@Autowired
+	private ShopService shopservice;
 	
 	@GetMapping("/user/point")
 	public ResponseEntity<Integer> getUserPoint(@RequestParam("user_id") String user_id) {
@@ -98,5 +105,20 @@ public class ShopController {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "토스 결제 승인 실패");
         }
     }
+    
+    @GetMapping("/shop/items")
+	public List<ItemVO> getItemCategory(@RequestParam("category") String category) {
 
+        Map<String, String> categoryMap = Map.of(
+            "테두리", "boundary",
+            "칭호", "title",
+            "글자색", "fontColor",
+            "배경", "background",
+            "말풍선", "balloon",
+            "랜덤박스", "randomBox"
+        );
+
+        String mappedCategory = categoryMap.getOrDefault(category, "unknown");
+	    return shopservice.getItemCategory(mappedCategory);
+	}
 }
