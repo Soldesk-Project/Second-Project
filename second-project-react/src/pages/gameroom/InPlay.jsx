@@ -18,6 +18,8 @@ const InPlay = () => {
   // 여러 소켓을 Context로부터 받아옴
   const sockets = useContext(WebSocketContext);
 
+  const isInitiator = users.some(u => u.userNick === userNick && u.userNo === 0);
+
   useEffect(() => {
     const socket = sockets['room'];
     if (!socket) return;
@@ -41,10 +43,16 @@ const InPlay = () => {
         const formattedUsers = data.userList.map((nick, index) => ({
           userNick: nick,
           userNo: index
-        }));
-        console.log(formattedUsers);
-        
+        }));        
         setUsers(formattedUsers);
+      }
+      if (data.type === 'gameStart' && data.server === server) {
+        console.log('시작한사람 ( 방장 ) : '+data.initiator);
+        
+        setPlay(true);
+      }
+      if (data.type === 'gameStop' && data.server === server) {
+        setPlay(false);
       }
     };
 
@@ -59,8 +67,36 @@ const InPlay = () => {
     // Provider에서 소켓을 관리하므로 여기선 cleanup 불필요
   }, [server, roomNo, sockets]);
 
-  const start = () => setPlay(true);
-  const stop = () => setPlay(false);
+  const start = () => {
+    const socket = sockets['room'];
+    
+    if (socket && socket.readyState === 1) {
+      socket.send(JSON.stringify({
+        action: 'startGame',
+        server,
+        roomNo,
+        userNick
+    }));      
+      // setPlay(true);
+    } else {
+      alert('웹소켓 연결이 준비되지 않았습니다 - startGame');
+    }
+  }
+  const stop = () => {
+    const socket = sockets['room'];
+    
+    if (socket && socket.readyState === 1) {
+      socket.send(JSON.stringify({
+        action: 'stopGame',
+        server,
+        roomNo,
+        userNick
+      }));
+      // setPlay(false);
+    } else {
+      alert('웹소켓 연결이 준비되지 않았습니다 - stopGame');
+    }
+  }
 
   const leaveRoom = () => {
     const socket = sockets['room'];
@@ -82,10 +118,17 @@ const InPlay = () => {
         <div className={styles.body_left}>
           <div className={styles.solving}>
             <div className={styles.problem}>
-              <button onClick={start}>시작</button>
-              <button onClick={stop}>중지</button>
-              {play ? <Test /> : <h2>대기중</h2>}
-              <button onClick={leaveRoom}>나가기</button>
+              <div className={styles.initiatorBtn}>
+                <button onClick={start} disabled={!isInitiator}>시작</button>
+                <button onClick={stop} disabled={!isInitiator}>중지</button>
+                <button onClick={leaveRoom} className={styles.leaveBtn}>나가기</button>
+              </div>
+                {!isInitiator && (
+                  <p className={styles.note}>방장만 게임을 시작/중지할 수 있습니다</p>
+                )}
+              <div className={styles.gamePlay}>
+                {play ? <Test /> : <h2>대기중</h2>}
+              </div>
             </div>
           </div>
           <div className={styles.chat_box}>
@@ -106,7 +149,7 @@ const InPlay = () => {
             {users.length > 0 ? (
               users.map(({ userNick, userNo }) => (
                 <div key={`user-${userNo}`} className={styles.user}>
-                  {userNick}
+                  {userNick} / {userNo}
                 </div>
               ))
             ) : (

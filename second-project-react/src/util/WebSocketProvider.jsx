@@ -21,7 +21,8 @@ export const WebSocketProvider = ({ children }) => {
 
   // 🟡 기존 room, server는 고정 주소 사용
   if (!socketsRef.current["room"]) {
-    socketsRef.current["room"] = new WebSocket("ws://192.168.0.112:9099/ws/room");
+    socketsRef.current["room"] = new WebSocket("ws://localhost:9099/ws/room");
+    // socketsRef.current["room"] = new WebSocket("ws://192.168.0.112:9099/ws/room");
   }
   if (!socketsRef.current["server"]) {
     socketsRef.current["server"] = new WebSocket("ws://192.168.0.112:9099/ws/server");

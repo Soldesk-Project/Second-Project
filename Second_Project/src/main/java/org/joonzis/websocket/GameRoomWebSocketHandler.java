@@ -62,6 +62,12 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             case "leaveRoom":
             	handleLeaveRoom(session, json);
             	break;
+            case "startGame":
+            	handleStartGame(session, json);
+            	break;
+            case "stopGame":
+            	handleStopGame(session, json);
+            	break;
         }
     }
 
@@ -222,6 +228,46 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         broadcaseRoomUserList(server, roomNo);
     }
     
+    private void handleStartGame(WebSocketSession session, JsonNode json) {
+    	String server = json.get("server").asText();
+    	String roomNo = json.get("roomNo").asText();
+    	String userNick = json.get("userNick").asText();
+//    	if (server == null || userNick == null) {
+//    		return;
+//    	}
+    	System.out.println("Game start requested by " + userNick + " in room " + roomNo);
+    	Map<String, Object> payload = Map.of(
+            "type", "gameStart",
+            "server", server,
+            "roomNo", roomNo,
+            "initiator", userNick
+        );
+        broadcast(server, payload);
+    	
+    }
+    
+    private void handleStopGame(WebSocketSession session, JsonNode json) {
+    	String server = json.get("server").asText();
+        String roomNo = json.get("roomNo").asText();
+        String userNick = json.get("userNick").asText();
+        
+        // 방장 여부 확인 로직 추가 가능 (필요한 경우)
+        System.out.println("Game stop requested by " + userNick + " in room " + roomNo);
+        
+        // 해당 방의 모든 유저에게 게임 중지 메시지 브로드캐스트
+        Map<String, Object> payload = Map.of(
+            "type", "gameStop",
+            "server", server,
+            "roomNo", roomNo,
+            "initiator", userNick
+        );
+        broadcast(server, payload);
+    }
+    
+    
+    
+    
+    
     private void broadcastUserList(String server) {
         Set<String> users = serverUsers.getOrDefault(server, Collections.emptySet());
         broadcast(server, Map.of("type", "userList", "users", users));
@@ -277,7 +323,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
                 if (session.isOpen()) {
                     session.sendMessage(new TextMessage(json));
                 }
-            } catch (Exception e) {
+            } catch (Exception e) {	
                 // 에러 처리
             }
         });
