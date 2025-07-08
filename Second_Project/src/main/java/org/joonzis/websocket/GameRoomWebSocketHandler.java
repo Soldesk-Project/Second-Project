@@ -160,6 +160,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	             .add(userNick);
 
 	    broadcastRoomList(server);
+	    broadcaseRoomUserList(server, roomNo);
     }	
     
     private void handleLeaveRoom(WebSocketSession session, JsonNode json) {
@@ -186,6 +187,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         // 방 목록, 유저 목록 전체 브로드캐스트
         broadcastRoomList(server);
         broadcastUserList(server);
+        broadcaseRoomUserList(server, roomNo);
     }
     
     private void handleUserList(WebSocketSession session, JsonNode json) {
@@ -204,7 +206,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             "type", "roomUserList",
             "server", server,
             "roomNo", roomNo,
-            "size", userNicks.size(),
             "userList", userList
         );
         
@@ -218,7 +219,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         	System.out.println("Error sending roomUserList for roomNo " + roomNo + ": " + e.getMessage());
             e.printStackTrace();
         }
-    	
+        broadcaseRoomUserList(server, roomNo);
     }
     
     private void broadcastUserList(String server) {
@@ -249,6 +250,20 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         broadcast(server, Map.of("type", "roomList", "rooms", roomListWithCount));
     }
 
+    private void broadcaseRoomUserList(String server, String roomNo) {
+    	Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
+        Set<String> userNicks = roomUserMap.getOrDefault(roomNo, Collections.emptySet());
+        List<String> userList = new ArrayList<>(userNicks);
+        
+        Map<String, Object> payload = Map.of(
+            "type", "roomUserList",
+            "server", server,
+            "roomNo", roomNo,
+            "userList", userList
+        );
+        broadcast(server, payload);
+    }
+    
     private void broadcast(String server, Object data) {
         String json;
         try {

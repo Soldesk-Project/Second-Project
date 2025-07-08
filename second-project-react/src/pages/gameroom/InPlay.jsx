@@ -32,16 +32,15 @@ const InPlay = () => {
       joinAndRequestUserList();
     } else {
       socket.onopen = joinAndRequestUserList;
-    }
+    } 
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data);
       
       if (data.type === 'roomUserList' && data.server === server) {
         const formattedUsers = data.userList.map((nick, index) => ({
           userNick: nick,
-          userNo: index // 임시로 index를 userNo로 사용, 실제로는 서버에서 제공 필요
+          userNo: index
         }));
         console.log(formattedUsers);
         
@@ -58,7 +57,7 @@ const InPlay = () => {
     };
 
     // Provider에서 소켓을 관리하므로 여기선 cleanup 불필요
-  }, [server, sockets]);
+  }, [server, roomNo, sockets]);
 
   const start = () => setPlay(true);
   const stop = () => setPlay(false);
@@ -72,7 +71,7 @@ const InPlay = () => {
         userNick: userNick
       }));
     } else {
-      alert('웹소켓 연결이 준비되지 않았습니다.--leaveRoom');
+      alert('웹소켓 연결이 준비되지 않았습니다 - leaveRoom');
     }
     nav('/main/' + server);
   };
