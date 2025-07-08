@@ -22,5 +22,8 @@ public class QuestionDTO {
     private int correct_answer;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String image_data;
+    private byte[] image_data;  // BLOB 컬럼
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String image_data_base64;  // 클라이언트에 보내줄 Base64 문자열
 }

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.joonzis.mapper.PlayMapper">
+
+	<resultMap id="questionResultMap" type="org.joonzis.domain.QuestionDTO">
+        <id property="id" column="id"/>
+        <result property="subject" column="subject"/>
+        <result property="question_text" column="question_text"/>
+        <result property="option_1" column="option_1"/>
+        <result property="option_2" column="option_2"/>
+        <result property="option_3" column="option_3"/>
+        <result property="option_4" column="option_4"/>
+        <result property="correct_answer" column="correct_answer"/>
+        <result property="image_data" column="image_data"/>
+    </resultMap>
+
+	<!-- 카테고리 별 문제 가져오기 -->
+	<select id="getQuestionsByCategory" resultMap="questionResultMap" parameterType="String">
+	    SELECT *
+	    FROM (
+	        SELECT *
+	        FROM ${category}
+	        ORDER BY DBMS_RANDOM.VALUE
+	    )
+	    WHERE ROWNUM &lt;= 20
+	</select>
+	
+	
+	<!-- 랜덤 모드 가져오기(랭크모드) -->
+	<select id="getRandomQuestions" resultMap="questionResultMap">
+        SELECT *
+        FROM (
+            SELECT * FROM (
+                SELECT * FROM cpe_q
+                UNION ALL
+                SELECT * FROM cpei_q
+                UNION ALL
+                SELECT * FROM cpet_q
+                UNION ALL
+                SELECT * FROM ict_q
+                UNION ALL
+                SELECT * FROM icti_q
+                UNION ALL
+                SELECT * FROM lm1_q
+                UNION ALL
+                SELECT * FROM lm2_q
+                UNION ALL
+                SELECT * FROM net1_q
+                UNION ALL
+                SELECT * FROM net2_q
+                UNION ALL
+                SELECT * FROM sec_q
+            )
+            ORDER BY DBMS_RANDOM.VALUE
+        )
+        WHERE ROWNUM &lt;= 20
+    </select>
+</mapper>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styles from '../css/ModalBasic.module.css';
 
-const ModalBasic = ({ setModalOpen, socket, isWsOpen }) => {
+const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('engineer_information');
   const [mode, setMode] = useState('normal');
@@ -36,6 +36,11 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen }) => {
       limit,
       pwd : isPrivate ? password : null
     };
+
+    // ✅ 선택한 카테고리를 상위 컴포넌트에 전달
+    if (typeof onCategorySelect === 'function') {
+      onCategorySelect(category);
+    }
     
     if (socket && socket.readyState === 1) {
       socket.send(JSON.stringify(roomData));
