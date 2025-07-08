@@ -50,6 +50,7 @@
 	<context:component-scan base-package="org.joonzis.service"/>
 	<context:component-scan base-package="org.joonzis.security"/>
 	<context:component-scan base-package="org.joonzis.config"/>
+	<context:component-scan base-package="org.joonzis.controller"/>
 	
 	<!-- WebSocket을 위한 ServerEndpointExporter 빈 등록 -->
 	<context:component-scan base-package="org.joonzis.websocket" />
