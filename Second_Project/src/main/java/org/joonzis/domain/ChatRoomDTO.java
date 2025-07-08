@@ -62,31 +62,28 @@ public class ChatRoomDTO {
     // --- toString() 메서드 오버라이드 ---
     @Override
     public String toString() {
-        // 로그 가독성을 높이기 위해 JSON 형식 또는 사용자 정의 텍스트 형식으로 출력
-        // 여기서는 JSON 형식으로 예시를 듭니다. (더 유연한 로깅을 위해 ObjectMapper 사용도 고려)
+        // null 값 처리 로직을 String.format()에 맞게 변경
+        // Long 타입 필드도 null일 경우 "null" 문자열로 변환
+        String formattedTimestamp = (mTimestamp != null) ? String.valueOf(mTimestamp) : "null";
+        String formattedGameroomNo = (gameroomNo != null) ? String.valueOf(gameroomNo) : "null";
+        String formattedMSenderNo = (mSenderNo != null) ? String.valueOf(mSenderNo) : "null";
+        String formattedMReceiverNo = (mReceiverNo != null) ? String.valueOf(mReceiverNo) : "null";
+
+        // 메시지 내용의 따옴표 이스케이프 및 null 처리
+        String escapedMContent = (mContent != null) ? mContent.replace("\"", "\\\"") : "";
+        String escapedMSender = (mSender != null) ? mSender.replace("\"", "\\\"") : "null";
+        String escapedMReceiver = (mReceiver != null) ? mReceiver.replace("\"", "\\\"") : "null";
+
         return String.format(
-            "{\"mTimestamp\": %d, \"mType\": \"%s\", \"gameroomNo\": %s, \"mSender\": \"%s\", \"mSenderNo\": %d, \"mContent\": \"%s\", \"mReceiver\": \"%s\", \"mReceiverNo\": %d}",
-            mTimestamp,
-            mType,
-            (gameroomNo != null ? gameroomNo : "null"), // null 값 처리
-            mSender,
-            mSenderNo,
-            mContent != null ? mContent.replace("\"", "\\\"") : "", // 메시지 내용에 따옴표가 있을 경우 이스케이프 처리
-            mReceiver != null ? mReceiver : "null", // null 값 처리
-            mReceiverNo != null ? mReceiverNo : "null" // null 값 처리
+            "{\"mTimestamp\": %s, \"mType\": \"%s\", \"gameroomNo\": %s, \"mSender\": \"%s\", \"mSenderNo\": %s, \"mContent\": \"%s\", \"mReceiver\": \"%s\", \"mReceiverNo\": %s}",
+            formattedTimestamp,
+            mType != null ? mType.name() : "null", // MessageType도 null 체크
+            formattedGameroomNo,
+            escapedMSender,
+            formattedMSenderNo,
+            escapedMContent,
+            escapedMReceiver,
+            formattedMReceiverNo
         );
-        /*
-        // 또는 더 읽기 쉬운 단순 텍스트 형식으로
-        return String.format("[%s] type:%s room:%s sender:%s(%d) receiver:%s(%d) content:\"%s\"",
-            (mTimestamp != null ? java.time.Instant.ofEpochMilli(mTimestamp).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : "N/A"),
-            mType,
-            (gameroomNo != null ? gameroomNo : "N/A"),
-            mSender,
-            (mSenderNo != null ? mSenderNo : -1),
-            (mReceiver != null ? mReceiver : "N/A"),
-            (mReceiverNo != null ? mReceiverNo : -1),
-            mContent
-        );
-        */
     }
 }
