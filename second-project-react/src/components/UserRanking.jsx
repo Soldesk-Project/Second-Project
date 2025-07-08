@@ -3,19 +3,22 @@ import React, { useContext, useEffect, useState } from 'react';
 import styles from '../css/UserRanking.module.css';
 import decoStyles from '../css/Decorations.module.css';
 import TestModal from './TestModal';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { WebSocketContext } from '../util/WebSocketProvider';
+import { setIsTop10 } from '../store/rankingSlice';
 
 const UserRanking = () => {
     const [userRankingList, setUserRankingList] = useState([]);
     const [itemList, setItemList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const dispatch = useDispatch();
 
     const { user } = useSelector((state) => state.user);
     const user_no = user.user_no;
     const sockets = useContext(WebSocketContext);
     const socket = sockets['server'];
+    dispatch(setIsTop10(userRankingList.slice(0, 10).some(u => u.user_no === user_no)));
 
     // 유저 랭킹 리스트 불러오기
     const fetchUserRanking = async () => {

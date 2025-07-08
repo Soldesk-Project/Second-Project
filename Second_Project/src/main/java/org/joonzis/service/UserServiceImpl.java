@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.joonzis.domain.ItemVO;
+import org.joonzis.domain.UserAchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDecoDTO;
 import org.joonzis.mapper.UserMapper;
@@ -44,5 +45,11 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public UserInfoDecoDTO getUserInfoByUserNo(int userNo) {
 		return mapper.getUserInfoByUserNo(userNo);
+	}
+	
+	// 업적 달성 포인트 추가
+	@Override
+	public int updateUserPoint(UserAchievementDTO dto) {
+		return mapper.updateUserPoint(dto);
 	}
 }

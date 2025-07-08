@@ -3,6 +3,7 @@ package org.joonzis.mapper;
 import java.util.List;
 
 import org.joonzis.domain.ItemVO;
+import org.joonzis.domain.UserAchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDecoDTO;
 
@@ -19,4 +20,7 @@ public interface UserMapper {
 	
 	// userNo로 유저 정보+css 찾기
 	public UserInfoDecoDTO getUserInfoByUserNo(int userNo);
+	
+	// 업적 달성 포인트 추가
+	public int updateUserPoint(UserAchievementDTO dto);
 }

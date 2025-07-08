@@ -5,7 +5,26 @@
 <mapper namespace="org.joonzis.mapper.AchievementMapper">
 	
 	<!-- 업적 리스트 -->
-	<select id="getAchievementList" resultType="org.joonzis.domain.AchievementVO">
-		SELECT * FROM ACHIEVEMENTS
+	<select id="getAchievementList" resultType="org.joonzis.domain.AchievementDTO">
+		SELECT
+		  A.ACH_TITLE,
+		  A.ACH_CONTENT,
+		  A.ACH_REWARD,
+		  A.ACH_TYPE,
+		  CASE 
+		    WHEN UA.ACH_TITLE IS NOT NULL THEN 'true'
+		    ELSE 'false'
+		  END AS is_reward
+		FROM 
+		  ACHIEVEMENTS A
+		LEFT JOIN 
+		  USER_ACHIEVEMENT UA
+		  ON A.ACH_TITLE = UA.ACH_TITLE AND UA.USER_NO = #{user_no}
 	</select>
+	
+	<!-- 유저업적 저장 -->
+	<insert id="addUserAchievement" parameterType="org.joonzis.domain.UserAchievementDTO">
+		INSERT INTO USER_ACHIEVEMENT (USER_NO, ACH_TITLE, ACHIEVED_DATE)
+		VALUES (#{user_no}, #{ach_title}, sysdate)
+	</insert>
 </mapper>

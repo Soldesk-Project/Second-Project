@@ -25,6 +25,7 @@ export const WebSocketProvider = ({ children }) => {
   }
   if (!socketsRef.current["server"]) {
     socketsRef.current["server"] = new WebSocket("ws://192.168.0.112:9099/ws/server");
+    // socketsRef.current["server"] = new WebSocket("ws://localhost:9099/ws/server");
   }
 
   // ✅ match 소켓만 userId 포함

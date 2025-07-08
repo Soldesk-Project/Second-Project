@@ -2,11 +2,16 @@ package org.joonzis.mapper;
 
 import java.util.List;
 
+import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.AchievementVO;
+import org.joonzis.domain.UserAchievementDTO;
 
 public interface AchievementMapper {
 	
 	// 업적 리스트
-	public List<AchievementVO> getAchievementList();
+	public List<AchievementDTO> getAchievementList(int user_no);
+	
+	// 유저업적 저장
+	public int addUserAchievement(UserAchievementDTO dto);
 
 }

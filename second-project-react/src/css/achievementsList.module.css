@@ -1,7 +1,28 @@
-.table {
+/* === 레이아웃 === */
+.box {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.tableWrapper {
   width: 100%;
+  overflow: hidden;
+}
+
+.scrollBody {
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+/* === 테이블 공통 === */
+.tableWrapper table,
+.scrollBody table {
+  width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
-  table-layout: fixed; /* 필수: 열 비율 고정 */
 }
 
 th, td {
@@ -14,23 +35,13 @@ th, td {
   text-overflow: ellipsis;
 }
 
-/* 공통 열 비율 클래스 */
-.col_title {
-  width: 45%;
-}
+/* === 컬럼 너비 === */
+.col_title   { width: 45%; }
+.col_content { width: 20%; }
+.col_reward  { width: 15%; }
+.col_button  { width: 20%; }
 
-.col_content {
-  width: 20%;
-}
-
-.col_reward {
-  width: 15%;
-}
-
-.col_button {
-  width: 20%;
-}
-
+/* === 색상 스타일 === */
 thead th {
   background-color: #f9f9f9bd;
   font-weight: bold;
@@ -40,10 +51,42 @@ tbody td {
   background-color: #f9f9f9;
 }
 
-.box {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
+/* === 버튼 공통 === */
+.button,
+.allRewardButton {
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  background: linear-gradient(to right, #6A5BFF, #C700E0);
+}
+
+.button:hover,
+.allRewardButton:hover {
+  background: linear-gradient(to right, #584ad1, #a200b9);
+}
+
+/* === '모두 받기' 버튼 별도 스타일 === */
+.allRewardButton {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+/* === 비활성화 버튼 === */
+.disabledButton,
+.disabledAllRewardButton {
+  background-color: #e0e0e0;
+  padding: 4px 8px;
+  color: #9e9e9e;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* === 보상 완료된 행 === */
+.rewardedRow {
+  background-color: #e0e0e0 !important;
+  opacity: 0.7;
 }

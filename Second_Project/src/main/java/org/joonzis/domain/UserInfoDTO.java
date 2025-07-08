@@ -13,7 +13,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserInfoDTO {
-	private int user_no, user_point, user_rank;
+	private int user_no, user_point, user_rank, user_play_count, user_1st_count;
 	private String user_nick, user_id, user_pw, user_email;
 	private Date user_date;
 	
