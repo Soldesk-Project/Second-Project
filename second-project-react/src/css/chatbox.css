@@ -1,3 +1,8 @@
+.chatbox-header button{
+  border: 1px solid white;
+  color: red;
+}
+
 .chatbox-log {
   height: 165px;
   border-bottom-left-radius: 5px;
@@ -48,6 +53,11 @@
   color: #888; /* 타임스탬프는 연한 회색으로 */
   font-size: 0.8em; /* 글자 크기 작게 */
 }
+
+.chatbox-log button{
+  border: 1px solid white;
+  color: red;
+}
 .chatbox-input{
   display: flex;
 }
@@ -73,4 +83,122 @@
   background-image: url('../../public/images/Submit.png');
   border-radius: 5px;
   color: white;
+}
+
+/* --- 모달 오버레이 --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.521); /* 반투명 검은색 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* 다른 요소 위에 표시 */
+}
+
+/* --- 모달 내용 컨테이너 --- */
+.modal-content {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 450px; /* 최대 너비 설정 */
+    animation: fadeInScale 0.3s ease-out; /* 등장 애니메이션 */
+    display: flex;
+    flex-direction: column;
+}
+
+/* 모달 등장 애니메이션 */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* --- 모달 헤더 --- */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5em;
+    color: white;
+    text-align: center;
+}
+
+.modal-header .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.8em;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.2s ease;
+}
+
+.modal-header .close-btn:hover {
+    color: #333;
+}
+
+/* --- 모달 바디 --- */
+.modal-body {
+    margin-bottom: 25px;
+    line-height: 1.6;
+    color: whitesmoke;
+    font-size: 0.95em;
+}
+
+/* --- 모달 푸터 (버튼) --- */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end; /* 버튼을 오른쪽으로 정렬 */
+    gap: 10px; /* 버튼 간격 */
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.modal-footer button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.modal-footer button:active {
+    transform: translateY(1px);
+}
+
+.modal-footer .cancel-btn {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.modal-footer .cancel-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.modal-footer .report-send-btn {
+    background-color: #dc3545; /* 빨간색 계열 */
+    color: white;
+}
+
+.modal-footer .report-send-btn:hover {
+    background-color: #c82333;
 }

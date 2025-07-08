@@ -4,6 +4,21 @@ import SockJS from 'sockjs-client';
 import '../css/chatbox.css'; // 동일한 CSS 사용 가능
 import { useSelector } from 'react-redux';
 
+function formatTimestamp(timestamp) {
+    if (!timestamp) return '';
+
+    const date = new Date(timestamp);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
 const ServerChatbox = () => {
     const stompClientInstanceRef = useRef(null);
     const [messages, setMessages] = useState([]);
@@ -13,6 +28,7 @@ const ServerChatbox = () => {
     const chatLogRef = useRef(null);
     const hasSentAddUserRef = useRef(false);
     const [isConnected, setIsConnected] = useState(false); // 웹소켓 연결 상태를 추적하는 state
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
     const currentUser = useSelector((state) => state.user.user);
     const userNick = currentUser?.user_nick;
@@ -166,6 +182,22 @@ const ServerChatbox = () => {
         console.log(`귓속말 모드 토글됨 (ServerChatbox): ${!isWhisperMode ? '활성화' : '비활성화'}`);
     };
 
+    //신고처리
+    const openReportModal = () => {
+        console.log("신고버튼 클릭");
+        setIsReportModalOpen(true);
+    };
+
+    const closeReportModal = () => {
+        setIsReportModalOpen(false);
+    };
+
+    const handleReportSubmit = () => {
+        console.log("신고하기 버튼 클릭됨. 다음 채팅 내역이 신고될 수 있습니다:", messages);
+        alert("채팅이 신고되었습니다. 관리자가 확인 후 조치할 예정입니다.");
+        closeReportModal(); // 신고 처리 후 모달 닫기
+    };
+
     return (
         <div className="chatbox-container">
             <div className="chatbox-header">
@@ -175,7 +207,7 @@ const ServerChatbox = () => {
                     <button onClick={() => setIsWhisperMode(true)}
                             className={isWhisperMode ? 'active-mode-btn' : ''}>귓속말</button>
 
-                    {isWhisperMode && (
+                    {/* {isWhisperMode && (
                         <input
                             type="text"
                             placeholder="귓속말 대상 (닉네임)"
@@ -183,7 +215,7 @@ const ServerChatbox = () => {
                             onChange={(e) => setWhisperTarget(e.target.value)}
                             className="whisper-target-input"
                         />
-                    )}
+                    )} */}
                 </div>
             </div>
 
@@ -191,20 +223,22 @@ const ServerChatbox = () => {
                 {messages.map((msg, index) => (
                     <div key={index} className={`chat-message ${msg.mSender === userNick ? 'my-message' : ''} ${msg.mType === 'WHISPER_CHAT' ? 'whisper' : ''} ${msg.mType === 'SERVER_JOIN' || msg.mType === 'SERVER_LEAVE' ? 'system-message' : ''}`}>
                         {msg.mType === 'SERVER_JOIN' || msg.mType === 'SERVER_LEAVE' ? (
-                            <span className="system-text">{msg.mContent} <span className="timestamp">[{msg.mTimestamp}]</span></span>
+                            <span className="system-text">{msg.mContent} <span className="timestamp">[{formatTimestamp(msg.mTimestamp)}]</span></span>
                         ) : msg.mType === 'WHISPER_CHAT' ? (
                             <>
                                 <span className="whisper-text">
                                     [귓속말] {msg.mSender === userNick ? `To ${msg.mReceiver}` : `From ${msg.mSender}`}:
                                 </span>
                                 <span className="message-content">{msg.mContent}</span>
-                                <span className="timestamp">[{msg.mTimestamp}]</span>
+                                <span className="timestamp">[{formatTimestamp(msg.mTimestamp)}]</span>
+                                <button id="reportBtn" onClick={openReportModal}> 신고</button>
                             </>
                         ) : (
                             <>
                                 <span className="sender">{msg.mSender}:</span>
                                 <span className="message-content">{msg.mContent}</span>
-                                <span className="timestamp">[{msg.mTimestamp}]</span>
+                                <span className="timestamp">[{formatTimestamp(msg.mTimestamp)}]</span>
+                                <button id="reportBtn" onClick={openReportModal}> 신고</button>
                             </>
                         )}
                     </div>
@@ -225,6 +259,32 @@ const ServerChatbox = () => {
                 <button id="emojiBtn" className="emojiBtn" disabled={!isConnected}>😊</button>
                 <button id="sendBtn" className="sendBtn" onClick={sendMessage} disabled={!isConnected}>전달</button>
             </div>
+
+            {/* --- 신고 모달 컴포넌트 --- */}
+            {isReportModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h2>채 팅 신 고</h2>
+                            <button className="close-btn" onClick={closeReportModal}>&times;</button>
+                        </div>
+                        <div className="modal-body">
+                            <p>현재 접속해 있는 서버의 최근 대화를 저장하여 신고할 수 있습니다. 신고하기를 눌러 신고해주시면 해당 내용을 관리자가 확인 후 문제가 있을 경우 제재가 진행됩니다.</p>
+                            {/* 필요하다면 여기에 신고할 메시지 내용을 보여줄 수 있습니다. */}
+                            {/* <div className="report-preview">
+                                <h3>신고 대상 메시지 (예시)</h3>
+                                {messages.slice(-5).map((msg, idx) => ( // 최근 5개 메시지만 보여주기
+                                    <p key={idx}>[{formatTimestamp(msg.mTimestamp)}] {msg.mSender}: {msg.mContent}</p>
+                                ))}
+                            </div> */}
+                        </div>
+                        <div className="modal-footer">
+                            <button id="cancelBtn" className="cancel-btn" onClick={closeReportModal}>취소</button>
+                            <button id="reportSendBtn" className="report-send-btn" onClick={handleReportSubmit}>신고하기</button>
+                        </div>
+                    </div>
+                </div>
+            )}            
         </div>
     );
 };
