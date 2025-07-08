@@ -2,7 +2,6 @@ package org.joonzis.controller;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.joonzis.domain.GameRoomDTO;
 import org.joonzis.domain.UserInfoDTO;
@@ -62,14 +61,21 @@ public class GameRoomController {
 	    return ResponseEntity.ok(user.getUser_rank());
 	}
 	
-	@GetMapping(value = "/match/test", produces = "application/json; charset=UTF-8")
-	public ResponseEntity<?> testMatch() {
-	    List<String> matched = matchService.peekAndRemove(4);
-	    if (!matched.isEmpty()) {
-	        String groupId = UUID.randomUUID().toString();
-	        matchService.startPendingGroup(matched, groupId);
-	        return ResponseEntity.ok(matched);
-	    }
-	    return ResponseEntity.ok("매칭 불가");
-	}
+	/*
+	 * @GetMapping(value = "/match/test", produces =
+	 * "application/json; charset=UTF-8") public ResponseEntity<?> testMatch() {
+	 * List<String> matched = matchService.peekAndRemove(4); if (!matched.isEmpty())
+	 * { String groupId = UUID.randomUUID().toString();
+	 * matchService.startPendingGroup(matched, groupId); return
+	 * ResponseEntity.ok(matched); } return ResponseEntity.ok("매칭 불가"); }
+	 * 
+	 * @PostMapping("/test/enqueue") public ResponseEntity<?>
+	 * testEnqueue(@RequestBody Map<String, String> body) { String userId =
+	 * body.get("userId"); int score = Integer.parseInt(body.get("score"));
+	 * 
+	 * redisTemplate.opsForValue().set("rank:" + userId, String.valueOf(score));
+	 * matchService.enqueue(userId);
+	 * 
+	 * return ResponseEntity.ok("등록 완료: " + userId + " (" + score + ")"); }
+	 */
 }
