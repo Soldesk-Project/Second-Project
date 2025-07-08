@@ -59,6 +59,7 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen }) => {
             <td>카테고리</td>
             <td>
               <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                <option value="random">랜덤</option>
                 <option value="engineer_information">정보처리기사</option>
                 <option value="industrial_information">정보처리산업기사</option>
                 <option value="function_information">정보처리기능사</option>

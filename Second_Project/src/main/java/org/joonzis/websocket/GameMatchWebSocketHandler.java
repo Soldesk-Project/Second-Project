@@ -1,6 +1,7 @@
 package org.joonzis.websocket;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.joonzis.service.match.MatchService;
@@ -22,29 +23,28 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
     @Autowired
     private MatchService matchService;
 
-    // userId → WebSocketSession (단일 세션 유지)
-    private static final Map<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
+    // userId → Set of WebSocketSession
+    private static final Map<String, Set<WebSocketSession>> sessionMap = new ConcurrentHashMap<>();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
+        String query = session.getUri() != null ? session.getUri().getQuery() : null;
+        System.out.println("🌐 [연결 URI]: " + query);
+
         String userId = extractUserId(session);
+        System.out.println("🌐 [추출된 userId]: " + userId);
+
         if (userId == null) {
             System.out.println("⚠️ 연결 시 userId 누락");
             return;
         }
 
-        // 기존 세션이 존재하면 닫기
-        WebSocketSession existingSession = sessionMap.get(userId);
-        if (existingSession != null && existingSession.isOpen()) {
-            try {
-                existingSession.close();
-                System.out.println("🔁 기존 세션 종료: " + existingSession.getId());
-            } catch (Exception e) {
-                System.err.println("❌ 기존 세션 종료 실패: " + e.getMessage());
-            }
-        }
+        // 기존 세션 정리
+        Set<WebSocketSession> sessions = sessionMap.computeIfAbsent(userId, k -> ConcurrentHashMap.newKeySet());
+        sessions.removeIf(s -> !s.isOpen() || s.getId().equals(session.getId()));
 
-        sessionMap.put(userId, session);
+        // 새 세션 추가
+        sessions.add(session);
         session.getAttributes().put("userId", userId);
 
         System.out.println("🔌 [연결됨] userId: " + userId + ", sessionId: " + session.getId());
@@ -57,30 +57,53 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
 
         JsonNode node = objectMapper.readTree(payload);
         String action = node.get("action").asText();
+        String userId = node.get("userId").asText();  // 공통적으로 사용됨
 
-        if ("quickMatch".equals(action)) {
-            String userId = node.get("userId").asText();
+        // 세션 갱신 (공통)
+        session.getAttributes().put("userId", userId);
+        Set<WebSocketSession> sessions = sessionMap.computeIfAbsent(userId, k -> ConcurrentHashMap.newKeySet());
+        sessions.removeIf(s -> !s.isOpen() || s.getId().equals(session.getId()));
+        sessions.add(session);
 
-            // 세션 등록 갱신
-            session.getAttributes().put("userId", userId);
-            sessionMap.put(userId, session);
+        switch (action) {
+            case "quickMatch":
+                matchService.enqueue(userId);
+                System.out.println("✅ [매칭 대기열 등록]: " + userId);
+                break;
 
-            matchService.enqueue(userId);
-            System.out.println("✅ [매칭 대기열 등록]: " + userId);
+            case "acceptMatch":
+                matchService.acceptMatch(userId);
+                System.out.println("✅ [수락 처리]: " + userId);
+                break;
+
+            case "rejectMatch":
+                matchService.rejectMatch(userId);
+                System.out.println("❌ [거절 처리]: " + userId);
+                break;
+
+            default:
+                System.out.println("⚠️ 알 수 없는 액션: " + action);
         }
     }
 
     public void sendToUser(String userId, Object messageObject) {
-        WebSocketSession session = sessionMap.get(userId);
-        if (session == null || !session.isOpen()) {
-            System.out.println("⚠️ 세션 없음 또는 닫힘 → " + userId);
+        Set<WebSocketSession> sessions = sessionMap.get(userId);
+        if (sessions == null || sessions.isEmpty()) {
+            System.out.println("⚠️ 세션 없음 → " + userId);
             return;
         }
 
         try {
             String json = objectMapper.writeValueAsString(messageObject);
-            session.sendMessage(new TextMessage(json));
-            System.out.println("📤 [전송 완료 → " + userId + "] sessionId: " + session.getId());
+
+            for (WebSocketSession session : sessions) {
+                if (session.isOpen()) {
+                    session.sendMessage(new TextMessage(json));
+                    System.out.println("📤 전송됨 → " + userId + ", sessionId: " + session.getId());
+                } else {
+                    System.out.println("❌ 세션 닫힘 → " + session.getId());
+                }
+            }
         } catch (Exception e) {
             System.err.println("❌ 전송 실패: " + e.getMessage());
         }
@@ -90,16 +113,18 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         String userId = (String) session.getAttributes().get("userId");
         if (userId != null) {
-            WebSocketSession currentSession = sessionMap.get(userId);
-            if (currentSession != null && currentSession.getId().equals(session.getId())) {
-                sessionMap.remove(userId);
+            Set<WebSocketSession> sessions = sessionMap.get(userId);
+            if (sessions != null) {
+                sessions.remove(session);
+                if (sessions.isEmpty()) {
+                    sessionMap.remove(userId);
+                }
                 System.out.println("❎ 연결 해제됨 → " + userId + ", sessionId: " + session.getId());
             }
         }
     }
 
     private String extractUserId(WebSocketSession session) {
-        // ?userId=xxx 방식에서 추출
         String query = session.getUri() != null ? session.getUri().getQuery() : null;
         if (query == null) return null;
 

@@ -1,11 +1,10 @@
 package org.joonzis.service.match;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.joonzis.websocket.GameMatchWebSocketHandler;
@@ -27,10 +26,32 @@ public class MatchService {
     private static final String GROUP_KEY_PREFIX = "match:group:";
     private static final String ACCEPT_KEY_PREFIX = "match:accept:";
 
-    // ✅ 1. 매칭 큐에 유저 등록 (점수는 이미 저장되어 있다고 가정)
+    // ✅ 1. 유저 큐 등록 및 즉시 매칭 시도
     public void enqueue(String userId) {
-        redisTemplate.opsForList().rightPush(MATCH_QUEUE_KEY, userId); // FIFO
+        List<String> queue = redisTemplate.opsForList().range(MATCH_QUEUE_KEY, 0, -1);
+        if (queue != null && queue.contains(userId)) {
+            System.out.println("⚠️ 이미 큐에 있음 → " + userId);
+            return;
+        }
+
+        redisTemplate.opsForList().rightPush(MATCH_QUEUE_KEY, userId);
         System.out.println("✅ 매칭 큐 등록: " + userId);
+
+        List<String> matchGroup = findMatchGroup(2);
+        System.out.println("🧪 matchGroup 후보: " + matchGroup);
+
+        if (matchGroup.size() == 2) {
+            String groupId = UUID.randomUUID().toString();
+            startPendingGroup(matchGroup, groupId);
+
+            for (String uid : matchGroup) {
+                redisTemplate.opsForList().remove(MATCH_QUEUE_KEY, 0, uid);
+            }
+
+            System.out.println("🎯 매칭 성사 → " + matchGroup);
+        } else {
+            System.out.println("⏳ 매칭 대기 → 현재 조건 불충분");
+        }
     }
 
     // ✅ 2. 큐 사이즈 확인
@@ -38,33 +59,30 @@ public class MatchService {
         return redisTemplate.opsForList().size(MATCH_QUEUE_KEY);
     }
 
-    // ✅ 3. 조건에 맞는 n명을 추출 (점수 필터링)
-    public List<String> peekAndRemove(int count) {
-        Long size = queueSize();
-        if (size == null || size == 0) return List.of();
+    // ✅ 3. 점수 기준으로 조건 맞는 유저 그룹 찾기 (수락 대기 유저 제외)
+    public List<String> findMatchGroup(int count) {
+        List<String> allUsers = redisTemplate.opsForList().range(MATCH_QUEUE_KEY, 0, -1);
+        if (allUsers == null || allUsers.size() < count) return List.of();
 
-        // 큐에서 모든 유저 꺼냄 (한 번에)
-        List<String> allUsers = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            String uid = redisTemplate.opsForList().leftPop("match-queue");
-            if (uid != null) allUsers.add(uid);
-        }
+        // 수락 대기 중인 유저 제외
+        List<String> filteredUsers = allUsers.stream()
+                .filter(uid -> redisTemplate.opsForValue().get(GROUP_KEY_PREFIX + uid) == null)
+                .collect(Collectors.toList());
 
-        // 매칭 그룹 탐색
-        for (int i = 0; i < allUsers.size(); i++) {
-            String anchorId = allUsers.get(i);
-            String anchorScoreStr = redisTemplate.opsForValue().get("rank:" + anchorId);
-            int anchorScore = (anchorScoreStr != null) ? Integer.parseInt(anchorScoreStr) : 0;
+        System.out.println("🧪 현재 큐 유저: " + allUsers);
+        System.out.println("🧪 필터링된 유저: " + filteredUsers);
+
+        for (int i = 0; i < filteredUsers.size(); i++) {
+            String anchorId = filteredUsers.get(i);
+            int anchorScore = getScore(anchorId);
 
             List<String> group = new ArrayList<>();
             group.add(anchorId);
 
-            for (int j = 0; j < allUsers.size(); j++) {
+            for (int j = 0; j < filteredUsers.size(); j++) {
                 if (i == j) continue;
-
-                String otherId = allUsers.get(j);
-                String otherScoreStr = redisTemplate.opsForValue().get("rank:" + otherId);
-                int otherScore = (otherScoreStr != null) ? Integer.parseInt(otherScoreStr) : 0;
+                String otherId = filteredUsers.get(j);
+                int otherScore = getScore(otherId);
 
                 if (Math.abs(otherScore - anchorScore) <= 50) {
                     group.add(otherId);
@@ -73,33 +91,20 @@ public class MatchService {
                 if (group.size() == count) break;
             }
 
-            if (group.size() == count) {
-                // ✅ 매칭 성공 → group 반환
-                Set<String> selected = new HashSet<>(group);
-                // 나머지 유저는 다시 큐에 복귀
-                for (String uid : allUsers) {
-                    if (!selected.contains(uid)) {
-                        redisTemplate.opsForList().rightPush("match-queue", uid);
-                    }
-                }
-                return group;
-            }
-        }
-
-        // ✅ 매칭 실패 → 전부 복귀
-        for (String uid : allUsers) {
-            redisTemplate.opsForList().rightPush("match-queue", uid);
+            if (group.size() == count) return group;
         }
 
         return List.of();
     }
 
-
-    // ✅ 4. 매칭 그룹 생성 (수락 대기 상태 저장)
+    // ✅ 4. 수락 대기 상태 저장 + 알림 전송
     public void startPendingGroup(List<String> userIds, String groupId) {
         for (String userId : userIds) {
             redisTemplate.opsForValue().set(GROUP_KEY_PREFIX + userId, groupId);
             redisTemplate.opsForHash().put(ACCEPT_KEY_PREFIX + groupId, userId, "false");
+
+            matchSocketHandler.sendToUser(userId, Map.of("type", "ACCEPT_MATCH"));
+            System.out.println("🔔 수락 알림 전송 → " + userId);
         }
     }
 
@@ -118,15 +123,13 @@ public class MatchService {
                     .map(Object::toString)
                     .collect(Collectors.toList());
 
-            int roomNo = createGameRoom(users); // 임시 방 생성
+            int roomNo = createGameRoom(users);
 
             for (String uid : users) {
-                Map<String, Object> msg = Map.of(
+                matchSocketHandler.sendToUser(uid, Map.of(
                         "type", "MATCH_FOUND",
                         "gameroom_no", roomNo
-                );
-                matchSocketHandler.sendToUser(uid, msg);
-
+                ));
                 redisTemplate.delete(GROUP_KEY_PREFIX + uid);
             }
 
@@ -144,19 +147,27 @@ public class MatchService {
         for (Object uidObj : statusMap.keySet()) {
             String uid = uidObj.toString();
 
+            // ❌ 거절한 유저는 다시 큐에 넣지 않음
             if (!uid.equals(userId)) {
-                enqueue(uid); // 다시 큐로 되돌림
+                enqueue(uid);  // 수락한 유저는 다시 큐에 등록
                 matchSocketHandler.sendToUser(uid, Map.of("type", "MATCH_CANCELLED"));
             }
 
+            // 공통적으로 키 정리
             redisTemplate.delete(GROUP_KEY_PREFIX + uid);
         }
 
         redisTemplate.delete(ACCEPT_KEY_PREFIX + groupId);
     }
 
-    // ✅ 7. 임시 방 생성 (랜덤 번호 반환)
+    // ✅ 7. 방 번호 생성
     private int createGameRoom(List<String> users) {
         return new Random().nextInt(100000);
+    }
+
+    // ✅ 8. 점수 조회
+    private int getScore(String userId) {
+        String scoreStr = redisTemplate.opsForValue().get(RANK_KEY_PREFIX + userId);
+        return (scoreStr != null) ? Integer.parseInt(scoreStr) : 0;
     }
 }
