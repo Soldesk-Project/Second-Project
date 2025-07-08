@@ -125,7 +125,7 @@ const ServerChatbox = () => {
                     mSenderNo: userNo,
                     mContent: messageInput,
                     mReceiver: whisperTarget,
-                    mTimestamp: timestamp
+                    mTimestamp: Date.now()
                 }));
             } else {
                 stompClientInstanceRef.current.send("/app/serverChat.sendMessage", {}, JSON.stringify({
@@ -133,7 +133,7 @@ const ServerChatbox = () => {
                     mSender: userNick,
                     mSenderNo: userNo,
                     mContent: messageInput,
-                    mTimestamp: timestamp
+                    mTimestamp: Date.now()
                 }));
             }
             setMessageInput('');

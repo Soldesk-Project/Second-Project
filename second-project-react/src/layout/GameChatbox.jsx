@@ -122,7 +122,7 @@ const GameChatbox = ({ gameroomNo, userNick, userNo }) => {
                 mSender: userNick,
                 mSenderNo: userNo,
                 mContent: messageInput,
-                mTimestamp: timestamp,
+                mTimestamp: Date.now(),
                 gameroomNo: gameroomNo // 서버에서 게임방 번호를 받을 수 있도록
             }));
             setMessageInput('');
