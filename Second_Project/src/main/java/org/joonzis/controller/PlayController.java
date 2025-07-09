@@ -23,6 +23,7 @@ public class PlayController {
 	@Autowired
     private PlayService playService;
 	
+	
 	@GetMapping("/questions")
 	public List<QuestionDTO> getQuestionsByCategory(@RequestParam(defaultValue = "random") String category) {
 		

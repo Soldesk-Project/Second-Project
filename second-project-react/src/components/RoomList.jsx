@@ -157,6 +157,35 @@ const RoomList = () => {
     }
   };
 
+  const setKoreanToCategory=(category)=>{
+    switch (category) {
+      case "random":
+        return "랜덤";
+      case "CPE_Q":
+        return "정보처리기사";
+      case "CPEI_Q":
+        return "정보처리산업기사";
+      case "CPET_Q":
+        return "정보처리기능사";
+      case "LM1_Q":
+        return "리눅스마스터1급";
+      case "LM2_Q":
+        return "리눅스마스터2급";
+      case "ICTI_Q":
+        return "정보통신산업기사";
+      case "ICT_Q":
+        return "정보통신기사";
+      case "SEC_Q":
+        return "정보보안기사";
+      case "NET1_Q":
+        return "네트워크관리사1급";
+      case "NET2_Q":
+        return "네트워크관리사2급";
+      default:
+        return category || "알 수 없음";
+    }
+  }
+
   return (
     <>
       {modalOpen && (
@@ -209,6 +238,9 @@ const RoomList = () => {
               <span>{room.gameroom_no}</span>
               <span className={styles.roomMode}>
                 {room.game_mode === 'rank' ? 'Rank Mode' : 'Casual Mode'}
+              </span>
+              <span className={styles.category}>
+                {setKoreanToCategory(room.category)}
               </span>
               <div className={styles.roomTitle}>{room.title}</div>
               <div className={styles.roomMeta}>

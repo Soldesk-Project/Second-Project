@@ -60,9 +60,13 @@
   width: 100px;
 }
 
+.category{
+  font-weight: bold;
+  width: 100px;
+}
+
 .roomTitle {
   flex: 1;
-  margin: 0 20px;
 }
 
 .roomMeta span {

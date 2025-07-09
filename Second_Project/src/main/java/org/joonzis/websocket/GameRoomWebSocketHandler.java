@@ -37,8 +37,8 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     // 서버별 방 목록: {서버명: [방1, 방2]}
     private final Map<String, List<GameRoomDTO>> serverRooms = new ConcurrentHashMap<>();
     
+    // 방별 유저
     private final Map<String, Map<String, Set<String>>> roomUsers = new ConcurrentHashMap<>();
-    
     
     private final ObjectMapper objectMapper = new ObjectMapper();
     
@@ -242,10 +242,13 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     	String server = json.get("server").asText();
     	String roomNo = json.get("roomNo").asText();
     	String userNick = json.get("userNick").asText();
+
     	String category = json.get("category").asText();
-;//    	if (server == null || userNick == null) {
-//    		return;
-//    	}
+
+    	if (server == null || userNick == null) {
+    		return;
+    	}
+
     	System.out.println("Game start requested by " + userNick + " in room " + roomNo);
     	List<QuestionDTO> list = playService.getQuestionsByCategory(category);
     	System.out.println(list);
@@ -255,11 +258,11 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             "roomNo", roomNo,
             "initiator", userNick,
             "list", list
+
         );
     	
     	
         broadcast(server, payload);
-    	
     }
     
     private void handleStopGame(WebSocketSession session, JsonNode json) {
@@ -278,11 +281,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             "initiator", userNick
         );
         broadcast(server, payload);
-    }
-    
-    
-    
-    
+    }   
     
     private void broadcastUserList(String server) {
         Set<String> users = serverUsers.getOrDefault(server, Collections.emptySet());
