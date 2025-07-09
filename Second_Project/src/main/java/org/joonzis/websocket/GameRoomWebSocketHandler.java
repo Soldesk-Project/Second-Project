@@ -40,6 +40,11 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     // 방별 유저
     private final Map<String, Map<String, Set<String>>> roomUsers = new ConcurrentHashMap<>();
     
+    // 방별 문제 Id
+    private final Map<String, Map<String, AtomicInteger>> roomQuestionIds = new ConcurrentHashMap<>();
+    
+    
+    
     private final ObjectMapper objectMapper = new ObjectMapper();
     
     @Autowired
@@ -76,6 +81,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             	break;
             case "stopGame":
             	handleStopGame(session, json);
+            	break;
+            case "nextQuestion":
+            	handleNextQuestion(session, json);
             	break;
         }
     }
@@ -212,12 +220,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     }
     
     private void handleUserList(WebSocketSession session, JsonNode json) {
-    	System.out.println("handleUserList....");
-//    	String server = (String) session.getAttributes().get("server");
     	String roomNo = json.get("roomNo").asText();
     	String server = json.get("server").asText();
     	if (server == null) return;
-    	System.out.println(roomNo);
     	
     	Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
         Set<String> userNicks = roomUserMap.getOrDefault(roomNo, Collections.emptySet());
@@ -247,15 +252,21 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     	String server = json.get("server").asText();
     	String roomNo = json.get("roomNo").asText();
     	String userNick = json.get("userNick").asText();
-
     	String category = json.get("category").asText();
 
     	if (server == null || userNick == null) {
     		return;
     	}
 
+    	
     	System.out.println("Game start requested by " + userNick + " in room " + roomNo);
-    	List<QuestionDTO> list = playService.getQuestionsByCategory(category);
+        List<QuestionDTO> list = playService.getQuestionsByCategory(category);
+        System.out.println(list);
+
+        // 방별 questionId 초기화
+        roomQuestionIds.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
+                       .computeIfAbsent(roomNo, k -> new AtomicInteger(0));
+    	
     	System.out.println(list);
     	Map<String, Object> payload = Map.of(
             "type", "gameStart",
@@ -275,6 +286,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         String roomNo = json.get("roomNo").asText();
         String userNick = json.get("userNick").asText();
         
+        if (server == null || userNick == null) {
+    		return;
+    	}
         // 방장 여부 확인 로직 추가 가능 (필요한 경우)
         System.out.println("Game stop requested by " + userNick + " in room " + roomNo);
         
@@ -287,6 +301,33 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         );
         broadcast(server, payload);
     }   
+    
+    private void handleNextQuestion(WebSocketSession session, JsonNode json) {
+    	String server = json.get("server").asText();
+        String roomNo = json.get("roomNo").asText();
+        String userNick = json.get("userNick").asText();
+    
+//        if (server == null || userNick == null) {
+//    		return;
+//    	}
+        
+        System.out.println("Next question requested by " + userNick + " in room " + roomNo);
+
+        // 방별 questionId 증가
+        AtomicInteger currentQuestionId = roomQuestionIds.getOrDefault(server, Collections.emptyMap())
+                                                         .getOrDefault(roomNo, new AtomicInteger(0));
+        int nextId = currentQuestionId.getAndIncrement();
+        
+        Map<String, Object> payload = Map.of(
+    		"type", "nextQuestion",
+    		"server", server,
+    		"roomNo", roomNo,
+    		"initiator", userNick,
+    		"nextId", nextId
+		);
+        broadcast(server, payload);
+    }
+    
     
     private void broadcastUserList(String server) {
         Set<String> users = serverUsers.getOrDefault(server, Collections.emptySet());

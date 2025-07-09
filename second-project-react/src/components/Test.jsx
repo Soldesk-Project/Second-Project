@@ -8,7 +8,7 @@ const ExamOMRViewer = ({question}) => {
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(null);
 
-  console.log(question);
+  // console.log(question);
   
   // 문제 불러오기
   // useEffect(() => {
@@ -62,8 +62,8 @@ const ExamOMRViewer = ({question}) => {
 
           <div>
             {[1, 2, 3, 4].map(num => (
-              <div>
-                <label key={num}>
+              <div key={num}>
+                <label>
                   <input
                     type="radio"
                     name={`q${currentQuestion.id}`}

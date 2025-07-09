@@ -18,7 +18,6 @@ const InPlay = () => {
   const category = location.state?.category || 'random';
   const [questionList, setQuestionList]=useState([]);
   const [question, setQuestion] = useState(null);
-  const [questionId, setQuestionId] = useState(0);
 
 
   // 여러 소켓을 Context로부터 받아옴
@@ -53,9 +52,8 @@ const InPlay = () => {
       }
       if (data.type === 'gameStart' && data.server === server && data.roomNo === roomNo) {
         console.log('시작한사람 ( 방장 ) : '+ data.initiator);
-        if (Array.isArray(data.list) && data.list.length > 0) {
+        if (Array.isArray(data.list) && data.list.length > 0 && questionList.length === 0) {
           setQuestionList(data.list);
-          setQuestionId(0);
           setQuestion(data.list[0]);
           setPlay(true);
         } else {
@@ -64,6 +62,24 @@ const InPlay = () => {
       }
       if (data.type === 'gameStop' && data.server === server) {
         setPlay(false);
+      }
+      if (data.type === 'nextQuestion' && data.server === server && data.roomNo === roomNo) {
+        const nextId = Number(data.nextId);
+        console.log("nextId 타입:", typeof data.nextId, "값:", data.nextId);
+        console.log("변환된 nextId:", nextId);
+        console.log("questionList : ", questionList);
+        console.log("questionList 길이:", questionList.length);
+        if (questionList.length === 0) {
+            console.error("questionList가 비어 있습니다. 다음 문제를 설정할 수 없습니다.");
+            return;
+        }
+        if (nextId < questionList.length) {
+          setQuestion(questionList[nextId]);
+        } else {
+          console.log(nextId);
+          console.log("모든 문제를 다 풀었습니다.");
+          setPlay(false);
+        }
       }
     };
 
@@ -74,12 +90,18 @@ const InPlay = () => {
     socket.onerror = (error) => {
       console.error('WebSocket error:', error); 
     };
-  }, [server, roomNo, sockets]);
 
-  // useEffect(() => {
-  //   console.log("현재 질문:", question);
-  //   console.log("질문 길이:", questionList.length);
-  // }, [question, questionList]);
+    return () => {
+        socket.onmessage = null; // Cleanup: 이벤트 핸들러 제거
+    };
+
+  }, [server, roomNo, sockets, userNick]);
+
+  useEffect(() => {
+    console.log("현재 질문:", question);
+    console.log("질문 길이:", questionList.length);
+    console.log("질문:", questionList);
+  }, [question, questionList]);
 
 
   const start = () => {
@@ -114,13 +136,16 @@ const InPlay = () => {
 
 
   const nextQuestion = () => {
-    const nextId = questionId + 1;
-    if (nextId < questionList.length) {
-      setQuestion(questionList[nextId]);
-      setQuestionId(nextId);
+    const socket = sockets['room'];
+    if (socket && socket.readyState === 1) {
+      socket.send(JSON.stringify({
+        action: 'nextQuestion',
+        server,
+        roomNo,
+        userNick
+      }));
     } else {
-      console.log("모든 문제를 다 풀었습니다.");
-      setPlay(false); // 문제가 더 이상 없으면 게임 중지
+      alert('웹소켓 연결이 준비되지 않았습니다 - nextQuestion');
     }
   };
 
