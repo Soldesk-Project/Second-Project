@@ -123,12 +123,16 @@ public class MatchService {
                     .map(Object::toString)
                     .collect(Collectors.toList());
 
+            // 방장 선정 (첫 번째 유저 또는 랜덤)
+            String roomLeaderId = users.get(0); // 또는 Collections.shuffle(users);
+
             int roomNo = createGameRoom(users);
 
             for (String uid : users) {
                 matchSocketHandler.sendToUser(uid, Map.of(
                         "type", "MATCH_FOUND",
-                        "gameroom_no", roomNo
+                        "gameroom_no", roomNo,
+                        "roomLeaderId", roomLeaderId
                 ));
                 redisTemplate.delete(GROUP_KEY_PREFIX + uid);
             }

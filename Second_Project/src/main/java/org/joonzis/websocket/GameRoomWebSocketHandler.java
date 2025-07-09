@@ -129,9 +129,11 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         if (server == null) return;
 
         // 방 생성 정보 파싱
-        int newRoomNo = roomIndex.getAndIncrement();
+        String roomNo = json.has("gameroom_no") 
+        		  ? json.get("gameroom_no").asText() 
+        		  : String.valueOf(roomIndex.getAndIncrement());
         GameRoomDTO newRoom = new GameRoomDTO(
-    		String.valueOf(newRoomNo), // 임시 ID 생성
+    		roomNo,
             json.get("title").asText(),
             json.get("category").asText(),
             json.get("game_mode").asText(),
@@ -169,6 +171,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
 	    String roomNo = json.get("roomNo").asText();
 	    String userNick = json.get("userNick").asText();
+	    
+	    System.out.println("🔔 joinRoom 요청 수신 → userNick: " + userNick + ", roomNo: " + roomNo);
+
 
 	    // 방 참가자 목록 관리 (예: roomUsers 맵)
 	    roomUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>())

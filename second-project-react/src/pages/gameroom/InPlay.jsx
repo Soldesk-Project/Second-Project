@@ -193,6 +193,7 @@ const InPlay = () => {
                 {
                   isInitiator && play && (<button onClick={nextQuestion}>다음 문제</button>)
                 }
+
               </div>
             </div>
           </div>

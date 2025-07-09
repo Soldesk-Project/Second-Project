@@ -85,21 +85,34 @@ const RoomList = () => {
           break;
           
         case "MATCH_FOUND":
-          const roomData = {
-            action: "createRoom",
-            title : "",
-            category: "random",
-            game_mode : "rank",
-            is_private : "N",
-            limit : "4",
-            pwd : null
-          };
-          if (socket && socket.readyState === 1) {
-            socket.send(JSON.stringify(roomData));
+          if (data.roomLeaderId === user.user_id) {
+            const roomData = {
+              action: "createRoom",
+              title : "",
+              category: "random",
+              gameroom_no: data.gameroom_no,
+              game_mode : "rank",
+              is_private : "N",
+              limit : "4",
+              
+              pwd : null
+            };
+            if (socket && socket.readyState === 1) {
+              socket.send(JSON.stringify(roomData));
+            } else {
+              alert("웹소켓 연결이 준비되지 않았습니다.--createRoom");
+            }
           } else {
-            alert("웹소켓 연결이 준비되지 않았습니다.--createRoom");
+            const joinData = {
+              action: "joinRoom",
+              roomNo: data.gameroom_no,
+              userNick: user.user_nick
+            };
+            if(socket && socket.readyState === 1){
+              socket.send(JSON.stringify(joinData))
+              nav('/gameRoom/' + data.gameroom_no);
+            }
           }
-          // setMatchStatus('idle');
           break;
 
         case "MATCH_CANCELLED":
