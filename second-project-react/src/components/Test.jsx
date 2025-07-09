@@ -3,33 +3,19 @@ import Loading from './Loading';
 
 const ExamOMRViewer = ({question}) => {
   const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [usedQuestionIds, setUsedQuestionIds] = useState([]);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(null);
+  const [questionNumber, setQuestionNumber]=useState(0);
 
-  console.log(question);
+  // console.log(question);
   
-  // 문제 불러오기
-  // useEffect(() => {
-  //   const fetchQuestions = async () => {
-  //     try {
-  //       const res = await axios.get(`/play/questions?category=${category}`);
-  //       setAllQuestions(res.data);
-  //       pickRandomQuestion(res.data, []);
-  //     } catch (err) {
-  //       console.error('문제 불러오기 실패:', err);
-  //     }
-  //   };
-  //   fetchQuestions();
-  // }, [category]);
-
   useEffect(()=>{
     setCurrentQuestion(question);
-    // setUsedQuestionIds([...used, random.id]);
     setSelectedAnswer(null);
     setShowResult(false);
     setIsCorrect(null);
+    setQuestionNumber(prev=>prev+1);
   }, [question])
 
   const handleSubmit = () => {
@@ -48,7 +34,7 @@ const ExamOMRViewer = ({question}) => {
     <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
       {currentQuestion ? (
         <div style={{ marginBottom: '40px', borderBottom: '1px solid #ccc', paddingBottom: '20px' }}>
-          <h3>{usedQuestionIds.length}. {currentQuestion.question_text}</h3>
+          <h3>{questionNumber}. {currentQuestion.question_text}</h3>
 
           {currentQuestion.image_data && (
             <div style={{ margin: '10px 0' }}>

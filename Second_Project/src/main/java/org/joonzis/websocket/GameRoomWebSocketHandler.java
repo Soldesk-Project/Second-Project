@@ -265,9 +265,8 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
         // 방별 questionId 초기화
         AtomicInteger currentQuestionId = roomQuestionIds.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
-                       .computeIfAbsent(roomNo, k -> new AtomicInteger(0));
-    	
-        int nextId = currentQuestionId.getAndIncrement();
+        												 .computeIfAbsent(roomNo, k -> new AtomicInteger(0));
+        currentQuestionId.set(0);
         
     	System.out.println(list);
     	Map<String, Object> payload = Map.of(
@@ -276,7 +275,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             "roomNo", roomNo,
             "initiator", userNick,
             "list", list,
-            "nextId", nextId
+            "nextId", currentQuestionId
 
         );
     	
@@ -294,6 +293,10 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     	}
         // 방장 여부 확인 로직 추가 가능 (필요한 경우)
         System.out.println("Game stop requested by " + userNick + " in room " + roomNo);
+        AtomicInteger currentQuestionId = roomQuestionIds.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
+                										 .computeIfAbsent(roomNo, k -> new AtomicInteger(0));
+        currentQuestionId.set(0);
+        
         
         // 해당 방의 모든 유저에게 게임 중지 메시지 브로드캐스트
         Map<String, Object> payload = Map.of(
@@ -318,7 +321,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
         // 방별 questionId 증가
         AtomicInteger currentQuestionId = roomQuestionIds.getOrDefault(server, Collections.emptyMap())
-                                                         .getOrDefault(roomNo, new AtomicInteger(0));
+                                                         .getOrDefault(roomNo, new AtomicInteger(1));
         int nextId = currentQuestionId.getAndIncrement();
         System.out.println(nextId);
         

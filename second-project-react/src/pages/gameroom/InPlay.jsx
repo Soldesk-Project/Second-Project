@@ -11,7 +11,7 @@ const InPlay = () => {
   const [users, setUsers] = useState([]);
   const [question, setQuestion] = useState(null);
 
-  const questionListRef = useRef([]); // ⭐ useRef로 상태 보존
+  const questionListRef = useRef([]);
   const { roomNo } = useParams();
   const nav = useNavigate();
   const { user, server } = useSelector((state) => state.user);
@@ -52,12 +52,13 @@ const InPlay = () => {
 
       if (data.type === 'gameStart' && data.server === server && data.roomNo === roomNo) {
         console.log('방장 :', data.initiator);
+        console.log('id :', data.nextId);
         if (Array.isArray(data.list) && data.list.length > 0) {
-          questionListRef.current = data.list; // ⭐ useRef에 저장
+          questionListRef.current = data.list;
           setQuestion(data.list[data.nextId]);
           setPlay(true);
         } else {
-          console.error("질문 리스트가 유효하지 않습니다.");
+            console.error("질문 리스트가 유효하지 않습니다. 데이터:", data.list);
         }
       }
 
@@ -185,10 +186,10 @@ const InPlay = () => {
                 <p className={styles.note}>방장만 게임을 시작/중지할 수 있습니다</p>
               )}
               <div className={styles.gamePlay}>
-                {play ? <Test question={question} /> : <h2>대기중</h2>}
+                {play ? <Test question={question}/> : <h2>대기중</h2>}
               </div>
               {isInitiator && play && (
-                <button onClick={nextQuestion}>다음 문제</button>
+                <button onClick={nextQuestion} className={styles.nextQuestionBtn}>다음 문제</button>
               )}
             </div>
           </div>

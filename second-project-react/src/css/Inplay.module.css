@@ -141,3 +141,9 @@ button:disabled {
   font-size: 0.9em;
   margin-top: 10px;
 }
+.nextQuestionBtn{
+  border: 1px solid white;
+  border-radius: 40px;
+  width: 100px;
+  height: 40px;
+}
