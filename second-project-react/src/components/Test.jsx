@@ -8,7 +8,7 @@ const ExamOMRViewer = ({question}) => {
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(null);
 
-  // console.log(question);
+  console.log(question);
   
   // 문제 불러오기
   // useEffect(() => {

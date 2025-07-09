@@ -264,16 +264,19 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         System.out.println(list);
 
         // 방별 questionId 초기화
-        roomQuestionIds.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
+        AtomicInteger currentQuestionId = roomQuestionIds.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
                        .computeIfAbsent(roomNo, k -> new AtomicInteger(0));
     	
+        int nextId = currentQuestionId.getAndIncrement();
+        
     	System.out.println(list);
     	Map<String, Object> payload = Map.of(
             "type", "gameStart",
             "server", server,
             "roomNo", roomNo,
             "initiator", userNick,
-            "list", list
+            "list", list,
+            "nextId", nextId
 
         );
     	
@@ -317,6 +320,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         AtomicInteger currentQuestionId = roomQuestionIds.getOrDefault(server, Collections.emptyMap())
                                                          .getOrDefault(roomNo, new AtomicInteger(0));
         int nextId = currentQuestionId.getAndIncrement();
+        System.out.println(nextId);
         
         Map<String, Object> payload = Map.of(
     		"type", "nextQuestion",

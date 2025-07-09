@@ -21,8 +21,8 @@ export const WebSocketProvider = ({ children }) => {
 
   // ✅ room, server 소켓은 항상 고정 연결
   if (!socketsRef.current["room"]) {
-    socketsRef.current["room"] = new WebSocket("ws://localhost:9099/ws/room");
-    // socketsRef.current["room"] = new WebSocket("ws://192.168.0.112:9099/ws/room");
+    // socketsRef.current["room"] = new WebSocket("ws://localhost:9099/ws/room");
+    socketsRef.current["room"] = new WebSocket("ws://192.168.0.112:9099/ws/room");
   }
   if (!socketsRef.current["server"]) {
     socketsRef.current["server"] = new WebSocket("ws://192.168.0.112:9099/ws/server");

@@ -37,10 +37,10 @@ public class MatchService {
         redisTemplate.opsForList().rightPush(MATCH_QUEUE_KEY, userId);
         System.out.println("✅ 매칭 큐 등록: " + userId);
 
-        List<String> matchGroup = findMatchGroup(2);
+        List<String> matchGroup = findMatchGroup(4);
         System.out.println("🧪 matchGroup 후보: " + matchGroup);
 
-        if (matchGroup.size() == 2) {
+        if (matchGroup.size() == 4) {
             String groupId = UUID.randomUUID().toString();
             startPendingGroup(matchGroup, groupId);
 
