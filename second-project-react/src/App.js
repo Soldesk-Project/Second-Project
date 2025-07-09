@@ -22,6 +22,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { WebSocketProvider } from './util/WebSocketProvider';
 import Customersuggest from './pages/Customersuggest';
 import CustomerProblemSubmit from './pages/CustomerProblemSubmit';
+import AdminPage from './pages/AdminPage';
 
 function App() {
   const dispatch = useDispatch();
@@ -63,6 +64,7 @@ function App() {
           <Route path="/inquiry" element={<CustomerCenterNew />} />
           <Route path="/suggest" element={<Customersuggest />} />
           <Route path="/problemsubmit" element={<CustomerProblemSubmit />} />
+          <Route path="/admin" element={<AdminPage/>}/>
         </Routes>
       </Router>
     </WebSocketProvider>
