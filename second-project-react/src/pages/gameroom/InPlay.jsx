@@ -4,7 +4,7 @@ import styles from '../../css/Inplay.module.css';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { WebSocketContext } from '../../util/WebSocketProvider';
-import GameChatbox from '../../layout/GameChatbox';
+import GameChatbox from '../../components/chatbox/GameChatbox';
 
 const InPlay = () => {
   const [play, setPlay] = useState(false);

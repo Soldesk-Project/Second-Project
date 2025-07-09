@@ -7,7 +7,7 @@ import UserRanking from '../components/UserRanking';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { loadUserFromStorage } from '../store/userSlice';
-import ServerChatbox from '../layout/ServerChatbox';
+import ServerChatbox from '../components/chatbox/ServerChatbox';
 
 const MainPage = () => {
   const dispatch = useDispatch();

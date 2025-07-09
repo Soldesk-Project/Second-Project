@@ -5,7 +5,7 @@ import UserRanking from '../components/UserRanking';
 import ServerUserList from '../components/ServerUserList';
 import { useLocation, useParams } from 'react-router-dom';
 import styles from '../css/MainPage.module.css';
-import ServerChatbox from '../layout/ServerChatbox';
+import ServerChatbox from '../components/chatbox/ServerChatbox';
 
 const Achievements = () => {
   const { serverNo } = useParams(); // 서버 번호 URL에서 추출
