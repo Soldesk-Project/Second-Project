@@ -12,6 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.joonzis.domain.GameRoomDTO;
+import org.joonzis.domain.QuestionDTO;
+import org.joonzis.service.PlayService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -38,6 +41,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     
     
     private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    @Autowired
+    private PlayService playService;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -236,16 +242,22 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     	String server = json.get("server").asText();
     	String roomNo = json.get("roomNo").asText();
     	String userNick = json.get("userNick").asText();
-//    	if (server == null || userNick == null) {
+    	String category = json.get("category").asText();
+;//    	if (server == null || userNick == null) {
 //    		return;
 //    	}
     	System.out.println("Game start requested by " + userNick + " in room " + roomNo);
+    	List<QuestionDTO> list = playService.getQuestionsByCategory(category);
+    	System.out.println(list);
     	Map<String, Object> payload = Map.of(
             "type", "gameStart",
             "server", server,
             "roomNo", roomNo,
-            "initiator", userNick
+            "initiator", userNick,
+            "list", list
         );
+    	
+    	
         broadcast(server, payload);
     	
     }

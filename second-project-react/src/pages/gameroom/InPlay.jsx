@@ -16,6 +16,8 @@ const InPlay = () => {
   const userNo = user.user_no;
   const location = useLocation();
   const category = location.state?.category || 'random';
+  const [list, setList] = useState([]);
+
 
   // 여러 소켓을 Context로부터 받아옴
   const sockets = useContext(WebSocketContext);
@@ -48,6 +50,9 @@ const InPlay = () => {
         setUsers(formattedUsers);
       }
       if (data.type === 'gameStart' && data.server === server) {
+        setList(data.list);
+        console.log(data.list);
+        
         console.log('시작한사람 ( 방장 ) : '+ data.initiator);
         
         setPlay(true);
@@ -76,7 +81,8 @@ const InPlay = () => {
         action: 'startGame',
         server,
         roomNo,
-        userNick
+        userNick,
+        category
     }));      
       // setPlay(true);
     } else {
@@ -128,7 +134,7 @@ const InPlay = () => {
                   <p className={styles.note}>방장만 게임을 시작/중지할 수 있습니다</p>
                 )}
               <div className={styles.gamePlay}>
-                {play ? <Test category={category} /> : <h2>대기중</h2>}
+                {play ? <Test list={list} /> : <h2>대기중</h2>}
               </div>
             </div>
           </div>
