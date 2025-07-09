@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Loading from './Loading';
 
-const ExamOMRViewer = ({ category = 'random' }) => {
+const ExamOMRViewer = ({category}) => {
   const [allQuestions, setAllQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [usedQuestionIds, setUsedQuestionIds] = useState([]);
@@ -10,9 +10,6 @@ const ExamOMRViewer = ({ category = 'random' }) => {
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(null);
   
-  console.log(category);
-  
-
   // 문제 불러오기
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -25,7 +22,7 @@ const ExamOMRViewer = ({ category = 'random' }) => {
       }
     };
     fetchQuestions();
-  }, []);
+  }, [category]);
 
   const pickRandomQuestion = (questions, used) => {
     const remaining = questions.filter(q => !used.includes(q.id));

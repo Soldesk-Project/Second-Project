@@ -20,6 +20,9 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.log4j.Log4j;
+
+@Log4j
 public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
     // 서버별 세션 관리: {서버명: [세션1, 세션2]}
@@ -143,7 +146,8 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         try {
             String msg = objectMapper.writeValueAsString(Map.of(
                 "type", "roomCreated",
-                "gameroom_no", newRoom.getGameroom_no()
+                "gameroom_no", newRoom.getGameroom_no(),
+                "category", newRoom.getCategory()
             ));
             if (session.isOpen()) {
             	session.sendMessage(new TextMessage(msg));

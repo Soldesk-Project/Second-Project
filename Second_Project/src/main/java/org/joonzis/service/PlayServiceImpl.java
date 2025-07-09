@@ -16,7 +16,7 @@ public class PlayServiceImpl implements PlayService {
 	// 카테고리 별 문제 가져오기
 	private static final List<String> ALLOWED_TABLES = List.of(
 			"CPE_Q", "CPEI_Q", "CPET_Q", "ICT_Q", "ICTI_Q", "LM1_Q",
-			"LM2_q", "NET1_Q", "NET2_Q", "SEC_Q"
+			"LM2_Q", "NET1_Q", "NET2_Q", "SEC_Q"
 		);
 
 		@Override

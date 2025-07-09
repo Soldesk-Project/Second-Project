@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import Test from '../../components/Test';
 import styles from '../../css/Inplay.module.css';
 import { useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { WebSocketContext } from '../../util/WebSocketProvider';
 import GameChatbox from '../../layout/GameChatbox';
 
@@ -14,6 +14,8 @@ const InPlay = () => {
   const { user, server } = useSelector((state) => state.user);
   const userNick = user.user_nick;
   const userNo = user.user_no;
+  const location = useLocation();
+  const category = location.state?.category || 'random';
 
   // 여러 소켓을 Context로부터 받아옴
   const sockets = useContext(WebSocketContext);
@@ -25,7 +27,6 @@ const InPlay = () => {
     if (!socket) return;
     
     const joinAndRequestUserList = () => {
-      console.log('joinAndRequestUserList 호출');
         socket.send(JSON.stringify({ action: 'join', server, userNick }));
         socket.send(JSON.stringify({ action: 'roomUserList', server, roomNo }));
     };
@@ -47,7 +48,7 @@ const InPlay = () => {
         setUsers(formattedUsers);
       }
       if (data.type === 'gameStart' && data.server === server) {
-        console.log('시작한사람 ( 방장 ) : '+data.initiator);
+        console.log('시작한사람 ( 방장 ) : '+ data.initiator);
         
         setPlay(true);
       }
@@ -127,7 +128,7 @@ const InPlay = () => {
                   <p className={styles.note}>방장만 게임을 시작/중지할 수 있습니다</p>
                 )}
               <div className={styles.gamePlay}>
-                {play ? <Test /> : <h2>대기중</h2>}
+                {play ? <Test category={category} /> : <h2>대기중</h2>}
               </div>
             </div>
           </div>

@@ -25,6 +25,7 @@ public class PlayController {
 	
 	@GetMapping("/questions")
 	public List<QuestionDTO> getQuestionsByCategory(@RequestParam(defaultValue = "random") String category) {
+		
 	    List<QuestionDTO> list = playService.getQuestionsByCategory(category);
 
 	    for (QuestionDTO dto : list) {

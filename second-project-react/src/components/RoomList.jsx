@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { WebSocketContext } from '../util/WebSocketProvider';
 
 const RoomList = () => {
+  const [category, setCategory] = useState('random');
   const [gameRoomList, setGameRoomList] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [isWsOpen, setIsWsOpen] = useState(false);
@@ -43,9 +44,11 @@ const RoomList = () => {
           socket.send(JSON.stringify({
             action: "joinRoom",
             roomNo: data.gameroom_no,
+            category: data.category,
             userNick
           }));
-          nav('/gameRoom/' + data.gameroom_no);
+          
+          nav('/gameRoom/' + data.gameroom_no, { state: { category: data.category } });
           break;
         default:
           break;
@@ -161,6 +164,8 @@ const RoomList = () => {
           setModalOpen={setModalOpen}
           socket={sockets['room']}
           isWsOpen={isWsOpen}
+          onCategorySelect={setCategory}
+          
         />
       )}
 

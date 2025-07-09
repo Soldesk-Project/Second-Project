@@ -17,7 +17,7 @@
     </resultMap>
 
 	<!-- 카테고리 별 문제 가져오기 -->
-	<select id="getQuestionsByCategory" resultMap="questionResultMap" parameterType="String">
+	<select id="getQuestionsByCategory" resultMap="questionResultMap" parameterType="map">
 	    SELECT *
 	    FROM (
 	        SELECT *
