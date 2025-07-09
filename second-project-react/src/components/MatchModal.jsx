@@ -3,6 +3,9 @@ import '../css/MatchModal.css';
 
 const MatchModal = ({ socket, currentUserId, setShowMatchModal, setMatchStatus }) => {
 
+  console.log(socket);
+  
+
   const onAccept = () => {
     socket.send(JSON.stringify({
       action: "acceptMatch",

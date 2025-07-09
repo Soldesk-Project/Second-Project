@@ -61,6 +61,7 @@ const RoomList = () => {
 
   useEffect(() => {
     const matchSocket = sockets['match'];
+    const socket = sockets['room'];
     if (!matchSocket) return;
 
     if (matchSocket.readyState !== 1) {
@@ -82,10 +83,23 @@ const RoomList = () => {
           setMatchStatus('pending');
           setShowMatchModal(true);
           break;
-
+          
         case "MATCH_FOUND":
-          setMatchStatus('idle');
-          nav('/game');
+          const roomData = {
+            action: "createRoom",
+            title : "",
+            category: "random",
+            game_mode : "rank",
+            is_private : "N",
+            limit : "4",
+            pwd : null
+          };
+          if (socket && socket.readyState === 1) {
+            socket.send(JSON.stringify(roomData));
+          } else {
+            alert("웹소켓 연결이 준비되지 않았습니다.--createRoom");
+          }
+          // setMatchStatus('idle');
           break;
 
         case "MATCH_CANCELLED":
