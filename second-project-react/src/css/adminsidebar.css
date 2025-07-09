@@ -1,0 +1,21 @@
+.DbMenu,
+.ReportMenu,
+.InfoMenu,
+.AuthMenu {
+  width : 300px;
+  color: white;
+  background-color: grey;
+  font-size: 1.5em;
+  text-align: left;
+  padding: 15px 20px;
+  border: 1px solid navy;
+}
+
+.submenu-list{
+  padding: 20px 40px;
+}
+
+.submenu-list button{
+  font-size: 1.2em;
+  margin-bottom: 5px;
+}
