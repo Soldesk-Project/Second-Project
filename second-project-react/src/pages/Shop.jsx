@@ -5,6 +5,7 @@ import decoStyles from '../css/Decorations.module.css';
 import axios from 'axios';
 import ChargeModal from '../components/ChargeModal';
 import { useSelector } from 'react-redux';
+import titleTextMap from '../js/Decorations';
 
 const Shop = () => {
   // 1) 포인트 충전 탭은 tabs 배열에서 제외함
@@ -31,7 +32,7 @@ const Shop = () => {
       .catch(() => setItems([]));
   }, [activeTab]);
   
-  console.log(items);
+  // console.log(items);
   
 
   return (
@@ -81,9 +82,23 @@ const Shop = () => {
                 <div key={item.item_no} className={styles.card}>
                   {/* <img src={item.imgUrl} alt={item.name} /> */}
                   <div className={styles.itemCss}>
-                    <div className={`${decoStyles[item.css_class_name]}`}>
-                      아이템
+                    <div>
+                        {item.item_type === 'title' && titleTextMap[item.css_class_name] && (
+                            <span className={decoStyles[item.css_class_name]} style={{marginRight: '5px', fontWeight: 'bold'}}>
+                                [{titleTextMap[item.css_class_name]}]
+                            </span>
+                            )}
+                        <span
+                          className={
+                            item.item_type !== 'title' ? decoStyles[item.css_class_name] : undefined
+                          }
+                        >
+                          아이템
+                        </span>
                     </div>
+                    {/* <div className={`${decoStyles[item.css_class_name]}`}>
+                      아이템
+                    </div> */}
                   </div>
                   <div className={styles.itemName}>이름 : {item.item_name}</div>
                   <div className={styles.itemPrice}>가격 : {item.item_price ? item.item_price.toLocaleString() : '가격 미정'} p</div>
