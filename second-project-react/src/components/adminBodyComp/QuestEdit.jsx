@@ -1,21 +1,6 @@
 import React, { useState, useEffect } from 'react'; // useEffect 추가
 
-// 카테고리별 주제 데이터를 컴포넌트 외부에 정의 (컴포넌트 렌더링 시마다 재생성 방지)
-const subjectOptionsByCategory = {
-  '정보처리기사': ['정보시스템 구축관리', '데이터베이스 구축', '소프트웨어 설계', '소프트웨어 개발', '프로그래밍 언어 활용'],
-  '정보처리산업기사': ['정보시스템 구축관리', '데이터베이스 구축', '소프트웨어 설계', '소프트웨어 개발', '프로그래밍 언어 활용'],
-  '정보처리기능사' : ['데이터베이스 구축', '소프트웨어 설계', '소프트웨어 개발'],
-  '리눅스마스터1급': ['정보시스템 구축관리', '데이터베이스 구축', '소프트웨어 설계', '소프트웨어 개발', '프로그래밍 언어 활용'],
-  '리눅스마스터2급': ['데이터베이스 구축', '소프트웨어 설계', '소프트웨어 개발', '프로그래밍 언어 활용'],
-  '정보통신산업기사': ['데이터베이스 구축', '소프트웨어 설계', '소프트웨어 개발', '프로그래밍 언어 활용'],
-  '정보통신기사': ['정보시스템 구축관리', '데이터베이스 구축', '소프트웨어 설계', '소프트웨어 개발', '프로그래밍 언어 활용'],
-  '정보보안기사': ['정보시스템 구축관리', '데이터베이스 구축', '소프트웨어 설계', '소프트웨어 개발', '프로그래밍 언어 활용'],
-  '네트워크관리사1급': ['데이터베이스 구축', '소프트웨어 설계', '소프트웨어 개발'],
-  '네트워크관리사2급': ['데이터베이스 구축', '소프트웨어 설계', '소프트웨어 개발'],
-  'default': ['주제를 선택하세요'], // 기본 또는 초기 상태
-};
-
-const QuestRegister = () => {
+const QuestEdit = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [questionText, setQuestionText] = useState(''); // 문제 본문 상태
@@ -24,34 +9,25 @@ const QuestRegister = () => {
 
   // 카테고리와 주제 상태 정의 (가장 위로 옮김)
   const [category, setCategory] = useState('정보처리기사'); // 카테고리 상태 (기본값)
-  const [subject, setSubject] = useState(''); // 주제 상태 (기본값은 초기화 시 설정)
 
-  // 카테고리가 변경될 때 subject를 초기화하고 새로운 옵션을 설정하는 useEffect
-  useEffect(() => {
-    const currentSubjects = subjectOptionsByCategory[category] || subjectOptionsByCategory['default'];
-
-    // 현재 선택된 주제가 새로운 카테고리의 옵션에 없으면 첫 번째 옵션으로 초기화
-    if (!currentSubjects.includes(subject)) {
-      setSubject(currentSubjects[0] || ''); // 첫 번째 옵션으로 설정 또는 빈 값
-    }
-  }, [category, subject]); // category가 바뀔 때, 또는 subject가 직접 변경될 때 (선택지에서 사라지는 경우)
+  // 카테고리 목록 정의 (별도의 배열로 관리하면 추후 유지보수 용이)
+  const categories = [
+    '정보처리기사',
+    '정보처리기능사',
+    '리눅스마스터1급',
+    '리눅스마스터2급',
+    '정보통신산업기사',
+    '정보통신기사',
+    '정보보안기사',
+    '네트워크관리사1급',
+    '네트워크관리사2급',
+  ];
 
   // 카테고리 변경 핸들러
   const handleCategoryChange = (e) => {
     const selectedCategory = e.target.value;
     setCategory(selectedCategory);
-    // 카테고리 변경 시 주제도 초기화 (useEffect에서 첫 번째 주제로 자동 설정됨)
-    // setSubject(''); // 이렇게 강제로 초기화할 수도 있지만, useEffect가 더 유연합니다.
   };
-
-  // 주제 변경 핸들러
-  const handleSubjectChange = (e) => {
-    setSubject(e.target.value);
-  };
-
-  // 렌더링할 현재 주제 옵션 목록 가져오기
-  const currentSubjectOptions = subjectOptionsByCategory[category] || subjectOptionsByCategory['default'];
-
 
   // 이미지 선택 핸들러
   const handleImageChange = (event) => {
@@ -109,7 +85,6 @@ const QuestRegister = () => {
   const handleQuestEditSubmit = async () => {
     const questData = {
       category: category,
-      subject: subject,
       questionText: questionText,
       options: options,
       correctAnswer: correctAnswer,
@@ -127,15 +102,7 @@ const QuestRegister = () => {
     setOptions(['', '', '', '']);
     setCorrectAnswer('1');
     setCategory('정보처리기사'); // 초기 카테고리로 재설정
-    setSubject(subjectOptionsByCategory['정보처리기사'][0] || ''); // 초기 카테고리의 첫 번째 주제로 재설정
   };
-
-  // 컴포넌트 마운트 시 초기 주제 설정 (기본 카테고리 '정보처리기사'에 대한 주제)
-  useEffect(() => {
-    if (subject === '') { // subject가 초기값일 때만 설정
-        setSubject(subjectOptionsByCategory[category][0] || '');
-    }
-  }, []); // 빈 배열: 컴포넌트가 처음 마운트될 때 한 번만 실행
 
   return (
     <div>
@@ -144,27 +111,16 @@ const QuestRegister = () => {
       <div className='category'>
         <h3>1. 카테고리 선택</h3>
         <select name="cateSelect" value={category} onChange={handleCategoryChange}>
-          {Object.keys(subjectOptionsByCategory)
-            .filter(key => key !== 'default') // 'default' 키는 옵션으로 보여주지 않음
-            .map((cat) => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
-      </div>
-      <br/>
-      <div className='subject'>
-        <h3>2. 주제 선택</h3>
-        <select name="subjSelect" value={subject} onChange={handleSubjectChange}>
-          {currentSubjectOptions.map((subj, index) => (
-            <option key={subj + index} value={subj}>
-              {subj}
+          {categories.map((cat, index) => (
+            <option key={index} value={cat}>
+              {cat}
             </option>
           ))}
         </select>
       </div>
       <br/>
       <div className='questionText'>
-        <h3>3. 문제 본문 입력</h3>
+        <h3>2. 문제 본문 입력</h3>
         <input
           type="text"
           value={questionText}
@@ -175,7 +131,7 @@ const QuestRegister = () => {
       </div>
       <br/>
       <div className='option'>
-        <h3>4. 선택지 입력</h3>
+        <h3>3. 선택지 입력</h3>
         {options.map((option, index) => (
           <div key={index} style={{ marginBottom: '5px' }}>
             <input
@@ -194,7 +150,7 @@ const QuestRegister = () => {
       </div>
       <br/>
       <div className='corAnswer'>
-        <h3>5. 정답 입력</h3>
+        <h3>4. 정답 입력</h3>
         <select name="corAnsSelect" value={correctAnswer} onChange={(e) => setCorrectAnswer(e.target.value)}>
           {options.map((_, index) => (
             <option key={index + 1} value={String(index + 1)}>{index + 1}</option>
@@ -203,7 +159,7 @@ const QuestRegister = () => {
       </div>
       <br/>
       <div className="photoInput">
-        <h3>6. 이미지 업로드 (선택 사항)</h3>
+        <h3>5. 이미지 업로드 (선택 사항)</h3>
         <form onSubmit={handleImageUploadSubmit}>
           <div>
             <label htmlFor="image-upload">이미지 선택:</label>
@@ -232,4 +188,4 @@ const QuestRegister = () => {
   );
 };
 
-export default QuestRegister;
+export default QuestEdit;

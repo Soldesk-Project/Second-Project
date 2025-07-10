@@ -3,6 +3,7 @@ import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import '../../css/chatbox.css'; // 동일한 CSS 사용 가능
 import { useSelector } from 'react-redux';
+import ChatReportModal from './ChatReportModal';
 
 function formatTimestamp(timestamp) {
     if (!timestamp) return '';
@@ -127,12 +128,12 @@ const ServerChatbox = () => {
 
         if (stompClientInstanceRef.current && isConnected && messageInput.trim() && userNick && userNo !== undefined && userNo !== null) {
             const now = new Date();
-            const timestamp = now.getFullYear() + '-' +
-                                String(now.getMonth() + 1).padStart(2, '0') + '-' +
-                                String(now.getDate()).padStart(2, '0') + ' ' +
-                                String(now.getHours()).padStart(2, '0') + ':' +
-                                String(now.getMinutes()).padStart(2, '0') + ':' +
-                                String(now.getSeconds()).padStart(2, '0');
+            // const timestamp = now.getFullYear() + '-' +
+            //                     String(now.getMonth() + 1).padStart(2, '0') + '-' +
+            //                     String(now.getDate()).padStart(2, '0') + ' ' +
+            //                     String(now.getHours()).padStart(2, '0') + ':' +
+            //                     String(now.getMinutes()).padStart(2, '0') + ':' +
+            //                     String(now.getSeconds()).padStart(2, '0');
 
             if (isWhisperMode && whisperTarget.trim()) {
                 stompClientInstanceRef.current.send("/app/whisperChat.sendMessage", {}, JSON.stringify({
@@ -260,31 +261,13 @@ const ServerChatbox = () => {
                 <button id="sendBtn" className="sendBtn" onClick={sendMessage} disabled={!isConnected}>전달</button>
             </div>
 
-            {/* --- 신고 모달 컴포넌트 --- */}
-            {isReportModalOpen && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h2>채 팅 신 고</h2>
-                            <button className="close-btn" onClick={closeReportModal}>&times;</button>
-                        </div>
-                        <div className="modal-body">
-                            <p>현재 접속해 있는 서버의 최근 대화를 저장하여 신고할 수 있습니다. 신고하기를 눌러 신고해주시면 해당 내용을 관리자가 확인 후 문제가 있을 경우 제재가 진행됩니다.</p>
-                            {/* 필요하다면 여기에 신고할 메시지 내용을 보여줄 수 있습니다. */}
-                            {/* <div className="report-preview">
-                                <h3>신고 대상 메시지 (예시)</h3>
-                                {messages.slice(-5).map((msg, idx) => ( // 최근 5개 메시지만 보여주기
-                                    <p key={idx}>[{formatTimestamp(msg.mTimestamp)}] {msg.mSender}: {msg.mContent}</p>
-                                ))}
-                            </div> */}
-                        </div>
-                        <div className="modal-footer">
-                            <button id="cancelBtn" className="cancel-btn" onClick={closeReportModal}>취소</button>
-                            <button id="reportSendBtn" className="report-send-btn" onClick={handleReportSubmit}>신고하기</button>
-                        </div>
-                    </div>
-                </div>
-            )}            
+            {/* ★ 분리된 ChatReportModal 컴포넌트 사용 */}
+            <ChatReportModal
+                isOpen={isReportModalOpen}
+                onClose={closeReportModal}
+                onReportSubmit={handleReportSubmit}
+                // recentMessages={messages.slice(-5)} // 필요하다면 최근 메시지를 props로 전달
+            />            
         </div>
     );
 };
