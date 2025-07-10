@@ -6,6 +6,7 @@ import TestModal from './TestModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { WebSocketContext } from '../util/WebSocketProvider';
 import { setIsTop10 } from '../store/rankingSlice';
+import titleTextMap from '../js/Decorations';
 
 const UserRanking = () => {
     const [userRankingList, setUserRankingList] = useState([]);
@@ -126,8 +127,15 @@ const UserRanking = () => {
                         key={user_no}
                         className={`${styles.user} ${decoStyles[boundary_class_name]} ${decoStyles[background_class_name]}`}
                     >
-                        <div className={decoStyles[fontcolor_class_name]}>
-                        {user_nick}
+                        <div>
+                            {title_class_name && titleTextMap[title_class_name] && (
+                                <span className={decoStyles[title_class_name]} style={{marginRight: '5px', fontWeight: 'bold'}}>
+                                    [{titleTextMap[title_class_name]}]
+                                </span>
+                                )}
+                            <span className={decoStyles[fontcolor_class_name]}>
+                                {user_nick}
+                            </span>
                         </div>
                     </div>
                 ))}

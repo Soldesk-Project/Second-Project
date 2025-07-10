@@ -3,6 +3,7 @@ import styles from "../css/ServerUserList.module.css";
 import decoStyles from '../css/Decorations.module.css';
 import { useSelector } from "react-redux";
 import { WebSocketContext } from "../util/WebSocketProvider";
+import titleTextMap from "../js/Decorations";
 
 const ServerUserList = () => {
   const [users, setUsers] = useState([]); // 현재 서버에 접속한 유저 목록
@@ -66,9 +67,19 @@ const ServerUserList = () => {
               <div 
                 key={`user-${userNo}`} 
                 className={`${styles.user} ${decoStyles[bgName]} ${decoStyles[bdName]}`}>
-                  <div className={`${decoStyles[fontColorName]}`}>
+                  <div>
+                            {titleName && titleTextMap[titleName] && (
+                                <span className={decoStyles[titleName]} style={{marginRight: '5px', fontWeight: 'bold'}}>
+                                    [{titleTextMap[titleName]}]
+                                </span>
+                                )}
+                            <span className={decoStyles[fontColorName]}>
+                                {userNick}
+                            </span>
+                        </div>
+                  {/* <div className={`${decoStyles[fontColorName]}`}>
                     {userNick}
-                  </div>
+                  </div> */}
               </div>
             ))
             
