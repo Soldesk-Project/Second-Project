@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
 import styles from '../css/UserRanking.module.css';
 import decoStyles from '../css/Decorations.module.css';
-import TestModal from './TestModal';
+import TestModal from './modal/TestModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { WebSocketContext } from '../util/WebSocketProvider';
 import { setIsTop10 } from '../store/rankingSlice';

@@ -1,6 +1,7 @@
 package org.joonzis.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.PaymentDTO;
 import org.joonzis.service.MemberService;
 import org.joonzis.service.ShopService;
+import org.joonzis.service.UserService;
 import org.joonzis.service.pay.PayService;
 import org.joonzis.service.pay.TossPayService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,9 @@ public class ShopController {
 	
 	@Autowired
 	private ShopService shopservice;
+	
+	@Autowired
+	private UserService userservice;
 	
 	@GetMapping("/user/point")
 	public ResponseEntity<Integer> getUserPoint(@RequestParam("user_id") String user_id) {
@@ -120,5 +125,25 @@ public class ShopController {
 
         String mappedCategory = categoryMap.getOrDefault(category, "unknown");
 	    return shopservice.getItemCategory(mappedCategory);
+	}
+    
+    @PostMapping("/shop/buyItemInventory")
+	public void postBuyItemInventory(@RequestParam("user_no") int user_no,
+										@RequestParam("item_price") int item_price,
+										@RequestParam("item_name") String item_name,
+										@RequestParam("item_type") String item_type,
+										@RequestParam("css_class_name") String css_class_name) {
+    	Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("item_price", item_price);
+        paramMap.put("user_no", user_no);
+    	boolean success = userservice.userPointMinus(paramMap);
+    	if(success) {
+    		Map<String, Object> paramMap2 = new HashMap<>();
+            paramMap2.put("item_name", item_name);
+            paramMap2.put("item_type", item_type);
+            paramMap2.put("css_class_name", css_class_name);
+            paramMap2.put("user_no", user_no);
+    		userservice.buyItemInventory(paramMap2);
+    	}
 	}
 }

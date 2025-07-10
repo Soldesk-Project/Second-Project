@@ -52,4 +52,23 @@ public class UserServiceImpl implements UserService{
 	public int updateUserPoint(UserAchievementDTO dto) {
 		return mapper.updateUserPoint(dto);
 	}
+	
+	public List<ItemVO> getInventoryCategory(Map<String, Object> paramMap) {
+	    return mapper.getInventoryCategory(paramMap);
+	}
+	
+	@Override
+	public boolean userPointMinus(Map<String, Object> paramMap) {
+		return mapper.userPointMinus(paramMap);
+	}
+	
+	@Override
+	public boolean buyItemInventory(Map<String, Object> paramMap) {
+		return mapper.buyItemInventory(paramMap);
+	}
+	
+	@Override
+	public List<ItemVO> getInventory(int user_no) {
+		return mapper.getInventory(user_no);
+	}
 }

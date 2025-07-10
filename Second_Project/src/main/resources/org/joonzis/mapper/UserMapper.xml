@@ -80,4 +80,28 @@
 	    SET USER_POINT = USER_POINT + #{ach_reward}
 	    WHERE USER_NO = #{user_no}
 	</update>
+	
+	<select id="getInventoryCategory" resultType="org.joonzis.domain.ItemVO">
+	    SELECT *
+	    FROM INVENTORY
+	    WHERE ITEM_TYPE = #{category}
+	      AND USER_NO = #{user_no}
+	</select>
+	
+	<update id="userPointMinus">
+		UPDATE USERS
+		SET USER_POINT = USER_POINT - #{item_price}
+		WHERE USER_NO = #{user_no}
+	</update>
+	
+	<insert id="buyItemInventory">
+		INSERT INTO INVENTORY (USER_NO, CSS_CLASS_NAME, ITEM_NAME, ITEM_TYPE)
+		VALUES (#{user_no}, #{css_class_name}, #{item_name}, #{item_type})
+	</insert>
+	
+	<select id="getInventory" resultType="org.joonzis.domain.ItemVO">
+		SELECT ITEM_NAME
+		FROM INVENTORY
+		WHERE USER_NO = #{user_no}
+	</select>
 </mapper>

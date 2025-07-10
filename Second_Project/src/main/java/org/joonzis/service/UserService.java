@@ -1,6 +1,7 @@
 package org.joonzis.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserAchievementDTO;
@@ -23,4 +24,16 @@ public interface UserService {
 	
 	// 업적 달성 포인트 추가
 	public int updateUserPoint(UserAchievementDTO dto);
+	
+	// 인벤토리 카테고리별 가져오기
+	public List<ItemVO> getInventoryCategory(Map<String, Object> paramMap);
+	
+	// 인벤토리 가져오기
+	public List<ItemVO> getInventory(int user_no);
+	
+	// 유저 point minus
+	public boolean userPointMinus(Map<String, Object> paramMap);
+	
+	// 아이템 유저 인벤토리 저장
+	public boolean buyItemInventory(Map<String, Object> paramMap);
 }

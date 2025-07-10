@@ -1,0 +1,58 @@
+.subTabContainer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  border-bottom: 2px solid #ddd;
+  padding: 0 20px;
+  flex-shrink: 0;
+  background-color: white;
+}
+
+.subTabLeft{
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.scrollArea {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #1f222d;
+  padding: 10px;
+}
+
+.shopMaingrid {
+  width: 100%;
+  padding: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  background-color: #1f222d;
+  width: 100%;
+  min-height: 790px;
+  border: 1px solid gray;
+  background-color: gray;
+  padding: 10px;
+}
+
+.card {
+  background-color: white;
+  border-radius: 10px;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+.itemCss {
+  flex: 6;
+  width: 100%;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -1,6 +1,8 @@
 package org.joonzis.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserDecoUpdateDTO;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.log4j.Log4j;
@@ -61,5 +64,29 @@ public class UserController {
 	    } else {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업데이트 실패");
 	    }
+	}
+	
+	@GetMapping("/inventory/category")
+	public List<ItemVO> getInventoryCategory(@RequestParam("category") String category, @RequestParam("user_no") int user_no) {
+
+        Map<String, String> categoryMap = Map.of(
+            "테두리", "boundary",
+            "칭호", "title",
+            "글자색", "fontColor",
+            "배경", "background",
+            "말풍선", "balloon",
+            "랜덤박스", "randomBox"
+        );
+
+        String mappedCategory = categoryMap.getOrDefault(category, "unknown");
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("category", mappedCategory);
+        paramMap.put("user_no", user_no);
+	    return service.getInventoryCategory(paramMap);
+	}
+	
+	@GetMapping("/getItems")
+	public List<ItemVO> getInventory(@RequestParam("user_no") int user_no) {
+	    return service.getInventory(user_no);
 	}
 }

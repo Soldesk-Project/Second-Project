@@ -6,6 +6,7 @@ import axios from 'axios';
 import ChargeModal from '../components/ChargeModal';
 import { useSelector } from 'react-redux';
 import titleTextMap from '../js/Decorations';
+import PreviewModal from '../components/modal/PreviewModal';
 
 const Shop = () => {
   // 1) 포인트 충전 탭은 tabs 배열에서 제외함
@@ -14,17 +15,40 @@ const Shop = () => {
   const [items, setItems]   = useState([]);
   const [point, setPoint]   = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [ownedItems, setOwnedItems] = useState([]);
 
   const user   = useSelector(state => state.user.user);
   const userId = user?.user_id;
 
-  useEffect(() => {
+  const fetchGetPoint = async () => {
     if (!userId) return;
-    axios.get(`/api/user/point?user_id=${userId}`)
-      .then(res => setPoint(res.data))
-      .catch(console.error);
+    try {
+      const res = await axios.get(`/api/user/point?user_id=${userId}`);
+      setPoint(res.data);
+    } catch (error) {
+      console.error('포인트 불러오기 실패:', error);
+    }
+  }
+
+  const fetchGetItems = async () => {
+    if (!user.user_no) return;
+    try {
+      const res = await axios.get(`/user/getItems?user_no=${user.user_no}`);
+      setOwnedItems(res.data);
+    } catch (error) {
+      console.error('포인트 불러오기 실패:', error);
+    }
+  }
+
+  useEffect(() => {
+    fetchGetPoint();
   }, [userId]);
 
+  useEffect(() => {
+    fetchGetItems();
+  }, [user.user_no]);
+  
   useEffect(() => {
     // 포인트 충전 탭이 아니므로, activeTab만으로 fetch
     axios.get(`/api/shop/items?category=${encodeURIComponent(activeTab)}`)
@@ -32,9 +56,38 @@ const Shop = () => {
       .catch(() => setItems([]));
   }, [activeTab]);
   
-  // console.log(items);
-  
+  const fetchBuyItemInventory = async (item) => {
+        try {
+          const params = new URLSearchParams();
+          params.append("user_no", user.user_no);
+          params.append("item_name", item.item_name);
+          params.append("item_type", item.item_type);
+          params.append("item_price", item.item_price);
+          params.append("css_class_name", item.css_class_name);
 
+            const { data, status } = await axios.post('/api/shop/buyItemInventory', params);
+            if (status === 200) {
+              fetchGetPoint();
+              fetchGetItems();
+            } else {
+                throw new Error('아이템 구매 실패');
+            }
+        } catch (error) {
+            console.error('아이템 구매 로드 실패:', error);
+        }
+    };
+
+  const buyItem = (item) => {
+    const isOwned = ownedItems.some(
+      owned => owned.item_name === item.item_name
+    );
+
+    if (isOwned) {
+      return alert('이미 보유한 아이템입니다!');
+    }
+    if(user.user_point < item.item_price) return alert("point 부족!");
+    fetchBuyItemInventory(item);
+  }
   return (
     <div className={styles.wrapper}>
       <div className={styles.top_nav}>
@@ -79,7 +132,7 @@ const Shop = () => {
           <div className={styles.grid}>
             {items.length ? (
               items.map(item => (
-                <div key={item.item_no} className={styles.card}>
+                <div key={item.item_no} className={styles.card} onClick={() => setSelectedItem(item)}>
                   {/* <img src={item.imgUrl} alt={item.name} /> */}
                   <div className={styles.itemCss}>
                     <div>
@@ -96,9 +149,6 @@ const Shop = () => {
                           아이템
                         </span>
                     </div>
-                    {/* <div className={`${decoStyles[item.css_class_name]}`}>
-                      아이템
-                    </div> */}
                   </div>
                   <div className={styles.itemName}>이름 : {item.item_name}</div>
                   <div className={styles.itemPrice}>가격 : {item.item_price ? item.item_price.toLocaleString() : '가격 미정'} p</div>
@@ -112,6 +162,7 @@ const Shop = () => {
       </div>
 
       {showModal && <ChargeModal onClose={() => setShowModal(false)} />}
+      {selectedItem && (<PreviewModal user={user} item={selectedItem} onClose={() => setSelectedItem(null)} onBuy={() => buyItem(selectedItem)} />)}
     </div>
   );
 };
