@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Header from '../layout/Header';
-import QnaAdminSidebar from '../components/AdminSidebar/QnaAdminSidebar';
-import UserAdminSidebar from '../components/AdminSidebar/UserAdminSidebar';
+import QnaAdminSidebar from '../components/adminSidebar/QnaAdminSidebar';
+import UserAdminSidebar from '../components/adminSidebar/UserAdminSidebar';
 import Headerstyles from '../css/MainPage.module.css';
 import styles from '../css/AdminPage.module.css';
 import { useSelector } from 'react-redux';
