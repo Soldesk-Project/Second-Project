@@ -1,18 +1,14 @@
 package org.joonzis.controller;
 
-import java.util.List;
 import java.util.Map;
 
-import org.joonzis.domain.GameRoomDTO;
 import org.joonzis.domain.UserInfoDTO;
-import org.joonzis.service.GameRoomService;
 import org.joonzis.service.MemberService;
 import org.joonzis.service.match.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,9 +23,6 @@ import lombok.extern.log4j.Log4j;
 public class GameRoomController {
 	
 	@Autowired
-	private GameRoomService gameRoomService;
-	
-	@Autowired
 	private MemberService memberService;
 	
 	@Autowired
@@ -37,19 +30,6 @@ public class GameRoomController {
 	
 	@Autowired
 	private MatchService matchService;
-	
-	// 게임방 생성
-	@PostMapping("/createRoom")
-	public String createRoom(@RequestBody GameRoomDTO room) {
-		log.info(room);
-		gameRoomService.createGameRoom(room);
-		return "방 생성 완료";
-	}
-	
-	@GetMapping("/showRoom")	
-	public List<GameRoomDTO> showRoom() {
-	    return gameRoomService.showRoom();
-	}
 	
 	@PostMapping("/rank/score")
 	public ResponseEntity<Integer> loadRank(@RequestBody Map<String, String> payload) {

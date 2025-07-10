@@ -163,7 +163,8 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             String msg = objectMapper.writeValueAsString(Map.of(
                 "type", "roomCreated",
                 "gameroom_no", newRoom.getGameroom_no(),
-                "category", newRoom.getCategory()
+                "category", newRoom.getCategory(),
+                "game_mode", newRoom.getGame_mode()
             ));
             if (session.isOpen()) {
             	session.sendMessage(new TextMessage(msg));
@@ -179,7 +180,8 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
 	    String roomNo = json.get("roomNo").asText();
 	    String userNick = json.get("userNick").asText();
-	    
+	    String gameMode = json.get("game_mode").asText();
+	    String category = json.get("category").asText();
 	    System.out.println("🔔 joinRoom 요청 수신 → userNick: " + userNick + ", roomNo: " + roomNo);
 
 
@@ -190,6 +192,15 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
 	    broadcastRoomList(server);
 	    broadcaseRoomUserList(server, roomNo);
+	    
+	    if("rank".equals(gameMode)) {
+	    	new Timer().schedule(new TimerTask() {
+	    		@Override
+	    		public void run() {
+	    			handleStartGame(roomNo, category, server);
+	    		}
+	    	}, 10_000);
+	    }
     }	
     
     private void handleLeaveRoom(WebSocketSession session, JsonNode json) {
@@ -248,6 +259,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         broadcaseRoomUserList(server, roomNo);
     }
     
+    // 일반 모드 게임 시작
     private void handleStartGame(WebSocketSession session, JsonNode json) {
     	String server = json.get("server").asText();
     	String roomNo = json.get("roomNo").asText();
@@ -280,6 +292,34 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         );
     	
     	
+        broadcast(server, payload);
+    }
+    
+    // 랭크 모드 게임 시작
+    private void handleStartGame(String roomNo, String category, String server) {
+        Set<String> userNicks = roomUsers.getOrDefault(server, Collections.emptyMap())
+                                         .getOrDefault(roomNo, Collections.emptySet());
+
+        if (userNicks.isEmpty()) return;
+
+        String initiator = userNicks.iterator().next(); // 방장 또는 아무나
+
+        List<QuestionDTO> list = playService.getQuestionsByCategory(category);
+
+        AtomicInteger currentQuestionId = roomQuestionIds
+            .computeIfAbsent(server, k -> new ConcurrentHashMap<>())
+            .computeIfAbsent(roomNo, k -> new AtomicInteger(0));
+        currentQuestionId.set(0);
+
+        Map<String, Object> payload = Map.of(
+            "type", "gameStart",
+            "server", server,
+            "roomNo", roomNo,
+            "initiator", initiator,
+            "list", list,
+            "nextId", currentQuestionId
+        );
+
         broadcast(server, payload);
     }
     
@@ -396,6 +436,34 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             }
         });
     }
+    
+	/*
+	 * private void autoStart(String roomNo) {
+	 * System.out.println("⏳ [랭크 자동 시작 예약] 10초 후 시작 - roomNo: " + roomNo);
+	 * 
+	 * new Timer().schedule(new TimerTask() {
+	 * 
+	 * @Override public void run() { Set<WebSocketSession> sessions =
+	 * serverSessions.values().stream() .flatMap(Set::stream) .filter(s -> { String
+	 * server = (String) s.getAttributes().get("server"); String userNick = (String)
+	 * s.getAttributes().get("userNick"); Set<String> roomUsersSet =
+	 * roomUsers.getOrDefault(server, Collections.emptyMap()) .getOrDefault(roomNo,
+	 * Collections.emptySet()); return roomUsersSet.contains(userNick); })
+	 * .collect(Collectors.toSet());
+	 * 
+	 * if (sessions.isEmpty()) { System.out.println("❌ 게임 시작 실패 - 세션 없음"); return; }
+	 * 
+	 * List<QuestionDTO> questionList =
+	 * playService.getQuestionsByCategory("random"); for (WebSocketSession session :
+	 * sessions) { try { session.sendMessage(new
+	 * TextMessage(objectMapper.writeValueAsString(Map.of( "type", "gameStart",
+	 * "questionList", questionList )))); } catch (IOException e) {
+	 * e.printStackTrace(); } }
+	 * 
+	 * System.out.println("🎮 [랭크 자동 시작] 게임 시작됨 - roomNo: " + roomNo); } }, 10000);
+	 * // 10초 후 실행 }
+	 */
+
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {

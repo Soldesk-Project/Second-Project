@@ -80,6 +80,10 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
                 matchService.rejectMatch(userId);
                 System.out.println("❌ [거절 처리]: " + userId);
                 break;
+            
+            case "timeOut":
+            	matchService.timeOut(userId);
+            	System.out.println("타임아웃:" + userId);
 
             default:
                 System.out.println("⚠️ 알 수 없는 액션: " + action);

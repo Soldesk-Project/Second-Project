@@ -45,6 +45,7 @@ const RoomList = () => {
             action: "joinRoom",
             roomNo: data.gameroom_no,
             category: data.category,
+            game_mode: data.game_mode,
             userNick
           }));
           
@@ -106,6 +107,8 @@ const RoomList = () => {
             const joinData = {
               action: "joinRoom",
               roomNo: data.gameroom_no,
+              game_mode: "rank",
+              category: "random",
               userNick: user.user_nick
             };
             if(socket && socket.readyState === 1){
@@ -117,6 +120,12 @@ const RoomList = () => {
 
         case "MATCH_CANCELLED":
           alert("상대방이 매칭을 거절했습니다.");
+          setShowMatchModal(false);
+          setMatchStatus('idle');
+          break;
+        
+        case "MATCH_TIMEOUT":
+          alert("시간초과");
           setShowMatchModal(false);
           setMatchStatus('idle');
           break;
@@ -167,12 +176,17 @@ const RoomList = () => {
   const handleOpenModal = () => setModalOpen(true);
 
   const joinRoom = (room) => {
+    console.log(room);
+    
     const socket = sockets['room'];
     if (socket && socket.readyState === 1) {
       if (room.limit > room.currentCount) {
+        console.log(room.game_mode);
+        
         socket.send(JSON.stringify({
           action: "joinRoom",
           roomNo: room.gameroom_no,
+          game_mode: room.game_mode,
           userNick
         }));
         nav('/gameRoom/' + room.gameroom_no);
@@ -237,12 +251,12 @@ const RoomList = () => {
 
       {/* ✅ 상대 수락 대기 중 */}
       {matchStatus === 'waiting' && (
-        <div className="match-modal-backdrop">
-          <div className="match-modal">
-            <h2>⏳ 상대방 수락 대기 중...</h2>
-            <p>상대가 수락하면 게임이 시작됩니다.</p>
-          </div>
+      <div className={styles.matchModalBackdrop}>
+        <div className={styles.matchModal}>
+          <h2>⏳ 상대방 수락 대기 중...</h2>
+          <p>상대가 수락하면 게임이 시작됩니다.</p>
         </div>
+      </div>
       )}
 
       <div className={styles.roomListHeader}>

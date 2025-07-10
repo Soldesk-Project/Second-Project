@@ -163,6 +163,33 @@ public class MatchService {
 
         redisTemplate.delete(ACCEPT_KEY_PREFIX + groupId);
     }
+    
+    public void timeOut(String userId) {
+        // 1. 그룹 ID 조회
+        String groupId = redisTemplate.opsForValue().get(GROUP_KEY_PREFIX + userId);
+        if (groupId == null) return;
+
+        // 2. 매칭 큐에서 해당 유저 제거
+        redisTemplate.opsForList().remove(MATCH_QUEUE_KEY, 0, userId);
+
+        // 3. 그룹 키 제거 (이 유저가 어떤 그룹에 속해 있었는지 제거)
+        redisTemplate.delete(GROUP_KEY_PREFIX + userId);
+
+        // 4. 수락 상태 해시에서 해당 유저 제거
+        redisTemplate.opsForHash().delete(ACCEPT_KEY_PREFIX + groupId, userId);
+
+        // 5. 해당 그룹에서 남은 유저가 없으면 그룹 전체 상태 제거
+        if (redisTemplate.opsForHash().size(ACCEPT_KEY_PREFIX + groupId) == 0) {
+            redisTemplate.delete(ACCEPT_KEY_PREFIX + groupId);
+        }
+
+        // 6. 클라이언트에게 타임아웃 알림 전송
+        matchSocketHandler.sendToUser(userId, Map.of("type", "MATCH_TIMEOUT"));
+
+        System.out.println("⌛ 타임아웃 처리 완료 → " + userId);
+    }
+
+
 
     // ✅ 7. 방 번호 생성
     private int createGameRoom(List<String> users) {
