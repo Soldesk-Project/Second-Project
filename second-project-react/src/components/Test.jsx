@@ -1,21 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import Loading from './Loading';
 
-const ExamOMRViewer = ({question}) => {
+const ExamOMRViewer = ({question, onSubmit, onSelectAnswer, selectedAnswer, disabled, nextId}) => {
   const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [showResult, setShowResult] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(null);
-  const [questionNumber, setQuestionNumber]=useState(0);
 
-  // console.log(question);
+  // console.log(nextId); 
   
   useEffect(()=>{
     setCurrentQuestion(question);
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setIsCorrect(null);
-    setQuestionNumber(prev=>prev+1);
   }, [question])
 
   const handleSubmit = () => {
@@ -23,18 +15,36 @@ const ExamOMRViewer = ({question}) => {
       alert("답안을 선택하세요.");
       return;
     }
-    const correct = currentQuestion.correct_answer === parseInt(selectedAnswer);
-    setIsCorrect(correct);
-    setShowResult(true);
+    // const correct = currentQuestion.correct_answer === parseInt(selectedAnswer);
+    // setIsCorrect(correct);
+    // setShowResult(true);
+    console.log(selectedAnswer);
+    
+  };
+
+  const handleChange = (e) => {
+    onSelectAnswer(e.target.value);
   };
 
 
 
+  useEffect(() => {
+    // 문제 바뀌면 선택 초기화
+    onSelectAnswer(null);
+  }, [question, onSelectAnswer]);
+
+
+
+
+
+
+
+
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: 'auto' }}>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: '100px' }}>
       {currentQuestion ? (
-        <div style={{ marginBottom: '40px', borderBottom: '1px solid #ccc', paddingBottom: '20px' }}>
-          <h3>{questionNumber}. {currentQuestion.question_text}</h3>
+        <div style={{ marginBottom: '40px',  paddingBottom: '20px' }}>
+          <h3>{nextId+1}. {currentQuestion.question_text}</h3>
 
           {currentQuestion.image_data && (
             <div style={{ margin: '10px 0' }}>
@@ -55,27 +65,18 @@ const ExamOMRViewer = ({question}) => {
                     name={`q${currentQuestion.id}`}
                     value={num}
                     checked={selectedAnswer === String(num)}
-                    onChange={(e) => setSelectedAnswer(e.target.value)}
-                    disabled={showResult}
+                    onChange={handleChange}
+                    disabled={disabled}
                     /> {currentQuestion[`option_${num}`]}
                   <br />
                 </label>
               </div>
             ))}
           </div>
-
-          {!showResult ? (
-            <button onClick={handleSubmit} style={{ marginTop: '20px' }}>제출</button>
-          ) : (
-            <div style={{ marginTop: '20px' }}>
-              <strong style={{ color: isCorrect ? 'green' : 'red' }}>
-                {isCorrect ? '✅ 정답입니다!' : '❌ 틀렸습니다.'}
-              </strong>
-              <br />
-              <span>정답: {currentQuestion[`option_${currentQuestion.correct_answer}`]}</span>
-              <br />
-            </div>
-          )}
+          <div>
+           <span> 정답 : {currentQuestion.correct_answer} </span>
+          </div>
+            {/* <button onClick={handleSubmit} style={{ marginTop: '20px' }} disabled={disabled}>제출</button> */}
         </div>
       ) : (
         <div style={{ textAlign: 'center', marginTop: '100px' }}>

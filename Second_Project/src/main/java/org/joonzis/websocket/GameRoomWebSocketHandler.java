@@ -28,13 +28,13 @@ import lombok.extern.log4j.Log4j;
 @Log4j
 public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
-    // 서버별 세션 관리: {서버명: [세션1, 세션2]}
+    // 서버 세션
     private final Map<String, Set<WebSocketSession>> serverSessions = new ConcurrentHashMap<>();
     
-    // 서버별 유저 목록: {서버명: [유저닉1, 유저닉2]}
+    // 서버별 유저
     private final Map<String, Set<String>> serverUsers = new ConcurrentHashMap<>();
     
-    // 서버별 방 목록: {서버명: [방1, 방2]}
+    // 서버별 방목록
     private final Map<String, List<GameRoomDTO>> serverRooms = new ConcurrentHashMap<>();
     
     // 방별 유저
@@ -43,9 +43,12 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     // 방별 문제 Id
     private final Map<String, Map<String, AtomicInteger>> roomQuestionIds = new ConcurrentHashMap<>();
     
-    
+    // 방별 유저별 점수
+    private final Map<String, Map<String, Map<String, AtomicInteger>>> roomScores = new ConcurrentHashMap<>();
     
     private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    private AtomicInteger roomIndex = new AtomicInteger(1);
     
     @Autowired
     private PlayService playService;
@@ -84,6 +87,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             	break;
             case "nextQuestion":
             	handleNextQuestion(session, json);
+            	break;
+            case "sumScore":
+            	handleSumScore(session, json);
             	break;
         }
     }
@@ -130,7 +136,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	 */
     
     
-    private AtomicInteger roomIndex = new AtomicInteger(1);
+    
     private void handleCreateRoom(WebSocketSession session, JsonNode json) {
         String server = (String) session.getAttributes().get("server");
         String userNick = (String) session.getAttributes().get("userNick");
@@ -279,7 +285,17 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         AtomicInteger currentQuestionId = roomQuestionIds.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
         												 .computeIfAbsent(roomNo, k -> new AtomicInteger(0));
         currentQuestionId.set(0);
+        int nextId = currentQuestionId.getAndIncrement();
         
+        // 참가자 점수 초기화
+        Map<String, Map<String, AtomicInteger>> serverScoreMap = roomScores.computeIfAbsent(server, k -> new ConcurrentHashMap<>());
+        Map<String, AtomicInteger> roomScoreMap = serverScoreMap.computeIfAbsent(roomNo, k -> new ConcurrentHashMap<>());
+        Set<String> users = roomUsers.getOrDefault(server, Collections.emptyMap())
+                                     .getOrDefault(roomNo, Collections.emptySet());
+        for (String user : users) {
+            roomScoreMap.put(user, new AtomicInteger(0));
+        }
+                
     	System.out.println(list);
     	Map<String, Object> payload = Map.of(
             "type", "gameStart",
@@ -287,8 +303,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             "roomNo", roomNo,
             "initiator", userNick,
             "list", list,
-            "nextId", currentQuestionId
-
+            "nextId", nextId
         );
     	
     	
@@ -353,9 +368,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         String roomNo = json.get("roomNo").asText();
         String userNick = json.get("userNick").asText();
     
-//        if (server == null || userNick == null) {
-//    		return;
-//    	}
+        if (server == null || userNick == null) {
+    		return;
+    	}
         
         System.out.println("Next question requested by " + userNick + " in room " + roomNo);
 
@@ -375,6 +390,37 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         broadcast(server, payload);
     }
     
+    private void handleSumScore(WebSocketSession session, JsonNode json) {
+    	String server = json.get("server").asText();
+        String roomNo = json.get("roomNo").asText();
+        String userNick = json.get("userNick").asText();
+        
+        if (server == null || userNick == null) {
+    		return;
+    	}
+        
+        System.out.println("Sum score by " + userNick + " in room " + roomNo);
+        
+        Map<String, Map<String, AtomicInteger>> serverScoreMap = roomScores.computeIfAbsent(server, k -> new ConcurrentHashMap<>());
+        Map<String, AtomicInteger> roomScoreMap = serverScoreMap.computeIfAbsent(roomNo, k -> new ConcurrentHashMap<>());
+        AtomicInteger userScore = roomScoreMap.computeIfAbsent(userNick, k -> new AtomicInteger(0));
+        userScore.incrementAndGet();
+        Map<String, Integer> scores = new HashMap<>();
+        for (Map.Entry<String, AtomicInteger> entry : roomScoreMap.entrySet()) {
+            scores.put(entry.getKey(), entry.getValue().get());
+        }
+        
+        Map<String, Object> payload = Map.of(
+    		"type", "sumScore",
+    		"server", server,
+    		"roomNo", roomNo,
+    		"initiator", userNick,
+    		"score", scores
+		);
+        
+        
+        broadcast(server, payload);
+    }
     
     private void broadcastUserList(String server) {
         Set<String> users = serverUsers.getOrDefault(server, Collections.emptySet());

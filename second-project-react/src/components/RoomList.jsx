@@ -187,6 +187,7 @@ const RoomList = () => {
           action: "joinRoom",
           roomNo: room.gameroom_no,
           game_mode: room.game_mode,
+          category: room.category,
           userNick
         }));
         nav('/gameRoom/' + room.gameroom_no);
