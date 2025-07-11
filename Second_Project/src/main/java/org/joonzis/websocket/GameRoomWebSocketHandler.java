@@ -46,6 +46,8 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     // 방별 유저별 점수
     private final Map<String, Map<String, Map<String, AtomicInteger>>> roomScores = new ConcurrentHashMap<>();
     
+    private final Map<String, Map<String, String>> roomOwners = new ConcurrentHashMap<>();
+    
     private final ObjectMapper objectMapper = new ObjectMapper();
     
     private AtomicInteger roomIndex = new AtomicInteger(1);
@@ -162,6 +164,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         roomUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
 	             .computeIfAbsent(newRoom.getGameroom_no(), k -> ConcurrentHashMap.newKeySet())
 	        	 .add(userNick);
+        
+        roomOwners.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).put(roomNo, userNick);
+        
         // 모든 클라이언트에게 방 목록 브로드캐스트
         broadcastRoomList(server);
         
@@ -372,6 +377,13 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     		return;
     	}
         
+        String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
+        if (owner == null || !owner.equals(userNick)) {
+            // 방장이 아니면 무시 (혹은 에러 메시지 전송)
+            System.out.println("❌ nextQuestion 요청 무시 - 방장 아님: " + userNick);
+            return;
+        }
+        
         System.out.println("Next question requested by " + userNick + " in room " + roomNo);
 
         // 방별 questionId 증가
@@ -415,7 +427,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     		"server", server,
     		"roomNo", roomNo,
     		"initiator", userNick,
-    		"score", scores
+    		"scores", scores
 		);
         
         

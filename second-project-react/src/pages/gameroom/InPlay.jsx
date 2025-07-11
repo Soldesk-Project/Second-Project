@@ -99,12 +99,13 @@ const InPlay = () => {
       }
 
       if (data.type === 'sumScore' && data.server === server && data.roomNo === roomNo) {
-        if (data.scores) {
-          setUsers(users => users.map(u => ({
-            ...u,
-            score: data.scores[u.userNick] ?? u.score
-          })));
-          setScore(data.scores[userNick] ?? score); // 내 점수 별도 관리도 가능
+          if (data.scores) {
+            setUsers(users => users.map(u => ({
+              ...u,
+              score: data.scores[u.userNick] ?? u.score
+            })));
+            // console.log("score : "+score);
+            // setScore(data.scores[userNick]); // 내 점수 별도 관리도 가능
         }
       }
     };
@@ -288,9 +289,9 @@ const InPlay = () => {
         <div className={styles.body_right}>
           <div className={styles.game_join_userList}>
             {users.length > 0 ? (
-              users.map(({ userNick, userNo, score }) => (
+              users.map(({ userNick, userNo, score }) => (                
                 <div key={`user-${userNo}`} className={styles.user}>
-                  <p>{userNick} / 번호 : {userNo==0?'방장':userNo} / 점수 : {score}</p>
+                  <p>{userNick} / 번호 : {userNo===0?'방장':userNo} / 점수 : {score ?? 0}</p>
                 </div>
               ))
             ) : (
