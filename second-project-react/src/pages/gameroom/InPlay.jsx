@@ -27,8 +27,8 @@ const InPlay = () => {
   const sockets = useContext(WebSocketContext);
 
   // 방장
-  const isInitiator = users.some(u => u.userNick === userNick && u.userNo === 0);
-
+  const isOwner = users.some(u => u.userNick === userNick && u.isOwner);
+  
   // 문제 데이터
   useEffect(() => {
     const socket = sockets['room'];
@@ -49,9 +49,11 @@ const InPlay = () => {
       const data = JSON.parse(event.data);
 
       if (data.type === 'roomUserList' && data.server === server) {
-        const formattedUsers = data.userList.map((nick, index) => ({
+        const onwerNick=data.owner;
+        const formattedUsers = data.userList.map((nick, no) => ({
           userNick: nick,
-          userNo: index
+          userNo: no,
+          isOwner: nick===onwerNick
         }));
         setUsers(formattedUsers);
       }
@@ -97,13 +99,11 @@ const InPlay = () => {
       }
 
       if (data.type === 'sumScore' && data.server === server && data.roomNo === roomNo) {
-          if (data.scores) {
-            setUsers(users => users.map(u => ({
-              ...u,
-              score: data.scores[u.userNick] ?? u.score
-            })));
-            // console.log("score : "+score);
-            // setScore(data.scores[userNick]); // 내 점수 별도 관리도 가능
+        if (data.scores) {
+          setUsers(users => users.map(u => ({
+            ...u,
+            score: data.scores[u.userNick] ?? u.score
+          })));
         }
       }
     };
@@ -254,14 +254,14 @@ const InPlay = () => {
                     </>
                   ):(
                     <>
-                      <button onClick={start} disabled={!isInitiator}>시작</button>
-                      <button onClick={stop} disabled={!isInitiator}>중지</button>
+                      <button onClick={start} disabled={!isOwner}>시작</button>
+                      <button onClick={stop} disabled={!isOwner}>중지</button>
                       <button onClick={leaveRoom} className={styles.leaveBtn}>나가기</button>
                     </>
                   )
                 }
               </div>
-              {!isInitiator && ( !play &&
+              {!isOwner && ( !play &&
                 <p className={styles.note}>방장만 게임을 시작/중지할 수 있습니다</p>
               )}
               <div className={styles.gamePlay}>
@@ -284,9 +284,9 @@ const InPlay = () => {
         <div className={styles.body_right}>
           <div className={styles.game_join_userList}>
             {users.length > 0 ? (
-              users.map(({ userNick, userNo, score }) => (                
-                <div key={`user-${userNo}`} className={styles.user}>
-                  <p>{userNick} / 번호 : {userNo===0?'방장':userNo} / 점수 : {score ?? 0}</p>
+              users.map(({ userNick, userNo, isOwner, score }) => (                
+                <div key={userNo} className={styles.user}>
+                  <p>{isOwner ? '[방장]':'[유저]'}{userNick} / 점수 : {score ?? 0}</p>
                 </div>
               ))
             ) : (
@@ -298,5 +298,5 @@ const InPlay = () => {
     </div>
   );
 };
-
+  
 export default InPlay;

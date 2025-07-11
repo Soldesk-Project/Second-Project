@@ -46,6 +46,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     // 방별 유저별 점수
     private final Map<String, Map<String, Map<String, AtomicInteger>>> roomScores = new ConcurrentHashMap<>();
     
+    // 방장
     private final Map<String, Map<String, String>> roomOwners = new ConcurrentHashMap<>();
     
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -111,34 +112,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         // 모든 클라이언트에게 유저 목록 브로드캐스트
         broadcastUserList(server);
         broadcastRoomList(server); 
-        
-        //sendRoomListToSession(server, session);
     }
     
-	/*
-	 * private void sendRoomListToSession(String server, WebSocketSession session) {
-	 * List<GameRoomDTO> rooms = serverRooms.getOrDefault(server,
-	 * Collections.emptyList()); Map<String, Set<String>> roomUserMap =
-	 * roomUsers.getOrDefault(server, Collections.emptyMap()); List<Map<String,
-	 * Object>> roomListWithCount = new ArrayList<>(); for (GameRoomDTO room :
-	 * rooms) { Map<String, Object> roomMap = new HashMap<>();
-	 * roomMap.put("gameroom_no", room.getGameroom_no()); roomMap.put("title",
-	 * room.getTitle()); roomMap.put("category", room.getCategory());
-	 * roomMap.put("game_mode", room.getGame_mode()); roomMap.put("is_private",
-	 * room.getIs_private()); roomMap.put("limit", room.getLimit());
-	 * roomMap.put("pwd", room.getPwd()); // 현재 인원수 Set<String> users =
-	 * roomUserMap.getOrDefault(room.getGameroom_no(), Collections.emptySet());
-	 * roomMap.put("currentCount", users.size());
-	 * System.out.println("방번호 : "+room.getGameroom_no()+", "+"유저수 : "+users.size())
-	 * ; roomListWithCount.add(roomMap); }
-	 * 
-	 * try { String json = objectMapper.writeValueAsString(Map.of("type",
-	 * "roomList", "rooms", rooms)); if (session.isOpen()) { session.sendMessage(new
-	 * TextMessage(json)); } } catch (Exception e) { // 에러 처리 } }
-	 */
-    
-    
-    
+    // 방 생성
     private void handleCreateRoom(WebSocketSession session, JsonNode json) {
         String server = (String) session.getAttributes().get("server");
         String userNick = (String) session.getAttributes().get("userNick");
@@ -157,7 +133,8 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             json.get("limit").asInt(),
             json.get("pwd") != null ? json.get("pwd").asText() : null
         );
-
+        
+        // 게임 모드 분기
         if("normal".equals(newRoom.getGame_mode())) {
         	// 서버별 방 목록 업데이트
         	serverRooms.computeIfAbsent(server, k -> new ArrayList<>()).add(newRoom);
@@ -169,6 +146,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         	broadcastRoomList(server);
         }
         
+        // 방장 지정
         roomOwners.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).put(roomNo, userNick);
 
         
@@ -187,6 +165,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
+    // 방 참가
     private void handleJoinRoom(WebSocketSession session, JsonNode json) {
     	String server = (String) session.getAttributes().get("server");
 	    if (server == null) return;
@@ -195,8 +174,8 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	    String userNick = json.get("userNick").asText();
 	    String gameMode = json.get("game_mode").asText();
 	    String category = json.get("category").asText();
-	    System.out.println("🔔 joinRoom 요청 수신 → userNick: " + userNick + ", roomNo: " + roomNo);
 
+	    System.out.println("🔔 joinRoom 요청 수신 → userNick: " + userNick + ", roomNo: " + roomNo);
 
 	    // 방 참가자 목록 관리 (예: roomUsers 맵)
 	    roomUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
@@ -216,6 +195,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	    }
     }	
     
+    // 게임 나가기
     private void handleLeaveRoom(WebSocketSession session, JsonNode json) {
         String server = (String) session.getAttributes().get("server");
         String userNick = (String) session.getAttributes().get("userNick");
@@ -243,10 +223,14 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         broadcaseRoomUserList(server, roomNo);
     }
     
+    // 방별 유저 리스트
     private void handleUserList(WebSocketSession session, JsonNode json) {
     	String roomNo = json.get("roomNo").asText();
     	String server = json.get("server").asText();
-    	if (server == null) return;
+    	if (server == null || roomNo == null) return;
+    	
+    	String userNick = (String) session.getAttributes().get("userNick");
+    	
     	
     	Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
         Set<String> userNicks = roomUserMap.getOrDefault(roomNo, Collections.emptySet());
@@ -256,6 +240,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             "type", "roomUserList",
             "server", server,
             "roomNo", roomNo,
+            "userNick", userNick,
             "userList", userList
         );
         
@@ -279,14 +264,15 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     	String userNick = json.get("userNick").asText();
     	String category = json.get("category").asText();
 
-    	if (server == null || userNick == null) {
+    	if (server == null || userNick == null || roomNo == null || category == null) {
     		return;
     	}
-
     	
-    	System.out.println("Game start requested by " + userNick + " in room " + roomNo);
+    	// 방장체크
+    	checkRoomOnwer(server, roomNo, userNick);
+    	
+    	System.out.println("게임 시작 요청 (방장) by " + userNick + " in room " + roomNo);
         List<QuestionDTO> list = playService.getQuestionsByCategory(category);
-        System.out.println(list);
 
         // 방별 questionId 초기화
         AtomicInteger currentQuestionId = roomQuestionIds.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
@@ -312,7 +298,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             "list", list,
             "nextId", nextId
         );
-    	
     	
         broadcast(server, payload);
     }
@@ -350,11 +335,14 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         String roomNo = json.get("roomNo").asText();
         String userNick = json.get("userNick").asText();
         
-        if (server == null || userNick == null) {
+        if (server == null || userNick == null || roomNo == null) {
     		return;
     	}
-        // 방장 여부 확인 로직 추가 가능 (필요한 경우)
-        System.out.println("Game stop requested by " + userNick + " in room " + roomNo);
+        
+        // 방장체크
+        checkRoomOnwer(server, roomNo, userNick);
+        
+        System.out.println("게임 중지 요청 (방장) by " + userNick + " in room " + roomNo);
         AtomicInteger currentQuestionId = roomQuestionIds.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
                 										 .computeIfAbsent(roomNo, k -> new AtomicInteger(0));
         currentQuestionId.set(0);
@@ -375,24 +363,19 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         String roomNo = json.get("roomNo").asText();
         String userNick = json.get("userNick").asText();
     
-        if (server == null || userNick == null) {
+        if (server == null || userNick == null || roomNo == null) {
     		return;
     	}
         
-        String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
-        if (owner == null || !owner.equals(userNick)) {
-            // 방장이 아니면 무시 (혹은 에러 메시지 전송)
-            System.out.println("❌ nextQuestion 요청 무시 - 방장 아님: " + userNick);
-            return;
-        }
+        // 방장 체크
+        checkRoomOnwer(server, roomNo, userNick);
         
-        System.out.println("Next question requested by " + userNick + " in room " + roomNo);
+        System.out.println("다음 문제 요청 (방장) by " + userNick + " in room " + roomNo);
 
         // 방별 questionId 증가
         AtomicInteger currentQuestionId = roomQuestionIds.getOrDefault(server, Collections.emptyMap())
                                                          .getOrDefault(roomNo, new AtomicInteger(1));
         int nextId = currentQuestionId.getAndIncrement();
-        System.out.println(nextId);
         
         Map<String, Object> payload = Map.of(
     		"type", "nextQuestion",
@@ -409,12 +392,10 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         String roomNo = json.get("roomNo").asText();
         String userNick = json.get("userNick").asText();
         
-        if (server == null || userNick == null) {
+        if (server == null || userNick == null || roomNo == null) {
     		return;
     	}
-        
-        System.out.println("Sum score by " + userNick + " in room " + roomNo);
-        
+                
         Map<String, Map<String, AtomicInteger>> serverScoreMap = roomScores.computeIfAbsent(server, k -> new ConcurrentHashMap<>());
         Map<String, AtomicInteger> roomScoreMap = serverScoreMap.computeIfAbsent(roomNo, k -> new ConcurrentHashMap<>());
         AtomicInteger userScore = roomScoreMap.computeIfAbsent(userNick, k -> new AtomicInteger(0));
@@ -469,11 +450,14 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         Set<String> userNicks = roomUserMap.getOrDefault(roomNo, Collections.emptySet());
         List<String> userList = new ArrayList<>(userNicks);
         
+        String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
+        
         Map<String, Object> payload = Map.of(
             "type", "roomUserList",
             "server", server,
             "roomNo", roomNo,
-            "userList", userList
+            "userList", userList,
+            "owner", owner
         );
         broadcast(server, payload);
     }
@@ -496,6 +480,17 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             }
         });
     }
+    
+    private void checkRoomOnwer(String server, String roomNo, String userNick) {
+    	String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
+        if (owner == null || !owner.equals(userNick)) {
+            System.out.println("❌  요청 무시 - 방장 아님: " + userNick);
+            return;
+        }
+    }
+    
+    
+    
     
 	/*
 	 * private void autoStart(String roomNo) {
