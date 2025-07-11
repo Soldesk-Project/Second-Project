@@ -13,7 +13,6 @@ const InPlay = () => {
   const [nextId, setNextId] = useState(0);
   const [time, setTime] = useState('타이머');
   const [score, setScore] = useState(0);
-  const [isTimeOver, setIsTimeOver] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const questionListRef = useRef([]);
   const { roomNo } = useParams();
@@ -80,7 +79,6 @@ const InPlay = () => {
       if (data.type === 'nextQuestion' && data.server === server && data.roomNo === roomNo) {
         const nextId = Number(data.nextId);
         setNextId(data.nextId);
-        setIsTimeOver(false);
         // console.log("nextId:", nextId);
         // console.log("questionListRef 길이:", questionListRef.current.length);
 
@@ -132,7 +130,6 @@ const InPlay = () => {
       }, 1000);
       if(time <= 0) {
         handleAnswerSubmit(selectedAnswer);
-        setIsTimeOver(true);
         const socket = sockets['room'];
         if (socket && socket.readyState === 1) {
           socket.send(JSON.stringify({
@@ -271,10 +268,8 @@ const InPlay = () => {
                 {play ? 
                 <Test question={question} 
                       nextId={nextId}
-                      onSubmit={handleAnswerSubmit}
                       onSelectAnswer={setSelectedAnswer} // 추가!
-                      selectedAnswer={selectedAnswer} 
-                      disabled={isTimeOver}/> : <h2>대기중</h2>}
+                      selectedAnswer={selectedAnswer}/> : <h2>대기중</h2>}
               </div>
             </div>
           </div>

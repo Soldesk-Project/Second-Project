@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Loading from './Loading';
 
-const ExamOMRViewer = ({question, onSubmit, onSelectAnswer, selectedAnswer, disabled, nextId}) => {
+const ExamOMRViewer = ({question, onSelectAnswer, selectedAnswer, nextId}) => {
   const [currentQuestion, setCurrentQuestion] = useState(null);
 
   // console.log(nextId); 
@@ -10,17 +10,16 @@ const ExamOMRViewer = ({question, onSubmit, onSelectAnswer, selectedAnswer, disa
     setCurrentQuestion(question);
   }, [question])
 
-  const handleSubmit = () => {
-    if (!selectedAnswer) {
-      alert("답안을 선택하세요.");
-      return;
-    }
-    // const correct = currentQuestion.correct_answer === parseInt(selectedAnswer);
-    // setIsCorrect(correct);
-    // setShowResult(true);
-    console.log(selectedAnswer);
-    
-  };
+  // const handleSubmit = () => {
+  //   if (!selectedAnswer) {
+  //     alert("답안을 선택하세요.");
+  //     return;
+  //   }
+  //   // const correct = currentQuestion.correct_answer === parseInt(selectedAnswer);
+  //   // setIsCorrect(correct);
+  //   // setShowResult(true);
+  //   console.log(selectedAnswer);
+  // };
 
   const handleChange = (e) => {
     onSelectAnswer(e.target.value);
@@ -66,7 +65,6 @@ const ExamOMRViewer = ({question, onSubmit, onSelectAnswer, selectedAnswer, disa
                     value={num}
                     checked={selectedAnswer === String(num)}
                     onChange={handleChange}
-                    disabled={disabled}
                     /> {currentQuestion[`option_${num}`]}
                   <br />
                 </label>
