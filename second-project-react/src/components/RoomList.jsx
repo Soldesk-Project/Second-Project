@@ -121,7 +121,7 @@ const RoomList = () => {
         case "MATCH_CANCELLED":
           alert("상대방이 매칭을 거절했습니다.");
           setShowMatchModal(false);
-          setMatchStatus('idle');
+          setMatchStatus('searching');
           break;
         
         case "MATCH_TIMEOUT":
@@ -140,7 +140,7 @@ const RoomList = () => {
   }, [sockets, nav]);
 
   const handleQuickMatch = async () => {
-    console.log("🚀 handleQuickMatch 호출됨");
+    setMatchStatus('searching');
 
     try {
       await axios.post('/api/rank/score', { userId: user.user_id });
@@ -199,6 +199,18 @@ const RoomList = () => {
     }
   };
 
+  const handleCancelMatch = () => {
+    const matchSocket = sockets['match'];
+    if (matchSocket && matchSocket.readyState === 1) {
+      matchSocket.send(JSON.stringify({
+        action: 'cancelMatch',
+        userId: user.user_id
+      }));
+    }
+    setMatchStatus('idle');
+    setShowMatchModal(false);
+  };
+
   const setKoreanToCategory=(category)=>{
     switch (category) {
       case "random":
@@ -248,6 +260,18 @@ const RoomList = () => {
           setShowMatchModal={setShowMatchModal}
           setMatchStatus={setMatchStatus}
         />
+      )}
+
+      {matchStatus === 'searching' && (
+      <div className={styles.matchModalBackdrop}>
+        <div className={styles.matchModal}>
+          <h2>🔍 매칭을 찾는 중...</h2>
+          <p>상대방을 찾고 있어요. 잠시만 기다려주세요!</p>
+          <button onClick={handleCancelMatch} className={styles.cancelBtn}>
+            매칭 취소
+          </button>
+        </div>
+      </div>
       )}
 
       {/* ✅ 상대 수락 대기 중 */}

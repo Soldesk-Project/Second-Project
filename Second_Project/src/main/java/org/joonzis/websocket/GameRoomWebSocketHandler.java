@@ -157,18 +157,20 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             json.get("limit").asInt(),
             json.get("pwd") != null ? json.get("pwd").asText() : null
         );
-        
-        // 서버별 방 목록 업데이트
-        serverRooms.computeIfAbsent(server, k -> new ArrayList<>()).add(newRoom);
-        
-        roomUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
-	             .computeIfAbsent(newRoom.getGameroom_no(), k -> ConcurrentHashMap.newKeySet())
-	        	 .add(userNick);
+
+        if("normal".equals(newRoom.getGame_mode())) {
+        	// 서버별 방 목록 업데이트
+        	serverRooms.computeIfAbsent(server, k -> new ArrayList<>()).add(newRoom);
+        	
+        	roomUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
+        	.computeIfAbsent(newRoom.getGameroom_no(), k -> ConcurrentHashMap.newKeySet())
+        	.add(userNick);
+        	// 모든 클라이언트에게 방 목록 브로드캐스트
+        	broadcastRoomList(server);
+        }
         
         roomOwners.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).put(roomNo, userNick);
-        
-        // 모든 클라이언트에게 방 목록 브로드캐스트
-        broadcastRoomList(server);
+
         
         try {
             String msg = objectMapper.writeValueAsString(Map.of(

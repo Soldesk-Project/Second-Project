@@ -31,7 +31,7 @@ const ChargeModal = ({ onClose }) => {
       tossPayments.requestPayment('카드', {
         amount,
         orderId,
-        orderName: '포인트 충전',
+        orderName: '넥슨캐시 5만원',
         customerName: userId,
         successUrl: `http://localhost:9099/api/pay/toss/success?userId=${userId}`, // ✅ 수정
         failUrl: 'http://localhost:3000/pay/fail',

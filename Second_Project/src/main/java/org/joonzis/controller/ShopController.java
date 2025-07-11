@@ -94,13 +94,6 @@ public class ShopController {
                             @RequestParam String userId,
                             HttpServletResponse response) throws IOException {
         try {
-            // 🔍 디버깅용 로그 출력
-            System.out.println("🔽 [Toss 결제 성공 redirect 파라미터]");
-            System.out.println("📦 paymentKey: " + paymentKey);
-            System.out.println("📦 orderId: " + orderId);
-            System.out.println("📦 amount: " + amount);
-            System.out.println("📦 userId: " + userId);
-
             tossPayService.confirmPayment(paymentKey, orderId, amount);
             memberservice.addPoint(userId, amount);
 

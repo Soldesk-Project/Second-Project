@@ -12,7 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.log4j.Log4j;
+
 @Service
+@Log4j
 public class MatchService {
 
     @Autowired
@@ -164,6 +167,12 @@ public class MatchService {
         redisTemplate.delete(ACCEPT_KEY_PREFIX + groupId);
     }
     
+    // 매칭 중 매치 거절시 큐에서 제거
+    public void cancelMatch(String userId) {
+        redisTemplate.opsForList().remove(MATCH_QUEUE_KEY, 0, userId);
+    }
+
+    // 매칭 성사 후 타임 아웃 시 처리
     public void timeOut(String userId) {
         // 1. 그룹 ID 조회
         String groupId = redisTemplate.opsForValue().get(GROUP_KEY_PREFIX + userId);

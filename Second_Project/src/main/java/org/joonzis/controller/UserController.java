@@ -38,14 +38,14 @@ public class UserController {
 	// 유저 랭킹
 	@GetMapping(value = "/ranking", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<UserInfoDecoDTO> getUserRankingList() {
-		log.info("🔥 getUserRankingList() 호출됨");
+		//log.info("🔥 getUserRankingList() 호출됨");
         return service.getUserRankingList();
     }
 	
 	// 아이템 겟 테스트
 	@GetMapping(value = "/item", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ItemVO> getItemList() {
-		log.info(" getItemList() 호출됨");
+		//log.info(" getItemList() 호출됨");
         return service.getItemList();
     }
 	
@@ -55,7 +55,7 @@ public class UserController {
 		boolean success = service.updateItem(UserDecoUpdateDTO);
 	    if (success) {
 	    	try {
-	    		log.info("DB업데이트 완료");
+	    		//log.info("DB업데이트 완료");
                 webSocketHandler.notifyUserStyleUpdate(String.valueOf(UserDecoUpdateDTO.getUser_no()));
             } catch (Exception e) {
                 e.printStackTrace();

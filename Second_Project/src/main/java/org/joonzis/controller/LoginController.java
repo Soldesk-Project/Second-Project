@@ -9,11 +9,11 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.joonzis.security.JwtUtil;
 import javax.servlet.http.HttpSession;
 
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UsersVO;
+import org.joonzis.security.JwtUtil;
 import org.joonzis.service.MemberService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,14 +120,12 @@ public class LoginController {
 	
 	@PostMapping("/signUp")
 	public void signUp(@RequestBody UsersVO users) {
-		log.info("회원가입");
 	    memberservice.insertMember(users);
 	}
 	
 	@PostMapping("/login")
 	@ResponseBody
 	public ResponseEntity<?> login(@RequestBody UserInfoDTO dto, HttpSession session) {
-	    System.out.println("🔐 로그인 요청");
 	    
 	    UserInfoDTO user = memberservice.isValidUser(dto.getUser_id(), dto.getUser_pw());
 	    if (user != null) {

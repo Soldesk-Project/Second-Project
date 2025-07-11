@@ -24,7 +24,7 @@ import lombok.extern.log4j.Log4j;
 @RestController
 @RequestMapping("/api/customer")
 public class CustomerController {
-
+	
     // 샘플 FAQ 데이터
     private static final List<FAQ> faqList = Arrays.asList(
         new FAQ(1, "주문 취소는 어떻게 하나요?", "마이페이지 > 주문내역에서 취소가 가능합니다.")
@@ -33,7 +33,7 @@ public class CustomerController {
     /* FAQ 목록 조회 */
     @GetMapping("/faq")
     public ResponseEntity<List<FAQ>> getFAQ() {
-        log.info("FAQ 목록 조회 요청");
+        //log.info("FAQ 목록 조회 요청");
         return ResponseEntity.ok(faqList);
     }
 

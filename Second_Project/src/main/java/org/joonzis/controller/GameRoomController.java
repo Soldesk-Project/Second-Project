@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.service.MemberService;
-import org.joonzis.service.match.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +27,6 @@ public class GameRoomController {
 	@Autowired
     private StringRedisTemplate redisTemplate;
 	
-	@Autowired
-	private MatchService matchService;
-	
 	@PostMapping("/rank/score")
 	public ResponseEntity<Integer> loadRank(@RequestBody Map<String, String> payload) {
 	    String userId = payload.get("userId");
@@ -40,22 +36,5 @@ public class GameRoomController {
 	    
 	    return ResponseEntity.ok(user.getUser_rank());
 	}
-	
-	/*
-	 * @GetMapping(value = "/match/test", produces =
-	 * "application/json; charset=UTF-8") public ResponseEntity<?> testMatch() {
-	 * List<String> matched = matchService.peekAndRemove(4); if (!matched.isEmpty())
-	 * { String groupId = UUID.randomUUID().toString();
-	 * matchService.startPendingGroup(matched, groupId); return
-	 * ResponseEntity.ok(matched); } return ResponseEntity.ok("매칭 불가"); }
-	 * 
-	 * @PostMapping("/test/enqueue") public ResponseEntity<?>
-	 * testEnqueue(@RequestBody Map<String, String> body) { String userId =
-	 * body.get("userId"); int score = Integer.parseInt(body.get("score"));
-	 * 
-	 * redisTemplate.opsForValue().set("rank:" + userId, String.valueOf(score));
-	 * matchService.enqueue(userId);
-	 * 
-	 * return ResponseEntity.ok("등록 완료: " + userId + " (" + score + ")"); }
-	 */
+
 }

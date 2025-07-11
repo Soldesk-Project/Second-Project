@@ -1,5 +1,19 @@
 package org.joonzis.controller;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.joonzis.domain.ChatRoomDTO;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -8,23 +22,9 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 @Slf4j
 @Controller
@@ -45,9 +45,9 @@ public class ChatController {
     // 서버 일반 채팅 메시지 처리
     @MessageMapping("/serverChat.sendMessage") // 클라이언트에서 /app/serverChat.sendMessage 로 메시지 전송
     public void serverSendMessage(@Payload ChatRoomDTO chatMessage) {
-    	log.info("Received server chat message from sender (No: {}), nick {}: {}",
-                new Object[]{chatMessage.getMSenderNo(), chatMessage.getMSender(), chatMessage.getMContent()});
-        
+//    	log.info("Received server chat message from sender (No: {}), nick {}: {}",
+//                new Object[]{chatMessage.getMSenderNo(), chatMessage.getMSender(), chatMessage.getMContent()});
+//        
         chatMessage.setMType(ChatRoomDTO.MessageType.SERVER_CHAT); // 메시지 타입 명확히 설정
         chatMessage.setMTimestamp(Instant.now().toEpochMilli());
         
@@ -67,15 +67,15 @@ public class ChatController {
             headerAccessor.getSessionAttributes().put("userNo", userNo);
             headerAccessor.getSessionAttributes().put("username", username);
         } else {
-            log.warn("Session attributes are null for serverAddUser operation. User: {}", username);
+            //log.warn("Session attributes are null for serverAddUser operation. User: {}", username);
         }
 
         String sessionId = headerAccessor.getSessionId();
         if (userNo != null && sessionId != null) {
             activeSessions.put(userNo, sessionId); // activeSessions 맵에 사용자 정보 추가
-            log.info("User joined server chat: {} (No: {}) with session ID: {}", new Object[]{username, userNo, sessionId});
+            //log.info("User joined server chat: {} (No: {}) with session ID: {}", new Object[]{username, userNo, sessionId});
         } else {
-        	log.warn("Failed to add user session for sender: {}. userNo: {}, sessionId: {}", new Object[]{username, userNo, sessionId});
+        	//log.warn("Failed to add user session for sender: {}. userNo: {}, sessionId: {}", new Object[]{username, userNo, sessionId});
         }
 
         chatMessage.setMType(ChatRoomDTO.MessageType.SERVER_JOIN); // 입장 메시지 타입 설정
@@ -97,7 +97,7 @@ public class ChatController {
         String username = chatMessage.getMSender();
 
         activeSessions.remove(userNo); // activeSessions 맵에서 사용자 제거
-        log.info("User left server chat: {} (No: {})", username, userNo);
+        //log.info("User left server chat: {} (No: {})", username, userNo);
 
         chatMessage.setMType(ChatRoomDTO.MessageType.SERVER_LEAVE);
         chatMessage.setMContent(username != null ? username + "님이 서버 채팅에서 퇴장하셨습니다." : "알 수 없는 사용자님이 퇴장하셨습니다.");
@@ -114,8 +114,8 @@ public class ChatController {
     // 게임룸 일반 채팅 메시지 처리
     @MessageMapping("/gameChat.sendMessage/{gameroomNo}") // gameroomNo를 @DestinationVariable로 받음
     public void gameSendMessage(@Payload ChatRoomDTO chatMessage, @DestinationVariable Long gameroomNo) {
-    	log.info("Received game chat message from sender (No: {}), nick {} in room {}: {}",
-                new Object[]{chatMessage.getMSenderNo(), chatMessage.getMSender(), gameroomNo, chatMessage.getMContent()});
+    	//log.info("Received game chat message from sender (No: {}), nick {} in room {}: {}",
+               // new Object[]{chatMessage.getMSenderNo(), chatMessage.getMSender(), gameroomNo, chatMessage.getMContent()});
         
         chatMessage.setMType(ChatRoomDTO.MessageType.GAME_CHAT); // 메시지 타입 명확히 설정
         chatMessage.setGameroomNo(gameroomNo); // DTO에 gameroomNo 설정
@@ -138,7 +138,7 @@ public class ChatController {
             headerAccessor.getSessionAttributes().put("username", username);
             headerAccessor.getSessionAttributes().put("gameroomNo", gameroomNo); // 세션에 현재 게임룸 ID 저장
         } else {
-            log.warn("Session attributes are null for gameAddUser operation. User: {}", username);
+            //log.warn("Session attributes are null for gameAddUser operation. User: {}", username);
         }
 
         // activeSessions 맵은 전체 서버 세션 관리용으로 유지하고, 게임룸 입장/퇴장 시에는 별도의 게임룸 멤버 관리 로직이 필요할 수 있습니다.
@@ -153,7 +153,7 @@ public class ChatController {
         
         // 해당 게임룸의 /gameChat/{gameroomNo} 목적지로 브로드캐스트
         messagingTemplate.convertAndSend("/gameChat/" + gameroomNo, chatMessage);
-        log.info("User joined game chat: {} (No: {}) in room {}", new Object[]{username, userNo, gameroomNo});
+       // log.info("User joined game chat: {} (No: {}) in room {}", new Object[]{username, userNo, gameroomNo});
     }
 
     // 게임룸 채팅방 퇴장 메시지 처리
@@ -170,7 +170,7 @@ public class ChatController {
         gameChatLogQueues.computeIfAbsent(gameroomNo, k -> new ConcurrentLinkedQueue<>()).offer(chatMessage);
         
         messagingTemplate.convertAndSend("/gameChat/" + gameroomNo, chatMessage);
-        log.info("User left game chat: {} (No: {}) from room {}", new Object[]{username, userNo, gameroomNo});
+       // log.info("User left game chat: {} (No: {}) from room {}", new Object[]{username, userNo, gameroomNo});
     }
 
 
@@ -185,8 +185,8 @@ public class ChatController {
         Long receiverNo = chatMessage.getMReceiverNo(); // 받는 사람의 userNo
         String content = chatMessage.getMContent();
 
-        log.info("Received whisper from {} (No: {}). To {} (No: {}). Content: {}",
-                new Object[]{senderNick, senderNo, receiverNick, receiverNo, content});
+//        log.info("Received whisper from {} (No: {}). To {} (No: {}). Content: {}",
+//                new Object[]{senderNick, senderNo, receiverNick, receiverNo, content});
 
         chatMessage.setMType(ChatRoomDTO.MessageType.WHISPER_CHAT); // 메시지 타입 명확히 설정
         chatMessage.setMTimestamp(Instant.now().toEpochMilli());
@@ -194,15 +194,15 @@ public class ChatController {
         // 귓속말 수신자에게 메시지 전송
         if (receiverNo != null) {
             messagingTemplate.convertAndSendToUser(String.valueOf(receiverNo), "/queue/messages", chatMessage);
-            log.info("Whisper sent to receiver userNo: {}", receiverNo);
+            //log.info("Whisper sent to receiver userNo: {}", receiverNo);
         } else {
-            log.warn("Cannot send whisper: receiverNo is null for content: {}", content);
+           // log.warn("Cannot send whisper: receiverNo is null for content: {}", content);
         }
 
         // 보낸 사람 본인에게도 귓속말 내용을 보여주기 위해 다시 보냄
         if (senderNo != null) {
             messagingTemplate.convertAndSendToUser(String.valueOf(senderNo), "/queue/messages", chatMessage);
-            log.info("Whisper sent back to sender userNo: {}", senderNo);
+            //log.info("Whisper sent back to sender userNo: {}", senderNo);
         }
     }
     

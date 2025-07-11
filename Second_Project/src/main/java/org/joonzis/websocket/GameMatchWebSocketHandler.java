@@ -80,6 +80,11 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
                 matchService.rejectMatch(userId);
                 System.out.println("❌ [거절 처리]: " + userId);
                 break;
+                
+            case "cancelMatch":
+            	matchService.cancelMatch(userId);
+            	System.out.println("매칭 취소:" + userId);
+            	break;
             
             case "timeOut":
             	matchService.timeOut(userId);
