@@ -7,8 +7,10 @@ import titleTextMap from "../js/Decorations";
 
 const ServerUserList = () => {
   const [users, setUsers] = useState([]); // 현재 서버에 접속한 유저 목록
-  const socketRef = useRef(null);
   const { user, server } = useSelector((state) => state.user);
+  const sockets = useContext(WebSocketContext);
+
+  const socketRef = useRef(null);
   const userNick = user.user_nick;
   const userNo = user.user_no;
   const bgName = user.background_class_name;
@@ -17,7 +19,6 @@ const ServerUserList = () => {
   const titleName = user.title_class_name;
   const fontColorName = user.fontcolor_class_name;
   
-  const sockets = useContext(WebSocketContext);
 
   useEffect(() => {
     if (!server || !user || !userNick || !userNo) return;
@@ -77,9 +78,6 @@ const ServerUserList = () => {
                                 {userNick}
                             </span>
                         </div>
-                  {/* <div className={`${decoStyles[fontColorName]}`}>
-                    {userNick}
-                  </div> */}
               </div>
             ))
             

@@ -6,16 +6,12 @@ const InventoryModal = ({ isOpen, onClose, children }) => {
         if (!isOpen) return;
 
         const handleKeyDown = (e) => {
-        if (e.key === 'Escape') {
-            onClose();
-        }
+            if (e.key === 'Escape') onClose();
         };
 
         window.addEventListener('keydown', handleKeyDown);
         
-        return () => {
-        window.removeEventListener('keydown', handleKeyDown);
-        };
+        return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isOpen, onClose]);
 
     if (!isOpen) return null;
@@ -26,10 +22,10 @@ const InventoryModal = ({ isOpen, onClose, children }) => {
 
     return (
         <div className={styles.modal_overlay} onClick={handleOverlayClick}>
-        <div className={styles.modal_content} onClick={e => e.stopPropagation()}>
-            <button className={styles.modal_close} onClick={onClose}>×</button>
-            {children}
-        </div>
+            <div className={styles.modal_content} onClick={e => e.stopPropagation()}>
+                <button className={styles.modal_close} onClick={onClose}>×</button>
+                {children}
+            </div>
         </div>
     );
 };

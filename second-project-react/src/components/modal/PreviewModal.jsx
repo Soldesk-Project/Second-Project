@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import decoStyles from '../../css/Decorations.module.css';
 import titleTextMap from '../../js/Decorations';
 
-const PreviewModal = ({ user, item, onClose, onBuy }) => {
+const PreviewModal = ({ action, user, item, onClose, on_click }) => {
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') onClose();
@@ -78,8 +78,10 @@ const PreviewModal = ({ user, item, onClose, onBuy }) => {
             {user.user_nick}
           </span>   
         </div>
-        <div style={{ marginTop: '20px' }}>
-            <button onClick={onBuy} style={{marginRight:"10px"}}>구매</button>
+        <div style={{ marginTop: '20px', color:'black' }}>
+            {
+              action === 'Shop' ? <button onClick={on_click} style={{marginRight:"10px"}}>구매</button> : <button onClick={on_click} style={{marginRight:"10px"}}>장착</button>
+            }
             <button onClick={onClose}>닫기</button>
         </div>
       </div>

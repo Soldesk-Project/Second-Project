@@ -9,14 +9,13 @@ import titleTextMap from '../js/Decorations';
 import PreviewModal from '../components/modal/PreviewModal';
 
 const Shop = () => {
-  // 1) 포인트 충전 탭은 tabs 배열에서 제외함
   const allTabs = ['테두리', '칭호', '글자색', '배경', '말풍선', '랜덤박스'];
   const [activeTab, setActiveTab] = useState(allTabs[0]);
   const [items, setItems]   = useState([]);
+  const [ownedItems, setOwnedItems] = useState([]);
   const [point, setPoint]   = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [ownedItems, setOwnedItems] = useState([]);
 
   const user   = useSelector(state => state.user.user);
   const userId = user?.user_id;
@@ -162,7 +161,7 @@ const Shop = () => {
       </div>
 
       {showModal && <ChargeModal onClose={() => setShowModal(false)} />}
-      {selectedItem && (<PreviewModal user={user} item={selectedItem} onClose={() => setSelectedItem(null)} onBuy={() => buyItem(selectedItem)} />)}
+      {selectedItem && (<PreviewModal action={'Shop'} user={user} item={selectedItem} onClose={() => setSelectedItem(null)} on_click={() => buyItem(selectedItem)} />)}
     </div>
   );
 };
