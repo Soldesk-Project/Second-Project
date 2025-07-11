@@ -4,11 +4,11 @@ import styles from '../../css/adminPage/QuestErrRepoManage.css'; // CSS 모듈 �
 const QuestErrRepoManage = () => {
   // 예시 데이터
   const [reports, setReports] = useState([
-    { id: 1, reporter: 'user123', reportedAt: '2025-07-01 10:00', title: '로그인 버튼 작동 오류', status: '미확인', 담당자: '-', lastUpdated: '2025-07-01 10:00', type: '버그', content: '로그인 페이지에서 로그인 버튼을 눌러도 반응이 없습니다.', attachments: ['login_error.png'] },
-    { id: 2, reporter: 'dev_user', reportedAt: '2025-06-28 14:30', title: '게시물 작성 시 사진 업로드 지연', status: '확인 중', 담당자: '김개발', lastUpdated: '2025-07-02 11:00', type: '성능', content: '게시물을 작성할 때 사진을 여러 장 업로드하면 매우 느려집니다.', attachments: [] },
-    { id: 3, reporter: 'admin_test', reportedAt: '2025-06-25 09:15', title: '마이페이지 오탈자 발견', status: '처리 완료', 담당자: '박수정', lastUpdated: '2025-06-26 16:00', type: '오탈자', content: '마이페이지의 "회원정보수정" 버튼 문구가 "회원정보수정정"으로 되어있습니다.', attachments: [] },
-    { id: 4, reporter: 'user123', reportedAt: '2025-07-05 17:00', title: '검색 기능 개선 요청', status: '미확인', 담당자: '-', lastUpdated: '2025-07-05 17:00', type: '기능개선', content: '검색 시 연관 검색어를 추천해주면 좋겠습니다.', attachments: [] },
-    { id: 5, reporter: 'spam_user', reportedAt: '2025-07-03 23:00', title: '광고성 게시물 제보', status: '반려', 담당자: '이관리', lastUpdated: '2025-07-04 09:30', type: '스팸', content: '지속적으로 광고성 게시물을 올리는 사용자가 있습니다. (반려 사유: 정책 위반이 아님)', attachments: [] },
+    { id: 1, reporter: 'user123', reportedAt: '2025-07-01 10:00', title: '로그인 버튼 작동 오류', status: '미확인', 담당자: '-', type: '버그', content: '로그인 페이지에서 로그인 버튼을 눌러도 반응이 없습니다.', attachments: ['login_error.png'] },
+    { id: 2, reporter: 'dev_user', reportedAt: '2025-06-28 14:30', title: '게시물 작성 시 사진 업로드 지연', status: '확인 중', 담당자: '김개발', type: '성능', content: '게시물을 작성할 때 사진을 여러 장 업로드하면 매우 느려집니다.', attachments: [] },
+    { id: 3, reporter: 'admin_test', reportedAt: '2025-06-25 09:15', title: '마이페이지 오탈자 발견', status: '처리 완료', 담당자: '박수정', type: '오탈자', content: '마이페이지의 "회원정보수정" 버튼 문구가 "회원정보수정정"으로 되어있습니다.', attachments: [] },
+    { id: 4, reporter: 'user123', reportedAt: '2025-07-05 17:00', title: '검색 기능 개선 요청', status: '미확인', 담당자: '-', type: '기능개선', content: '검색 시 연관 검색어를 추천해주면 좋겠습니다.', attachments: [] },
+    { id: 5, reporter: 'spam_user', reportedAt: '2025-07-03 23:00', title: '광고성 게시물 제보', status: '반려', 담당자: '이관리', type: '스팸', content: '지속적으로 광고성 게시물을 올리는 사용자가 있습니다. (반려 사유: 정책 위반이 아님)', attachments: [] },
   ]);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -62,7 +62,7 @@ const QuestErrRepoManage = () => {
   const handleBulkStatusChange = (newStatus) => {
     const updatedReports = reports.map(report =>
       selectedReports.includes(report.id)
-        ? { ...report, status: newStatus, lastUpdated: new Date().toLocaleString() }
+        ? { ...report, status: newStatus}
         : report
     );
     setReports(updatedReports);
@@ -77,7 +77,7 @@ const QuestErrRepoManage = () => {
 
   const handleDetailSave = () => {
     const updatedReports = reports.map(report =>
-      report.id === selectedReport.id ? { ...selectedReport, lastUpdated: new Date().toLocaleString() } : report
+      report.id === selectedReport.id ? { ...selectedReport, } : report
     );
     setReports(updatedReports);
     setShowDetailModal(false);
@@ -103,7 +103,6 @@ const QuestErrRepoManage = () => {
   return (
     <div className={styles.pageContainer}>
       <h1>문제 오류 제보 관리</h1>
-      <p>사용자들의 문제 오류 제보를 관리하는 페이지입니다.</p>
 
       <div className={styles.filterSection}>
         <input
@@ -142,13 +141,12 @@ const QuestErrRepoManage = () => {
                   checked={currentReports.length > 0 && selectedReports.length === currentReports.filter(r => selectedReports.includes(r.id)).length}
                 />
               </th>
-              <th>제보 ID</th>
+              <th>No.</th>
               <th>제보자</th>
               <th>접수일시</th>
               <th>제목/요약</th>
               <th>현재 상태</th>
               <th>담당자</th>
-              <th>최종 업데이트</th>
               <th>조치</th>
             </tr>
           </thead>
@@ -175,7 +173,6 @@ const QuestErrRepoManage = () => {
                     </span>
                   </td>
                   <td>{report.담당자}</td>
-                  <td>{report.lastUpdated}</td>
                   <td>
                     <button className={styles.actionButton} onClick={() => handleRowClick(report)}>상세 보기</button>
                   </td>
@@ -238,10 +235,6 @@ const QuestErrRepoManage = () => {
             <div className={styles.formGroup}>
               <label>접수일시:</label>
               <input type="text" value={selectedReport.reportedAt} readOnly />
-            </div>
-            <div className={styles.formGroup}>
-              <label>최종 업데이트:</label>
-              <input type="text" value={selectedReport.lastUpdated} readOnly />
             </div>
             <hr />
             <div className={styles.formGroup}>
