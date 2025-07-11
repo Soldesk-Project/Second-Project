@@ -209,6 +209,18 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             Set<String> users = roomUserMap.get(roomNo);
             users.remove(userNick);
 
+            String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
+            if (owner != null && owner.equals(userNick)) {
+                // 방장이 나가면 남은 유저 중 한 명을 새 방장으로 지정
+                if (!users.isEmpty()) {
+                    String newOwner = users.iterator().next();
+                    roomOwners.get(server).put(roomNo, newOwner);
+                } else {
+                    // 방에 아무도 없으면 방장 정보 제거
+                    roomOwners.get(server).remove(roomNo);
+                }
+            }
+            
             // 방 인원이 0명이면 방 삭제
             if (users.isEmpty()) {
                 roomUserMap.remove(roomNo);
@@ -269,7 +281,11 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     	}
     	
     	// 방장체크
-    	checkRoomOnwer(server, roomNo, userNick);
+    	String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
+        if (owner == null || !owner.equals(userNick)) {
+            System.out.println("❌  요청 무시 - 방장 아님: " + userNick);
+            return;
+        }
     	
     	System.out.println("게임 시작 요청 (방장) by " + userNick + " in room " + roomNo);
         List<QuestionDTO> list = playService.getQuestionsByCategory(category);
@@ -340,7 +356,11 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     	}
         
         // 방장체크
-        checkRoomOnwer(server, roomNo, userNick);
+        String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
+        if (owner == null || !owner.equals(userNick)) {
+            System.out.println("❌  요청 무시 - 방장 아님: " + userNick);
+            return;
+        }
         
         System.out.println("게임 중지 요청 (방장) by " + userNick + " in room " + roomNo);
         AtomicInteger currentQuestionId = roomQuestionIds.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
@@ -368,7 +388,11 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     	}
         
         // 방장 체크
-        checkRoomOnwer(server, roomNo, userNick);
+        String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
+        if (owner == null || !owner.equals(userNick)) {
+            System.out.println("❌  요청 무시 - 방장 아님: " + userNick);
+            return;
+        }
         
         System.out.println("다음 문제 요청 (방장) by " + userNick + " in room " + roomNo);
 
@@ -481,13 +505,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         });
     }
     
-    private void checkRoomOnwer(String server, String roomNo, String userNick) {
-    	String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
-        if (owner == null || !owner.equals(userNick)) {
-            System.out.println("❌  요청 무시 - 방장 아님: " + userNick);
-            return;
-        }
-    }
+    
     
     
     
@@ -535,12 +553,25 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             List<String> emptyRooms = new ArrayList<>();
             
             for (Map.Entry<String, Set<String>> entry : roomUserMap.entrySet()) {
+            	String roomNo = entry.getKey();
                 Set<String> users = entry.getValue();
                 users.remove(userNick);
-                // 방 인원이 0명이면 삭제 대상에 추가
-                if (users.isEmpty()) {
-                    emptyRooms.add(entry.getKey());
+                
+                String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
+                if (owner != null && owner.equals(userNick)) {
+                    if (!users.isEmpty()) {
+                        String newOwner = users.iterator().next();
+                        roomOwners.get(server).put(roomNo, newOwner);
+                    } else {
+                        roomOwners.get(server).remove(roomNo);
+                    }
                 }
+                if (users.isEmpty()) {
+                    emptyRooms.add(roomNo);
+                }
+//                if (users.isEmpty()) {
+//                    emptyRooms.add(entry.getKey());
+//                }
             }
             
             List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
@@ -555,6 +586,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
                             roomUserMap.remove(roomNo);
                             rooms.removeIf(room -> room.getGameroom_no().equals(roomNo));
                             broadcastRoomList(server);
+                            roomOwners.get(server).remove(roomNo);
                         }
                     }
                 }, 5000); // 5초 후 체크

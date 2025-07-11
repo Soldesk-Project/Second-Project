@@ -49,11 +49,14 @@ const InPlay = () => {
       const data = JSON.parse(event.data);
 
       if (data.type === 'roomUserList' && data.server === server) {
-        const onwerNick=data.owner;
+        console.log(data.userList);
+        console.log(data.owner);
+        
+        const ownerNick =data.owner;
         const formattedUsers = data.userList.map((nick, no) => ({
           userNick: nick,
           userNo: no,
-          isOwner: nick===onwerNick
+          isOwner: nick===ownerNick
         }));
         setUsers(formattedUsers);
       }
@@ -298,5 +301,5 @@ const InPlay = () => {
     </div>
   );
 };
-  
+
 export default InPlay;
