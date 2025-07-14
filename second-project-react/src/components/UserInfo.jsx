@@ -35,7 +35,7 @@ const UserInfo = () => {
     };
 
     useEffect(() => {
-        if (!user?.user_no) return;
+        if (!user.user_no) return;
         axios
         .get('/user/inventory/category', {
             params: {

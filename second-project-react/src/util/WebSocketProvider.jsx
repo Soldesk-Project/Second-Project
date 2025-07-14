@@ -19,10 +19,12 @@ export const WebSocketProvider = ({ children }) => {
     // socketsRef.current["room"] = new WebSocket("ws://localhost:9099/ws/room");
     socketsRef.current["room"] = new WebSocket("ws://192.168.0.112:9099/ws/room");
   }
-  if (!socketsRef.current["server"]) {
-    socketsRef.current["server"] = new WebSocket("ws://192.168.0.112:9099/ws/server");
-    // socketsRef.current["server"] = new WebSocket("ws://localhost:9099/ws/server");
-  }
+  useEffect(() => {
+    if (!socketsRef.current["server"]) {
+      socketsRef.current["server"] = new WebSocket("ws://192.168.0.112:9099/ws/server");
+      // socketsRef.current["server"] = new WebSocket("ws://localhost:9099/ws/server");
+    }
+  }, []);
   // :흰색_확인_표시: match 소켓은 userId 있을 때만 연결
   useEffect(() => {
     const userId = getUserIdFromToken();

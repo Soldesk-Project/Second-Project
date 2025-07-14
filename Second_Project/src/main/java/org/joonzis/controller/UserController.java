@@ -66,6 +66,7 @@ public class UserController {
 	    }
 	}
 	
+	// 인벤토리 카테고리에 맞는 아이템 가져오기
 	@GetMapping("/inventory/category")
 	public List<ItemVO> getInventoryCategory(@RequestParam("category") String category, @RequestParam("user_no") int user_no) {
 
@@ -85,6 +86,7 @@ public class UserController {
 	    return service.getInventoryCategory(paramMap);
 	}
 	
+	// 유저가 가지고있는 아이템목록
 	@GetMapping("/getItems")
 	public List<ItemVO> getInventory(@RequestParam("user_no") int user_no) {
 	    return service.getInventory(user_no);
