@@ -54,7 +54,8 @@ const ServerChatbox = () => {
             return;
         }
 
-        const socket = new SockJS('http://192.168.0.112:9099/ws-chat'); // ★ 일반 서버 채팅 엔드포인트
+        // const socket = new SockJS('http://192.168.0.112:9099/ws-chat'); // ★ 일반 서버 채팅 엔드포인트
+        const socket = new SockJS('http://localhost:9099/ws-chat'); // ★ 일반 서버 채팅 엔드포인트
         const client = Stomp.over(() => socket);
         client.debug = () => {};  // 아무 출력도 하지 않음
 

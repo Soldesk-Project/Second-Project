@@ -30,6 +30,8 @@
 	
 	<context:component-scan base-package="org.joonzis.controller" />
 	
+	<context:component-scan base-package="org.joonzis.config" />
+	
 	<context:component-scan base-package="org.joonzis.websocket" />
 	<mvc:annotation-driven />
 </beans:beans>

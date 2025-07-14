@@ -91,16 +91,6 @@ public class WebSocketEventListener {
                      displayUsername + " (No: " + displayUserNo + ")",
                      sessionId);
 
-            // 서버 채팅방 퇴장 메시지 전송
-            ChatRoomDTO serverLeaveMessage = ChatRoomDTO.builder()
-                    .mType(ChatRoomDTO.MessageType.SERVER_LEAVE)
-                    .mSender(displayUsername) // Nullable 처리된 값 사용
-                    .mSenderNo(userNo) // userNo는 여기서는 null이 아니므로 직접 사용 가능
-                    .mContent(displayUsername + "님이 서버 채팅에서 퇴장하셨습니다.")
-                    .mTimestamp(Instant.now().toEpochMilli())
-                    .build();
-            messagingTemplate.convertAndSend("/serverChat/public", serverLeaveMessage);
-
             // 게임룸에 접속해 있었다면 게임룸 퇴장 메시지 전송 및 로그 저장
             if (gameroomNo != null) {
                 ChatRoomDTO gameLeaveMessage = ChatRoomDTO.builder()
@@ -118,7 +108,7 @@ public class WebSocketEventListener {
                          displayGameroomNo);
 
                 // 핵심: 게임룸 로그 저장 메서드 호출
-                chatController.saveGameChatLogs(gameroomNo);
+                chatController.saveGameRoomLogs(gameroomNo); 
             }
         } else {
             // userNo가 null인 경우 (로그인 없이 웹소켓 연결 시도, 비정상 종료 등)
