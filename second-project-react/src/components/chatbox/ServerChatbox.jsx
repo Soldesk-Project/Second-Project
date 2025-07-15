@@ -66,8 +66,15 @@ const ServerChatbox = () => {
 
             // 공개 채팅방 구독
             client.subscribe('/serverChat/public', message => {
-                const receivedMessage = JSON.parse(message.body);
-                setMessages(prevMessages => [...prevMessages, receivedMessage]);
+                try{
+                    const receivedMessage = JSON.parse(message.body);
+                    console.log("🟢 ServerChatbox: 수신된 공개 채팅 메시지:", receivedMessage);
+                    console.log("🟢 ServerChatbox: setMessages 호출 전 prevMessages:", messages);
+                    setMessages(prevMessages => [...prevMessages, receivedMessage]);
+                } catch (e){
+                    console.error("🚫 ServerChatbox: 메시지 파싱 오류:", e, "원본 메시지:", message.body);
+                }
+                
             });
 
             // 귓속말 채팅방 구독
