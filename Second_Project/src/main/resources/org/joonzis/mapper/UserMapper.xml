@@ -104,4 +104,25 @@
 		FROM INVENTORY
 		WHERE USER_NO = #{user_no}
 	</select>
+	
+	<insert id="addReward" parameterType="org.joonzis.domain.UserDecoUpdateDTO">
+		INSERT INTO INVENTORY (USER_NO, CSS_CLASS_NAME, ITEM_NAME, ITEM_TYPE)
+		VALUES (#{user_no}, #{css_class_name}, #{item_name}, #{item_type})
+	</insert>
+	
+	<select id="getRewardStatus" resultType="org.joonzis.domain.UserRewardVO">
+		SELECT *
+		FROM USER_REWARDS
+		WHERE USER_NO = #{user_no}
+	</select>
+	
+	<update id="rewardUpdate" parameterType="org.joonzis.domain.UserRewardVO">
+		UPDATE USER_REWARDS
+		SET BOUNDARY = #{boundary},
+			TITLE = #{title},
+			FONTCOLOR = #{fontColor},
+			BACKGROUND = #{background}
+		WHERE USER_NO = #{user_no}
+	</update>
+	
 </mapper>

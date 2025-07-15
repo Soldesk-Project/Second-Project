@@ -1,285 +1,241 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styles from '../css/ItemList.module.css';
 import decoStyles from '../css/Decorations.module.css';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import titleTextMap from '../js/Decorations';
 
+const ITEM_TYPES = [
+  { key: 'boundary', label: 'BOUNDARY ITEM' },
+  { key: 'title', label: 'TITLE ITEM' },
+  { key: 'fontColor', label: 'FONTCOLOR ITEM' },
+  { key: 'background', label: 'BACKGROUND ITEM' },
+];
+
+const REWARDS = {
+  boundary: { css_class_name: 'rainbow_bd', item_name: 'rainbow_boundary'},
+  title: { css_class_name: 'collector_title', item_name: '콜렉터'},
+  fontColor: { css_class_name: 'rainbow_fontColor', item_name: 'rainbow_fontColor'},
+  background: { css_class_name: 'rainbow_bg', item_name: 'rainbow_background'},
+};
+
 const ItemList = () => {
-  const [items, setItems]   = useState([]);
-  const [ownedItems, setOwnedItems] = useState([]);
+  const [items, setItems] = useState([]); // 전체 아이템
+  const [ownedItems, setOwnedItems] = useState([]); // 보유 아이템
   const [visibleSections, setVisibleSections] = useState({
     boundary: false,
     title: false,
-    fontcolor: false,
+    fontColor: false,
     background: false,
   });
-  const allItemsRef = useRef(null);
-  const user   = useSelector(state => state.user.user);
-  
-  const ownedItemNos = useMemo(() => new Set(ownedItems.map(item => item.item_name)), [ownedItems]);
-  const isOwned = (item_name) => ownedItemNos.has(item_name);
+  const [rewardReceived, setRewardReceived] = useState({});
+  const [reloadRewardStatus, setReloadRewardStatus] = useState(false);
 
-  const fetchGetItems = async () => {
-    if (!user.user_no) return;
-    try {
-      const res = await axios.get(`/user/getItems?user_no=${user.user_no}`);
-      setOwnedItems(res.data);
-    } catch (error) {
-      console.error('유저 아이템 불러오기 실패:', error);
+  const dropdownRefs = useRef({});
+  const isDragging = useRef({});
+  const startX = useRef({});
+  const scrollLeft = useRef({});
+  const user = useSelector(state => state.user.user);
+
+  // 보유 아이템 체크
+  const ownedItemNames = useMemo(() => new Set(ownedItems.map(item => item.item_name)), [ownedItems]);
+  const isOwned = (name) => ownedItemNames.has(name);
+
+  // 보유 아이템 가져오기
+  useEffect(() => {
+    if (user.user_no) {
+      axios.get(`/user/getItems?user_no=${user.user_no}`)
+        .then(res => setOwnedItems(res.data))
+        .catch(err => console.error('유저 아이템 불러오기 실패:', err));
     }
-  }
+  }, [user.user_no]);
 
+  // 전체 아이템 가져오기
   useEffect(() => {
-      fetchGetItems();
-    }, [user.user_no]);
+    axios.get('/user/item')
+      .then(res => setItems(res.data))
+      .catch(() => setItems([]));
+  }, []);
 
+  // 리워드 상태 가져오기
   useEffect(() => {
-        axios.get('/user/item')
-        .then((res) => setItems(res.data))
-        .catch(() => setItems([]));
-    }, []);
+    if (user.user_no) {
+      axios.get(`/user/rewardStatus?user_no=${user.user_no}`)
+        .then(res => {
+          setRewardReceived(res.data); // ✅ 서버에서 수령 상태 받아옴
+        })
+        .catch(err => console.error('리워드 상태 불러오기 실패:', err));
+    }
+  }, [user.user_no, reloadRewardStatus]);
+  
+  // 아이템 타입별 필터 및 소유 개수, 퍼센트 계산 함수
+  const getItemStats = useCallback((type) => {
+    const filtered = items.filter(item => item.item_type === type);
+    const ownedCount = filtered.filter(item => isOwned(item.item_name)).length;
+    const totalCount = filtered.length;
+    const percent = totalCount ? Math.round((ownedCount / totalCount) * 100) : 0;
+    return { filtered, ownedCount, totalCount, percent };
+  }, [items, ownedItemNames]);
 
-  useEffect(() => {
-    if (!visibleSections.boundary) return;
-
-    const dropdown = allItemsRef.current;
-    if (!dropdown) return;
-
-    const onWheel = (e) => {
+  // 휠 스크롤 이벤트 핸들러
+  const createWheelHandler = useCallback((type) => {
+    return (e) => {
       if (e.deltaY === 0) return;
       e.preventDefault();
-      dropdown.scrollLeft += e.deltaY;
+      const container = dropdownRefs.current[type];
+      if (container) container.scrollLeft += e.deltaY;
     };
+  }, []);
 
-    dropdown.addEventListener("wheel", onWheel);
-    return () => dropdown.removeEventListener("wheel", onWheel);
-  }, [visibleSections.boundary]);
+  //마우스 드래그 스크롤 이벤트 핸들러
+  const handleDragStart = useCallback((type, e) => {
+    const container = dropdownRefs.current[type];
+    if (!container) return;
 
+    isDragging.current[type] = true;
+    startX.current[type] = e.pageX - container.offsetLeft;
+    scrollLeft.current[type] = container.scrollLeft;
+  }, []);
+
+  const handleDragMove = useCallback((type, e) => {
+    if (!isDragging.current[type]) return;
+
+    const container = dropdownRefs.current[type];
+    if (!container) return;
+
+    e.preventDefault();
+    const x = e.pageX - container.offsetLeft;
+    const walk = x - startX.current[type];
+    container.scrollLeft = scrollLeft.current[type] - walk;
+  }, []);
+
+  const handleDragEnd = useCallback((type) => {
+    isDragging.current[type] = false;
+  }, []);
+
+  // 휠 이벤트 리스너 등록 / 해제
   useEffect(() => {
-    if (!visibleSections.title) return;
+    const types = Object.keys(visibleSections);
+    const listeners = {};
 
-    const dropdown = allItemsRef.current;
-    if (!dropdown) return;
+    types.forEach((type) => {
+      const container = dropdownRefs.current[type];
+      if (!visibleSections[type] || !container) return;
 
-    const onWheel = (e) => {
-      if (e.deltaY === 0) return;
-      e.preventDefault();
-      dropdown.scrollLeft += e.deltaY;
+      const wheelHandler = createWheelHandler(type);
+      container.addEventListener('wheel', wheelHandler);
+      listeners[type] = wheelHandler;
+    });
+
+    return () => {
+      types.forEach((type) => {
+        const container = dropdownRefs.current[type];
+        if (container && listeners[type]) {
+          container.removeEventListener('wheel', listeners[type]);
+        }
+      });
     };
+  }, [visibleSections, createWheelHandler]);
+  
+  // 리워드 핸들러
+  const handleRewardClick = (typeKey) => {
+    const reward = REWARDS[typeKey];
+     if (!reward) return;
+    
+    // API 호출 등 비동기 처리도 가능
+    axios.post('/user/reward', { item_type: typeKey, user_no: user.user_no, css_class_name: reward.css_class_name, item_name: reward.item_name })
+    .then(() => {
+      const updated = {
+        ...rewardReceived,
+        [typeKey]: 'Y',
+        user_no: user.user_no
+      };
 
-    dropdown.addEventListener("wheel", onWheel);
-    return () => dropdown.removeEventListener("wheel", onWheel);
-  }, [visibleSections.title]);
+      setRewardReceived(updated);
+      axios.post('/user/rewardUpdate', { user_no: updated.user_no, boundary: updated.boundary, title: updated.title, fontColor: updated.fontColor, background: updated.background })
+      .then(() => {
+          setReloadRewardStatus(prev => !prev);
+        })
+        .catch(console.error);
+      })
+      .catch(console.error);
+  };
 
-  useEffect(() => {
-    if (!visibleSections.fontcolor) return;
+  // UI 렌더링 함수
+  const renderItemSection = (typeKey, label) => {
+    const { filtered, ownedCount, totalCount, percent } = getItemStats(typeKey);
+    const isVisible = visibleSections[typeKey];
+    const isRewarded = rewardReceived[typeKey] === 'Y';
+    const canReward = ownedCount === totalCount && totalCount > 0 && !isRewarded;
 
-    const dropdown = allItemsRef.current;
-    if (!dropdown) return;
+    return (
+      <div key={typeKey}>
+        <div
+          className={styles.title}
+          onClick={() =>
+            setVisibleSections(prev => ({
+              ...prev,
+              [typeKey]: !prev[typeKey],
+            }))
+          }
+        >
+          <div>{label}</div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span>{ownedCount} / {totalCount} ({percent}%)</span>
+            {ownedCount === totalCount && totalCount > 0 && (
+              <button
+                disabled={!canReward}
+                className={`${styles.rewardButton} ${!canReward ? styles.rewardButtonDisabled : ''}`}
+                onClick={() => handleRewardClick(typeKey)}
+              >
+                {isRewarded ? '보상 받기 완료' : '보상 받기'}
+              </button>
+            )}
+          </div>
+        </div>
 
-    const onWheel = (e) => {
-      if (e.deltaY === 0) return;
-      e.preventDefault();
-      dropdown.scrollLeft += e.deltaY;
-    };
-
-    dropdown.addEventListener("wheel", onWheel);
-    return () => dropdown.removeEventListener("wheel", onWheel);
-  }, [visibleSections.fontcolor]);
-
-  useEffect(() => {
-    if (!visibleSections.background) return;
-
-    const dropdown = allItemsRef.current;
-    if (!dropdown) return;
-
-    const onWheel = (e) => {
-      if (e.deltaY === 0) return;
-      e.preventDefault();
-      dropdown.scrollLeft += e.deltaY;
-    };
-
-    dropdown.addEventListener("wheel", onWheel);
-    return () => dropdown.removeEventListener("wheel", onWheel);
-  }, [visibleSections.background]);
-
-  const boundaryItems = items.filter(item => item.item_type === 'boundary');
-  const titleItems = items.filter(item => item.item_type === 'title');
-  const fontcolorItems = items.filter(item => item.item_type === 'fontColor');
-  const backgroundItems = items.filter(item => item.item_type === 'background');
+        {isVisible && (
+          <div
+            className={styles.dropdown}
+            ref={(el) => (dropdownRefs.current[typeKey] = el)}
+            onMouseDown={(e) => handleDragStart(typeKey, e)}
+            onMouseMove={(e) => handleDragMove(typeKey, e)}
+            onMouseUp={() => handleDragEnd(typeKey)}
+            onMouseLeave={() => handleDragEnd(typeKey)}
+          >
+            {filtered.length ? (
+              filtered.map(item => (
+                <div
+                  key={item.item_no}
+                  className={`${styles.card} ${isOwned(item.item_name) ? styles.owned : ''}`}
+                >
+                  <div className={styles.itemCss}>
+                    <div>
+                      {item.item_type === 'title' && titleTextMap[item.css_class_name] && (
+                        <span className={decoStyles[item.css_class_name]} style={{ marginRight: '5px', fontWeight: 'bold' }}>
+                          [{titleTextMap[item.css_class_name]}]
+                        </span>
+                      )}
+                      <span className={item.item_type !== 'title' ? decoStyles[item.css_class_name] : undefined}>
+                        아이템
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.itemName}>이름 : {item.item_name}</div>
+                </div>
+              ))
+            ) : (
+              <div>상품이 없습니다.</div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className={styles.box}>
-
-      <div
-        onClick={() =>
-          setVisibleSections((prev) => ({
-            ...prev,
-            boundary: !prev.boundary,
-          }))
-        }
-        className={styles.title}
-      >
-        BOUNDARY ITEM
-      </div>
-
-      {visibleSections.boundary && (
-        <div className={styles.dropdown} ref={allItemsRef}>
-          {boundaryItems.length ? (
-            boundaryItems.map(item => (
-              <div key={item.item_no}  className={`${styles.card} ${isOwned(item.item_name) ? styles.owned : ''}`}>
-                <div className={styles.itemCss}>
-                  <div>
-                      {item.item_type === 'title' && titleTextMap[item.css_class_name] && (
-                          <span className={decoStyles[item.css_class_name]} style={{marginRight: '5px', fontWeight: 'bold'}}>
-                              [{titleTextMap[item.css_class_name]}]
-                          </span>
-                          )}
-                      <span
-                      className={
-                          item.item_type !== 'title' ? decoStyles[item.css_class_name] : undefined
-                      }
-                      >
-                      아이템
-                      </span>
-                  </div>
-                </div>
-                <div className={styles.itemName}>이름 : {item.item_name}</div>
-              </div>
-            ))
-            ) : (
-            <div>상품이 없습니다.</div>
-          )}
-        </div>
-      )}
-
-      <div
-        onClick={() =>
-          setVisibleSections((prev) => ({
-            ...prev,
-            title: !prev.title,
-          }))
-        }
-        className={styles.title}
-      >
-        TITLE ITEM
-      </div>
-
-      {visibleSections.title && (
-        <div className={styles.dropdown} ref={allItemsRef}>
-          {titleItems.length ? (
-            titleItems.map(item => (
-              <div key={item.item_no} className={`${styles.card} ${isOwned(item.item_name) ? styles.owned : ''}`}>
-                <div className={styles.itemCss}>
-                  <div>
-                      {item.item_type === 'title' && titleTextMap[item.css_class_name] && (
-                          <span className={decoStyles[item.css_class_name]} style={{marginRight: '5px', fontWeight: 'bold'}}>
-                              [{titleTextMap[item.css_class_name]}]
-                          </span>
-                          )}
-                      <span
-                      className={
-                          item.item_type !== 'title' ? decoStyles[item.css_class_name] : undefined
-                      }
-                      >
-                      아이템
-                      </span>
-                  </div>
-                </div>
-                <div className={styles.itemName}>이름 : {item.item_name}</div>
-              </div>
-            ))
-            ) : (
-            <div>상품이 없습니다.</div>
-          )}
-        </div>
-      )}
-
-      <div
-        onClick={() =>
-          setVisibleSections((prev) => ({
-            ...prev,
-            fontcolor: !prev.fontcolor,
-          }))
-        }
-        className={styles.title}
-      >
-        FONTCOLOR ITEM
-      </div>
-
-      {visibleSections.fontcolor && (
-        <div className={styles.dropdown} ref={allItemsRef}>
-          {fontcolorItems.length ? (
-            fontcolorItems.map(item => (
-              <div key={item.item_no} className={`${styles.card} ${isOwned(item.item_name) ? styles.owned : ''}`}>
-                <div className={styles.itemCss}>
-                  <div>
-                      {item.item_type === 'title' && titleTextMap[item.css_class_name] && (
-                          <span className={decoStyles[item.css_class_name]} style={{marginRight: '5px', fontWeight: 'bold'}}>
-                              [{titleTextMap[item.css_class_name]}]
-                          </span>
-                          )}
-                      <span
-                      className={
-                          item.item_type !== 'title' ? decoStyles[item.css_class_name] : undefined
-                      }
-                      >
-                      아이템
-                      </span>
-                  </div>
-                </div>
-                <div className={styles.itemName}>이름 : {item.item_name}</div>
-              </div>
-            ))
-            ) : (
-            <div>상품이 없습니다.</div>
-          )}
-        </div>
-      )}
-
-      <div
-        onClick={() =>
-          setVisibleSections((prev) => ({
-            ...prev,
-            background: !prev.background,
-          }))
-        }
-        className={styles.title}
-      >
-        BACKGROUND ITEM
-      </div>
-
-      {visibleSections.background && (
-        <div className={styles.dropdown} ref={allItemsRef}>
-          {backgroundItems.length ? (
-            backgroundItems.map(item => (
-              <div key={item.item_no} className={`${styles.card} ${isOwned(item.item_name) ? styles.owned : ''}`}>
-                <div className={styles.itemCss}>
-                  <div>
-                      {item.item_type === 'title' && titleTextMap[item.css_class_name] && (
-                          <span className={decoStyles[item.css_class_name]} style={{marginRight: '5px', fontWeight: 'bold'}}>
-                              [{titleTextMap[item.css_class_name]}]
-                          </span>
-                          )}
-                      <span
-                      className={
-                          item.item_type !== 'title' ? decoStyles[item.css_class_name] : undefined
-                      }
-                      >
-                      아이템
-                      </span>
-                  </div>
-                </div>
-                <div className={styles.itemName}>이름 : {item.item_name}</div>
-              </div>
-            ))
-            ) : (
-            <div>상품이 없습니다.</div>
-          )}
-        </div>
-      )}
-
+      {ITEM_TYPES.map(({ key, label }) => renderItemSection(key, label))}
     </div>
   );
 };

@@ -8,6 +8,7 @@ import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserAchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDecoDTO;
+import org.joonzis.domain.UserRewardVO;
 import org.joonzis.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,5 +71,20 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public List<ItemVO> getInventory(int user_no) {
 		return mapper.getInventory(user_no);
+	}
+	
+	@Override
+	public boolean addReward(UserDecoUpdateDTO UserDecoUpdateDTO) {
+		return mapper.addReward(UserDecoUpdateDTO);
+	}
+	
+	@Override
+	public UserRewardVO getRewardStatus(int user_no) {
+		return mapper.getRewardStatus(user_no);
+	}
+	
+	@Override
+	public boolean rewardUpdate(UserRewardVO UserRewardVO) {
+		return mapper.rewardUpdate(UserRewardVO);
 	}
 }

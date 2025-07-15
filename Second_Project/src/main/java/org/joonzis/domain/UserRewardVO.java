@@ -11,9 +11,11 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDecoUpdateDTO {
+public class UserRewardVO {
 	private int user_no;
-	private String css_class_name;
-	private String item_type;
-	private String item_name;
+
+    private String boundary;
+    private String title;
+    private String fontColor;
+    private String background;
 }

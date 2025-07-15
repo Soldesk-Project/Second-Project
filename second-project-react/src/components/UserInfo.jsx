@@ -67,7 +67,7 @@ const UserInfo = () => {
 
             if (status === 200) {
                 dispatch(triggerRefreshRanking());
-
+                setSelectedItem(null);
                 if (socket && socket.readyState === 1) {
                     socket.send(JSON.stringify({
                         action: 'updateStyle',

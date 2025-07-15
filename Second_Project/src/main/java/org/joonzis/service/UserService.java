@@ -7,6 +7,7 @@ import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserAchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDecoDTO;
+import org.joonzis.domain.UserRewardVO;
 
 public interface UserService {
 	
@@ -36,4 +37,13 @@ public interface UserService {
 	
 	// 아이템 유저 인벤토리 저장
 	public boolean buyItemInventory(Map<String, Object> paramMap);
+	
+	// 리워드 추가하기
+	public boolean addReward(UserDecoUpdateDTO UserDecoUpdateDTO);
+	
+	// 리워드 상태 가져오기
+	public UserRewardVO getRewardStatus(int user_no);
+	
+	// 리워드 상태 업데이트하기
+	public boolean rewardUpdate(UserRewardVO UserRewardVO);
 }
