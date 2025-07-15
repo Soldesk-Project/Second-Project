@@ -73,7 +73,7 @@ public class ChatController {
         serverChatLogQueue.offer(chatRoomDTO.getMSender() + ": " + chatRoomDTO.getMContent());
         
         // STOMP를 통해 구독자에게 메시지 전송
-        simpMessagingTemplate.convertAndSend("/topic/public", chatRoomDTO);
+        simpMessagingTemplate.convertAndSend("/serverChat/public", chatRoomDTO);
     }
     
     // 귓속말 메시지 전송 (개인 채팅)

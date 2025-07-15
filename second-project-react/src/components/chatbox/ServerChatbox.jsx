@@ -126,36 +126,32 @@ const ServerChatbox = () => {
 
     // 메시지 전송 함수
     const sendMessage = () => {
+    if (stompClientInstanceRef.current && isConnected && messageInput.trim() && userNick && userNo !== undefined && userNo !== null) {
+        const messageToSend = {
+            mSender: userNick,
+            mSenderNo: userNo,
+            mContent: messageInput,
+            mTimestamp: Date.now()
+        };
 
-        if (stompClientInstanceRef.current && isConnected && messageInput.trim() && userNick && userNo !== undefined && userNo !== null) {
-            const now = new Date();
-            // const timestamp = now.getFullYear() + '-' +
-            //                     String(now.getMonth() + 1).padStart(2, '0') + '-' +
-            //                     String(now.getDate()).padStart(2, '0') + ' ' +
-            //                     String(now.getHours()).padStart(2, '0') + ':' +
-            //                     String(now.getMinutes()).padStart(2, '0') + ':' +
-            //                     String(now.getSeconds()).padStart(2, '0');
+        if (isWhisperMode && whisperTarget.trim()) {
+            messageToSend.mType = 'WHISPER_CHAT';
+            messageToSend.mReceiver = whisperTarget;
 
-            if (isWhisperMode && whisperTarget.trim()) {
-                stompClientInstanceRef.current.send("/app/whisperChat.sendMessage", {}, JSON.stringify({
-                    mType: 'WHISPER_CHAT',
-                    mSender: userNick,
-                    mSenderNo: userNo,
-                    mContent: messageInput,
-                    mReceiver: whisperTarget,
-                    mTimestamp: Date.now()
-                }));
-            } else {
-                stompClientInstanceRef.current.send("/app/serverChat.sendMessage", {}, JSON.stringify({
-                    mType: 'SERVER_CHAT',
-                    mSender: userNick,
-                    mSenderNo: userNo,
-                    mContent: messageInput,
-                    mTimestamp: Date.now()
-                }));
-            }
-            setMessageInput('');
+            stompClientInstanceRef.current.send("/app/whisperChat.sendMessage", {}, JSON.stringify(messageToSend));
+            // 귓속말은 자신에게도 바로 표시되도록 추가
+            setMessages(prevMessages => [...prevMessages, {
+                ...messageToSend,
+                mReceiver: whisperTarget
+            }]);
         } else {
+            messageToSend.mType = 'SERVER_CHAT';
+            stompClientInstanceRef.current.send("/app/serverChat.sendMessage", {}, JSON.stringify(messageToSend));
+            // 보낸 메시지를 즉시 로컬 상태에 추가하여 화면에 표시
+            setMessages(prevMessages => [...prevMessages, messageToSend]);
+        }
+        setMessageInput('');
+    } else {
             if (!stompClientInstanceRef.current) {
                 console.warn("메시지 전송 실패 (ServerChatbox): STOMP Client 인스턴스가 없습니다.");
             } else if (!isConnected) {

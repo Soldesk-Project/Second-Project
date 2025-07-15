@@ -124,28 +124,36 @@ const GameChatbox = ({ gameroomNo, userNick, userNo }) => {
     }, [messages]);
 
     // 메시지 전송 함수
-    const sendGameMessage = () => {
+const sendGameMessage = () => {
+    if (stompClientInstanceRef.current && isConnected && messageInput.trim() && userNick && userNo !== undefined && userNo !== null && gameroomNo) {
+        const messageToSend = {
+            mType: 'GAME_CHAT',
+            mSender: userNick,
+            mSenderNo: userNo,
+            mContent: messageInput,
+            mTimestamp: Date.now(),
+            gameroomNo: gameroomNo
+        };
 
-
-        if (stompClientInstanceRef.current && isConnected && messageInput.trim() && userNick && userNo !== undefined && userNo !== null && gameroomNo) {
-            const now = new Date();
-            const timestamp = now.getFullYear() + '-' +
-                                String(now.getMonth() + 1).padStart(2, '0') + '-' +
-                                String(now.getDate()).padStart(2, '0') + ' ' +
-                                String(now.getHours()).padStart(2, '0') + ':' +
-                                String(now.getMinutes()).padStart(2, '0') + ':' +
-                                String(now.getSeconds()).padStart(2, '0');
-
-            stompClientInstanceRef.current.send(`/app/gameChat.sendMessage/${gameroomNo}`, {}, JSON.stringify({
-                mType: 'GAME_CHAT', // 서버와 맞춰야 함
-                mSender: userNick,
-                mSenderNo: userNo,
-                mContent: messageInput,
-                mTimestamp: Date.now(),
-                gameroomNo: gameroomNo // 서버에서 게임방 번호를 받을 수 있도록
+        if (isWhisperMode && whisperTarget.trim()) {
+            stompClientInstanceRef.current.send("/app/whisperChat.sendMessage", {}, JSON.stringify({
+                ...messageToSend,
+                mType: 'WHISPER_CHAT',
+                mReceiver: whisperTarget,
             }));
-            setMessageInput('');
+            setMessages(prevMessages => [...prevMessages, {
+                ...messageToSend,
+                mType: 'WHISPER_CHAT',
+                mReceiver: whisperTarget
+            }]);
         } else {
+            stompClientInstanceRef.current.send(`/app/gameChat.sendMessage/${gameroomNo}`, {}, JSON.stringify(messageToSend));
+            // 보낸 게임방 메시지를 즉시 로컬 상태에 추가하여 화면에 표시
+            setMessages(prevMessages => [...prevMessages, messageToSend]);
+        }
+
+        setMessageInput('');
+    } else {
             if (!stompClientInstanceRef.current) {
                 console.warn("메시지 전송 실패 (GameChatbox): STOMP Client 인스턴스가 없습니다.");
             } else if (!isConnected) {
