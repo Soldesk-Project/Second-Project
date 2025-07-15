@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useRef } from 'react';
+import React, { useEffect, useState, useContext, useRef, useCallback } from 'react';
 import Test from '../../components/Test';
 import styles from '../../css/Inplay.module.css';
 import { useSelector } from 'react-redux';
@@ -48,6 +48,7 @@ const InPlay = () => {
   // 랭크 진입 경로 일 때도 항상 gameMode를 제대로 받게 한다
   const gameMode = location.state?.gameMode || location.state?.game_mode || 'normal';
   const rankedUsers = getRankedUsers(users);
+  const messageTimeoutRef = useRef({});
   
   // 소켓
   const sockets = useContext(WebSocketContext);
@@ -55,6 +56,47 @@ const InPlay = () => {
   // 방장 여부
   const isOwner = users.some(u => u.userNick === userNick && u.isOwner);
 
+  // 사용자별 최근 채팅 메시지를 저장할 상태
+  const [userRecentChats, setUserRecentChats] = useState({});
+
+  // GameChatbox로부터 새 메시지를 받을 콜백 함수
+  const handleNewChatMessage = useCallback((chatMessage) => {
+    if (chatMessage.mSender && chatMessage.mContent) {
+      //1. 새로운 내용으로 말풍선 업데이트
+      setUserRecentChats(prev => ({
+        ...prev,
+        [chatMessage.mSender]: {
+          message: chatMessage.mContent,
+          timestamp: chatMessage.mTimestamp
+        }
+      }));
+
+      //2. 기존 타이머 취소
+      if (messageTimeoutRef.current[chatMessage.mSender]) {
+        clearTimeout(messageTimeoutRef.current[chatMessage.mSender]);
+      }
+
+      // 3. 새로운 타이머 설정
+      const timerId = setTimeout(() => {
+        setUserRecentChats(prev => {
+          const newState = { ...prev };
+          // ⭐ 중요: 타이머가 만료될 때, 해당 메시지가 여전히 해당 유저의 최신 메시지인지 확인
+          // (그 사이에 같은 유저가 다른 메시지를 보내면 이전 메시지를 지우지 않음)
+          if (newState[chatMessage.mSender] && newState[chatMessage.mSender].timestamp === chatMessage.mTimestamp) {
+            delete newState[chatMessage.mSender];
+          }
+          return newState;
+        });
+        // 타이머가 실행된 후에는 ref에서도 해당 타이머 ID 제거
+        delete messageTimeoutRef.current[chatMessage.mSender]; 
+      }, 5000); // 마지막 메시지 출력 후 5초 뒤에 사라짐
+
+      // 4. 새로 설정된 타이머 ID를 useRef에 저장
+      messageTimeoutRef.current[chatMessage.mSender] = timerId;
+    }
+  }, []);
+
+  // 문제 데이터
   useEffect(() => {
     const socket = sockets['room'];
     if (!socket) return;
@@ -325,7 +367,7 @@ const InPlay = () => {
           </div>
           <div className={styles.chat_box}>
             {userNick && userNo != null && roomNo ? (
-              <GameChatbox gameroomNo={roomNo} userNick={userNick} userNo={userNo} />
+              <GameChatbox gameroomNo={roomNo} userNick={userNick} userNo={userNo} onNewMessage={handleNewChatMessage}/>
             ) : (
               <p>채팅을 로드할 수 없습니다. 사용자 정보 또는 게임방 번호를 확인 중...</p>
             )}
@@ -341,6 +383,11 @@ const InPlay = () => {
                     <span className={styles.nick}>{userNick}</span>
                     <span className={styles.score}>점수: {score ?? 0}</span>
                   </div>
+                  {userRecentChats[userNick] && (
+                    <div className={styles.chatBubble}>
+                      {userRecentChats[userNick].message}
+                    </div>
+                  )}
                 </div>
               ))
             ) : (
@@ -351,7 +398,7 @@ const InPlay = () => {
         {
           result &&
             <ResultModal users={rankedUsers}
-                          setResult={setResult}/>
+              setResult={setResult}/>
         }
       </div>
     </div>
