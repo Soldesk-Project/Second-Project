@@ -24,12 +24,12 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
+
 @Controller
 public class ChatController {
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
-    
     private static final Queue<String> serverChatLogQueue = new ConcurrentLinkedQueue<>();
     private static final ConcurrentHashMap<Long, ConcurrentLinkedQueue<String>> gameChatQueues = new ConcurrentHashMap<>();
     private String logDirectoryPath;

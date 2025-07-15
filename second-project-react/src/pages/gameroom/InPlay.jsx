@@ -5,6 +5,28 @@ import { useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { WebSocketContext } from '../../util/WebSocketProvider';
 import GameChatbox from '../../components/chatbox/GameChatbox';
+import ResultModal from '../../components/modal/ResultModal';
+
+const getRankedUsers = (users) => {
+  const sorted = [...users].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+  let rank = 0;
+  let lastScore = null;
+  let realRank = 0;
+
+  const pointsMap = { 1: 40, 2: 30, 3: 20, 4: 10 };
+  return sorted.map((user, idx) => {
+    realRank++;
+    if (user.score !== lastScore) {
+      rank = realRank;
+      lastScore = user.score;
+    }
+    return {
+      ...user,
+      rank,
+      point: pointsMap[rank] ?? 10,
+    };
+  });
+};
 
 const InPlay = () => {
   const [play, setPlay] = useState(false);
@@ -13,6 +35,7 @@ const InPlay = () => {
   const [nextId, setNextId] = useState(0);
   const [time, setTime] = useState('타이머');
   const [score, setScore] = useState(0);
+  const [result, setResult] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const questionListRef = useRef([]);
   const { roomNo } = useParams();
@@ -24,6 +47,7 @@ const InPlay = () => {
   const category = location.state?.category || 'random';
   // 랭크 진입 경로 일 때도 항상 gameMode를 제대로 받게 한다
   const gameMode = location.state?.gameMode || location.state?.game_mode || 'normal';
+  const rankedUsers = getRankedUsers(users);
   
   // 소켓
   const sockets = useContext(WebSocketContext);
@@ -80,7 +104,10 @@ const InPlay = () => {
           questionListRef.current = data.list;
           setQuestion(data.list[0]);
           setPlay(true);
-          setScore(0);
+          setResult(false);
+          setUsers(users => users.map(u => ({
+            ...u,
+            score: 0})));
           setTime(5);
         } else {
           console.error("질문 리스트가 유효하지 않습니다. 데이터:", data.list);
@@ -112,6 +139,7 @@ const InPlay = () => {
           setQuestion({ ...questionListRef.current[nextId] });
         } else {
           setPlay(false);
+          setResult(true);
           setTime('타이머');
         }
       }
@@ -263,30 +291,36 @@ const InPlay = () => {
                 <span className={styles.timer}>{time}</span>
               </div>
               <div className={styles.initiatorBtn}>
-                {play ? (
-                  <>
-                    <button onClick={start} disabled={true}>시작</button>
-                    <button onClick={stop} disabled={true}>중지</button>
-                    <button onClick={leaveRoom} className={styles.leaveBtn} disabled={true}>나가기</button>
-                  </>
-                ) : (
-                  <>
-                    <button onClick={start} disabled={!isOwner}>시작</button>
-                    <button onClick={stop} disabled={!isOwner}>중지</button>
-                    <button onClick={leaveRoom} className={styles.leaveBtn}>나가기</button>
-                  </>
-                )}
+                {
+                  (play||result)?(
+                    <>
+                      <button onClick={start} disabled={true}>시작</button>
+                      <button onClick={stop} disabled={true}>중지</button>
+                      <button onClick={leaveRoom} className={styles.leaveBtn} disabled={true}>나가기</button>
+                    </>
+                  ):(
+                    <>  
+                      <button onClick={start} disabled={!isOwner}>시작</button>
+                      <button onClick={stop} disabled={!isOwner}>중지</button>
+                      <button onClick={leaveRoom} className={styles.leaveBtn}>나가기</button>
+                    </>
+                  )
+                }
               </div>
-              {!isOwner && !play &&
-                <p className={styles.note}>방장만 게임을 시작/중지할 수 있습니다</p>
+              {!isOwner && ( !play && 
+                <p className={styles.note}>방장만 게임을 시작/중지할 수 있습니다</p>)
               }
               <div className={styles.gamePlay}>
-                {play ? 
+                {
+                  play ? 
                   <Test question={question} 
                         nextId={nextId}
-                        onSelectAnswer={setSelectedAnswer}
-                        selectedAnswer={selectedAnswer}/> : <h2>대기중</h2>}
+                        onSelectAnswer={setSelectedAnswer} // 추가!
+                        selectedAnswer={selectedAnswer}/> : 
+                  <h2>대기중</h2>
+                }
               </div>
+              <button onClick={()=>setResult(true)}>결과창확인</button>
             </div>
           </div>
           <div className={styles.chat_box}>
@@ -314,6 +348,11 @@ const InPlay = () => {
             )}
           </div>
         </div>
+        {
+          result &&
+            <ResultModal users={rankedUsers}
+                          setResult={setResult}/>
+        }
       </div>
     </div>
   );

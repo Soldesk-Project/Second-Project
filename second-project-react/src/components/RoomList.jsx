@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import ModalBasic from './ModalBasic';
+import ModalBasic from './modal/ModalBasic';
 import MatchModal from './MatchModal';
 import axios from 'axios';
 import styles from '../css/RoomList.module.css';

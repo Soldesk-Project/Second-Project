@@ -40,7 +40,7 @@ const ExamOMRViewer = ({question, onSelectAnswer, selectedAnswer, nextId}) => {
 
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1200px', margin: '100px' }}>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: 'auto 100px' }}>
       {currentQuestion ? (
         <div style={{ marginBottom: '40px',  paddingBottom: '20px' }}>
           <h3>{nextId+1}. {currentQuestion.question_text}</h3>

@@ -574,9 +574,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     
     
     
-    
-    
-    
 	/*
 	 * private void autoStart(String roomNo) {
 	 * System.out.println("⏳ [랭크 자동 시작 예약] 10초 후 시작 - roomNo: " + roomNo);
