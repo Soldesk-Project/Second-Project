@@ -57,8 +57,6 @@ function App() {
           <Route path="/kakao/callback" element={<KakaoCallback />} />
           <Route path="/main/:serverNo" element={<MainPage />} />
           <Route path="/shop" element={<Shop />} />
-          <Route path="/achievements" element={<Achievements />} />
-          <Route path="/itemBook" element={<ItemBook />} />
           <Route path="/gameRoom/:roomNo" element={<InPlay />} />
           <Route path="/inquiries" element={<CustomerServiceCenter />} />
           <Route path="/inquiry" element={<CustomerCenterNew />} />

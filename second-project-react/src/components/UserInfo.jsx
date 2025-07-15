@@ -153,11 +153,6 @@ const UserInfo = () => {
         </div>
 
       <InventoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div style={{textAlign: 'center'}}>닉네임 : {user.user_nick}</div>
-        <div style={{textAlign: 'center'}}>티어 : {renderTier()}</div>
-        <div style={{textAlign: 'center'}}>칭호 : {titleTextMap[user.title_class_name]}</div>
-        <div style={{textAlign: 'center'}}>정답률 : </div>
-
         <div role="tablist" className={styles.subTabContainer}>
           <div className={styles.subTabLeft}>
             {TABS.map((tab) => (
