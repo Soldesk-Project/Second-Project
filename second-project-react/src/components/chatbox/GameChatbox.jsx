@@ -57,7 +57,7 @@ const GameChatbox = ({ gameroomNo, userNick, userNo }) => {
 
         // 게임방 전용 STOMP 엔드포인트 사용
         const socket = new SockJS('http://192.168.0.112:9099/ws-game-chat');
-        //const socket = new SockJS('http://localhost:9099/ws-game-chat');
+        // const socket = new SockJS('http://localhost:9099/ws-game-chat');
         const client = Stomp.over(() => socket);
         client.debug = () => {};  // 아무 출력도 하지 않음
 
@@ -149,8 +149,6 @@ const sendGameMessage = () => {
             }]);
         } else {
             stompClientInstanceRef.current.send(`/app/gameChat.sendMessage/${gameroomNo}`, {}, JSON.stringify(messageToSend));
-            // 보낸 게임방 메시지를 즉시 로컬 상태에 추가하여 화면에 표시
-            setMessages(prevMessages => [...prevMessages, messageToSend]);
         }
 
         setMessageInput('');

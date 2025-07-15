@@ -154,8 +154,6 @@ const ServerChatbox = () => {
         } else {
             messageToSend.mType = 'SERVER_CHAT';
             stompClientInstanceRef.current.send("/app/serverChat.sendMessage", {}, JSON.stringify(messageToSend));
-            // 보낸 메시지를 즉시 로컬 상태에 추가하여 화면에 표시
-            setMessages(prevMessages => [...prevMessages, messageToSend]);
         }
         setMessageInput('');
     } else {

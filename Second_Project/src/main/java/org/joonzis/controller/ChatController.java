@@ -95,7 +95,9 @@ public class ChatController {
 
  // 게임 채팅방 메시지 전송
     @MessageMapping("/gameChat.sendMessage/{gameroomNo}")
-    public void gameSendMessage(@Payload ChatRoomDTO chatRoomDTO, @org.springframework.web.bind.annotation.PathVariable("gameroomNo") Long gameroomNo) {
+    public void gameSendMessage(@Payload ChatRoomDTO chatRoomDTO) {
+    	Long gameroomNo = chatRoomDTO.getGameroomNo();
+    	
     	System.out.println("--- GameChat: 메시지 수신됨 (룸 " + gameroomNo + ") ---");
         System.out.println("Sender: " + chatRoomDTO.getMSender());
         System.out.println("Content: " + chatRoomDTO.getMContent());
@@ -114,7 +116,6 @@ public class ChatController {
     // 게임 채팅방 입장
     @MessageMapping("/gameChat.addUser/{gameroomNo}")
     public void gameAddUser(@Payload ChatRoomDTO chatRoomDTO,
-    		//@org.springframework.web.bind.annotation.PathVariable("gameroomNo") Long gameroomNo,
     		SimpMessageHeaderAccessor headerAccessor) {
     	 Long gameroomNo = chatRoomDTO.getGameroomNo();
     	
@@ -124,14 +125,17 @@ public class ChatController {
         ConcurrentLinkedQueue<String> queue = gameChatQueues.computeIfAbsent(gameroomNo, k -> new ConcurrentLinkedQueue<>());
         String logMessage = "[게임방 " + gameroomNo + "] " + chatRoomDTO.getMSender() + "님이 입장했습니다.";
         queue.offer(logMessage); // 해당 게임방 큐에 추가
+        
+        chatRoomDTO.setMType(ChatRoomDTO.MessageType.GAME_JOIN);
+        chatRoomDTO.setMContent(chatRoomDTO.getMSender() + "님이 입장했습니다");
+        chatRoomDTO.setMTimestamp(System.currentTimeMillis());
+        
         simpMessagingTemplate.convertAndSend("/gameChat/" + gameroomNo, chatRoomDTO);
     }
 
     // 게임 채팅방 퇴장
     @MessageMapping("/gameChat.leaveUser/{gameroomNo}")
-    public void gameLeaveUser(@Payload ChatRoomDTO chatRoomDTO
-    		//@org.springframework.web.bind.annotation.PathVariable("gameroomNo") Long gameroomNo
-    		) {
+    public void gameLeaveUser(@Payload ChatRoomDTO chatRoomDTO) {
     	Long gameroomNo = chatRoomDTO.getGameroomNo();
     	
         // 해당 게임방의 큐를 가져오거나 없으면 새로 생성
@@ -158,6 +162,7 @@ public class ChatController {
     
     // 스케줄된 로그 저장 
     @Scheduled(fixedRate = 3600000)
+//    @Scheduled(fixedRate = 60000)
     public void saveScheduledLogs() {
         System.out.println("DEBUG: " + getClass().getName() + " - Before saving scheduled logs: serverChatLogQueue size = " + serverChatLogQueue.size());
         if (!serverChatLogQueue.isEmpty()) {
