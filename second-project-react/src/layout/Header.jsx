@@ -7,26 +7,34 @@ import { clearUser, clearServer } from '../store/userSlice';
 
 const Header = () => {
   const server = useSelector((state) => state.user.server);
-  const nav=useNavigate();
+  const nav = useNavigate();
   const dispatch = useDispatch();
 
-  const clickToGoMain=()=>{
-    nav('/main/'+ server);
-  }
-  const clickToGo=(e)=>{
+  const clickToGoMain = () => {
+    nav(`/main/${server}`); // RoomList로 이동
+  };
+
+  const clickToGo = (e) => {
     const name = e.target.dataset.name;
-    // console.log('navigate to:', name);
-    nav(`/${name}`);
-  }
+
+    if (name === 'itemBook' || name === 'achievements') {
+      nav(`/main/${server}?page=${name}`);
+    } else {
+      nav(`/${name}`); // shop, inquiries 등은 별도 라우트
+    }
+  };
+
   const serverOut=()=>{
     dispatch(clearServer());
     nav('/server');   
   }
+
   const logOut=()=>{
     dispatch(clearUser());
     localStorage.clear(); 
     nav('/');  
   }
+  
   return (
     <div className='header'>
       <div className='header-box-left'>
