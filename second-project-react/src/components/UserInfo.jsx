@@ -99,10 +99,58 @@ const UserInfo = () => {
             return () => { socket.removeEventListener('message', handleMessage); };
         }, [socket]);
 
+    // 2) 사용자 통계 가져오기
+        const [stats, setStats] = useState(null);
+        useEffect(() => {
+            if (!user.user_no) return;
+            axios
+            .get(`/api/users/${user.user_no}/stats`)
+            .then(res => setStats(res.data))
+            .catch(err => console.error(err));
+        }, [user.user_no]);    
+
+    // 2) 퍼센트 계산
+    // --- 퍼센트 계산 (통계가 로딩되지 않았으면 0으로)
+        const expPercent = stats
+            ? Math.floor((stats.exp / stats.nextExp) * 100)
+            : 0;
+        const answerPercent = stats && stats.totalCount > 0
+            ? Math.floor((stats.correctCount / stats.totalCount) * 100)
+            : 0;
+
   return (
     <div>
-      <h1>유저 정보쪽</h1>
-      <button style={openButtonStyle} onClick={() => setIsModalOpen(true)}>Inventory</button>
+        <div className={styles.userInfo_Box}>
+            <div className={styles.userInfo_Box_1}>
+            <img src='/images/womenProfileTest.png' alt='프로필' style={{ width: `120px`, height: `120px`}}/>
+            <div className={styles.userInfo_Name}>
+                <p>{user.user_nick}</p>
+                <p>{renderTier()}</p>
+            </div>
+            </div>
+            <div className={styles.bar_set}>
+                {/* 경험치 바 */}
+                <div className={styles.progressLine}>
+                    <div
+                    className={styles.progressFill}
+                    style={{ width: `${expPercent}%` }}
+                    />
+                </div>
+                <div className={styles.label}>{expPercent}% 경험치</div>
+
+                {/* 정답률 바 */}
+                <div className={styles.progressLine}>
+                    <div
+                    className={styles.progressFill}
+                    style={{ width: `${answerPercent}%` }}
+                    />
+                </div>
+                <div className={styles.label}>{answerPercent}% 정답률</div>
+            </div>
+        </div>
+        <div className={styles.invenBtn}>
+            <button style={openButtonStyle} onClick={() => setIsModalOpen(true)}>Inventory</button>
+        </div>
 
       <InventoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div style={{textAlign: 'center'}}>닉네임 : {user.user_nick}</div>
