@@ -3,41 +3,15 @@ import Loading from './Loading';
 
 const ExamOMRViewer = ({question, onSelectAnswer, selectedAnswer, nextId}) => {
   const [currentQuestion, setCurrentQuestion] = useState(null);
-
-  // console.log(nextId); 
   
   useEffect(()=>{
     setCurrentQuestion(question);
   }, [question])
 
-  // const handleSubmit = () => {
-  //   if (!selectedAnswer) {
-  //     alert("답안을 선택하세요.");
-  //     return;
-  //   }
-  //   // const correct = currentQuestion.correct_answer === parseInt(selectedAnswer);
-  //   // setIsCorrect(correct);
-  //   // setShowResult(true);
-  //   console.log(selectedAnswer);
-  // };
 
   const handleChange = (e) => {
     onSelectAnswer(e.target.value);
   };
-
-
-
-  useEffect(() => {
-    // 문제 바뀌면 선택 초기화
-    onSelectAnswer(null);
-  }, [question, onSelectAnswer]);
-
-
-
-
-
-
-
 
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: 'auto 100px' }}>

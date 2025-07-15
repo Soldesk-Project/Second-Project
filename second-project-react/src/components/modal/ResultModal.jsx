@@ -22,8 +22,11 @@ import styles from '../../css/ResultModal.module.css';
 //   });
 // };
 
-const ResultModal = ({users, setResult}) => {
+const ResultModal = ({users, setResult, gameMode}) => {
   // const rankedUsers = getRankedUsers(users);
+
+  console.log(gameMode);
+  
 
   const close=()=>{
     setResult(false);
@@ -39,11 +42,12 @@ const ResultModal = ({users, setResult}) => {
             <th>점수</th>
             <th>정답율</th>
             <th>포인트</th>
+            {gameMode === 'rank' && <th>랭크점수</th>}
           </tr>
         </thead>
         <tbody>
           {users.length > 0 ? (
-            users.map(({ userNick, userNo, isOwner, score, rank, point }) => (                
+            users.map(({ userNick, userNo, isOwner, score, rank, point, rankPoint }) => (                
               <tr key={userNo}>
                 <td>{isOwner ? '[방장]':'[유저]'}</td>
                 <td>{rank}</td>
@@ -51,6 +55,7 @@ const ResultModal = ({users, setResult}) => {
                 <td>{score ?? 0}</td>
                 <td>{score ? `${score*5}%` : '0'}</td>
                 <td>+{point}</td>
+                {gameMode === 'rank' && <td>{rankPoint ?? '-'}</td>}
               </tr>
             ))
           ) : (

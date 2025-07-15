@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styles from '../css/MatchModal.module.css';
+import styles from '../../css/MatchModal.module.css';
 
 const MatchModal = ({ socket, currentUserId, setShowMatchModal, setMatchStatus }) => {
   const [secondsLeft, setSecondsLeft] = useState(10);

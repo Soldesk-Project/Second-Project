@@ -458,7 +458,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             "initiator", userNick,
             "nextId", nextId
         );
-        broadcast(server, payload);
+        broadcast(broadcastServer, payload);
     }
 
     
@@ -493,7 +493,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		);
         
         
-        broadcast(server, payload);
+        broadcast(broadcastServer, payload);
     }
     
     private void broadcastUserList(String server) {

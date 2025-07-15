@@ -7,13 +7,17 @@ import { WebSocketContext } from '../../util/WebSocketProvider';
 import GameChatbox from '../../components/chatbox/GameChatbox';
 import ResultModal from '../../components/modal/ResultModal';
 
-const getRankedUsers = (users) => {
+const getRankedUsers = (users, gameMode) => {
   const sorted = [...users].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
   let rank = 0;
   let lastScore = null;
   let realRank = 0;
 
+  // 게임 내 재화(포인트)
   const pointsMap = { 1: 40, 2: 30, 3: 20, 4: 10 };
+  // 랭크 점수
+  const rankPointMap = { 1: 20, 2: 10, 3: -10, 4: -20 };
+
   return sorted.map((user, idx) => {
     realRank++;
     if (user.score !== lastScore) {
@@ -23,7 +27,8 @@ const getRankedUsers = (users) => {
     return {
       ...user,
       rank,
-      point: pointsMap[rank] ?? 10,
+      point: pointsMap[rank] ?? 10, // 게임 내 재화
+      ...(gameMode === "rank" && { rankPoint: rankPointMap[rank] ?? -20 }) // 랭크 점수
     };
   });
 };
@@ -114,9 +119,6 @@ const InPlay = () => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data);
-      
-
       // ✅ 유저리스트(랭크 & 일반) 모두 처리
       if (
         data.type === 'roomUserList' && data.roomNo === roomNo &&
@@ -131,7 +133,6 @@ const InPlay = () => {
           userNo: no,
           isOwner: nick === ownerNick
         }));
-        console.log(formattedUsers);
         
         setUsers(formattedUsers);
       }
@@ -219,31 +220,25 @@ const InPlay = () => {
       const timer = setInterval(() => {
         setTime((prev) => prev - 1);
       }, 1000);
-      if(time <= 0) {
-        handleAnswerSubmit(selectedAnswer);
-        const socket = sockets['room'];
-        if (socket && socket.readyState === 1) {
-          socket.send(JSON.stringify({
-            action: 'nextQuestion',
-            server,
-            roomNo,
-            userNick,
-            game_mode: gameMode
-          }));
-        } else {
-          alert('웹소켓 연결이 준비되지 않았습니다 - nextQuestion');
-        }
-        setTime(6);
+
+      if (time <= 0) {
+        // 요청 시점만 로그
+        //console.log(`[${userNick}] nextQuestion 요청 보냄 at ${new Date().toLocaleTimeString()}`);
+
+        handleAnswerSubmit(selectedAnswer, question);
       }
-      return () => clearInterval(timer);
+
+      return () => clearInterval(timer,);
     }
   }, [time, play]);
 
   // 정답 판단
-  const handleAnswerSubmit = (answer) => {
-    const isCorrect = question && question.correct_answer === parseInt(answer);
+  const handleAnswerSubmit = (answer, targetQuestion) => {
+
+    //console.log(`[${userNick}] 정답 판정! 선택 답: ${answer} (정답: ${targetQuestion?.correct_answer}) at ${new Date().toLocaleTimeString()}`);
+    const isCorrect = targetQuestion  && targetQuestion.correct_answer === parseInt(answer);
+    const socket = sockets['room'];
     if (isCorrect){
-      const socket = sockets['room'];
       if (socket && socket.readyState === 1) {
         socket.send(JSON.stringify({
           action: 'sumScore',
@@ -254,7 +249,19 @@ const InPlay = () => {
         }));
       } else {
         alert('웹소켓 연결이 준비되지 않았습니다 - score');
-      }
+      } 
+    }
+    if (socket && socket.readyState === 1) {
+      socket.send(JSON.stringify({
+        action: 'nextQuestion',
+        server,
+        roomNo,
+        userNick,
+        game_mode: gameMode
+      }));
+      setTime(6);    
+    } else {
+      alert('웹소켓 연결이 준비되지 않았습니다 - nextQuestion');
     }
     setSelectedAnswer(null);
   };
@@ -398,7 +405,8 @@ const InPlay = () => {
         {
           result &&
             <ResultModal users={rankedUsers}
-              setResult={setResult}/>
+              setResult={setResult}
+              gameMode={gameMode}/>
         }
       </div>
     </div>
