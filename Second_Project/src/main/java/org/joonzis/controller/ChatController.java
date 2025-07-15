@@ -1,32 +1,35 @@
 package org.joonzis.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.joonzis.domain.ChatRoomDTO;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.joonzis.domain.ChatRoomDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Controller;
+
 
 @Controller
 public class ChatController {
 
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
-
     private static final Queue<String> serverChatLogQueue = new ConcurrentLinkedQueue<>();
     private static final ConcurrentHashMap<Long, ConcurrentLinkedQueue<String>> gameChatQueues = new ConcurrentHashMap<>();
     private String logDirectoryPath;
@@ -68,17 +71,24 @@ public class ChatController {
     
     // 서버 공지 메시지 전송 (전체 공통 채팅방용)
     @MessageMapping("/serverChat.sendMessage")
-    public void serverSendMessage(ChatRoomDTO chatRoomDTO) {
+    public void serverSendMessage(@Payload ChatRoomDTO chatRoomDTO) {
+    	System.out.println("--- ServerChat: 메시지 수신됨 ---");
+        System.out.println("Sender: " + chatRoomDTO.getMSender());
+        System.out.println("Content: " + chatRoomDTO.getMContent());
+        System.out.println("Type: " + chatRoomDTO.getMType()); // ★ 중요: GAME_CHAT 또는 SERVER_CHAT인지 확인
+        System.out.println("Timestamp: " + chatRoomDTO.getMTimestamp()); // ★ 중요: 유효한 Long 값인지 확인
+        System.out.println("----------------------------");
         // 메시지 큐에 추가
         serverChatLogQueue.offer(chatRoomDTO.getMSender() + ": " + chatRoomDTO.getMContent());
         
         // STOMP를 통해 구독자에게 메시지 전송
-        simpMessagingTemplate.convertAndSend("/topic/public", chatRoomDTO);
+        simpMessagingTemplate.convertAndSend("/serverChat/public", chatRoomDTO);
+        System.out.println("DEBUG: serverChat/public 토픽으로 메시지 발행 시도 완료.");
     }
     
     // 귓속말 메시지 전송 (개인 채팅)
     @MessageMapping("/whisperChat.sendMessage")
-    public void sendWhisperMessage(ChatRoomDTO chatRoomDTO) {
+    public void sendWhisperMessage(@Payload ChatRoomDTO chatRoomDTO) {
         // 귓속말은 파일에 저장하지 않는다고 가정. 필요시 별도 큐 사용
         // simpMessagingTemplate.convertAndSendToUser(chatRoomDTO.getMReceiver(), "/queue/private", chatRoomDTO);
         simpMessagingTemplate.convertAndSendToUser(chatRoomDTO.getMReceiver(), "/private", chatRoomDTO);
@@ -87,34 +97,54 @@ public class ChatController {
 
  // 게임 채팅방 메시지 전송
     @MessageMapping("/gameChat.sendMessage/{gameroomNo}")
-    public void gameSendMessage(ChatRoomDTO chatRoomDTO, @org.springframework.web.bind.annotation.PathVariable("gameroomNo") Long gameroomNo) {
-        // 해당 게임방의 큐를 가져오거나 없으면 새로 생성
+    public void gameSendMessage(@Payload ChatRoomDTO chatRoomDTO) {
+    	Long gameroomNo = chatRoomDTO.getGameroomNo();
+    	
+    	System.out.println("--- GameChat: 메시지 수신됨 (룸 " + gameroomNo + ") ---");
+        System.out.println("Sender: " + chatRoomDTO.getMSender());
+        System.out.println("Content: " + chatRoomDTO.getMContent());
+        System.out.println("Type: " + chatRoomDTO.getMType()); // ★ 중요: GAME_CHAT인지 확인
+        System.out.println("Timestamp: " + chatRoomDTO.getMTimestamp()); // ★ 중요: 유효한 Long 값인지 확인
+        System.out.println("------------------------------------");
+    	
+    	// 해당 게임방의 큐를 가져오거나 없으면 새로 생성
         ConcurrentLinkedQueue<String> queue = gameChatQueues.computeIfAbsent(gameroomNo, k -> new ConcurrentLinkedQueue<>());
         String logMessage = "[게임방 " + gameroomNo + "] " + chatRoomDTO.getMSender() + ": " + chatRoomDTO.getMContent();
         queue.offer(logMessage); // 해당 게임방 큐에 추가
-        simpMessagingTemplate.convertAndSend("/topic/game/" + gameroomNo, chatRoomDTO);
+        simpMessagingTemplate.convertAndSend("/gameChat/" + gameroomNo, chatRoomDTO);
+        System.out.println("DEBUG: /gameChat/" + gameroomNo + " 토픽으로 메시지 발행 시도 완료.");
     }
 
     // 게임 채팅방 입장
     @MessageMapping("/gameChat.addUser/{gameroomNo}")
-    public void gameAddUser(ChatRoomDTO chatRoomDTO, @org.springframework.web.bind.annotation.PathVariable("gameroomNo") Long gameroomNo, SimpMessageHeaderAccessor headerAccessor) {
-        headerAccessor.getSessionAttributes().put("username", chatRoomDTO.getMSender());
+    public void gameAddUser(@Payload ChatRoomDTO chatRoomDTO,
+    		SimpMessageHeaderAccessor headerAccessor) {
+    	 Long gameroomNo = chatRoomDTO.getGameroomNo();
+    	
+    	headerAccessor.getSessionAttributes().put("username", chatRoomDTO.getMSender());
         headerAccessor.getSessionAttributes().put("gameroomNo", gameroomNo);
         // 해당 게임방의 큐를 가져오거나 없으면 새로 생성
         ConcurrentLinkedQueue<String> queue = gameChatQueues.computeIfAbsent(gameroomNo, k -> new ConcurrentLinkedQueue<>());
         String logMessage = "[게임방 " + gameroomNo + "] " + chatRoomDTO.getMSender() + "님이 입장했습니다.";
         queue.offer(logMessage); // 해당 게임방 큐에 추가
-        simpMessagingTemplate.convertAndSend("/topic/game/" + gameroomNo, chatRoomDTO);
+        
+        chatRoomDTO.setMType(ChatRoomDTO.MessageType.GAME_JOIN);
+        chatRoomDTO.setMContent(chatRoomDTO.getMSender() + "님이 입장했습니다");
+        chatRoomDTO.setMTimestamp(System.currentTimeMillis());
+        
+        simpMessagingTemplate.convertAndSend("/gameChat/" + gameroomNo, chatRoomDTO);
     }
 
     // 게임 채팅방 퇴장
     @MessageMapping("/gameChat.leaveUser/{gameroomNo}")
-    public void gameLeaveUser(ChatRoomDTO chatRoomDTO, @org.springframework.web.bind.annotation.PathVariable("gameroomNo") Long gameroomNo) {
+    public void gameLeaveUser(@Payload ChatRoomDTO chatRoomDTO) {
+    	Long gameroomNo = chatRoomDTO.getGameroomNo();
+    	
         // 해당 게임방의 큐를 가져오거나 없으면 새로 생성
         ConcurrentLinkedQueue<String> queue = gameChatQueues.computeIfAbsent(gameroomNo, k -> new ConcurrentLinkedQueue<>());
         String logMessage = "[게임방 " + gameroomNo + "] " + chatRoomDTO.getMSender() + "님이 퇴장했습니다.";
         queue.offer(logMessage); // 해당 게임방 큐에 추가
-        simpMessagingTemplate.convertAndSend("/topic/game/" + gameroomNo, chatRoomDTO);
+        simpMessagingTemplate.convertAndSend("/gameChat/" + gameroomNo, chatRoomDTO);
     }
 
     public void addServerLeaveMessageToQueue(String sender) {
@@ -134,6 +164,7 @@ public class ChatController {
     
     // 스케줄된 로그 저장 
     @Scheduled(fixedRate = 3600000)
+//    @Scheduled(fixedRate = 60000)
     public void saveScheduledLogs() {
         System.out.println("DEBUG: " + getClass().getName() + " - Before saving scheduled logs: serverChatLogQueue size = " + serverChatLogQueue.size());
         if (!serverChatLogQueue.isEmpty()) {

@@ -66,8 +66,15 @@ const ServerChatbox = () => {
 
             // 공개 채팅방 구독
             client.subscribe('/serverChat/public', message => {
-                const receivedMessage = JSON.parse(message.body);
-                setMessages(prevMessages => [...prevMessages, receivedMessage]);
+                try{
+                    const receivedMessage = JSON.parse(message.body);
+                    console.log("🟢 ServerChatbox: 수신된 공개 채팅 메시지:", receivedMessage);
+                    console.log("🟢 ServerChatbox: setMessages 호출 전 prevMessages:", messages);
+                    setMessages(prevMessages => [...prevMessages, receivedMessage]);
+                } catch (e){
+                    console.error("🚫 ServerChatbox: 메시지 파싱 오류:", e, "원본 메시지:", message.body);
+                }
+                
             });
 
             // 귓속말 채팅방 구독
@@ -126,36 +133,30 @@ const ServerChatbox = () => {
 
     // 메시지 전송 함수
     const sendMessage = () => {
+    if (stompClientInstanceRef.current && isConnected && messageInput.trim() && userNick && userNo !== undefined && userNo !== null) {
+        const messageToSend = {
+            mSender: userNick,
+            mSenderNo: userNo,
+            mContent: messageInput,
+            mTimestamp: Date.now()
+        };
 
-        if (stompClientInstanceRef.current && isConnected && messageInput.trim() && userNick && userNo !== undefined && userNo !== null) {
-            const now = new Date();
-            // const timestamp = now.getFullYear() + '-' +
-            //                     String(now.getMonth() + 1).padStart(2, '0') + '-' +
-            //                     String(now.getDate()).padStart(2, '0') + ' ' +
-            //                     String(now.getHours()).padStart(2, '0') + ':' +
-            //                     String(now.getMinutes()).padStart(2, '0') + ':' +
-            //                     String(now.getSeconds()).padStart(2, '0');
+        if (isWhisperMode && whisperTarget.trim()) {
+            messageToSend.mType = 'WHISPER_CHAT';
+            messageToSend.mReceiver = whisperTarget;
 
-            if (isWhisperMode && whisperTarget.trim()) {
-                stompClientInstanceRef.current.send("/app/whisperChat.sendMessage", {}, JSON.stringify({
-                    mType: 'WHISPER_CHAT',
-                    mSender: userNick,
-                    mSenderNo: userNo,
-                    mContent: messageInput,
-                    mReceiver: whisperTarget,
-                    mTimestamp: Date.now()
-                }));
-            } else {
-                stompClientInstanceRef.current.send("/app/serverChat.sendMessage", {}, JSON.stringify({
-                    mType: 'SERVER_CHAT',
-                    mSender: userNick,
-                    mSenderNo: userNo,
-                    mContent: messageInput,
-                    mTimestamp: Date.now()
-                }));
-            }
-            setMessageInput('');
+            stompClientInstanceRef.current.send("/app/whisperChat.sendMessage", {}, JSON.stringify(messageToSend));
+            // 귓속말은 자신에게도 바로 표시되도록 추가
+            setMessages(prevMessages => [...prevMessages, {
+                ...messageToSend,
+                mReceiver: whisperTarget
+            }]);
         } else {
+            messageToSend.mType = 'SERVER_CHAT';
+            stompClientInstanceRef.current.send("/app/serverChat.sendMessage", {}, JSON.stringify(messageToSend));
+        }
+        setMessageInput('');
+    } else {
             if (!stompClientInstanceRef.current) {
                 console.warn("메시지 전송 실패 (ServerChatbox): STOMP Client 인스턴스가 없습니다.");
             } else if (!isConnected) {

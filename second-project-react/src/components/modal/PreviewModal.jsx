@@ -59,7 +59,7 @@ const PreviewModal = ({ action, user, item, onClose, on_click }) => {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3>미리보기</h3>
+        <h4 style={{color: 'black'}}>미리보기</h4>
         <div
           className={[
             decoStyles[previewStyle.background_class_name],

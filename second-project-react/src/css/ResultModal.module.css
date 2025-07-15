@@ -1,0 +1,32 @@
+.modalContainer{
+  /* width: 500px; */
+  /* height: 300px; */
+  /* background-color: gray; */
+  position: absolute;
+  top: 40%;
+  left: 40%;
+  transform: translate(-50%, -50%);
+  /* border-radius: 15px; */
+  border: 1px solid blueviolet;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.modalClose{
+  display: flex;
+  justify-content: center;
+}
+.modalCloseBtn{
+  width: 60px;
+  height: 40px;
+  border: 1px solid white;
+  border-radius: 20px;
+  margin: 10px;
+  color: white;
+}
+.modalContainer table{
+  flex: 1;
+}
+.modalContainer th, .modalContainer td{
+  /* background-color: gray; */
+}

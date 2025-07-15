@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import ModalBasic from './ModalBasic';
+import ModalBasic from './modal/ModalBasic';
 import MatchModal from './MatchModal';
 import axios from 'axios';
 import styles from '../css/RoomList.module.css';
@@ -44,12 +44,13 @@ const RoomList = () => {
           socket.send(JSON.stringify({
             action: "joinRoom",
             roomNo: data.gameroom_no,
+            server: data.server,
             category: data.category,
             game_mode: data.game_mode,
             userNick
           }));
           
-          nav('/gameRoom/' + data.gameroom_no, { state: { category: data.category } });
+          nav('/gameRoom/' + data.gameroom_no, { state: { category: data.category, gameMode: data.game_mode } });
           break;
         default:
           break;
@@ -91,11 +92,11 @@ const RoomList = () => {
               action: "createRoom",
               title : "",
               category: "random",
+              server: data.server,
               gameroom_no: data.gameroom_no,
               game_mode : "rank",
               is_private : "N",
               limit : "4",
-              
               pwd : null
             };
             if (socket && socket.readyState === 1) {
@@ -107,13 +108,14 @@ const RoomList = () => {
             const joinData = {
               action: "joinRoom",
               roomNo: data.gameroom_no,
+              server: data.server,
               game_mode: "rank",
               category: "random",
               userNick: user.user_nick
             };
             if(socket && socket.readyState === 1){
               socket.send(JSON.stringify(joinData))
-              nav('/gameRoom/' + data.gameroom_no);
+              nav('/gameRoom/' + data.gameroom_no, {state : {gameMode : "rank"}});
             }
           }
           break;
@@ -190,7 +192,7 @@ const RoomList = () => {
           category: room.category,
           userNick
         }));
-        nav('/gameRoom/' + room.gameroom_no);
+        nav('/gameRoom/' + room.gameroom_no, {state : {gameMode : room.game_mode}});
       } else {
         alert("인원수가 가득 찼습니다");
       }

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDecoDTO;
+import org.joonzis.domain.UserRewardVO;
 import org.joonzis.service.UserService;
 import org.joonzis.websocket.ServerUserWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,5 +91,30 @@ public class UserController {
 	@GetMapping("/getItems")
 	public List<ItemVO> getInventory(@RequestParam("user_no") int user_no) {
 	    return service.getInventory(user_no);
+	}
+	
+	@GetMapping("/rewardStatus")
+	public UserRewardVO getRewardStatus(@RequestParam("user_no") int user_no) {
+	    return service.getRewardStatus(user_no);
+	}
+	
+	@PostMapping(value = "/reward", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> addReward(@RequestBody UserDecoUpdateDTO UserDecoUpdateDTO) {
+		boolean success = service.addReward(UserDecoUpdateDTO);
+	    if (success) {
+	        return ResponseEntity.ok("업데이트 성공");
+	    } else {	
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업데이트 실패");
+	    }
+	}
+	
+	@PostMapping(value = "/rewardUpdate", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> rewardUpdate(@RequestBody UserRewardVO UserRewardVO) {
+		boolean success = service.rewardUpdate(UserRewardVO);
+	    if (success) {
+	        return ResponseEntity.ok("업데이트 성공");
+	    } else {	
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업데이트 실패");
+	    }
 	}
 }

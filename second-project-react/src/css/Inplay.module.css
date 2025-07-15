@@ -87,8 +87,57 @@
   flex: 1;
 }
 
+/* 사용자 목록 아이템*/
+.user {
+    position: relative; /* 자식 요소인 chatBubble의 absolute 위치 지정을 위한 기준점 */
+    margin-bottom: 10px; /* 각 유저 아이템 간 간격 */
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column; /* 채팅 풍선이 사용자 정보 아래로 오도록 */
+    align-items: flex-start; /* 텍스트 정렬 */
+    color: white;
+}
 
 
+/* 화면 우측 말풍선*/
+.chatBubble {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #e0f7fa;
+    border: 1px solid #b2ebf2;
+    border-radius: 10px;
+    padding: 5px 10px;
+    font-size: 0.8em;
+    color: #333;
+    min-width: 80px;
+    max-width: 150px;
+    word-wrap: break-word;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+/* 말풍선 꼬리 */
+.chatBubble::after {
+    content: '';
+    position: absolute;
+    bottom: 100%; /* ★ 변경: 말풍선 위쪽으로 (꼬리가 위를 향하도록) */
+    left: 50%; /* 가운데 정렬을 위해 50% 이동 */
+    transform: translateX(-50%); /* 가운데 정렬 */
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #e0f7fa transparent; /* ★ 변경: 꼬리 색상 및 방향 */
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; display: none; }
+}
 
 /* Inplay css 추후 수정 --------------------------------------------- */
 .game_join_userList{
@@ -155,4 +204,44 @@ button:disabled {
 }
 .timer{
   margin-left: auto;
+}
+
+/* 게임 참여 유저 카드 스타일 (1열 세로 최대 4명) */
+.user_card {
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+/* 방장 / 유저 뱃지 */
+.role_badge {
+  font-size: 14px;
+  font-weight: bold;
+  color: #FFD700;
+  margin-right: 10px;
+}
+
+/* 유저 정보 묶음 */
+.user_info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.nick {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.score {
+  font-size: 14px;
+  color: #bbb;
 }

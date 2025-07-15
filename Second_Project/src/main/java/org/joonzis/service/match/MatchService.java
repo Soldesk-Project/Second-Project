@@ -135,6 +135,7 @@ public class MatchService {
                 matchSocketHandler.sendToUser(uid, Map.of(
                         "type", "MATCH_FOUND",
                         "gameroom_no", roomNo,
+                        "server", "rank",
                         "roomLeaderId", roomLeaderId
                 ));
                 redisTemplate.delete(GROUP_KEY_PREFIX + uid);

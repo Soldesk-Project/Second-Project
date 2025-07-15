@@ -74,5 +74,5 @@
     
     <bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"/>
     
-    <bean class="org.joonzis.websocket.StompWebSocketConfig"/> 
+    
 </beans>

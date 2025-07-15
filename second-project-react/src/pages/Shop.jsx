@@ -92,6 +92,7 @@ const Shop = () => {
     }
     if(user.user_point < item.item_price) return alert("point 부족!");
     fetchBuyItemInventory(item);
+    setSelectedItem(null);
   }
   return (
     <div className={styles.wrapper}>

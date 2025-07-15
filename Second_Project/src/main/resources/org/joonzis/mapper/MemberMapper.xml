@@ -24,7 +24,7 @@
     </select>
     
     <!-- 회원 포인트 조회 -->
-    <select id="getUserPoint" resultType="int">
+    <select id="getUserPoint" resultType="long">
     	SELECT USER_POINT
     	FROM USERS
     	WHERE USER_ID = #{user_id}

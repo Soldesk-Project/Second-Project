@@ -51,8 +51,8 @@ public class ShopController {
 	private UserService userservice;
 	
 	@GetMapping("/user/point")
-	public ResponseEntity<Integer> getUserPoint(@RequestParam("user_id") String user_id) {
-	    int point = memberservice.getUserPoint(user_id);
+	public ResponseEntity<Long> getUserPoint(@RequestParam("user_id") String user_id) {
+	    long point = memberservice.getUserPoint(user_id);
 	    return ResponseEntity.ok(point);
 	}
 	

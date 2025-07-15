@@ -1,7 +1,5 @@
 package org.joonzis.domain;
 
-import java.util.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,9 +11,11 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsersVO {
-	private int user_no, user_rank, user_play_count, user_1st_count;
-	private long user_point;
-	private String user_nick, user_id, user_pw, user_email;
-	private Date user_date;
+public class UserRewardVO {
+	private int user_no;
+
+    private String boundary;
+    private String title;
+    private String fontColor;
+    private String background;
 }
