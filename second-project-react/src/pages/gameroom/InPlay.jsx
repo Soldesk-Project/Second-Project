@@ -22,21 +22,22 @@ const InPlay = () => {
   const userNo = user.user_no;
   const location = useLocation();
   const category = location.state?.category || 'random';
+  // 랭크 진입 경로 일 때도 항상 gameMode를 제대로 받게 한다
+  const gameMode = location.state?.gameMode || location.state?.game_mode || 'normal';
   
   // 소켓
   const sockets = useContext(WebSocketContext);
 
-  // 방장
+  // 방장 여부
   const isOwner = users.some(u => u.userNick === userNick && u.isOwner);
-  
-  // 문제 데이터
+
   useEffect(() => {
     const socket = sockets['room'];
     if (!socket) return;
 
     const joinAndRequestUserList = () => {
       socket.send(JSON.stringify({ action: 'join', server, userNick }));
-      socket.send(JSON.stringify({ action: 'roomUserList', server, roomNo }));
+      socket.send(JSON.stringify({ action: 'roomUserList', server: gameMode === 'rank' ? 'rank' : server, roomNo }));
     };
 
     if (socket.readyState === 1) {
@@ -47,45 +48,60 @@ const InPlay = () => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      console.log(data);
+      
 
-      if (data.type === 'roomUserList' && data.server === server) {
-        console.log(data.userList);
-        console.log(data.owner);
-        
-        const ownerNick =data.owner;
+      // ✅ 유저리스트(랭크 & 일반) 모두 처리
+      if (
+        data.type === 'roomUserList' && data.roomNo === roomNo &&
+        (
+          data.server === server ||
+          (gameMode === 'rank' && data.server === 'rank')
+        )
+      ) {
+        const ownerNick = data.owner;
         const formattedUsers = data.userList.map((nick, no) => ({
           userNick: nick,
           userNo: no,
-          isOwner: nick===ownerNick
+          isOwner: nick === ownerNick
         }));
+        console.log(formattedUsers);
+        
         setUsers(formattedUsers);
       }
 
-      if (data.type === 'gameStart' && data.server === server && data.roomNo === roomNo) {
-        // console.log('방장 :', data.initiator);
-        // console.log('id :', data.nextId);
+      if (
+        data.type === 'gameStart' &&
+        data.roomNo === roomNo &&
+        (gameMode === 'rank' ? data.server === 'rank' : data.server === server)
+      ) {
         if (Array.isArray(data.list) && data.list.length > 0) {
           setNextId(0);
           questionListRef.current = data.list;
-          setQuestion(data.list[data.nextId]);
+          setQuestion(data.list[0]);
           setPlay(true);
           setScore(0);
           setTime(5);
         } else {
-            console.error("질문 리스트가 유효하지 않습니다. 데이터:", data.list);
+          console.error("질문 리스트가 유효하지 않습니다. 데이터:", data.list);
         }
       }
 
-      if (data.type === 'gameStop' && data.server === server) {
+      if (
+        data.type === 'gameStop' &&
+        (gameMode === 'rank' ? data.server === 'rank' : data.server === server)
+      ) {
         setPlay(false);
         setTime('타이머');
       }
 
-      if (data.type === 'nextQuestion' && data.server === server && data.roomNo === roomNo) {
+      if (
+        data.type === 'nextQuestion' &&
+        data.roomNo === roomNo &&
+        (gameMode === 'rank' ? data.server === 'rank' : data.server === server)
+      ) {
         const nextId = Number(data.nextId);
-        setNextId(data.nextId);
-        // console.log("nextId:", nextId);
-        // console.log("questionListRef 길이:", questionListRef.current.length);
+        setNextId(nextId);
 
         if (questionListRef.current.length === 0) {
           console.error("questionListRef가 비어 있습니다.");
@@ -95,13 +111,16 @@ const InPlay = () => {
         if (nextId < questionListRef.current.length) {
           setQuestion({ ...questionListRef.current[nextId] });
         } else {
-          console.log("모든 문제를 다 풀었습니다.");
           setPlay(false);
           setTime('타이머');
         }
       }
 
-      if (data.type === 'sumScore' && data.server === server && data.roomNo === roomNo) {
+      if (
+        data.type === 'sumScore' &&
+        data.roomNo === roomNo &&
+        (gameMode === 'rank' ? data.server === 'rank' : data.server === server)
+      ) {
         if (data.scores) {
           setUsers(users => users.map(u => ({
             ...u,
@@ -122,8 +141,7 @@ const InPlay = () => {
     return () => {
       socket.onmessage = null;
     };
-  }, [server, roomNo, sockets, userNick]);
-
+  }, [server, roomNo, sockets, userNick, gameMode]);
 
   // 문제 풀이 타이머
   useEffect(() => {
@@ -139,7 +157,8 @@ const InPlay = () => {
             action: 'nextQuestion',
             server,
             roomNo,
-            userNick
+            userNick,
+            game_mode: gameMode
           }));
         } else {
           alert('웹소켓 연결이 준비되지 않았습니다 - nextQuestion');
@@ -152,21 +171,16 @@ const InPlay = () => {
 
   // 정답 판단
   const handleAnswerSubmit = (answer) => {
-    const isCorrect = question.correct_answer === parseInt(answer);
-    // console.log("answer : "+answer);
-    // console.log("isCorrect : "+isCorrect);
-    
+    const isCorrect = question && question.correct_answer === parseInt(answer);
     if (isCorrect){
-      // setScore(prev => prev + 1);
-      // console.log("score : "+score);
-      
       const socket = sockets['room'];
       if (socket && socket.readyState === 1) {
         socket.send(JSON.stringify({
           action: 'sumScore',
           server,
           roomNo,
-          userNick
+          userNick,
+          game_mode: gameMode
         }));
       } else {
         alert('웹소켓 연결이 준비되지 않았습니다 - score');
@@ -174,7 +188,6 @@ const InPlay = () => {
     }
     setSelectedAnswer(null);
   };
-
 
   // 시작 버튼
   const start = () => {
@@ -185,7 +198,8 @@ const InPlay = () => {
         server,
         roomNo,
         userNick,
-        category
+        category,
+        game_mode: gameMode
       }));
     } else {
       alert('웹소켓 연결이 준비되지 않았습니다 - startGame');
@@ -245,34 +259,33 @@ const InPlay = () => {
           <div className={styles.solving}>
             <div className={styles.problem}>
               <div className={styles.testHeader}>
-                <span>{setKoreanToCategory(category)}</span><span className={styles.timer}>{time}</span>
+                <span>{setKoreanToCategory(category)}</span>
+                <span className={styles.timer}>{time}</span>
               </div>
               <div className={styles.initiatorBtn}>
-                {
-                  play?(
-                    <>
-                      <button onClick={start} disabled={true}>시작</button>
-                      <button onClick={stop} disabled={true}>중지</button>
-                      <button onClick={leaveRoom} className={styles.leaveBtn} disabled={true}>나가기</button>
-                    </>
-                  ):(
-                    <>
-                      <button onClick={start} disabled={!isOwner}>시작</button>
-                      <button onClick={stop} disabled={!isOwner}>중지</button>
-                      <button onClick={leaveRoom} className={styles.leaveBtn}>나가기</button>
-                    </>
-                  )
-                }
+                {play ? (
+                  <>
+                    <button onClick={start} disabled={true}>시작</button>
+                    <button onClick={stop} disabled={true}>중지</button>
+                    <button onClick={leaveRoom} className={styles.leaveBtn} disabled={true}>나가기</button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={start} disabled={!isOwner}>시작</button>
+                    <button onClick={stop} disabled={!isOwner}>중지</button>
+                    <button onClick={leaveRoom} className={styles.leaveBtn}>나가기</button>
+                  </>
+                )}
               </div>
-              {!isOwner && ( !play &&
+              {!isOwner && !play &&
                 <p className={styles.note}>방장만 게임을 시작/중지할 수 있습니다</p>
-              )}
+              }
               <div className={styles.gamePlay}>
                 {play ? 
-                <Test question={question} 
-                      nextId={nextId}
-                      onSelectAnswer={setSelectedAnswer} // 추가!
-                      selectedAnswer={selectedAnswer}/> : <h2>대기중</h2>}
+                  <Test question={question} 
+                        nextId={nextId}
+                        onSelectAnswer={setSelectedAnswer}
+                        selectedAnswer={selectedAnswer}/> : <h2>대기중</h2>}
               </div>
             </div>
           </div>
@@ -287,9 +300,13 @@ const InPlay = () => {
         <div className={styles.body_right}>
           <div className={styles.game_join_userList}>
             {users.length > 0 ? (
-              users.map(({ userNick, userNo, isOwner, score }) => (                
-                <div key={userNo} className={styles.user}>
-                  <p>{isOwner ? '[방장]':'[유저]'}{userNick} / 점수 : {score ?? 0}</p>
+              users.slice(0, 4).map(({ userNick, userNo, isOwner, score }) => (
+                <div key={userNo} className={styles.user_card}>
+                  <div className={styles.role_badge}>{isOwner ? '방장' : '유저'}</div>
+                  <div className={styles.user_info}>
+                    <span className={styles.nick}>{userNick}</span>
+                    <span className={styles.score}>점수: {score ?? 0}</span>
+                  </div>
                 </div>
               ))
             ) : (

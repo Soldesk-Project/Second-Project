@@ -26,7 +26,7 @@ public class MemberServiceImpl implements MemberService {
 	
 	// 유저 포인트 조회
 	@Override
-	public int getUserPoint(String user_id) {
+	public long getUserPoint(String user_id) {
 		return mapper.getUserPoint(user_id);
 	}
 	
