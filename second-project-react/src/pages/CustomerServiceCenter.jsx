@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../layout/Header';
-import '../css/customer.css';
+import styles from '../css/customer.module.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -37,19 +37,19 @@ const CustomerServiceCenter = () => {
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (
-    <div className="customer-service-center">
-      <div className='top-nav'><Header/></div>
+    <div className={styles.customerServiceCenter}>
+      <div className={styles.topNav}><Header/></div>
 
-      <div className='title'>
+      <div className={styles.title}>
         <p>Support</p>
       </div>
       {/* 탭 */}
 
-      <div className="tabs">
+      <div className={styles.tabs}>
         {tabs.map(tab => (
           <button
             key={tab}
-            className={tab === activeTab ? 'active' : ''}
+            className={styles.tab === activeTab ? 'active' : ''}
             onClick={() => {
               setActiveTab(tab);
               setPage(1);
@@ -61,28 +61,36 @@ const CustomerServiceCenter = () => {
       </div>
 
       {/* 탭 패널 */}
-      <div className="tab-panels">
+      <div className={styles.tabPanels}>
         {activeTab === '1:1 문의' && (
-          <section role="tabpanel" className="content">
+          <section role="tabpanel" className={styles.content}>
 
-          <div className='inquiry-box'>
-            <ul className="inquiry-title">
+          <div className={styles.inquiryBox}>
+            <ul className={styles.inquiryTitle}>
               <li>Title</li>
               <li>NickName</li>
               <li>Data</li>
             </ul>
               {/* 문의글 리스트 (간단하게 제목만 표시) */}
-              <ul className="inquiry-list">
+               <ul className={styles.inquiryList}>
                 {inquiries.map(inq => (
-                  <li key={inq.id} className='inquiry-personal'>
-                    <strong>{inq.subject}</strong> — {inq.createdAt}
+                  <li key={inq.id} className={styles.inquiryPersonal}>
+                    <button
+                      className={styles.inquiryLink}
+                      onClick={() => navigate(`/inquiries/${inq.id}`)}
+                    >
+                      {inq.subject}
+                    </button>
+                    <span className={styles.inquiryDate}>
+                      — {new Date(inq.createdAt).toLocaleDateString()}
+                    </span>
                   </li>
                 ))}
-              </ul>
+               </ul>
 
             {/* 페이징 */}
-            <div className='list-bottom'>
-              <div className="pagination">
+            <div className={styles.listBottom}>
+              <div className={styles.pagination}>
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
@@ -100,7 +108,7 @@ const CustomerServiceCenter = () => {
 
               {/* 새 문의글 등록 버튼 */}
               <button
-                className="InqBtn"
+                className={styles.InqBtn}
                 onClick={() => navigate('/inquiry')}
                 >
                 새 문의글 등록
@@ -111,25 +119,33 @@ const CustomerServiceCenter = () => {
         )}
 
         {activeTab === 'FAQ' && (
-          <section role="tabpanel" className="content">
+          <section role="tabpanel" className={styles.content}>
             
-            <div className='inquiry-box'>
-              <ul className="inquiry-title">
+            <div className={styles.inquiryBox}>
+              <ul className={styles.inquiryTitle}>
                 <li>Title</li>
                 <li>Data</li>
               </ul>
                 {/* FAQ 리스트 */}
-                <ul className="inquiry-list">
-                  {inquiries.map(inq => (
-                    <li key={inq.id} className='inquiry-personal'>
-                      <strong>{inq.subject}</strong> — {inq.createdAt}
-                    </li>
-                  ))}
-                </ul>
+               <ul className={styles.inquiryList}>
+                {inquiries.map(inq => (
+                  <li key={inq.id} className={styles.inquiryPersonal}>
+                    <button
+                      className={styles.inquiryLink}
+                      onClick={() => navigate(`/inquiry/${inq.id}`)}
+                    >
+                      {inq.subject}
+                    </button>
+                    <span className={styles.inquiryDate}>
+                      — {new Date(inq.createdAt).toLocaleDateString()}
+                    </span>
+                  </li>
+                ))}
+               </ul>
 
               {/* 페이징 */}
-              <div className='list-bottom'>
-                <div className="pagination">
+              <div className={styles.listBottom}>
+                <div className={styles.pagination}>
                   <button
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={page === 1}
@@ -150,25 +166,33 @@ const CustomerServiceCenter = () => {
         )}
 
         {activeTab === '문제 제출' && (
-          <section role="tabpanel" className="content">
-            <div className='inquiry-box'>
-              <ul className="inquiry-title">
+          <section role="tabpanel" className={styles.content}>
+            <div className={styles.inquiryBox}>
+              <ul className={styles.inquiryTitle}>
                 {/* 파일 업로드, 설명 입력 폼 등 구현 */}
                 <li>Title</li>
                 <li>Data</li>
               </ul>
                 {/* FAQ 리스트 */}
-                <ul className="inquiry-list">
-                  {inquiries.map(inq => (
-                    <li key={inq.id} className='inquiry-personal'>
-                      <strong>{inq.subject}</strong> — {inq.createdAt}
-                    </li>
-                  ))}
-                </ul>
+               <ul className={styles.inquiryList}>
+                {inquiries.map(inq => (
+                  <li key={inq.id} className={styles.inquiryPersonal}>
+                    <button
+                      className={styles.inquiryLink}
+                      onClick={() => navigate(`/inquiry/${inq.id}`)}
+                    >
+                      {inq.subject}
+                    </button>
+                    <span className={styles.inquiryDate}>
+                      — {new Date(inq.createdAt).toLocaleDateString()}
+                    </span>
+                  </li>
+                ))}
+               </ul>
 
               {/* 페이징 */}
-              <div className='list-bottom'>
-                <div className="pagination">
+              <div className={styles.listBottom}>
+                <div className={styles.pagination}>
                   <button
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={page === 1}
@@ -186,7 +210,7 @@ const CustomerServiceCenter = () => {
 
                 {/* 새 건의글 등록 버튼 */}
                 <button
-                  className="InqBtn"
+                  className={styles.InqBtn}
                   onClick={() => navigate('/inquiry')}
                   >
                   건의글 등록
@@ -197,25 +221,33 @@ const CustomerServiceCenter = () => {
         )}
 
         {activeTab === '고객 건의' && (
-          <section role="tabpanel" className="content">
-            <div className='inquiry-box'>
-              <ul className="inquiry-title">
+          <section role="tabpanel" className={styles.content}>
+            <div className={styles.inquiryBox}>
+              <ul className={styles.inquiryTitle}>
                 <li>Title</li>
                 <li>NickName</li>
                 <li>Data</li>
               </ul>
                 {/* 건의글 리스트 */}
-                <ul className="inquiry-list">
-                  {inquiries.map(inq => (
-                    <li key={inq.id} className='inquiry-personal'>
-                      <strong>{inq.subject}</strong> — {inq.createdAt}
-                    </li>
-                  ))}
-                </ul>
+               <ul className={styles.inquiryList}>
+                {inquiries.map(inq => (
+                  <li key={inq.id} className={styles.inquiryPersonal}>
+                    <button
+                      className={styles.inquiryLink}
+                      onClick={() => navigate(`/inquiry/${inq.id}`)}
+                    >
+                      {inq.subject}
+                    </button>
+                    <span className={styles.inquiryDate}>
+                      — {new Date(inq.createdAt).toLocaleDateString()}
+                    </span>
+                  </li>
+                ))}
+               </ul>
 
               {/* 페이징 */}
-              <div className='list-bottom'>
-                <div className="pagination">
+              <div className={styles.listBottom}>
+                <div className={styles.pagination}>
                   <button
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={page === 1}
@@ -233,7 +265,7 @@ const CustomerServiceCenter = () => {
 
                 {/* 새 건의글 등록 버튼 */}
                 <button
-                  className="InqBtn"
+                  className={styles.InqBtn}
                   onClick={() => navigate('/inquiry')}
                   >
                   건의글 등록

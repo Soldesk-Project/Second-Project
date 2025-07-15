@@ -38,3 +38,8 @@
 .admin_title { color: #00FFC6;}
 .tester_title { color: 	#FFD700;}
 .vip_title { color: #FF69B4;}
+
+.itemImage{
+  width: 130px;
+  height: 130px;
+}

@@ -35,4 +35,9 @@ public class InquiryServiceImpl implements InquiryService {
                                 .build();
         inquiryMapper.insertInquiry(vo);
     }
+    
+    @Override
+    public InquiryVO findById(Long id) {
+      return inquiryMapper.selectById(id);
+    }
 }

@@ -1,9 +1,12 @@
 package org.joonzis.controller;
 
 import java.util.Arrays;
+
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.bind.annotation.PathVariable;
+import org.joonzis.domain.InquiryVO;
 import org.joonzis.service.InquiryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,6 +50,15 @@ public class CustomerController {
             @RequestParam(value = "size", defaultValue = "15") int size) {
         Map<String, Object> data = inquiryService.getInquiries(page, size);
         return ResponseEntity.ok(data);
+    }
+    
+    @GetMapping("/inquiries/{id}")
+    public ResponseEntity<InquiryVO> getInquiryDetail(@PathVariable Long id) {
+        InquiryVO vo = inquiryService.findById(id);
+        if (vo == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(vo);
     }
 
     /** 1:1 문의 생성 */

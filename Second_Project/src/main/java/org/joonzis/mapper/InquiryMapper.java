@@ -17,4 +17,7 @@ public interface InquiryMapper {
 
     /** 새 문의글 등록 */
     int insertInquiry(InquiryVO inquiry);
+    
+    /** 상세 조회 */
+    InquiryVO selectById(@Param("id") Long id);
 }

@@ -38,4 +38,15 @@
       SYSDATE
     )
   </insert>
+  
+  <!-- 상세 조회 -->
+  <select id="selectById" parameterType="long" resultType="org.joonzis.domain.InquiryVO">
+    SELECT id,
+           user_id    AS userId,
+           subject,
+           message,
+           created_at AS createdAt
+      FROM inquiry
+     WHERE id = #{id}
+  </select>
 </mapper>

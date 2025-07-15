@@ -23,6 +23,7 @@ import { WebSocketProvider } from './util/WebSocketProvider';
 import Customersuggest from './pages/Customersuggest';
 import CustomerProblemSubmit from './pages/CustomerProblemSubmit';
 import AdminPage from './pages/AdminPage';
+import InquiryDetail from './pages/InquiryDetail';
 
 function App() {
   const dispatch = useDispatch();
@@ -65,6 +66,7 @@ function App() {
           <Route path="/suggest" element={<Customersuggest />} />
           <Route path="/problemsubmit" element={<CustomerProblemSubmit />} />
           <Route path="/admin" element={<AdminPage/>}/>
+          <Route path="/inquiries/:id" element={<InquiryDetail />} />
         </Routes>
       </Router>
     </WebSocketProvider>

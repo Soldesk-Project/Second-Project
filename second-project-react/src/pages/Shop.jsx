@@ -51,7 +51,13 @@ const Shop = () => {
   useEffect(() => {
     // 포인트 충전 탭이 아니므로, activeTab만으로 fetch
     axios.get(`/api/shop/items?category=${encodeURIComponent(activeTab)}`)
-      .then(res => setItems(res.data))
+      .then(res => {
+        const withImg = res.data.map(item => ({
+          ...item,
+          imgUrl: `/images/${item.imageFileName}`
+        }));
+        setItems(withImg);
+      })
       .catch(() => setItems([]));
   }, [activeTab]);
   
@@ -132,9 +138,9 @@ const Shop = () => {
             {items.length ? (
               items.map(item => (
                 <div key={item.item_no} className={styles.card} onClick={() => setSelectedItem(item)}>
-                  {/* <img src={item.imgUrl} alt={item.name} /> */}
                   <div className={styles.itemCss}>
-                    <div>
+                  <img src={`/images/${item.imageFileName}`} alt={item.item_name} className={styles.itemImage} />
+                    {/* <div>
                         {item.item_type === 'title' && titleTextMap[item.css_class_name] && (
                             <span className={decoStyles[item.css_class_name]} style={{marginRight: '5px', fontWeight: 'bold'}}>
                                 [{titleTextMap[item.css_class_name]}]
@@ -147,7 +153,7 @@ const Shop = () => {
                         >
                           아이템
                         </span>
-                    </div>
+                    </div> */}
                   </div>
                   <div className={styles.itemName}>이름 : {item.item_name}</div>
                   <div className={styles.itemPrice}>가격 : {item.item_price ? item.item_price.toLocaleString() : '가격 미정'} p</div>

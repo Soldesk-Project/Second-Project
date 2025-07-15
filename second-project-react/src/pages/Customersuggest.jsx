@@ -1,6 +1,6 @@
 import React from 'react';
 import Header from '../layout/Header';
-import '../css/customer.css';
+import styles from '../css/customer.module.css';
 import { useNavigate } from 'react-router-dom';
 
 const Customersuggest = () => {

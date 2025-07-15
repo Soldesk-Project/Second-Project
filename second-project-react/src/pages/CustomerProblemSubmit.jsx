@@ -1,6 +1,6 @@
 import React from 'react';
 import Header from '../layout/Header';
-import '../css/customer.css';
+import styles from '../css/customer.module.css';
 import { useNavigate } from 'react-router-dom';
 
 const CustomerProblemSubmit = () => {
@@ -12,26 +12,26 @@ const CustomerProblemSubmit = () => {
   }
   
   return (
-    <div className='customer-service-center'>
-      <div className='top-nav'><Header/></div>
+    <div className={styles.customerServiceCenter}>
+      <div className={styles.topNav}><Header/></div>
 
-      <div className='inqueries-box'>
+      <div className={styles.inqueriesBox}>
 
-        <div className='title'>
+        <div className={styles.title}>
           <p>문제 제출</p>
         </div>
         <div>
           <p>간단한 설명</p>
         </div>
         
-        <div className='inq-container'>
-        <div className='inq-container-two'>
-          <div className='inqPw-Box'>
+        <div className={styles.inqContainer}>
+        <div className={styles.inqContainerTwo}>
+          <div className={styles.inqPwBox}>
             <p>아이디(db에서 불러오기)</p>
             <p>게시글 비밀번호</p>
             <input></input>
           </div>
-          <div className='email'>
+          <div className={styles.email}>
             <input
               type="email"
               placeholder="문의 결과 안내받을 외부 이메일"
@@ -39,8 +39,8 @@ const CustomerProblemSubmit = () => {
             />
           </div>
 
-          <div className='inq-text-Box'>
-            <div className='inq-title'>
+          <div className={styles.inqTextBox}>
+            <div className={styles.inqTitle}>
               <p>제목</p>
               <input type='text' placeholder='제목을 입력하세요.'/>
             </div>
@@ -51,7 +51,7 @@ const CustomerProblemSubmit = () => {
             />
           </div>
         </div>
-          <div className='text-limit'>
+          <div className={styles.textLimit}>
             <p>0자 입력 / 최대 10000자</p>
           </div>
 
@@ -69,9 +69,9 @@ const CustomerProblemSubmit = () => {
           <p>동의합니다.</p>
         </div>
         
-        <div className='inqBtns'>
-          <button className='submitBtn'>등록</button>
-          <button className='submitBtn' onClick={() => navigate('/inquiries')}>돌아가기</button>
+        <div className={styles.inqBtns}>
+          <button className={styles.submitBtn}>등록</button>
+          <button className={styles.submitBtn} onClick={() => navigate('/inquiries')}>돌아가기</button>
         </div>
         </div>
         
