@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // useEffect 추가
+import React, { useState, useEffect } from 'react';
 
 const QuestRegister = () => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -6,13 +6,12 @@ const QuestRegister = () => {
   const [questionText, setQuestionText] = useState(''); // 문제 본문 상태
   const [options, setOptions] = useState(['', '', '', '']); // 선택지 상태
   const [correctAnswer, setCorrectAnswer] = useState('1'); // 정답 상태
-
-  // 카테고리와 주제 상태 정의 (가장 위로 옮김)
   const [category, setCategory] = useState('정보처리기사'); // 카테고리 상태 (기본값)
+  const [base64ImageString, setBase64ImageString] = useState(''); // Base64 이미지 문자열 저장
 
-  // 카테고리 목록 정의 (별도의 배열로 관리하면 추후 유지보수 용이)
   const categories = [
     '정보처리기사',
+    '정보처리산업기사',
     '정보처리기능사',
     '리눅스마스터1급',
     '리눅스마스터2급',
@@ -23,10 +22,8 @@ const QuestRegister = () => {
     '네트워크관리사2급',
   ];
 
-  // 카테고리 변경 핸들러
   const handleCategoryChange = (e) => {
-    const selectedCategory = e.target.value;
-    setCategory(selectedCategory);
+    setCategory(e.target.value);
   };
 
   // 이미지 선택 핸들러
@@ -37,71 +34,83 @@ const QuestRegister = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result);
+        const base64 = reader.result.split(',')[1];
+        setBase64ImageString(base64);
       };
       reader.readAsDataURL(file);
     } else {
       setSelectedImage(null);
       setPreviewImage(null);
-    }
-  };
-
-  // 이미지 업로드 제출 핸들러 (개별 함수로 분리)
-  const handleImageUploadSubmit = async (event) => {
-    event.preventDefault(); // 폼의 기본 제출 동작 방지
-
-    if (!selectedImage) {
-      alert('이미지를 선택해주세요.');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('image', selectedImage);
-
-    try {
-      // 실제 API 엔드포인트로 변경하세요.
-      const response = await fetch('/api/upload-image', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        alert('이미지 업로드 성공: ' + result.imageUrl);
-        // 업로드 성공 후 상태 초기화 (필요시)
-        // setSelectedImage(null);
-        // setPreviewImage(null);
-      } else {
-        alert('이미지 업로드 실패');
-        const errorData = await response.json(); // 에러 메시지 확인
-        console.error('이미지 업로드 실패 상세:', errorData);
-      }
-    } catch (error) {
-      console.error('이미지 업로드 오류:', error);
-      alert('이미지 업로드 중 오류가 발생했습니다.');
+      setBase64ImageString('');
     }
   };
 
   // 전체 문제 등록 제출 핸들러
   const handleQuestRegisterSubmit = async () => {
+    // 필수 입력 필드 검증
+    if (!questionText.trim()) {
+      alert('문제 본문을 입력해주세요.');
+      return;
+    }
+    for (let i = 0; i < options.length; i++) {
+      if (!options[i].trim()) {
+        alert(`${i + 1}번 선택지를 입력해주세요.`);
+        return;
+      }
+    }
+
     const questData = {
-      category: category,
-      questionText: questionText,
-      options: options,
-      correctAnswer: correctAnswer,
+      subject: "임시주제",
+      question_text: questionText,
+      option_1: options[0],
+      option_2: options[1],
+      option_3: options[2],
+      option_4: options[3],
+      correct_answer: parseInt(correctAnswer),
+      image_data_base64: base64ImageString,
     };
 
     console.log('등록할 문제 데이터:', questData);
-    alert('문제 등록 로직 실행됨 (콘솔 확인)'); // 임시 알림
+    console.log('선택된 카테고리 (테이블 결정용):', category);
+    console.log('Option 1:', questData.option_1);
+    console.log('Option 2:', questData.option_2);
+    console.log('Option 3:', questData.option_3);
+    console.log('Option 4:', questData.option_4);
+
+    try {
+      const response = await fetch(`/admin/registerQuestion?category=${encodeURIComponent(category)}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(questData),
+      });
+
+      if (response.ok) {
+        alert('문제 등록 성공!');
+        handleReset(); // 성공 시 폼 초기화
+      } else {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        console.error('문제 등록 실패 상세:', errorData);
+        alert('문제 등록 실패: ' + (errorData.message || '알 수 없는 오류'));
+        }
+      }
+    } catch (error) {
+      console.error('문제 등록 오류:', error);
+      alert('문제 등록 중 오류가 발생했습니다.');
+    }
   };
 
-  // 폼 초기화 핸들러
   const handleReset = () => {
     setSelectedImage(null);
     setPreviewImage(null);
     setQuestionText('');
     setOptions(['', '', '', '']);
     setCorrectAnswer('1');
-    setCategory('정보처리기사'); // 초기 카테고리로 재설정
+    setCategory('정보처리기사');
+    setBase64ImageString('');
   };
 
   return (
@@ -160,26 +169,21 @@ const QuestRegister = () => {
       <br/>
       <div className="photoInput">
         <h3>5. 이미지 업로드 (선택 사항)</h3>
-        <form onSubmit={handleImageUploadSubmit}>
-          <div>
-            <label htmlFor="image-upload">이미지 선택:</label>
-            <input
-              type="file"
-              id="image-upload"
-              accept="image/*"
-              onChange={handleImageChange}
-            />
+        <div>
+          <label htmlFor="image-upload">이미지 선택:</label>
+          <input
+            type="file"
+            id="image-upload"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+        </div>
+        {previewImage && (
+          <div style={{ marginTop: '20px' }}>
+            <h3>이미지 미리보기:</h3>
+            <img src={previewImage} alt="Image Preview" style={{ maxWidth: '300px', maxHeight: '300px', border: '1px solid #ddd' }} />
           </div>
-          {previewImage && (
-            <div style={{ marginTop: '20px' }}>
-              <h3>이미지 미리보기:</h3>
-              <img src={previewImage} alt="Image Preview" style={{ maxWidth: '300px', maxHeight: '300px', border: '1px solid #ddd' }} />
-            </div>
-          )}
-          <button type="submit" style={{ marginTop: '20px', padding: '10px 20px' }}>
-            이미지 업로드
-          </button>
-        </form>
+        )}
       </div>
       <br/>
       {/* 전체 폼 제출 버튼 */}
