@@ -1,0 +1,55 @@
+@import './QuestAdmin.css';
+
+/* QuestEdit 고유 스타일 */
+.category button {
+  background-color: #007bff; /* 검색 버튼 */
+}
+
+.category button:hover {
+  background-color: #0056b3;
+}
+
+.searchResults li {
+  /* 선택된 문제 강조 (QuestEdit: 초록색 계열) */
+  background-color: #e0f7fa; /* 연한 하늘색 */
+}
+
+.searchResults li.selected-edit {
+  background-color: #e0f7fa; /* 선택된 문제 강조 색상 */
+  font-weight: bold;
+}
+
+.pagination button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.pagination button:not(.active):hover {
+  background-color: #e9ecef;
+}
+
+/* 문제 수정 폼 내 버튼 스타일 */
+.button-group button.reset-button {
+  background-color: #6c757d; /* 초기화 버튼 */
+}
+
+.button-group button.reset-button:hover {
+  background-color: #5a6268;
+}
+
+.button-group button.submit-button {
+  background-color: #28a745; /* 수정 완료 버튼 */
+}
+
+.button-group button.submit-button:hover {
+  background-color: #218838;
+}
+
+/* 문제 본문, 선택지 등 입력 필드의 disabled 상태 스타일 */
+.question-detail-form input[type="text"]:disabled,
+.question-detail-form select:disabled,
+.question-detail-form textarea:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+  color: #6c757d;
+}

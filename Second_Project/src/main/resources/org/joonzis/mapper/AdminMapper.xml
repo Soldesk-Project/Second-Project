@@ -139,5 +139,13 @@
         WHERE
             id = #{question.id}
     </update>
-
+	
+	<!-- 문제삭제 -->
+	<delete id="deleteQuestions">
+        DELETE FROM ${params.category}
+        WHERE id IN
+        <foreach collection="params.questionIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

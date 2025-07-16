@@ -10,4 +10,7 @@ public interface AdminService {
     Map<String, Object> searchQuestions(String category, String query, int page, int limit);
     
     void updateQuestion(QuestionDTO questionDTO, String category);
+
+	void deleteQuestions(String decodedCategory, List<Integer> questionIds);
+    
 }

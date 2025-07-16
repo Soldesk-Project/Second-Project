@@ -28,4 +28,6 @@ public interface AdminMapper {
     
     //문제 수정 메소드
     void updateQuestion(@Param("question") QuestionDTO question, @Param("category") String category);
+    
+    int deleteQuestions(@Param("params") Map<String, Object> params);
 }

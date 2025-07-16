@@ -183,4 +183,28 @@ public class AdminServiceImpl implements AdminService {
         System.out.println("ServiceImpl: 문제 수정 실행 - 카테고리: " + category + ", DTO: " + questionDTO);
         adminMapper.updateQuestion(questionDTO, category);
     }
+    
+    @Override
+    public void deleteQuestions(String category, List<Integer> questionIds) {
+        log.info("ServiceImpl: deleteQuestions 호출 - 카테고리: " + category + ", 삭제할 ID 목록: " + questionIds);
+
+        if (questionIds == null || questionIds.isEmpty()) {
+            throw new IllegalArgumentException("삭제할 문제 ID가 제공되지 않았습니다.");
+        }
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("category", category);
+        params.put("questionIds", questionIds);
+
+        try {
+            int deletedCount = adminMapper.deleteQuestions(params);
+            log.info(category + " 테이블에서 " + deletedCount + "개의 문제가 삭제되었습니다.");
+            if (deletedCount == 0) {
+                log.warn("삭제 요청된 ID 중 해당 카테고리에서 일치하는 문제가 없거나 이미 삭제되었습니다.");
+            }
+        } catch (Exception e) {
+            log.error("문제 삭제 중 매퍼 오류 발생: " + e.getMessage(), e);
+            throw new RuntimeException("데이터베이스에서 문제를 삭제하는 중 오류가 발생했습니다.", e);
+        }
+    }
 }

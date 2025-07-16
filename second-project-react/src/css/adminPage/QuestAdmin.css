@@ -1,0 +1,204 @@
+/* 전체적인 페이지 제목 스타일 */
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+/* 카테고리 선택 및 검색 섹션 */
+.category {
+  margin-bottom: 25px;
+  padding: 15px;
+  background-color: #f0f8ff;
+  border: 1px solid #cceeff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap; /* 작은 화면에서 요소들이 줄바꿈되도록 */
+}
+
+.category h3 {
+  color: #2c3e50;
+  margin: 0 10px 0 0;
+  font-size: 1.1em;
+}
+
+/* select 및 input 공통 스타일 */
+.category select,
+.category input[type="text"] {
+  padding: 10px 12px;
+  border: 1px solid #aaddff;
+  border-radius: 5px;
+  font-size: 1em;
+  color: #333;
+}
+
+.category input[type="text"] {
+  flex-grow: 1; /* 검색어 입력 필드가 최대한 공간을 차지하도록 */
+  max-width: 400px; /* 너무 길어지지 않도록 최대 너비 설정 */
+}
+
+/* 공통 버튼 스타일 (예: 검색 버튼) */
+.category button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* 검색 결과 섹션 */
+.searchResults {
+  margin-top: 20px;
+  border: 1px solid #e0e0e0;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.searchResults h3 {
+  color: #34495e;
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.05em;
+}
+
+.searchResults ul {
+  list-style: none;
+  padding: 0;
+  max-height: 300px; /* 스크롤바 생성 */
+  overflow-y: auto;
+  border: 1px solid #f0f0f0;
+  border-radius: 5px;
+  background-color: #fdfdfd;
+}
+
+.searchResults li {
+  padding: 12px 15px;
+  border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 0.95em;
+  color: #444;
+}
+
+.searchResults li:last-child {
+  border-bottom: none;
+}
+
+.searchResults li:hover {
+  background-color: #f5f5f5;
+}
+
+.searchResults li span {
+  color: #777;
+  margin-right: 10px;
+  font-size: 0.9em;
+}
+
+/* 페이지네이션 스타일 */
+.pagination {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.pagination button {
+  margin: 0 4px;
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* 문제 상세/수정/삭제 폼 섹션 공통 스타일 */
+.question-detail-form {
+  margin-top: 20px;
+  border: 1px solid #dcdcdc;
+  padding: 25px;
+  border-radius: 8px;
+  background-color: #fdfdfd;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.question-detail-form h2 {
+  color: #2c3e50;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.3em;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.question-detail-form p {
+  color: #555;
+  font-size: 0.95em;
+  margin-bottom: 15px;
+}
+
+.question-detail-form h3 {
+  color: #34495e;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+/* 텍스트 입력 및 선택지 스타일 */
+.question-detail-form input[type="text"],
+.question-detail-form select {
+  width: calc(100% - 24px); /* 패딩 고려 */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+  margin-bottom: 10px;
+}
+
+.question-detail-form select {
+  width: auto; /* select는 내용에 따라 너비 조절 */
+}
+
+/* 이미지 업로드 섹션 */
+.photoInput label {
+  font-weight: bold;
+  color: #333;
+}
+
+.photoInput img {
+  max-width: 300px;
+  max-height: 300px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-top: 10px;
+  display: block;
+}
+
+/* 하단 버튼 그룹 */
+.button-group {
+  margin-top: 30px;
+  text-align: right; /* 버튼을 오른쪽으로 정렬 */
+}
+
+.button-group button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-left: 10px;
+}
+
+/* 수평선 */
+hr {
+  border: 0;
+  border-top: 1px solid #f0f0f0;
+  margin: 30px 0;
+}

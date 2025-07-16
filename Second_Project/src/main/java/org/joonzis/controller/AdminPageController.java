@@ -9,9 +9,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin")
@@ -103,6 +106,35 @@ public class AdminPageController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("문제 수정 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    @DeleteMapping("/deleteQuestions")
+    public ResponseEntity<?> deleteQuestions(
+            @RequestParam("category") String categoryParam,
+            @RequestParam("ids") String idsParam) { // 쉼표로 구분된 ID 문자열
+        System.out.println("문제 삭제 요청 수신 - 카테고리: " + categoryParam + ", ID 목록: " + idsParam);
+
+        try {
+            String decodedCategory = URLDecoder.decode(categoryParam, "UTF-8");
+            // 쉼표로 구분된 ID 문자열을 List<Integer>로 변환
+            List<Integer> questionIds = Arrays.stream(idsParam.split(","))
+                                              .map(Integer::parseInt)
+                                              .collect(Collectors.toList());
+
+            // 서비스 계층 호출
+            adminService.deleteQuestions(decodedCategory, questionIds);
+
+            return new ResponseEntity<>("선택된 문제가 성공적으로 삭제되었습니다.", HttpStatus.OK);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("카테고리 디코딩 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("잘못된 문제 ID 형식입니다. 숫자로 구성된 쉼표 구분 문자열이어야 합니다.", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("문제 삭제 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

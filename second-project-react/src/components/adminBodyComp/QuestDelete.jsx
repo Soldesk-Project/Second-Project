@@ -1,146 +1,259 @@
-import React, { useState } from 'react';
-
-// 가상의 문제 데이터 (실제로는 API 호출 등을 통해 가져올 수 있습니다)
-const allQuestionData = [
-  {
-    id: 1,
-    category: '정보처리기사',
-    questionNum: '1',
-    topic: '데이터베이스',
-    content: '관계형 데이터베이스의 특징은?',
-    option1: 'A',
-    option2: 'B',
-    option3: 'C',
-    option4: 'D',
-    answer: 1,
-  },
-  {
-    id: 2,
-    category: '정보처리산업기사',
-    questionNum: '6',
-    topic: '운영체제',
-    content: '데드락 발생 조건은?',
-    option1: '옵션1',
-    option2: '옵션2',
-    option3: '옵션3',
-    option4: '옵션4',
-    answer: 2,
-  },
-  {
-    id: 3,
-    category: '정보처리기사',
-    questionNum: '4',
-    topic: '자료구조',
-    content: '트리 구조의 순회 방법 중 전위 순회는?',
-    option1: '전위',
-    option2: '중위',
-    option3: '후위',
-    option4: '레벨',
-    answer: 1,
-  },
-  {
-    id: 4,
-    category: '리눅스마스터2급',
-    questionNum: '1',
-    topic: '리눅스 명령어',
-    content: '파일 내용을 출력하는 명령어는?',
-    option1: 'ls',
-    option2: 'cd',
-    option3: 'cat',
-    option4: 'mkdir',
-    answer: 3,
-  },
-];
-
-// 카테고리 목록을 배열로 정의
-const categories = [
-  '전체',
-  '정보처리기사',
-  '정보처리산업기사',
-  '정보처리기능사',
-  '리눅스마스터1급',
-  '리눅스마스터2급',
-  '정보통신산업기사',
-  '정보통신기사',
-  '정보보안기사',
-  '네트워크관리사1급',
-  '네트워크관리사2급',
-];
+import React, { useState, useEffect } from 'react';
+import '../../css/adminPage/QuestDelete.css'; // 수정된 QuestDelete.css 임포트
 
 const QuestDelete = () => {
-  const [selectedCategory, setSelectedCategory] = useState('전체');
+  const [category, setCategory] = useState('정보처리기사');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedQuestId, setSelectedQuestId] = useState(null);
+  const [selectedQuestData, setSelectedQuestData] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 5;
+  const [selectedQuestionsToDelete, setSelectedQuestionsToDelete] = useState(new Set());
 
-  // 카테고리 버튼 클릭 핸들러
-  // 이 함수 자체가 이미 const로 정의되어 분리된 형태입니다.
-  const handleCategoryClick = (category) => {
-    setSelectedCategory(category);
+  const categories = [
+    '정보처리기사', '정보처리산업기사', '정보처리기능사',
+    '리눅스마스터1급', '리눅스마스터2급',
+    '정보통신산업기사', '정보통신기사', '정보보안기사',
+    '네트워크관리사1급', '네트워크관리사2급',
+  ];
+
+  const categoryTableMap = {
+    '정보처리기사': 'CPE_Q',
+    '정보처리산업기사': 'CPEI_Q',
+    '정보처리기능사': 'CPET_Q',
+    '리눅스마스터1급': 'LM1_Q',
+    '리눅스마스터2급': 'LM2_Q',
+    '정보통신산업기사': 'ICTI_Q',
+    '정보통신기사': 'ICT_Q',
+    '정보보안기사': 'SEC_Q',
+    '네트워크관리사1급': 'NET1_Q',
+    '네트워크관리사2급': 'NET2_Q',
   };
 
-  // 선택된 카테고리에 따라 데이터를 필터링
-  const filteredQuestions = allQuestionData.filter(question => {
-    if (selectedCategory === '전체') {
-      return true;
+  const handleCategoryChange = (e) => {
+    const selectedCategory = e.target.value;
+    setCategory(selectedCategory);
+    setSearchResults([]);
+    setSearchQuery('');
+    setSelectedQuestId(null);
+    setSelectedQuestData(null);
+    setCurrentPage(1);
+    setTotalPages(1);
+    setSelectedQuestionsToDelete(new Set()); // 카테고리 변경 시 선택된 문제 초기화
+  };
+
+  const handleSearchQuest = async (page = 1) => {
+    const tableName = categoryTableMap[category];
+    if (!tableName) {
+      alert('유효하지 않은 카테고리입니다.');
+      return;
     }
-    return question.category === selectedCategory;
-  });
+
+    try {
+      const response = await fetch(`/admin/searchQuestions?category=${tableName}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setSearchResults(data.questions);
+      setTotalPages(data.totalPages);
+      setCurrentPage(page);
+    } catch (error) {
+      console.error('문제 검색 중 오류 발생:', error);
+      alert('문제 검색 중 오류가 발생했습니다. 서버 상태를 확인해주세요.');
+      setSearchResults([]);
+      setTotalPages(1);
+    }
+  };
+
+  // 1. <li> 요소 클릭 시 문제 상세 정보만 표시하도록 변경
+  const handleQuestListItemClick = (question) => {
+    setSelectedQuestId(question.id);
+    setSelectedQuestData(question);
+  };
+
+  // 2. 체크박스 변경 시에만 삭제 목록 Set을 업데이트하도록 분리
+  const handleCheckboxChange = (event, questionId) => {
+    // 이벤트 버블링 방지 (li의 onClick 이벤트가 동시에 발생하지 않도록)
+    event.stopPropagation();
+    setSelectedQuestionsToDelete(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(questionId)) {
+        newSet.delete(questionId);
+      } else {
+        newSet.add(questionId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleDeleteSelectedQuests = async () => {
+    if (selectedQuestionsToDelete.size === 0) {
+      alert('삭제할 문제를 하나 이상 선택해주세요.');
+      return;
+    }
+
+    if (!window.confirm(`${selectedQuestionsToDelete.size}개의 문제를 정말 삭제하시겠습니까?`)) {
+      return;
+    }
+
+    const tableName = categoryTableMap[category];
+    if (!tableName) {
+      alert('유효하지 않은 카테고리입니다.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/admin/deleteQuestions?category=${encodeURIComponent(tableName)}&ids=${Array.from(selectedQuestionsToDelete).join(',')}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        alert('선택된 문제가 성공적으로 삭제되었습니다.');
+        setSelectedQuestionsToDelete(new Set());
+        setSelectedQuestId(null);
+        setSelectedQuestData(null);
+        handleSearchQuest(currentPage); // 삭제 후 현재 페이지의 검색 결과 새로고침
+      } else {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await response.json();
+          console.error('문제 삭제 실패 상세:', errorData);
+          alert('문제 삭제 실패: ' + (errorData.message || '알 수 없는 오류'));
+        } else {
+          console.error('문제 삭제 실패: 서버 응답 형식 오류');
+          alert('문제 삭제 실패: 서버 응답 오류. 콘솔을 확인하세요.');
+        }
+      }
+    } catch (error) {
+      console.error('문제 삭제 중 클라이언트 오류:', error);
+      alert('문제 삭제 중 클라이언트 오류가 발생했습니다.');
+    }
+  };
+
+  useEffect(() => {
+    // 카테고리 변경 시 검색 결과 및 선택 상태 초기화
+    setSearchResults([]);
+    setSearchQuery('');
+    setSelectedQuestId(null);
+    setSelectedQuestData(null);
+    setCurrentPage(1);
+    setTotalPages(1);
+    setSelectedQuestionsToDelete(new Set());
+  }, [category]);
 
   return (
     <div>
-      <h1>문제 삭제</h1>
+      <h1>문제 삭제 🗑️</h1>
       <div className='category'>
-        {/* categories 배열을 map 함수로 순회하며 버튼 렌더링 */}
-        {categories.map((category) => (
-          <button
-            key={category} // 각 버튼에 고유한 key prop 제공
-            onClick={() => handleCategoryClick(category)}
-            className={selectedCategory === category ? 'active' : ''}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
-      <br />
-      <table className='question'>
-        <thead>
-          <tr>
-            <th>카테고리</th>
-            <th>문제 번호</th>
-            <th>주제</th>
-            <th>문제 본문</th>
-            <th>옵션 1</th>
-            <th>옵션 2</th>
-            <th>옵션 3</th>
-            <th>옵션 4</th>
-            <th>정답 번호</th>
-            <th>선택</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredQuestions.map((question) => (
-            <tr key={question.id}>
-              <td>{question.category}</td>
-              <td>{question.questionNum}</td>
-              <td>{question.topic}</td>
-              <td>{question.content}</td>
-              <td>{question.option1}</td>
-              <td>{question.option2}</td>
-              <td>{question.option3}</td>
-              <td>{question.option4}</td>
-              <td>{question.answer}</td>
-              <td>
-                <input type="checkbox" name="selectQuestion" value={question.id} />
-              </td>
-            </tr>
+        <h3>1. 카테고리 선택 및 문제 검색 🔍</h3>
+        <select name="cateSelect" value={category} onChange={handleCategoryChange}>
+          {categories.map((cat, index) => (
+            <option key={index} value={cat}>
+              {cat}
+            </option>
           ))}
-          {filteredQuestions.length === 0 && (
-            <tr>
-              <td colSpan="10">해당 카테고리의 문제가 없습니다.</td>
-            </tr>
+        </select>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="문제 본문 검색어를 입력하세요."
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              handleSearchQuest();
+            }
+          }}
+        />
+        <button onClick={() => handleSearchQuest()} className="search-button">검색</button>
+      </div>
+
+      {searchResults.length > 0 && (
+        <div className='searchResults'>
+          <h3>검색 결과 ({searchResults.length}개): 삭제할 문제를 선택하세요.</h3>
+          <ul>
+            {searchResults.map((quest) => (
+              <li
+                key={quest.id}
+                // <li> 클릭 시에는 문제 상세 정보만 보여줌
+                onClick={() => handleQuestListItemClick(quest)}
+                className={selectedQuestionsToDelete.has(quest.id) ? 'selected-delete' : ''}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedQuestionsToDelete.has(quest.id)}
+                  // 3. 체크박스 클릭 시에만 삭제 목록 업데이트 (이벤트 버블링 방지)
+                  onChange={(e) => handleCheckboxChange(e, quest.id)}
+                />
+                <span className="quest-id">[ID: {quest.id}]</span>
+                {quest.question_text.length > 80 ? quest.question_text.substring(0, 80) + '...' : quest.question_text}
+              </li>
+            ))}
+          </ul>
+          {totalPages > 1 && (
+            <div className="pagination">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
+                <button
+                  key={pageNumber}
+                  onClick={() => handleSearchQuest(pageNumber)}
+                  className={currentPage === pageNumber ? 'active' : ''}
+                >
+                  {pageNumber}
+                </button>
+              ))}
+            </div>
           )}
-        </tbody>
-      </table>
-      <br />
-      <button>삭제</button>
+        </div>
+      )}
+
+      {selectedQuestData && (
+        <>
+          <hr />
+          <div className='question-detail-form'>
+            <h2>선택된 문제 정보 (수정 불가) ℹ️</h2>
+            <p>선택된 문제 ID: <strong>{selectedQuestData.id}</strong></p>
+            <div className='questionText'>
+              <h3>문제 본문</h3>
+              <div className="read-only-field">
+                {selectedQuestData.question_text}
+              </div>
+            </div>
+            <div className='option'>
+              <h3>선택지</h3>
+              {['option_1', 'option_2', 'option_3', 'option_4'].map((optionKey, index) => (
+                <div key={index}>
+                  <div className="read-only-field">
+                    {index + 1}. {selectedQuestData[optionKey]}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className='corAnswer'>
+              <h3>정답</h3>
+              <div className="read-only-field">
+                {selectedQuestData.correct_answer}
+              </div>
+            </div>
+            <div className="photoInput">
+              <h3>이미지 (있는 경우)</h3>
+              {selectedQuestData.image_data_base64 ? (
+                <div>
+                  <img src={`data:image/png;base64,${selectedQuestData.image_data_base64}`} alt="Question Image" />
+                </div>
+              ) : (
+                <div className="no-image-message">
+                  첨부된 이미지가 없습니다.
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+      <div className="button-group">
+        <button onClick={handleDeleteSelectedQuests} className="delete-button">선택된 문제 삭제</button>
+      </div>
     </div>
   );
 };
