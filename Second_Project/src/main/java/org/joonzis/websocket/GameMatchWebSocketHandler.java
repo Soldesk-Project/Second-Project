@@ -29,13 +29,13 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         String query = session.getUri() != null ? session.getUri().getQuery() : null;
-        System.out.println("🌐 [연결 URI]: " + query);
+//        System.out.println("🌐 [연결 URI]: " + query);
 
         String userId = extractUserId(session);
-        System.out.println("🌐 [추출된 userId]: " + userId);
+//        System.out.println("🌐 [추출된 userId]: " + userId);
 
         if (userId == null) {
-            System.out.println("⚠️ 연결 시 userId 누락");
+//            System.out.println("⚠️ 연결 시 userId 누락");
             return;
         }
 
@@ -47,7 +47,7 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
         sessions.add(session);
         session.getAttributes().put("userId", userId);
 
-        System.out.println("🔌 [연결됨] userId: " + userId + ", sessionId: " + session.getId());
+//        System.out.println("🔌 [연결됨] userId: " + userId + ", sessionId: " + session.getId());
     }
 
     @Override
@@ -68,37 +68,37 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
         switch (action) {
             case "quickMatch":
                 matchService.enqueue(userId);
-                System.out.println("✅ [매칭 대기열 등록]: " + userId);
+//                System.out.println("✅ [매칭 대기열 등록]: " + userId);
                 break;
 
             case "acceptMatch":
                 matchService.acceptMatch(userId);
-                System.out.println("✅ [수락 처리]: " + userId);
+//                System.out.println("✅ [수락 처리]: " + userId);
                 break;
 
             case "rejectMatch":
                 matchService.rejectMatch(userId);
-                System.out.println("❌ [거절 처리]: " + userId);
+//                System.out.println("❌ [거절 처리]: " + userId);
                 break;
                 
             case "cancelMatch":
             	matchService.cancelMatch(userId);
-            	System.out.println("매칭 취소:" + userId);
+//            	System.out.println("매칭 취소:" + userId);
             	break;
             
             case "timeOut":
             	matchService.timeOut(userId);
-            	System.out.println("타임아웃:" + userId);
+//            	System.out.println("타임아웃:" + userId);
 
             default:
-                System.out.println("⚠️ 알 수 없는 액션: " + action);
+//                System.out.println("⚠️ 알 수 없는 액션: " + action);
         }
     }
 
     public void sendToUser(String userId, Object messageObject) {
         Set<WebSocketSession> sessions = sessionMap.get(userId);
         if (sessions == null || sessions.isEmpty()) {
-            System.out.println("⚠️ 세션 없음 → " + userId);
+//            System.out.println("⚠️ 세션 없음 → " + userId);
             return;
         }
 
@@ -108,13 +108,13 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
             for (WebSocketSession session : sessions) {
                 if (session.isOpen()) {
                     session.sendMessage(new TextMessage(json));
-                    System.out.println("📤 전송됨 → " + userId + ", sessionId: " + session.getId());
+//                    System.out.println("📤 전송됨 → " + userId + ", sessionId: " + session.getId());
                 } else {
-                    System.out.println("❌ 세션 닫힘 → " + session.getId());
+//                    System.out.println("❌ 세션 닫힘 → " + session.getId());
                 }
             }
         } catch (Exception e) {
-            System.err.println("❌ 전송 실패: " + e.getMessage());
+//            System.err.println("❌ 전송 실패: " + e.getMessage());
         }
     }
 
@@ -128,7 +128,7 @@ public class GameMatchWebSocketHandler extends TextWebSocketHandler {
                 if (sessions.isEmpty()) {
                     sessionMap.remove(userId);
                 }
-                System.out.println("❎ 연결 해제됨 → " + userId + ", sessionId: " + session.getId());
+//                System.out.println("❎ 연결 해제됨 → " + userId + ", sessionId: " + session.getId());
             }
         }
     }

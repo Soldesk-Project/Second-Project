@@ -8,9 +8,7 @@ import GameChatbox from '../../components/chatbox/GameChatbox';
 import ResultModal from '../../components/modal/ResultModal';
 
 const getRankedUsers = (users, gameMode) => {
-  
-  console.log(gameMode);
-  
+
   const sorted = [...users].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
   let rank = 0;
   let lastScore = null;
@@ -35,13 +33,14 @@ const getRankedUsers = (users, gameMode) => {
     };
   });
 };
- 
+
 const InPlay = () => {
   const [play, setPlay] = useState(false);
   const [users, setUsers] = useState([]);
   const [question, setQuestion] = useState(null);
   const [nextId, setNextId] = useState(0);
   const [time, setTime] = useState('타이머');
+  const [score, setScore] = useState(0);
   const [result, setResult] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const questionListRef = useRef([]);
@@ -167,7 +166,30 @@ const InPlay = () => {
         setTime('타이머');
       }
 
-      if (data.type === 'checkAnswerAndNextQuestion' &&
+      if (
+        data.type === 'nextQuestion' &&
+        data.roomNo === roomNo &&
+        (gameMode === 'rank' ? data.server === 'rank' : data.server === server)
+      ) {
+        const nextId = Number(data.nextId);
+        setNextId(nextId);
+
+        if (questionListRef.current.length === 0) {
+          console.error("questionListRef가 비어 있습니다.");
+          return;
+        }
+
+        if (nextId < questionListRef.current.length) {
+          setQuestion({ ...questionListRef.current[nextId] });
+        } else {
+          setPlay(false);
+          setResult(true);
+          setTime('타이머');
+        }
+      }
+
+      if (
+        data.type === 'sumScore' &&
         data.roomNo === roomNo &&
         (gameMode === 'rank' ? data.server === 'rank' : data.server === server)
       ) {
@@ -177,68 +199,7 @@ const InPlay = () => {
             score: data.scores[u.userNick] ?? u.score
           })));
         }
-
-        console.log("다음 문제 Id : "+data.nextId);
-        
-        if (data.nextId !== null) {
-          const nextId = Number(data.nextId);
-          setNextId(nextId);
-  
-          if (questionListRef.current.length === 0) {
-            console.error("questionListRef가 비어 있습니다.");
-            return;
-          }
-          if (nextId < questionListRef.current.length) {
-            setQuestion({ ...questionListRef.current[nextId] });
-            setTime(6);
-          } else {
-            setPlay(false);
-            setResult(true);
-            setTime('타이머');
-          }
-          
-        }
-        
-        
-
-
       }
-
-
-      // if (
-      //   data.type === 'nextQuestion' &&
-      //   data.roomNo === roomNo &&
-      //   (gameMode === 'rank' ? data.server === 'rank' : data.server === server)
-      // ) {
-      //   const nextId = Number(data.nextId);
-      //   setNextId(nextId);
-
-      //   if (questionListRef.current.length === 0) {
-      //     console.error("questionListRef가 비어 있습니다.");
-      //     return;
-      //   }
-
-      //   if (nextId < questionListRef.current.length) {
-      //     setQuestion({ ...questionListRef.current[nextId] });
-      //   } else {
-      //     setPlay(false);
-      //     setResult(true);
-      //     setTime('타이머');
-      //   }
-      // }
-
-      // if (
-      //   data.type === 'sumScore' &&
-      //   data.roomNo === roomNo &&
-      //   (gameMode === 'rank' ? data.server === 'rank' : data.server === server)
-      // ) {
-      //   if (data.scores) {
-      //     setUsers(users => users.map(u => ({
-      //       ...u,
-      //       score: data.scores[u.userNick] ?? u.score
-      //     })));
-      //   }
-      // }
     };
 
     socket.onclose = () => {
@@ -262,9 +223,6 @@ const InPlay = () => {
       }, 1000);
 
       if (time <= 0) {
-        // 요청 시점만 로그
-        //console.log(`[${userNick}] nextQuestion 요청 보냄 at ${new Date().toLocaleTimeString()}`);
-
         handleAnswerSubmit(selectedAnswer);
       }
 
@@ -274,54 +232,24 @@ const InPlay = () => {
 
   // 정답 판단
   const handleAnswerSubmit = (answer) => {
+    
     const socket = sockets['room'];
     if (socket && socket.readyState === 1) {
       socket.send(JSON.stringify({
-        action: 'checkAnswer',
+        action: 'submitAnswer',  // or 'checkAnswer' 등 서버에 맞춰서!
         server,
         roomNo,
         userNick,
-        answer,
+        answer, // 내가 선택한 답 번호만 보냄!
+        questionIndex: nextId, // 현재 문제 번호
         game_mode: gameMode
       }));
     } else {
-      alert('웹소켓 연결이 준비되지 않았습니다 - checkAnswer');
-    } 
-    setTime(6);    
+      alert('웹소켓 연결이 준비되지 않았습니다 - answer');
+    }
+    setTime(5);
     setSelectedAnswer(null);
   };
-  // const handleAnswerSubmit = (answer, targetQuestion) => {
-
-  //   console.log(`[${userNick}] 정답 판정! 선택 답: ${answer} (정답: ${targetQuestion?.correct_answer}) at ${new Date().toLocaleTimeString()}`);
-  //   const isCorrect = targetQuestion  && targetQuestion.correct_answer === parseInt(answer);
-  //   const socket = sockets['room'];
-  //   if (isCorrect){
-  //     if (socket && socket.readyState === 1) {
-  //       socket.send(JSON.stringify({
-  //         action: 'sumScore',
-  //         server,
-  //         roomNo,
-  //         userNick,
-  //         game_mode: gameMode
-  //       }));
-  //     } else {
-  //       alert('웹소켓 연결이 준비되지 않았습니다 - score');
-  //     } 
-  //   }
-  //   if (socket && socket.readyState === 1) {
-  //     socket.send(JSON.stringify({
-  //       action: 'nextQuestion',
-  //       server,
-  //       roomNo,
-  //       userNick,
-  //       game_mode: gameMode
-  //     }));
-  //     setTime(6);    
-  //   } else {
-  //     alert('웹소켓 연결이 준비되지 않았습니다 - nextQuestion');
-  //   }
-  //   setSelectedAnswer(null);
-  // };
 
   // 시작 버튼
   const start = () => {

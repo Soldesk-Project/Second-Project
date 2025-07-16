@@ -48,8 +48,6 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
             return;
         }
 
-        console.log(`GameChatbox: STOMP 연결 시작 시도... gameroomNo: ${gameroomNo}`);
-
         // ⭐ 기존 연결을 정리하는 함수
         const cleanupExistingConnection = () => {
             const client = stompClientRef.current;
@@ -58,7 +56,6 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
             if (subscription) {
                 try {
                     subscription.unsubscribe(); // 구독 해제
-                    console.log("GameChatbox: 기존 STOMP 구독 해제 완료.");
                 } catch (e) {
                     console.warn("GameChatbox: 구독 해제 중 오류 발생:", e);
                 }
@@ -66,7 +63,6 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
             }
 
             if (client && client.connected) {
-                console.log(`GameChatbox: 기존 STOMP 연결 해제 시도 (roomNo: ${gameroomNo}).`);
                 
                 // GAME_LEAVE 메시지 전송
                 client.send(`/app/gameChat.leaveUser/${gameroomNo}`, {}, JSON.stringify({
@@ -80,7 +76,6 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
                 setTimeout(() => {
                     if (client.connected) { // 혹시 그 사이에 이미 해제되지 않았는지 확인
                         client.disconnect(() => {
-                            console.log("GameChatbox: 기존 STOMP 연결 해제 완료.");
                             stompClientRef.current = null;
                             setIsConnected(false);
                             hasSentJoinRef.current = false;
@@ -91,7 +86,6 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
                 }, 50); // 짧은 지연 (메시지 전송 시간을 벌기 위함)
 
             } else {
-                console.log("GameChatbox: 해제할 기존 연결이 없거나 이미 해제됨.");
                 stompClientRef.current = null;
                 setIsConnected(false);
                 hasSentJoinRef.current = false;
@@ -113,13 +107,10 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
             setMessages([]); // 새 연결 성공 시 메시지 목록 초기화
             hasSentJoinRef.current = false; // 새 연결이므로 GAME_JOIN 메시지 보낼 준비
 
-            console.log(`GameChatbox: STOMP 연결 성공. roomNo: ${gameroomNo}`);
-
             // ⭐ 게임방 채팅 구독 (`/serverChat/public` -> `/gameChat/{gameroomNo}`)
             const sub = client.subscribe(`/gameChat/${gameroomNo}`, message => {
                 try {
                     const receivedMessage = JSON.parse(message.body);
-                    console.log("🟢 GameChatbox: 수신된 게임 채팅 메시지:", receivedMessage);
 
                     // mContent가 null일 경우 처리
                     if (receivedMessage.mType === 'GAME_LEAVE' && receivedMessage.mContent === null) {
@@ -150,7 +141,6 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
                     gameroomNo: gameroomNo // 게임방 번호 추가
                 }));
                 hasSentJoinRef.current = true;
-                console.log(`GameChatbox: GAME_JOIN 메시지 전송 완료 for room ${gameroomNo}`);
             } else {
                 console.log("GameChatbox: GAME_JOIN 메시지 이미 전송됨 (hasSentJoinRef). 스킵.");
             }
@@ -165,7 +155,6 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
 
         // ⭐ 클린업 함수 (컴포넌트 언마운트 또는 의존성 변경 시 실행)
         return () => {
-            console.log(`GameChatbox: 클린업 함수 실행 (roomNo: ${gameroomNo}) - 언마운트/의존성 변경`);
             cleanupExistingConnection(); // 기존 연결 정리 로직 재사용
         };
     // ⭐ 의존성 배열에 gameroomNo 추가 (이게 바뀌면 useEffect 재실행)
@@ -221,12 +210,10 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
         // 게임방에서는 귓속말 모드 비활성화
         setIsWhisperMode(false); 
         setWhisperTarget('');
-        console.warn("GameChatbox: 게임방에서는 귓속말 모드를 지원하지 않습니다.");
     };
 
     //신고처리 (기존과 동일)
     const openReportModal = () => {
-        console.log("신고버튼 클릭");
         setIsReportModalOpen(true);
     };
 
@@ -235,7 +222,6 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
     };
 
     const handleReportSubmit = () => {
-        console.log("신고하기 버튼 클릭됨. 다음 채팅 내역이 신고될 수 있습니다:", messages);
         alert("채팅이 신고되었습니다. 관리자가 확인 후 조치할 예정입니다.");
         closeReportModal(); // 신고 처리 후 모달 닫기
     };

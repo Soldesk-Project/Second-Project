@@ -40,7 +40,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     // 방별 유저
     private final Map<String, Map<String, Set<String>>> roomUsers = new ConcurrentHashMap<>();
     
-    // 방별 문제
+    // 방별 문제 리스트
     private final Map<String, Map<String, List<QuestionDTO>>> roomQuestionList = new ConcurrentHashMap<>();
     
     // 방별 문제 Id
@@ -49,9 +49,11 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     // 방별 유저별 점수
     private final Map<String, Map<String, Map<String, AtomicInteger>>> roomScores = new ConcurrentHashMap<>();
     
+    // 방별 문제별로, 정답 제출한 유저 set 관리
+    private final Map<String, Map<String, Map<Integer, Set<String>>>> answerSubmittedUsers = new ConcurrentHashMap<>();
+    
     // 방장
     private final Map<String, Map<String, String>> roomOwners = new ConcurrentHashMap<>();
-    
     
     // 방별로 한 번만 시작하도록 관리
     private final Set<String> startedRankRooms = ConcurrentHashMap.newKeySet();
@@ -95,15 +97,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             case "stopGame":
             	handleStopGame(session, json);
             	break;
-            case "checkAnswer":
-            	handleCheckAnswer(session, json);
+            case "submitAnswer":
+            	handleSubmitAnswer(session, json);
             	break;
-//            case "nextQuestion":
-//            	handleNextQuestion(session, json);
-//            	break;
-//            case "sumScore":
-//            	handleSumScore(session, json);
-//            	break;
         }
     }
 
@@ -318,20 +314,19 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     	// 방장체크
     	String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
         if (owner == null || !owner.equals(userNick)) {
-            System.out.println("❌  요청 무시 - 방장 아님: " + userNick);
             return;
         }
     	
-    	System.out.println("게임 시작 요청 (방장) by " + userNick + " in room " + roomNo);
         List<QuestionDTO> list = playService.getQuestionsByCategory(category);
-        
-        
-        // 문제 저장
-        roomQuestionList.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).put(roomNo, list);
+        roomQuestionList.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
+        				.put(roomNo, list);
 
         // 방별 questionId 초기화
         AtomicInteger currentQuestionId = roomQuestionIds.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
         												 .computeIfAbsent(roomNo, k -> new AtomicInteger(0));
+        
+        answerSubmittedUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).remove(roomNo);
+        
         currentQuestionId.set(0);
         int nextId = currentQuestionId.getAndIncrement();
         
@@ -344,7 +339,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             roomScoreMap.put(user, new AtomicInteger(0));
         }
                 
-    	System.out.println(list);
     	Map<String, Object> payload = Map.of(
             "type", "gameStart",
             "server", server,
@@ -367,17 +361,17 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         String initiator = userNicks.iterator().next(); // 방장 또는 아무나
 
         List<QuestionDTO> list = playService.getQuestionsByCategory(category);
-        
-        // 문제 저장
-        roomQuestionList.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).put(roomNo, list);
+        roomQuestionList.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
+						.put(roomNo, list);
 
         AtomicInteger currentQuestionId = roomQuestionIds
             .computeIfAbsent(server, k -> new ConcurrentHashMap<>())
             .computeIfAbsent(roomNo, k -> new AtomicInteger(0));
         currentQuestionId.set(0);
+        
+        answerSubmittedUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).remove(roomNo);
         int nextId = currentQuestionId.getAndIncrement();
 
-        
         Map<String, Object> payload = Map.of(
             "type", "gameStart",
             "server", server,
@@ -387,8 +381,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             "nextId", nextId
         );
         
-        System.out.println("가져온 문제" + payload);
-
         broadcast(server, payload);
     }
     
@@ -404,11 +396,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         // 방장체크
         String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
         if (owner == null || !owner.equals(userNick)) {
-            System.out.println("❌  요청 무시 - 방장 아님: " + userNick);
             return;
         }
         
-        System.out.println("게임 중지 요청 (방장) by " + userNick + " in room " + roomNo);
         AtomicInteger currentQuestionId = roomQuestionIds.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
                 										 .computeIfAbsent(roomNo, k -> new AtomicInteger(0));
         currentQuestionId.set(0);
@@ -424,189 +414,104 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         broadcast(server, payload);
     }   
     
-    private void handleCheckAnswer(WebSocketSession session, JsonNode json) {
-    	String server = json.get("server").asText();
-        String roomNo = json.get("roomNo").asText();
-        String userNick = json.get("userNick").asText();
-        String answer = json.get("answer").asText();
-        String gameMode = json.has("game_mode") ? json.get("game_mode").asText() : "normal";
-    	
-        if (server == null || userNick == null || roomNo == null) {
-            return;
-        }
-        // 서버 관리
-        String broadcastServer = "rank".equals(gameMode) ? "rank" : server;
-        
-        AtomicInteger currentQuestionId = roomQuestionIds.computeIfAbsent(broadcastServer, k -> new ConcurrentHashMap<>())
-				 										 .computeIfAbsent(roomNo, k -> new AtomicInteger(0));
-        
-        int nowId=currentQuestionId.get();
-        
-        List<QuestionDTO> list = roomQuestionList.getOrDefault(broadcastServer, Collections.emptyMap())
-        										 .getOrDefault(roomNo, Collections.emptyList());
-        
-        String owner;
-        if ("rank".equals(gameMode)) {
-            owner = roomOwners.getOrDefault("rank", Collections.emptyMap()).get(roomNo);
-        } else {
-            owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
-        }
-        System.out.println("방장 : " + owner);
-        
-        // 점수 추가
-        Map<String, Map<String, AtomicInteger>> serverScoreMap = roomScores.computeIfAbsent(broadcastServer, k -> new ConcurrentHashMap<>());
-        Map<String, AtomicInteger> roomScoreMap = serverScoreMap.computeIfAbsent(roomNo, k -> new ConcurrentHashMap<>());
-        
-        boolean isCorrect=false;
-        try {
-        	int correctAnswer=list.get(nowId).getCorrect_answer();
-        	isCorrect=Integer.parseInt(answer) == correctAnswer;
-        	System.out.println("내가 체크한 답 : "+answer+" , 정답 : "+list.get(nowId).getCorrect_answer()+" , 문제번호 : "+nowId);
-		} catch (Exception e) {
-			System.out.println("내가 체크한 답 : "+answer+" , 정답 : "+list.get(nowId).getCorrect_answer()+" , 문제번호 : "+nowId);
-		}
-        
-        if (isCorrect) {
-        	AtomicInteger userScore = roomScoreMap.computeIfAbsent(userNick, k -> new AtomicInteger(0));
-        	userScore.incrementAndGet();
-        }
-        
-        Map<String, Integer> scores = new HashMap<>();
-        for (Map.Entry<String, AtomicInteger> entry : roomScoreMap.entrySet()) {
-        	scores.put(entry.getKey(), entry.getValue().get());
-        }
-        
-        
-        // 문제 번호 관리도 랭크/일반 구분
-        // 다음 문제로
-//        if ("rank".equals(gameMode)) {
-//            currentQuestionId = roomQuestionIds
-//                .computeIfAbsent("rank", k -> new ConcurrentHashMap<>())
-//                .computeIfAbsent(roomNo, k -> new AtomicInteger(1));
-//            System.out.println("문제 번호 층가 rank");
-//        } else {
-//            currentQuestionId = roomQuestionIds
-//                .computeIfAbsent(server, k -> new ConcurrentHashMap<>())
-//                .computeIfAbsent(roomNo, k -> new AtomicInteger(1));
-//            System.out.println("문제 번호 층가 일반");
-//        }
-        System.out.println(nowId);
-        int nextId = currentQuestionId.incrementAndGet();
-        
-        System.out.println(nextId);
-        
-        if (owner == null || !owner.equals(userNick)) {
-        	Map<String, Object> payload = Map.of(
-        			"type", "checkAnswerAndNextQuestion",
-        			"server", broadcastServer,
-        			"roomNo", roomNo,
-        			"initiator", userNick,
-        			"scores", scores
-        			);
-        	broadcast(broadcastServer, payload);
-        	System.out.println("❌  요청 무시 - 방장 아님: " + userNick);
-        }else {
-        	Map<String, Object> payload = Map.of(
-        			"type", "checkAnswerAndNextQuestion",
-        			"server", broadcastServer,
-        			"roomNo", roomNo,
-        			"initiator", userNick,
-        			"nextId", nextId,
-        			"scores", scores
-        			);
-        	broadcast(broadcastServer, payload);
-        	System.out.println("다음 문제 요청 (방장) by " + userNick + " in room " + roomNo);
-        }
-        
-    }
-    
-    private void handleNextQuestion(WebSocketSession session, JsonNode json) {
+    private void handleSubmitAnswer(WebSocketSession session, JsonNode json) {
+        // 1. 데이터 파싱
         String server = json.get("server").asText();
         String roomNo = json.get("roomNo").asText();
         String userNick = json.get("userNick").asText();
-        String gameMode = json.has("game_mode") ? json.get("game_mode").asText() : "normal"; // 혹시 없을 때 default
-
-        if (server == null || userNick == null || roomNo == null) {
-            return;
-        }
+        int answer = json.get("answer").asInt(); // 유저가 제출한 답
+        String gameMode = json.has("game_mode") ? json.get("game_mode").asText() : "normal";
         
-        // 게임 모드에 따른 서버 분기처리
+        if (server == null || roomNo == null || userNick == null) return;
+
+        // 2. 서버에 저장된 문제 인덱스 (문제 인덱스 증가는 nextQuestion에서만 하도록!)
         String broadcastServer = "rank".equals(gameMode) ? "rank" : server;
 
-        // 방장 체크 - 랭크는 "rank" 네임스페이스, 일반은 server별
-        String owner;
-        if ("rank".equals(gameMode)) {
-            owner = roomOwners.getOrDefault("rank", Collections.emptyMap()).get(roomNo);
+        // 문제 인덱스: 클라에서 questionIndex(=nextId) 보내면 사용, 아니면 서버의 현재 인덱스 사용 (권장: 항상 클라에서 보내라!)
+        int questionIdx;
+        if (json.has("questionIndex")) {
+            questionIdx = json.get("questionIndex").asInt();
         } else {
-            owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
+            // fallback: 서버 상태
+            AtomicInteger currentQuestionId = roomQuestionIds
+                .computeIfAbsent(broadcastServer, k -> new ConcurrentHashMap<>())
+                .computeIfAbsent(roomNo, k -> new AtomicInteger(0));
+            questionIdx = currentQuestionId.get() - 1;
+            if (questionIdx < 0) questionIdx = 0;
         }
-        System.out.println("방장 : " + owner);
 
-        if (owner == null || !owner.equals(userNick)) {
-            System.out.println("❌  요청 무시 - 방장 아님: " + userNick);
-            return;
-        }
+        // 3. 문제 리스트에서 인덱스로 문제 가져옴 (이제는 캐싱된 리스트에서!)
+        List<QuestionDTO> questionList = roomQuestionList
+            .getOrDefault(broadcastServer, Collections.emptyMap())
+            .getOrDefault(roomNo, Collections.emptyList());
+        if (questionIdx < 0 || questionIdx >= questionList.size()) return; // 인덱스 예외처리
 
-        System.out.println("다음 문제 요청 (방장) by " + userNick + " in room " + roomNo);
+        QuestionDTO curQ = questionList.get(questionIdx);
 
-        // 문제 번호 관리도 랭크/일반 구분
-        AtomicInteger currentQuestionId;
-        if ("rank".equals(gameMode)) {
-            currentQuestionId = roomQuestionIds
-                .computeIfAbsent("rank", k -> new ConcurrentHashMap<>())
-                .computeIfAbsent(roomNo, k -> new AtomicInteger(1));
-        } else {
-            currentQuestionId = roomQuestionIds
-                .computeIfAbsent(server, k -> new ConcurrentHashMap<>())
-                .computeIfAbsent(roomNo, k -> new AtomicInteger(1));
-        }
-        int nextId = currentQuestionId.getAndIncrement();
+        // 4. 정답 비교
+        boolean isCorrect = curQ.getCorrect_answer() == answer;
 
-        Map<String, Object> payload = Map.of(
-            "type", "nextQuestion",
-            "server", broadcastServer,
-            "roomNo", roomNo,
-            "initiator", userNick,
-            "nextId", nextId
-        );
-        broadcast(broadcastServer, payload);
-    }
-
-    
-    private void handleSumScore(WebSocketSession session, JsonNode json) {
-    	String server = json.get("server").asText();
-        String roomNo = json.get("roomNo").asText();
-        String userNick = json.get("userNick").asText();
-        String gameMode = json.has("game_mode") ? json.get("game_mode").asText() : "normal"; // 혹시 없을 때 default
-        
-        if (server == null || userNick == null || roomNo == null) {
-    		return;
-    	}
-        
-        // 게임 모드에 따른 서버 분기처리
-        String broadcastServer = "rank".equals(gameMode) ? "rank" : server;
-                
-        Map<String, Map<String, AtomicInteger>> serverScoreMap = roomScores.computeIfAbsent(server, k -> new ConcurrentHashMap<>());
+        // 5. 점수 증가(정답일 때만)
+        Map<String, Map<String, AtomicInteger>> serverScoreMap = roomScores.computeIfAbsent(broadcastServer, k -> new ConcurrentHashMap<>());
         Map<String, AtomicInteger> roomScoreMap = serverScoreMap.computeIfAbsent(roomNo, k -> new ConcurrentHashMap<>());
         AtomicInteger userScore = roomScoreMap.computeIfAbsent(userNick, k -> new AtomicInteger(0));
-        userScore.incrementAndGet();
+        if (isCorrect) {
+            userScore.incrementAndGet();
+        }
         Map<String, Integer> scores = new HashMap<>();
         for (Map.Entry<String, AtomicInteger> entry : roomScoreMap.entrySet()) {
             scores.put(entry.getKey(), entry.getValue().get());
         }
-        
-        Map<String, Object> payload = Map.of(
-    		"type", "sumScore",
-    		"server", broadcastServer,
-    		"roomNo", roomNo,
-    		"initiator", userNick,
-    		"scores", scores
-		);
-        
-        
-        broadcast(broadcastServer, payload);
+
+        answerSubmittedUsers.computeIfAbsent(broadcastServer, k -> new ConcurrentHashMap<>())
+        					.computeIfAbsent(roomNo, k -> new ConcurrentHashMap<>())
+        					.computeIfAbsent(questionIdx, k -> ConcurrentHashMap.newKeySet())
+        					.add(userNick);
+
+	    // 2. 현재 방의 전체 유저 수
+	    int totalUsers = roomUsers.getOrDefault(broadcastServer, Collections.emptyMap())
+	            .getOrDefault(roomNo, Collections.emptySet()).size();
+	    int submitted = answerSubmittedUsers.get(broadcastServer).get(roomNo).get(questionIdx).size();
+	
+	    // 3. 브로드캐스트 (점수 및 정답 여부)
+	    Map<String, Object> payload = Map.of(
+	        "type", "sumScore",
+	        "server", broadcastServer,
+	        "roomNo", roomNo,
+	        "userNick", userNick,
+	        "isCorrect", isCorrect,
+	        "answer", answer,
+	        "correctAnswer", curQ.getCorrect_answer(),
+	        "scores", scores
+	    );
+	    broadcast(broadcastServer, payload);
+	
+	    // 4. 모든 유저가 제출 완료 → 자동 다음 문제로!
+	    if (submitted == totalUsers) {
+	        // answerSubmittedUsers에서 현재 문제 인덱스(메모리) 해제도 가능
+	        sendNextQuestion(broadcastServer, roomNo, questionIdx + 1);
+	    }
     }
     
+    private void sendNextQuestion(String server, String roomNo, int nextIdx) {
+        // 문제리스트 길이 체크 (마지막 문제 처리)
+        List<QuestionDTO> questionList = roomQuestionList
+            .getOrDefault(server, Collections.emptyMap())
+            .getOrDefault(roomNo, Collections.emptyList());
+
+            roomQuestionIds.getOrDefault(server, Collections.emptyMap())
+                .getOrDefault(roomNo, new AtomicInteger()).set(nextIdx);
+            // 모든 유저에게 브로드캐스트
+            Map<String, Object> payload = Map.of(
+                "type", "nextQuestion",
+                "server", server,
+                "roomNo", roomNo,
+                "initiator", "SERVER",
+                "nextId", nextIdx
+            );
+            broadcast(server, payload);
+    }
+
     private void broadcastUserList(String server) {
         Set<String> users = serverUsers.getOrDefault(server, Collections.emptySet());
         broadcast(server, Map.of("type", "userList", "users", users));
@@ -628,7 +533,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             // 현재 인원수
             Set<String> users = roomUserMap.getOrDefault(room.getGameroom_no(), Collections.emptySet());
             roomMap.put("currentCount", users.size());
-            //System.out.println("방번호 : "+room.getGameroom_no()+", "+"유저수 : "+users.size());	
             roomListWithCount.add(roomMap);
         }
 
@@ -659,9 +563,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         broadcast(key, payload);
     }
 
-
-
-    
     private void broadcast(String server, Object data) {
         String json;
         try {
@@ -670,47 +571,24 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             return;
         }
         Set<WebSocketSession> sessions = serverSessions.getOrDefault(server, Collections.emptySet());
+        List<WebSocketSession> closedSessions = new ArrayList<>(); // 오류 세션 추적
+
         sessions.forEach(session -> {
             try {
                 if (session.isOpen()) {
                     session.sendMessage(new TextMessage(json));
+                } else {
+                    closedSessions.add(session);
                 }
             } catch (Exception e) {
-                e.printStackTrace(); // 꼭 콘솔로 찍어두세요!
+                // 여기서 오류 세션 모음 (특히 IllegalStateException)
+                closedSessions.add(session);
+                System.out.println("WebSocket 세션 오류: " + e.getMessage());
             }
         });
+        // 오류 세션 전체 제거
+        closedSessions.forEach(sessions::remove);
     }
-
-
-    
-    
-    
-	/*
-	 * private void autoStart(String roomNo) {
-	 * System.out.println("⏳ [랭크 자동 시작 예약] 10초 후 시작 - roomNo: " + roomNo);
-	 * 
-	 * new Timer().schedule(new TimerTask() {
-	 * 
-	 * @Override public void run() { Set<WebSocketSession> sessions =
-	 * serverSessions.values().stream() .flatMap(Set::stream) .filter(s -> { String
-	 * server = (String) s.getAttributes().get("server"); String userNick = (String)
-	 * s.getAttributes().get("userNick"); Set<String> roomUsersSet =
-	 * roomUsers.getOrDefault(server, Collections.emptyMap()) .getOrDefault(roomNo,
-	 * Collections.emptySet()); return roomUsersSet.contains(userNick); })
-	 * .collect(Collectors.toSet());
-	 * 
-	 * if (sessions.isEmpty()) { System.out.println("❌ 게임 시작 실패 - 세션 없음"); return; }
-	 * 
-	 * List<QuestionDTO> questionList =
-	 * playService.getQuestionsByCategory("random"); for (WebSocketSession session :
-	 * sessions) { try { session.sendMessage(new
-	 * TextMessage(objectMapper.writeValueAsString(Map.of( "type", "gameStart",
-	 * "questionList", questionList )))); } catch (IOException e) {
-	 * e.printStackTrace(); } }
-	 * 
-	 * System.out.println("🎮 [랭크 자동 시작] 게임 시작됨 - roomNo: " + roomNo); } }, 10000);
-	 * // 10초 후 실행 }
-	 */
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {

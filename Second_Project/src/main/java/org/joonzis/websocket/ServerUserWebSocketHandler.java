@@ -46,13 +46,13 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             removeSessionFromAllServers(session);
             serverSessions.putIfAbsent(server, new ConcurrentHashMap<>());
             serverSessions.get(server).put(session, new UserInfo(userNick, userNo, bgName, blName, bdName, titleName, fontColorName));
-            log.info("[WebSocket] 세션 추가됨. 서버: " + server + ", 세션ID: " + session.getId()
-            + ", 현재 접속 유저 수: " + serverSessions.get(server).size());
+//            log.info("[WebSocket] 세션 추가됨. 서버: " + server + ", 세션ID: " + session.getId()
+//            + ", 현재 접속 유저 수: " + serverSessions.get(server).size());
             // 3) 해당 서버에 접속한 유저 목록 전송
             broadcastUserList(server);
         }
         else if ("updateStyle".equals(action) && userNo != null) {
-            log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
+//            log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
             UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));
             if (updatedUser == null) {
 //                log.warn("해당 userNo의 유저 정보를 DB에서 찾을 수 없습니다: " + userNo);
@@ -98,10 +98,10 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         for (Map<WebSocketSession, UserInfo> sessionMap : serverSessions.values()) {
             for (WebSocketSession session : sessionMap.keySet()) {
             	 if (session.isOpen()) {
-                     log.info("Sending styleUpdated to session: " + session.getId());
+//                     log.info("Sending styleUpdated to session: " + session.getId());
                      session.sendMessage(message);
                  } else {
-                     log.warn("WebSocket session closed: " + session.getId());
+//                     log.warn("WebSocket session closed: " + session.getId());
                  }
             }
         }
@@ -120,7 +120,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         return null;
     }
     public void notifyUserStyleUpdate(String userNo) throws Exception {
-        log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
+//        log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
         String server = findServerByUserNo(userNo);  // ① 서버 탐색
         UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));  // ② DB 조회
 //        log.info(updatedUser);
