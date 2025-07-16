@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.joonzis.mapper.AdminMapper">
+
+    <sql id="questionColumns">
+        id, question_text, option_1, option_2, option_3, option_4, correct_answer, image_data, created_at
+    </sql>
+	
+	<!-- 문제 등록 관련 쿼리들 -->
+    <insert id="insertCPE_Q" parameterType="org.joonzis.domain.QuestionDTO">
+        INSERT INTO CPE_Q (
+            <include refid="questionColumns" />
+        ) VALUES (
+            CPE_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
+        )
+    </insert>
+
+    <insert id="insertCPEI_Q" parameterType="org.joonzis.domain.QuestionDTO">
+        INSERT INTO CPEI_Q (
+            <include refid="questionColumns" />
+        ) VALUES (
+            CPEI_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
+        )
+    </insert>
+
+    <insert id="insertCPET_Q" parameterType="org.joonzis.domain.QuestionDTO">
+        INSERT INTO CPET_Q (
+            <include refid="questionColumns" />
+        ) VALUES (
+            CPET_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
+        )
+    </insert>
+
+    <insert id="insertLM1_Q" parameterType="org.joonzis.domain.QuestionDTO">
+        INSERT INTO LM1_Q (
+            <include refid="questionColumns" />
+        ) VALUES (
+            LM1_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
+        )
+    </insert>
+
+    <insert id="insertLM2_Q" parameterType="org.joonzis.domain.QuestionDTO">
+        INSERT INTO LM2_Q (
+            <include refid="questionColumns" />
+        ) VALUES (
+            LM2_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
+        )
+    </insert>
+
+    <insert id="insertICTI_Q" parameterType="org.joonzis.domain.QuestionDTO">
+        INSERT INTO ICTI_Q (
+            <include refid="questionColumns" />
+        ) VALUES (
+            ICTI_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
+        )
+    </insert>
+
+    <insert id="insertICT_Q" parameterType="org.joonzis.domain.QuestionDTO">
+        INSERT INTO ICT_Q (
+            <include refid="questionColumns" />
+        ) VALUES (
+            ICT_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
+        )
+    </insert>
+
+    <insert id="insertSEC_Q" parameterType="org.joonzis.domain.QuestionDTO">
+        INSERT INTO SEC_Q (
+            <include refid="questionColumns" />
+        ) VALUES (
+            SEC_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
+        )
+    </insert>
+
+    <insert id="insertNET1_Q" parameterType="org.joonzis.domain.QuestionDTO">
+        INSERT INTO NET1_Q (
+            <include refid="questionColumns" />
+        ) VALUES (
+            NET1_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
+        )
+    </insert>
+
+    <insert id="insertNET2_Q" parameterType="org.joonzis.domain.QuestionDTO">
+        INSERT INTO NET2_Q (
+            <include refid="questionColumns" />
+        ) VALUES (
+            NET2_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
+        )
+    </insert>
+	
+	<!-- 문제 검색 쿼리들 -->
+	<select id="getQuestionsBySearch" resultType="org.joonzis.domain.QuestionDTO" parameterType="map">
+    SELECT
+        id,
+        question_text,
+        option_1,
+        option_2,
+        option_3,
+        option_4,
+        correct_answer,
+        image_data
+    FROM
+        ${category}
+    <where>
+        <if test="query != null and query != ''">
+            question_text LIKE '%' || #{query} || '%'
+        </if>
+    </where>
+    ORDER BY id DESC
+</select>
+
+    <select id="getTotalQuestionCount" resultType="int" parameterType="map">
+        SELECT COUNT(*)
+        FROM ${category}
+        <where>
+            <if test="query != null and query != ''">
+                question_text LIKE '%' || #{query} || '%'
+            </if>
+        </where>
+    </select>
+	
+	<!-- 문제 수정쿼리 -->
+    <update id="updateQuestion" parameterType="map">
+        UPDATE ${category}
+        SET
+            question_text = #{question.question_text},
+            option_1 = #{question.option_1},
+            option_2 = #{question.option_2},
+            option_3 = #{question.option_3},
+            option_4 = #{question.option_4},
+            correct_answer = #{question.correct_answer},
+            <if test="question.image_data != null">
+                image_data = #{question.image_data, jdbcType=BLOB}
+            </if>
+            <if test="question.image_data == null">
+                image_data = NULL
+            </if>
+        WHERE
+            id = #{question.id}
+    </update>
+
+</mapper>
