@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useContext, useRef, useCallback, useMemo } from 'react';
 import Test from '../../components/Test';
 import styles from '../../css/Inplay.module.css';
 import { useSelector } from 'react-redux';
@@ -8,6 +8,9 @@ import GameChatbox from '../../components/chatbox/GameChatbox';
 import ResultModal from '../../components/modal/ResultModal';
 
 const getRankedUsers = (users, gameMode) => {
+  
+  console.log(gameMode);
+  
   const sorted = [...users].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
   let rank = 0;
   let lastScore = null;
@@ -32,7 +35,7 @@ const getRankedUsers = (users, gameMode) => {
     };
   });
 };
-
+ 
 const InPlay = () => {
   const [play, setPlay] = useState(false);
   const [users, setUsers] = useState([]);
@@ -52,7 +55,7 @@ const InPlay = () => {
   const category = location.state?.category || 'random';
   // 랭크 진입 경로 일 때도 항상 gameMode를 제대로 받게 한다
   const gameMode = location.state?.gameMode || location.state?.game_mode || 'normal';
-  const rankedUsers = getRankedUsers(users);
+  const rankedUsers = useMemo(() => getRankedUsers(users, gameMode), [users, gameMode]);
   const messageTimeoutRef = useRef({});
   
   // 소켓
@@ -235,7 +238,7 @@ const InPlay = () => {
   // 정답 판단
   const handleAnswerSubmit = (answer, targetQuestion) => {
 
-    //console.log(`[${userNick}] 정답 판정! 선택 답: ${answer} (정답: ${targetQuestion?.correct_answer}) at ${new Date().toLocaleTimeString()}`);
+    console.log(`[${userNick}] 정답 판정! 선택 답: ${answer} (정답: ${targetQuestion?.correct_answer}) at ${new Date().toLocaleTimeString()}`);
     const isCorrect = targetQuestion  && targetQuestion.correct_answer === parseInt(answer);
     const socket = sockets['room'];
     if (isCorrect){

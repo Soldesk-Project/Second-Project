@@ -26,8 +26,9 @@ const ResultModal = ({users, setResult, gameMode}) => {
   // const rankedUsers = getRankedUsers(users);
 
   console.log(gameMode);
+  console.log(users);
+  console.log(setResult);
   
-
   const close=()=>{
     setResult(false);
   }
