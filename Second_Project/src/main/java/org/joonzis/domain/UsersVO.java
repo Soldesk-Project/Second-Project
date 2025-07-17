@@ -1,5 +1,6 @@
 package org.joonzis.domain;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -18,4 +19,6 @@ public class UsersVO {
 	private long user_point;
 	private String user_nick, user_id, user_pw, user_email;
 	private Date user_date;
+	private int ischatbanned;
+    private Timestamp banned_timestamp;
 }

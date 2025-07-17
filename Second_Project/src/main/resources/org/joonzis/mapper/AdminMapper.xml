@@ -148,4 +148,58 @@
             #{id}
         </foreach>
     </delete>
+    
+    <!-- 유저조회 -->
+    <select id="selectAllUsers" resultType="org.joonzis.domain.UsersVO">
+        SELECT USER_NO, USER_ID, USER_NICK, USER_EMAIL, USER_DATE, USER_POINT, USER_RANK, USER_PLAY_COUNT, USER_1ST_COUNT, USER_PW
+        FROM USERS
+    </select>
+	
+	<!-- 유저 검색 -->
+    <select id="searchUsers" resultType="org.joonzis.domain.UsersVO">
+        SELECT USER_NO, USER_ID, USER_NICK, USER_EMAIL, USER_DATE, USER_POINT, USER_RANK, USER_PLAY_COUNT, USER_1ST_COUNT, USER_PW
+        FROM USERS
+        <where>
+            <if test="searchType != null and searchValue != null and searchValue != ''">
+                <choose>
+                    <when test="searchType == 'userNo'">
+                        USER_NO LIKE '%' || #{searchValue} || '%'
+                    </when>
+                    <when test="searchType == 'userId'">
+                        USER_ID LIKE '%' || #{searchValue} || '%'
+                    </when>
+                    <when test="searchType == 'userNick'">
+                        USER_NICK LIKE '%' || #{searchValue} || '%'
+                    </when>
+                    <when test="searchType == 'userRank'">
+                        TO_CHAR(USER_RANK) LIKE '%' || #{searchValue} || '%'
+                    </when>
+                </choose>
+            </if>
+        </where>
+        ORDER BY USER_NO DESC
+    </select>
+    
+    <!-- 유저 채금 적용 -->
+    <update id="banChatusers">
+        UPDATE USERS
+        SET
+            ISCHATBANNED = 1,
+            BANNED_TIMESTAMP = SYSTIMESTAMP
+        WHERE USER_NO IN
+        <foreach item="userNo" collection="list" open="(" separator="," close=")">
+            #{userNo}
+        </foreach>
+    </update>
+    
+    <update id="performUnbanExpiredChatUsers">
+        UPDATE USERS
+        SET
+            ISCHATBANNED = 0,
+            BANNED_TIMESTAMP = NULL
+        WHERE
+            ISCHATBANNED = 1
+            AND BANNED_TIMESTAMP IS NOT NULL
+            AND BANNED_TIMESTAMP <![CDATA[ <= ]]> (SYSTIMESTAMP - INTERVAL '72' HOUR)
+    </update>
 </mapper>

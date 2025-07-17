@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.Base64;
 
 import org.joonzis.domain.QuestionDTO;
+import org.joonzis.domain.UsersVO;
 import org.joonzis.mapper.AdminMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.log4j.Log4j;
 
@@ -175,15 +177,14 @@ public class AdminServiceImpl implements AdminService {
         return result;
     }
 
-    // 새롭게 추가된 문제 수정 메서드 구현
+    //문제 수정 메서드
     @Override
     public void updateQuestion(QuestionDTO questionDTO, String category) {
-        // 문제 ID(questionDTO.getId())를 사용하여 해당 카테고리 테이블에서 문제 수정
-        // 예: adminMapper.updateQuestion(questionDTO, category);
         System.out.println("ServiceImpl: 문제 수정 실행 - 카테고리: " + category + ", DTO: " + questionDTO);
         adminMapper.updateQuestion(questionDTO, category);
     }
     
+    //문제 삭제 메소드
     @Override
     public void deleteQuestions(String category, List<Integer> questionIds) {
         log.info("ServiceImpl: deleteQuestions 호출 - 카테고리: " + category + ", 삭제할 ID 목록: " + questionIds);
@@ -206,5 +207,36 @@ public class AdminServiceImpl implements AdminService {
             log.error("문제 삭제 중 매퍼 오류 발생: " + e.getMessage(), e);
             throw new RuntimeException("데이터베이스에서 문제를 삭제하는 중 오류가 발생했습니다.", e);
         }
+    }
+    
+    //유저 조회
+    @Override
+    public List<UsersVO> getAllUsers() {
+        return adminMapper.selectAllUsers();
+    }
+    
+    //유저 검색
+    @Override
+    public List<UsersVO> searchUsers(String searchType, String searchValue) {
+        // 필요하다면 여기에서 검색어 유효성 검사 등 추가적인 비즈니스 로직을 구현할 수 있습니다.
+        return adminMapper.searchUsers(searchType, searchValue);
+    }
+    
+    //유저 채금 적용
+    @Override
+    @Transactional
+    public int banChatusers(List<Integer> userNos) {
+        if (userNos == null || userNos.isEmpty()) {
+            return 0;
+        }
+        return adminMapper.banChatusers(userNos);
+    }
+    
+    //유저 채금 해제
+    @Override
+    @Transactional
+    public void unbanChatUsers() {
+        // 매퍼를 호출하여 72시간이 경과한 사용자들의 밴 상태를 해제
+        adminMapper.unbanChatUsers();
     }
 }

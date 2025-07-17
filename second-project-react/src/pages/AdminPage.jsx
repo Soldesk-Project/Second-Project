@@ -68,8 +68,8 @@ const AdminPage = () => {
       {/* 상단 바 (로고 + 메뉴 + 검색) */}
       <div className={Headerstyles.top_nav}><Header /></div>
       <div className={styles.top_nav}>
-        <button className="QnaAdminBtn" onClick={setPageQnaAdmin}>문제관리</button>
-        <button className="UserAdminBtn" onClick={setpageUserAdmin}>유저관리</button>
+        <button className="QnaAdminBtn" onClick={setPageQnaAdmin}>문제/제보관리</button>
+        <button className="UserAdminBtn" onClick={setpageUserAdmin}>유저/권한관리</button>
         <span>관리자 {userNick} 님</span>
       </div>
       {/*메인 바디 */}
