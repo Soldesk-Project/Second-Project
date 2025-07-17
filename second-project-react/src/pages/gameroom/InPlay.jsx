@@ -40,9 +40,9 @@ const InPlay = () => {
   const [question, setQuestion] = useState(null);
   const [nextId, setNextId] = useState(0);
   const [time, setTime] = useState('타이머');
-  const [score, setScore] = useState(0);
   const [result, setResult] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [userAnswerHistory, setUserAnswerHistory] = useState([]);
   const questionListRef = useRef([]);
   const { roomNo } = useParams();
   const nav = useNavigate();
@@ -143,6 +143,8 @@ const InPlay = () => {
         data.roomNo === roomNo &&
         (gameMode === 'rank' ? data.server === 'rank' : data.server === server)
       ) {
+        console.log(data.list);
+        
         if (Array.isArray(data.list) && data.list.length > 0) {
           setNextId(0);
           questionListRef.current = data.list;
@@ -199,7 +201,36 @@ const InPlay = () => {
             score: data.scores[u.userNick] ?? u.score
           })));
         }
+        setUserAnswerHistory(prev=>[...prev, 
+          {
+            userNick: data.userNick,
+            question_id: data.questionListRef.current[data.questionIdx].id,
+            subject: setKoreanToCategory(questionListRef.current[data.questionIdx].subject),
+            selected_answer: data.answer,
+            correct_answer: data.correctAnswer,
+            is_correct: data.isCorrect,
+            submitted_at: data.isCorrect,
+          }
+        ])
+        // console.log("-----------------");
+        // console.log("userNick : "+data.userNick);
+        // console.log("isCorrect : "+data.isCorrect);
+        // console.log("answer : "+data.answer);
+        // console.log("correctAnswer : "+data.correctAnswer);
+        // console.log("question : "+data.questionIdx);
+        // console.log("question : "+questionListRef.current[data.questionIdx].id);
+        // console.log("question : "+setKoreanToCategory(questionListRef.current[data.questionIdx].subject));
+        // console.log("question : "+questionListRef.current[data.questionIdx].question_text);
+        // console.log("question : "+questionListRef.current[data.questionIdx].correct_answer);
+        
+
       }
+
+      // if (data.type === 'joinDenied') {
+      //   alert(data.reason);
+      // }
+
+
     };
 
     socket.onclose = () => {
@@ -219,7 +250,7 @@ const InPlay = () => {
   useEffect(() => {
     if (play) {
       const timer = setInterval(() => {
-        setTime((prev) => prev - 1);
+        setTime(time - 1);
       }, 1000);
 
       if (time <= 0) {
@@ -228,7 +259,27 @@ const InPlay = () => {
 
       return () => clearInterval(timer,);
     }
-  }, [time, play]);
+    if (!play && result) {
+
+      const socket = sockets['room'];
+      if (socket && socket.readyState === 1) {
+        const myInfo = rankedUsers.find(u => u.userNick === userNick);
+        const myPoint = myInfo.point ?? 0;
+        console.log(userAnswerHistory);
+        
+        socket.send(JSON.stringify({
+          action: 'rewardPointsAndSaveUserHistory',
+          server,
+          roomNo,
+          userNick,
+          point: myPoint,
+          // history: userAnswerHistory
+        }));
+      } else {
+        alert('웹소켓 연결이 준비되지 않았습니다 - rewardPoints');
+      }
+    }
+  }, [time, play, result]);
 
   // 정답 판단
   const handleAnswerSubmit = (answer) => {
@@ -247,7 +298,7 @@ const InPlay = () => {
     } else {
       alert('웹소켓 연결이 준비되지 않았습니다 - answer');
     }
-    setTime(5);
+    setTime(1);
     setSelectedAnswer(null);
   };
 
@@ -303,13 +354,23 @@ const InPlay = () => {
       case "CPE_Q": return "정보처리기사";
       case "CPEI_Q": return "정보처리산업기사";
       case "CPET_Q": return "정보처리기능사";
-      case "LM1_Q": return "리눅스마스터1급";
-      case "LM2_Q": return "리눅스마스터2급";
+      case "LM1_Q": return "리눅스마스터 1급";
+      case "LM2_Q": return "리눅스마스터 2급";
       case "ICTI_Q": return "정보통신산업기사";
       case "ICT_Q": return "정보통신기사";
       case "SEC_Q": return "정보보안기사";
-      case "NET1_Q": return "네트워크관리사1급";
-      case "NET2_Q": return "네트워크관리사2급";
+      case "NET1_Q": return "네트워크관리사 1급";
+      case "NET2_Q": return "네트워크관리사 2급";
+      case "정보처리기사": return "CPE_Q";
+      case "정보처리산업기사": return "CPEI_Q";
+      case "정보처리기능사": return "CPET_Q";
+      case "리눅스마스터 1급": return "LM1_Q";
+      case "리눅스마스터 2급": return "LM2_Q";
+      case "정보통신산업기사": return "ICTI_Q";
+      case "정보통신기사": return "ICT_Q";
+      case "정보보안기사": return "SEC_Q";
+      case "네트워크관리사 1급": return "NET1_Q";
+      case "네트워크관리사 2급": return "NET2_Q";
       default: return category || "알 수 없음";
     }
   };
