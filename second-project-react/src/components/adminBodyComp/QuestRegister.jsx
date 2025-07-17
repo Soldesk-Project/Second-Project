@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../../css/adminPage/QuestRegister.css'; // CSS 파일 임포트
 
 const QuestRegister = () => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -92,9 +93,9 @@ const QuestRegister = () => {
       } else {
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
-        const errorData = await response.json();
-        console.error('문제 등록 실패 상세:', errorData);
-        alert('문제 등록 실패: ' + (errorData.message || '알 수 없는 오류'));
+          const errorData = await response.json();
+          console.error('문제 등록 실패 상세:', errorData);
+          alert('문제 등록 실패: ' + (errorData.message || '알 수 없는 오류'));
         }
       }
     } catch (error) {
@@ -114,12 +115,12 @@ const QuestRegister = () => {
   };
 
   return (
-    <div>
-      <h1>문제 등록</h1>
-      <br/>
-      <div className='category'>
-        <h3>1. 카테고리 선택</h3>
-        <select name="cateSelect" value={category} onChange={handleCategoryChange}>
+    <div className="quest-register-container"> {/* 최상위 div에 클래스 추가 */}
+      <h1 className="quest-register-title">문제 등록</h1>
+      
+      <div className='category-section'>
+        <h3 className="section-title">1. 카테고리 선택</h3>
+        <select name="cateSelect" value={category} onChange={handleCategoryChange} className="category-select">
           {categories.map((cat, index) => (
             <option key={index} value={cat}>
               {cat}
@@ -127,22 +128,22 @@ const QuestRegister = () => {
           ))}
         </select>
       </div>
-      <br/>
-      <div className='questionText'>
-        <h3>2. 문제 본문 입력</h3>
+      
+      <div className='question-text-section'>
+        <h3 className="section-title">2. 문제 본문 입력</h3>
         <input
           type="text"
           value={questionText}
           onChange={(e) => setQuestionText(e.target.value)}
-          style={{ width: '80%', padding: '5px' }}
+          className="question-text-input"
           placeholder="문제 본문을 입력하세요."
         />
       </div>
-      <br/>
-      <div className='option'>
-        <h3>3. 선택지 입력</h3>
+      
+      <div className='option-section'>
+        <h3 className="section-title">3. 선택지 입력</h3>
         {options.map((option, index) => (
-          <div key={index} style={{ marginBottom: '5px' }}>
+          <div key={index} className="option-item">
             <input
               type="text"
               value={option}
@@ -151,44 +152,46 @@ const QuestRegister = () => {
                 newOptions[index] = e.target.value;
                 setOptions(newOptions);
               }}
-              style={{ width: '70%', padding: '5px' }}
+              className="option-input"
               placeholder={`${index + 1}번 선택지를 입력하세요.`}
             />
           </div>
         ))}
       </div>
-      <br/>
-      <div className='corAnswer'>
-        <h3>4. 정답 입력</h3>
-        <select name="corAnsSelect" value={correctAnswer} onChange={(e) => setCorrectAnswer(e.target.value)}>
+      
+      <div className='correct-answer-section'>
+        <h3 className="section-title">4. 정답 입력</h3>
+        <select name="corAnsSelect" value={correctAnswer} onChange={(e) => setCorrectAnswer(e.target.value)} className="correct-answer-select">
           {options.map((_, index) => (
             <option key={index + 1} value={String(index + 1)}>{index + 1}</option>
           ))}
         </select>
       </div>
-      <br/>
-      <div className="photoInput">
-        <h3>5. 이미지 업로드 (선택 사항)</h3>
-        <div>
-          <label htmlFor="image-upload">이미지 선택:</label>
+      
+      <div className="photo-input-section">
+        <h3 className="section-title">5. 이미지 업로드 (선택 사항)</h3>
+        <div className="image-upload-wrapper">
+          <label htmlFor="image-upload" className="image-upload-label">이미지 선택:</label>
           <input
             type="file"
             id="image-upload"
             accept="image/*"
             onChange={handleImageChange}
+            className="image-upload-input"
           />
         </div>
         {previewImage && (
-          <div style={{ marginTop: '20px' }}>
-            <h3>이미지 미리보기:</h3>
-            <img src={previewImage} alt="Image Preview" style={{ maxWidth: '300px', maxHeight: '300px', border: '1px solid #ddd' }} />
+          <div className="image-preview-container">
+            <h3 className="image-preview-title">이미지 미리보기:</h3>
+            <img src={previewImage} alt="Image Preview" className="image-preview" />
           </div>
         )}
       </div>
-      <br/>
-      {/* 전체 폼 제출 버튼 */}
-      <button onClick={handleReset} style={{ marginRight: '10px', padding: '10px 20px' }}>초기화</button>
-      <button onClick={handleQuestRegisterSubmit} style={{ padding: '10px 20px' }}>등록 완료</button>
+      
+      <div className="button-group">
+        <button onClick={handleReset} className="reset-button">초기화</button>
+        <button onClick={handleQuestRegisterSubmit} className="submit-button">등록 완료</button>
+      </div>
     </div>
   );
 };

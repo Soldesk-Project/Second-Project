@@ -1,0 +1,153 @@
+@import './QuestAdmin.css';
+
+/* QuestRegister.css */
+
+.quest-register-container {
+  padding: 20px;
+  width: 100%;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.quest-register-title {
+  color: #333;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2em;
+}
+
+.section-title {
+  color: #555;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+/* 카테고리 선택 */
+.category-section,
+.question-text-section,
+.option-section,
+.correct-answer-section,
+.photo-input-section {
+  margin-bottom: 25px;
+}
+
+.category-select,
+.correct-answer-select {
+  width: auto;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+  box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+}
+
+/* 문제 본문 입력 */
+.question-text-input {
+  width: 100%; /* 부모 div의 100%를 차지하도록 수정 */
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+/* 선택지 입력 */
+.option-item {
+  margin-bottom: 10px;
+}
+
+.option-input {
+  width: 100%; /* 부모 div의 100%를 차지하도록 수정 */
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+/* 이미지 업로드 */
+.image-upload-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.image-upload-label {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.image-upload-label:hover {
+  background-color: #0056b3;
+}
+
+.image-upload-input {
+  display: none; /* 실제 파일 인풋 숨기기 */
+}
+
+.image-preview-container {
+  margin-top: 20px;
+  text-align: center;
+  border: 1px dashed #ccc;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.image-preview-title {
+  margin-top: 0;
+  color: #666;
+  font-size: 1em;
+}
+
+.image-preview {
+  max-width: 300px;
+  max-height: 300px;
+  border: 1px solid #eee;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+/* 버튼 그룹 */
+.button-group {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.reset-button,
+.submit-button {
+  padding: 12px 25px;
+  font-size: 1.1em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.reset-button {
+  background-color: #6c757d;
+  color: white;
+  margin-right: 15px;
+}
+
+.reset-button:hover {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+}
+
+.submit-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.submit-button:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}

@@ -236,17 +236,19 @@ const QuestDelete = () => {
                 {selectedQuestData.correct_answer}
               </div>
             </div>
-            <div className="photoInput">
-              <h3>이미지 (있는 경우)</h3>
+            <div className="photo-input-section">
+              <h3 className="section-title">이미지 (있는 경우)</h3>
+              <div className="image-preview-container">
               {selectedQuestData.image_data_base64 ? (
                 <div>
-                  <img src={`data:image/png;base64,${selectedQuestData.image_data_base64}`} alt="Question Image" />
+                  <img src={`data:image/png;base64,${selectedQuestData.image_data_base64}`} alt="Image-preview" className="image-preview"/>
                 </div>
               ) : (
                 <div className="no-image-message">
                   첨부된 이미지가 없습니다.
                 </div>
               )}
+              </div>
             </div>
           </div>
         </>

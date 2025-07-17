@@ -164,19 +164,51 @@ h1 {
   width: auto; /* select는 내용에 따라 너비 조절 */
 }
 
-/* 이미지 업로드 섹션 */
-.photoInput label {
-  font-weight: bold;
-  color: #333;
+/* 이미지 업로드 */
+.image-upload-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.photoInput img {
+.image-upload-label {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.image-upload-label:hover {
+  background-color: #0056b3;
+}
+
+.image-upload-input {
+  display: none; /* 실제 파일 인풋 숨기기 */
+}
+
+.image-preview-container {
+  margin-top: 20px;
+  text-align: center;
+  border: 1px dashed #ccc;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.image-preview-title {
+  margin-top: 0;
+  color: #666;
+  font-size: 1em;
+}
+
+.image-preview {
   max-width: 300px;
   max-height: 300px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-top: 10px;
-  display: block;
+  border: 1px solid #eee;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
 }
 
 /* 하단 버튼 그룹 */

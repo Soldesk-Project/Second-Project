@@ -286,22 +286,23 @@ const QuestEdit = () => {
                 ))}
               </select>
             </div>
-            <div className="photoInput">
-              <h3>5. 이미지 업로드 (선택 사항)</h3>
-              <div>
-                <label htmlFor="image-upload">이미지 선택:</label>
+            <div className="photo-input-section">
+              <h3 className="section-title">5. 이미지 업로드 (선택 사항)</h3>
+              <div className="image-upload-wrapper">
+                <label htmlFor="image-upload" className="image-upload-label">이미지 선택:</label>
                 <input
                   type="file"
                   id="image-upload"
                   accept="image/*"
                   onChange={handleImageChange}
+                  className="image-upload-input"
                 />
               </div>
               {previewImage && (
-                <div>
-                  <h4>이미지 미리보기:</h4>
-                  <img src={previewImage} alt="Image Preview" />
-                </div>
+              <div className="image-preview-container">
+                <h3 className="image-preview-title">이미지 미리보기:</h3>
+                <img src={previewImage} alt="Image Preview" className="image-preview" />
+              </div>
               )}
             </div>
             <div className="button-group">
