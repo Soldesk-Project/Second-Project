@@ -1,20 +1,42 @@
 import React, { useState } from 'react';
 import '../../css/findId.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function FindId() {
   const [emailId, setEmailId] = useState('');
   const [emailDomain, setEmailDomain] = useState('');
+  const [findId, setFindId] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleFindId = async() => {
     const full = `${emailId}@${emailDomain}`;
-    if (full === 'admin@naver.com') {
-      navigate('/server', { state: { userEmail: full } });
-    } else {
-      alert('이메일로 확인된 아이디가 없습니다');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(full)) {
+          alert("올바른 이메일 형식을 입력해주세요.");
+          return;
     }
+    try {
+    const res = await axios.get(`/api/findId/checkEmail?user_email=${full}`);
+    if (res.data && res.data !== '') {
+      setFindId(res.data);
+      setErrorMessage('');
+      resetInputs();
+    } else {
+      setFindId('');
+      setErrorMessage('입력한 이메일로 가입된 계정이 없습니다.');
+    }
+  } catch (err) {
+    console.error("ID 찾기 실패:", err);
+    setErrorMessage('서버 오류로 ID를 찾을 수 없습니다.');
+  }
   };
+
+  const resetInputs = () => {
+        setEmailId('');
+        setEmailDomain('');
+    }
 
   const handleButtonOption = (e) => {
     const { name } = e.target;
@@ -22,6 +44,20 @@ export default function FindId() {
     else if (name === 'signUp') navigate('/signUp');
     else if (name === 'findId') navigate('/findId');
     else if (name === 'findPw') navigate('/findPw');
+  };
+
+  const moveToLogin = () => {
+        navigate(`/`);
+    }
+
+  const buttonStyle = {
+        width : "100px",
+    };
+  
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleFindId();
+    }
   };
 
   return (
@@ -38,7 +74,7 @@ export default function FindId() {
           <h4>Let's align our constellations!</h4>
           <div className="login-options">
             <div className="login-option_1">
-              <button name="signUp" onClick={handleButtonOption}>Join</button>
+              <button name="signUp" onClick={handleButtonOption}>Sign Up</button>
             </div>
             <div className="login-option_2">
               <button name="findId" onClick={handleButtonOption}>Find id</button>
@@ -53,6 +89,7 @@ export default function FindId() {
               placeholder="이메일을 입력하세요."
               value={emailId}
               onChange={(e) => setEmailId(e.target.value)}
+              onKeyDown={handleKeyDown}
               style={{ width: '45%' }}
             />
             <div
@@ -71,6 +108,7 @@ export default function FindId() {
               placeholder="직접 입력"
               value={emailDomain}
               onChange={(e) => setEmailDomain(e.target.value)}
+              onKeyDown={handleKeyDown}
               style={{ width: '45%' }}
             />
             <datalist id="email-domains">
@@ -79,10 +117,19 @@ export default function FindId() {
               <option value="hanmail.net" />
             </datalist>
           </div>
-
-          <button onClick={handleLogin} className="findIdButton">
-            Find Result
-          </button>
+          {findId && (<div style={{ color: 'white', marginBottom: '20px' }}>ID : {findId}</div>)}
+          {errorMessage && (<div style={{ color: 'lightcoral', marginBottom: '20px' }}>{errorMessage}</div>)}
+          <div className='signUpBtn'
+                        style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                        marginBottom: '1rem 0',
+                    }}>
+            <button style={buttonStyle} onClick={handleFindId}>Find Result</button>
+            <button style={buttonStyle} onClick={resetInputs}>Reset</button>
+            <button style={buttonStyle} onClick={moveToLogin}>Home</button>
+          </div>
         </div>
         <div className="login-image">
           <img

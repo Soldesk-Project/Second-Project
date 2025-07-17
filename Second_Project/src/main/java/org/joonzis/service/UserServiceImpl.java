@@ -9,6 +9,7 @@ import org.joonzis.domain.UserAchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDecoDTO;
 import org.joonzis.domain.UserRewardVO;
+import org.joonzis.domain.UsersVO;
 import org.joonzis.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,19 +25,28 @@ public class UserServiceImpl implements UserService{
 	@Autowired
 	private UserMapper mapper;	
 
-	// 유저 랭킹 리스트
+	// Top 10 유저 랭킹 목록
 	@Override
 	public List<UserInfoDecoDTO> getUserRankingList() {
 		return mapper.getUserRankingList();
 	}
 	
-	// 아이템 겟 테스트
+	// 모든 아이템 목록
 	@Override
 	public List<ItemVO> getItemList() {
 		return mapper.getItemList();
 	}
+	// 인벤토리 - 카테고리별 아이템 목록
+	public List<ItemVO> getInventoryCategory(Map<String, Object> paramMap) {
+		return mapper.getInventoryCategory(paramMap);
+	}
+	// 보유 아이템 목록
+	@Override
+	public List<ItemVO> getInventory(int user_no) {
+		return mapper.getInventory(user_no);
+	}
 	
-	// 아이템 업데이트 테스트	
+	// 유저 장식 업데이트	
 	@Override
 	public boolean updateItem(UserDecoUpdateDTO UserDecoUpdateDTO) {
 		return mapper.updateItem(UserDecoUpdateDTO);
@@ -48,43 +58,64 @@ public class UserServiceImpl implements UserService{
 		return mapper.getUserInfoByUserNo(userNo);
 	}
 	
-	// 업적 달성 포인트 추가
+	// 업적 달성 - 포인트 추가
 	@Override
 	public int updateUserPoint(UserAchievementDTO dto) {
 		return mapper.updateUserPoint(dto);
 	}
 	
-	public List<ItemVO> getInventoryCategory(Map<String, Object> paramMap) {
-	    return mapper.getInventoryCategory(paramMap);
-	}
 	
+	// 아이템 구매 - 포인트 감소
 	@Override
 	public boolean userPointMinus(Map<String, Object> paramMap) {
 		return mapper.userPointMinus(paramMap);
 	}
-	
+	// 아이템 구매 - 인벤토리에 추가
 	@Override
 	public boolean buyItemInventory(Map<String, Object> paramMap) {
 		return mapper.buyItemInventory(paramMap);
 	}
 	
+	// 리워드 상태
 	@Override
-	public List<ItemVO> getInventory(int user_no) {
-		return mapper.getInventory(user_no);
+	public UserRewardVO getRewardStatus(int user_no) {
+		return mapper.getRewardStatus(user_no);
 	}
-	
+	// 리워드 상태 업데이트
+	@Override
+	public boolean rewardUpdate(UserRewardVO UserRewardVO) {
+		return mapper.rewardUpdate(UserRewardVO);
+	}
+	// 리워드 보상 획득
 	@Override
 	public boolean addReward(UserDecoUpdateDTO UserDecoUpdateDTO) {
 		return mapper.addReward(UserDecoUpdateDTO);
 	}
 	
+	// 회원가입 - 닉네임 중복 확인
 	@Override
-	public UserRewardVO getRewardStatus(int user_no) {
-		return mapper.getRewardStatus(user_no);
+	public boolean isUserNickTaken(String user_nick) {
+		return mapper.isUserNickTaken(user_nick) == 1;
+	}
+	// 회원가입 - 아이디 중복 확인
+	@Override
+	public boolean isUserIdTaken(String user_id) {
+		return mapper.isUserIdTaken(user_id) == 1;
+	}
+	// 회원가입 - 이메일 중복 확인
+	@Override
+	public boolean isUserEmailTaken(String user_email) {
+		return mapper.isUserEmailTaken(user_email) == 1;
 	}
 	
+	// 아이디 찾기
 	@Override
-	public boolean rewardUpdate(UserRewardVO UserRewardVO) {
-		return mapper.rewardUpdate(UserRewardVO);
+	public String findIdByEmail(String user_email) {
+		return mapper.findIdByEmail(user_email);
+	}
+	// 비밀번호 찾기
+	@Override
+	public String findPwByIdAndEmail(UsersVO vo) {
+		return mapper.findPwByIdAndEmail(vo);
 	}
 }

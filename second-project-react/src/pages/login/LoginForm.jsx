@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../css/loginForm.css';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '../../store/userSlice';
 
 
@@ -11,9 +11,17 @@ const LoginForm = () => {
   const [pw, setPw] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const user = useSelector(state => state.user.user);
 
   const KAKAO_CLIENT_ID = "99ddb7e910a924e51b633490da611ead";
   const REDIRECT_URI = "http://localhost:3000/kakao/callback";
+
+  useEffect(() => {
+    if (user) {
+      // 이미 로그인 상태면 서버 메인 페이지 등으로 이동
+      navigate('/server');
+    }
+  }, [user, navigate]);
   
   const handleLogin = async () => {
     if (!id || !pw) {
@@ -31,7 +39,11 @@ const LoginForm = () => {
       dispatch(setUser(res.data.user));
       navigate('/server');
     } catch (err) {
-      alert('로그인 실패');
+      if (err.response?.status === 409) {
+        alert('이미 로그인된 사용자입니다.');
+      } else {
+        alert('로그인 실패');
+      }
     }
   };
 
@@ -76,7 +88,7 @@ const LoginForm = () => {
           문구는 뭐 대애충 아무거나 환영글... </h4>
           <div className="login-options">
             <div className='login-option_1'>
-              <button name="signUp" onClick={handleButtonOption}>Join</button>
+              <button name="signUp" onClick={handleButtonOption}>Sing Up</button>
             </div>
             <div className='login-option_2'>
               <button name="findId" onClick={handleButtonOption}>Find id</button>

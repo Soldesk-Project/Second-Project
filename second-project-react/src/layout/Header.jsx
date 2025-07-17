@@ -4,9 +4,11 @@ import '../css/header.css';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { clearUser, clearServer } from '../store/userSlice';
+import axios from 'axios';
 
 const Header = () => {
   const server = useSelector((state) => state.user.server);
+  const user = useSelector(state => state.user.user);
   const nav = useNavigate();
   const dispatch = useDispatch();
 
@@ -29,11 +31,19 @@ const Header = () => {
     nav('/server');   
   }
 
-  const logOut=()=>{
+  const logOut = async () => {
+  try {
+    if (user && user.user_id) {
+      await axios.post('/api/logout', { userId: user.user_id });
+    }
+  } catch (error) {
+    console.error('로그아웃 처리 중 오류:', error);
+  } finally {
     dispatch(clearUser());
-    localStorage.clear(); 
-    nav('/');  
+    localStorage.clear();
+    nav('/');
   }
+};
   
   return (
     <div className='header'>

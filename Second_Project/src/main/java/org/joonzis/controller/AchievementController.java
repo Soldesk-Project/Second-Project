@@ -32,7 +32,7 @@ public class AchievementController {
 	@Autowired
     private UserService userService;
 
-	// 업적 리스트
+	// 전체 업적 목록
 	@GetMapping(value = "/achievements", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<AchievementDTO> getAchievementList(@RequestParam("user_no") int user_no) {
         return service.getAchievementList(user_no);

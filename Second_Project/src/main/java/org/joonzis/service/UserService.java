@@ -8,42 +8,50 @@ import org.joonzis.domain.UserAchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDecoDTO;
 import org.joonzis.domain.UserRewardVO;
+import org.joonzis.domain.UsersVO;
 
 public interface UserService {
 	
-	// 유저 랭킹 리스트
+	// Top 10 유저 랭킹 목록
 	public List<UserInfoDecoDTO> getUserRankingList();
 	
-	// 아이템 겟 테스트
+	// 모든 아이템 목록
 	public List<ItemVO> getItemList();
-
-	// 아이템 업데이트 테스트	
-	public boolean updateItem(UserDecoUpdateDTO UserDecoUpdateDTO);
+	// 인벤토리 - 카테고리별 아이템 목록
+	public List<ItemVO> getInventoryCategory(Map<String, Object> paramMap);
+	// 보유 아이템 목록
+	public List<ItemVO> getInventory(int user_no);
 	
 	// userNo로 유저 정보+css 찾기	
 	public UserInfoDecoDTO getUserInfoByUserNo(int userNo);
 	
-	// 업적 달성 포인트 추가
+	// 유저 장식 업데이트	
+	public boolean updateItem(UserDecoUpdateDTO UserDecoUpdateDTO);
+	
+	// 업적 달성 - 포인트 추가
 	public int updateUserPoint(UserAchievementDTO dto);
 	
-	// 인벤토리 카테고리별 가져오기
-	public List<ItemVO> getInventoryCategory(Map<String, Object> paramMap);
-	
-	// 인벤토리 가져오기
-	public List<ItemVO> getInventory(int user_no);
-	
-	// 유저 point minus
+	// 아이템 구매 - 포인트 감소
 	public boolean userPointMinus(Map<String, Object> paramMap);
-	
-	// 아이템 유저 인벤토리 저장
+	// 아이템 구매 - 인벤토리에 추가
 	public boolean buyItemInventory(Map<String, Object> paramMap);
 	
-	// 리워드 추가하기
+	// 리워드 상태
+	public UserRewardVO getRewardStatus(int user_no);
+	// 리워드 상태 업데이트
+	public boolean rewardUpdate(UserRewardVO UserRewardVO);
+	// 리워드 보상 획득
 	public boolean addReward(UserDecoUpdateDTO UserDecoUpdateDTO);
 	
-	// 리워드 상태 가져오기
-	public UserRewardVO getRewardStatus(int user_no);
+	// 회원가입 - 닉네임 중복 확인
+	public boolean isUserNickTaken(String user_nick);
+	// 회원가입 - 아이디 중복 확인
+	public boolean isUserIdTaken(String user_id);
+	// 회원가입 - 이메일 중복 확인
+	public boolean isUserEmailTaken(String user_email);
 	
-	// 리워드 상태 업데이트하기
-	public boolean rewardUpdate(UserRewardVO UserRewardVO);
+	// 아이디 찾기
+	public String findIdByEmail(String user_email);
+	// 비밀번호 찾기
+	public String findPwByIdAndEmail(UsersVO vo);
 }

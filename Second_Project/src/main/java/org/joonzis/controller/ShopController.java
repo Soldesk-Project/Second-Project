@@ -104,6 +104,7 @@ public class ShopController {
         }
     }
     
+    // 상점 - 카테고리별 아이템 목록
     @GetMapping("/shop/items")
 	public List<ItemVO> getItemCategory(@RequestParam("category") String category) {
 
@@ -120,6 +121,7 @@ public class ShopController {
 	    return shopservice.getItemCategory(mappedCategory);
 	}
     
+    // 아이템 구매 - 인벤토리에 추가
     @PostMapping("/shop/buyItemInventory")
 	public void postBuyItemInventory(@RequestParam("user_no") int user_no,
 										@RequestParam("item_price") int item_price,

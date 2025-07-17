@@ -5,6 +5,7 @@ import org.joonzis.domain.UsersVO;
 import org.joonzis.mapper.MemberMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -14,8 +15,19 @@ public class MemberServiceImpl implements MemberService {
 	
 	// 회원가입
 	@Override
+	@Transactional
 	public void insertMember(UsersVO users) {
 		mapper.insertMember(users);
+		Integer user_no = users.getUser_no();
+		if (user_no != null) {
+			insertDecoAndReward(user_no);
+        }
+	}
+	// 유저 데코,리워드에 추가
+	@Transactional
+	public void insertDecoAndReward(int user_no) {
+		mapper.insertDeco(user_no);
+		mapper.insertReward(user_no);
 	}
 
 	// 로그인

@@ -36,27 +36,24 @@ public class UserController {
 	 @Autowired
     private ServerUserWebSocketHandler webSocketHandler;
 
-	// 유저 랭킹
+	// Top 10 유저 랭킹 목록
 	@GetMapping(value = "/ranking", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<UserInfoDecoDTO> getUserRankingList() {
-		//log.info("🔥 getUserRankingList() 호출됨");
         return service.getUserRankingList();
     }
 	
-	// 아이템 겟 테스트
+	// 모든 아이템 목록
 	@GetMapping(value = "/item", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ItemVO> getItemList() {
-		//log.info(" getItemList() 호출됨");
         return service.getItemList();
     }
 	
-	// 아이템 업데이트 테스트
+	// 유저 장식 업데이트
 	@PostMapping(value = "/item/select", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> updateItem(@RequestBody UserDecoUpdateDTO UserDecoUpdateDTO) {
 		boolean success = service.updateItem(UserDecoUpdateDTO);
 	    if (success) {
 	    	try {
-	    		//log.info("DB업데이트 완료");
                 webSocketHandler.notifyUserStyleUpdate(String.valueOf(UserDecoUpdateDTO.getUser_no()));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -67,7 +64,7 @@ public class UserController {
 	    }
 	}
 	
-	// 인벤토리 카테고리에 맞는 아이템 가져오기
+	// 인벤토리 아이템 리스트
 	@GetMapping("/inventory/category")
 	public List<ItemVO> getInventoryCategory(@RequestParam("category") String category, @RequestParam("user_no") int user_no) {
 
@@ -87,17 +84,19 @@ public class UserController {
 	    return service.getInventoryCategory(paramMap);
 	}
 	
-	// 유저가 가지고있는 아이템목록
+	// 보유 아이템 목록
 	@GetMapping("/getItems")
 	public List<ItemVO> getInventory(@RequestParam("user_no") int user_no) {
 	    return service.getInventory(user_no);
 	}
 	
+	// 리워드 상태
 	@GetMapping("/rewardStatus")
 	public UserRewardVO getRewardStatus(@RequestParam("user_no") int user_no) {
 	    return service.getRewardStatus(user_no);
 	}
 	
+	// 리워드 보상 획득
 	@PostMapping(value = "/reward", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> addReward(@RequestBody UserDecoUpdateDTO UserDecoUpdateDTO) {
 		boolean success = service.addReward(UserDecoUpdateDTO);
@@ -108,6 +107,7 @@ public class UserController {
 	    }
 	}
 	
+	// 리워드 상태 업데이트
 	@PostMapping(value = "/rewardUpdate", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> rewardUpdate(@RequestBody UserRewardVO UserRewardVO) {
 		boolean success = service.rewardUpdate(UserRewardVO);

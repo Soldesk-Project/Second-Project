@@ -15,7 +15,7 @@
 	    <result column="balloon_class_name" property="balloon_class_name"/>
 	</resultMap>
 
-	 <!-- 유저 랭킹 가져오기-->
+	 <!-- Top 10 유저 랭킹 목록 -->
 	<select id="getUserRankingList" resultMap="userInfoDecoMap">
 	    <![CDATA[
 	        SELECT *
@@ -37,12 +37,25 @@
 	    ]]>
 	</select>
 	
-	<!-- 아이템 겟 테스트 -->
+	<!-- 모든 아이템 목록 -->
 	<select id="getItemList" resultType="org.joonzis.domain.ItemVO">
 		SELECT * FROM ITEMS
 	</select>
+	<!-- 인벤토리 - 카테고리별 아이템 목록 -->
+	<select id="getInventoryCategory" resultType="org.joonzis.domain.ItemVO">
+	    SELECT *
+	    FROM INVENTORY
+	    WHERE ITEM_TYPE = #{category}
+	      AND USER_NO = #{user_no}
+	</select>
+	<!-- 보유 아이템 목록 -->
+	<select id="getInventory" resultType="org.joonzis.domain.ItemVO">
+		SELECT ITEM_NAME
+		FROM INVENTORY
+		WHERE USER_NO = #{user_no}
+	</select>
 
-	<!-- 아이템 업데이트 테스트 -->
+	<!-- 유저 장식 업데이트 -->
 	<update id="updateItem" parameterType="org.joonzis.domain.UserDecoUpdateDTO">
 		UPDATE USER_DECO
 	    <set>
@@ -67,6 +80,7 @@
 	    WHERE USER_NO = #{user_no}
 	</update>
 	
+	<!-- userNo로 유저 정보+css 찾기	 -->
 	<select id="getUserInfoByUserNo" resultType="org.joonzis.domain.UserInfoDecoDTO">
 		SELECT *
 		FROM users u
@@ -74,48 +88,33 @@
 		WHERE u.user_no = #{user_no}
 	</select>
 	
-	<!-- 업적 달성 포인트 추가 -->
+	<!-- 업적 달성 - 포인트 추가 -->
 	<update id="updateUserPoint" parameterType="org.joonzis.domain.UserAchievementDTO">
 		UPDATE USERS
 	    SET USER_POINT = USER_POINT + #{ach_reward}
 	    WHERE USER_NO = #{user_no}
 	</update>
 	
-	<select id="getInventoryCategory" resultType="org.joonzis.domain.ItemVO">
-	    SELECT *
-	    FROM INVENTORY
-	    WHERE ITEM_TYPE = #{category}
-	      AND USER_NO = #{user_no}
-	</select>
 	
+	<!-- 아이템 구매 - 포인트 감소 -->
 	<update id="userPointMinus">
 		UPDATE USERS
 		SET USER_POINT = USER_POINT - #{item_price}
 		WHERE USER_NO = #{user_no}
 	</update>
-	
+	<!-- 아이템 구매 - 인벤토리에 추가 -->
 	<insert id="buyItemInventory">
 		INSERT INTO INVENTORY (USER_NO, CSS_CLASS_NAME, ITEM_NAME, ITEM_TYPE)
 		VALUES (#{user_no}, #{css_class_name}, #{item_name}, #{item_type})
 	</insert>
 	
-	<select id="getInventory" resultType="org.joonzis.domain.ItemVO">
-		SELECT ITEM_NAME
-		FROM INVENTORY
-		WHERE USER_NO = #{user_no}
-	</select>
-	
-	<insert id="addReward" parameterType="org.joonzis.domain.UserDecoUpdateDTO">
-		INSERT INTO INVENTORY (USER_NO, CSS_CLASS_NAME, ITEM_NAME, ITEM_TYPE)
-		VALUES (#{user_no}, #{css_class_name}, #{item_name}, #{item_type})
-	</insert>
-	
+	<!-- 리워드 상태 -->
 	<select id="getRewardStatus" resultType="org.joonzis.domain.UserRewardVO">
 		SELECT *
 		FROM USER_REWARDS
 		WHERE USER_NO = #{user_no}
 	</select>
-	
+	<!-- 리워드 상태 업데이트 -->
 	<update id="rewardUpdate" parameterType="org.joonzis.domain.UserRewardVO">
 		UPDATE USER_REWARDS
 		SET BOUNDARY = #{boundary},
@@ -124,5 +123,38 @@
 			BACKGROUND = #{background}
 		WHERE USER_NO = #{user_no}
 	</update>
+	<!-- 리워드 보상 획득 -->
+	<insert id="addReward" parameterType="org.joonzis.domain.UserDecoUpdateDTO">
+		INSERT INTO INVENTORY (USER_NO, CSS_CLASS_NAME, ITEM_NAME, ITEM_TYPE)
+		VALUES (#{user_no}, #{css_class_name}, #{item_name}, #{item_type})
+	</insert>
+	
+	<!-- 회원가입 - 닉네임 중복 확인 -->
+	<select id="isUserNickTaken" resultType="int" parameterType="String">
+		SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+		  FROM USERS
+		  WHERE USER_NICK = #{user_nick}
+	</select>
+	<!-- 회원가입 - 아이디 중복 확인 -->
+	<select id="isUserIdTaken" resultType="int" parameterType="String">
+		SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+		  FROM USERS
+		  WHERE USER_ID = #{user_id}
+	</select>
+	<!-- 회원가입 - 이메일 중복 확인 -->
+	<select id="isUserEmailTaken" resultType="int" parameterType="String">
+		SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+		  FROM USERS
+		  WHERE USER_EMAIL = #{user_email}
+	</select>
+	
+	<!-- 아이디 찾기 -->
+	<select id="findIdByEmail" resultType="String" parameterType="String">
+		SELECT USER_ID FROM USERS WHERE USER_EMAIL = #{user_email}
+	</select>
+	<!-- 비밀번호 찾기 -->
+	<select id="findPwByIdAndEmail" resultType="String" parameterType="org.joonzis.domain.UsersVO">
+		SELECT USER_PW FROM USERS WHERE USER_EMAIL = #{user_email} AND USER_ID = #{user_id}
+	</select>
 	
 </mapper>

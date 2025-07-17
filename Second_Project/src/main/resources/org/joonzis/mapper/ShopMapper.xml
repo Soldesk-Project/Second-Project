@@ -4,6 +4,7 @@
 
 <mapper namespace="org.joonzis.mapper.ShopMapper">
 	 
+	 <!-- 상점 - 카테고리별 아이템 목록 -->
 	 <select id="getItemCategory" resultType="org.joonzis.domain.ItemVO" parameterType="String">
 	 	SELECT * FROM ITEMS WHERE ITEM_TYPE = #{category}
 	 </select>

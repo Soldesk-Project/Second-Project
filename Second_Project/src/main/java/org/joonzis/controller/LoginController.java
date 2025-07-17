@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +15,9 @@ import javax.servlet.http.HttpSession;
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.security.JwtUtil;
+import org.joonzis.service.LoggedInUsers;
 import org.joonzis.service.MemberService;
+import org.joonzis.service.UserService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,7 +51,13 @@ public class LoginController {
     MemberService memberservice;
     
     @Autowired
+    UserService userservice;
+    
+    @Autowired
     JwtUtil jwtUtil;
+    
+    @Autowired
+    private LoggedInUsers loggedInUsers;
 	
 	@ResponseBody
 	@PostMapping("/kakao/login")
@@ -123,12 +133,49 @@ public class LoginController {
 	    memberservice.insertMember(users);
 	}
 	
+	@GetMapping("/signUp/checkId")
+	public ResponseEntity<Map<String, Boolean>> checkUserId(@RequestParam String user_id) {
+	    boolean isDuplicate = userservice.isUserIdTaken(user_id);
+	    return ResponseEntity.ok(Collections.singletonMap("duplicate", isDuplicate));
+	}
+	
+	@GetMapping("/signUp/checkNick")
+	public ResponseEntity<Map<String, Boolean>> checkUserNick(@RequestParam String user_nick) {
+	    boolean isDuplicate = userservice.isUserNickTaken(user_nick);
+	    return ResponseEntity.ok(Collections.singletonMap("duplicate", isDuplicate));
+	}
+	
+	@GetMapping("/signUp/checkEmail")
+	public ResponseEntity<Map<String, Boolean>> checkUserEmail(@RequestParam String user_email) {
+	    boolean isDuplicate = userservice.isUserEmailTaken(user_email);
+	    return ResponseEntity.ok(Collections.singletonMap("duplicate", isDuplicate));
+	}
+	
+	@GetMapping("/findId/checkEmail")
+	public String findIdByEmail(@RequestParam String user_email) {
+	    String email = userservice.findIdByEmail(user_email);
+	    return email;
+	}
+	
+	@PostMapping("/findPw/checkIdAndEmail")
+	public String findPwByIdAndEmail(@RequestBody UsersVO vo) {
+	    String pw = userservice.findPwByIdAndEmail(vo);
+	    return pw;
+	}
+	
 	@PostMapping("/login")
 	@ResponseBody
 	public ResponseEntity<?> login(@RequestBody UserInfoDTO dto, HttpSession session) {
+		
+		if (loggedInUsers.isLoggedIn(dto.getUser_id())) {
+	        return ResponseEntity.status(HttpStatus.CONFLICT)
+	                .body("이미 로그인된 사용자입니다.");
+	    }
 	    
 	    UserInfoDTO user = memberservice.isValidUser(dto.getUser_id(), dto.getUser_pw());
 	    if (user != null) {
+	    	loggedInUsers.addUser(dto.getUser_id());
+	    	
 	        String token = jwtUtil.generateToken(user.getUser_id());
 
 	        // ✅ 토큰과 함께 전체 유저 정보도 응답
@@ -136,10 +183,22 @@ public class LoginController {
 	        response.put("token", token);
 	        response.put("user", user);  // 전체 정보 포함 (user_pw 포함됨 주의)
 
+	        session.setAttribute("user_id", user.getUser_id());
+	        
 	        return ResponseEntity.ok(response);
 	    } else {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
 	    }
+	}
+	
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {
+	    String userId = request.get("userId");
+	    if (userId != null) {
+	        loggedInUsers.removeUser(userId);
+	        return ResponseEntity.ok("로그아웃 완료");
+	    }
+	    return ResponseEntity.badRequest().body("잘못된 요청");
 	}
 	
 	@GetMapping("/auth/me")

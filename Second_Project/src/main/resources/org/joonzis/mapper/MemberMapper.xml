@@ -5,9 +5,19 @@
 <mapper namespace="org.joonzis.mapper.MemberMapper">
 	
 	<!-- 회원가입 -->
-	<insert id="insertMember">
+	<insert id="insertMember" parameterType="org.joonzis.domain.UsersVO">
+		<selectKey keyProperty="user_no" resultType="int" order="BEFORE">
+	        SELECT SEQ_USERS.NEXTVAL FROM dual
+	    </selectKey>
 		INSERT INTO USERS (USER_NO, USER_NICK, USER_ID, USER_PW, USER_EMAIL, USER_DATE)
-		VALUES (SEQ_USERS.NEXTVAL, #{user_nick}, #{user_id}, #{user_pw}, #{user_email}, sysdate)
+		VALUES (#{user_no}, #{user_nick}, #{user_id}, #{user_pw}, #{user_email}, sysdate)
+	</insert>
+	<!-- 유저 데코,리워드에 추가 -->
+	<insert id="insertDeco">
+		INSERT INTO USER_DECO (USER_NO) VALUES (#{user_no})
+	</insert>
+	<insert id="insertReward">
+		INSERT INTO USER_REWARDS (USER_NO) VALUES (#{user_no})
 	</insert>
 	
 	<!-- 로그인 -->
