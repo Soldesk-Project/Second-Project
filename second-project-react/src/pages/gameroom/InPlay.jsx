@@ -8,10 +8,21 @@ import GameChatbox from '../../components/chatbox/GameChatbox';
 import ResultModal from '../../components/modal/ResultModal';
 
 const getRankedUsers = (users, gameMode) => {
+  const sorted = [...users].sort((a, b) => {
+    // 1. 점수 높은 순
+    const scoreA = a.score ?? 0;
+    const scoreB = b.score ?? 0;
+    if (scoreB !== scoreA) return scoreB - scoreA;
 
-  const sorted = [...users].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+    // 2. 점수 같으면 누적 시간 적은 순 (빠른 사람이 이김)
+    const elapsedA = typeof a.elapsedTime === "number" ? a.elapsedTime : Infinity;
+    const elapsedB = typeof b.elapsedTime === "number" ? b.elapsedTime : Infinity;
+    return elapsedA - elapsedB;
+  });
+
   let rank = 0;
   let lastScore = null;
+  let lastElapsed = null;
   let realRank = 0;
 
   // 게임 내 재화(포인트)
@@ -21,15 +32,17 @@ const getRankedUsers = (users, gameMode) => {
 
   return sorted.map((user, idx) => {
     realRank++;
-    if (user.score !== lastScore) {
+    // **동점 && 누적시간까지 같을 때만 공동순위!**
+    if (user.score !== lastScore || user.elapsedTime !== lastElapsed) {
       rank = realRank;
       lastScore = user.score;
+      lastElapsed = user.elapsedTime;
     }
     return {
       ...user,
       rank,
-      point: pointsMap[rank] ?? 10, // 게임 내 재화
-      ...(gameMode === "rank" && { rankPoint: rankPointMap[rank] ?? -20 }) // 랭크 점수
+      point: pointsMap[rank] ?? 10,
+      ...(gameMode === "rank" && { rankPoint: rankPointMap[rank] ?? -20 })
     };
   });
 };
@@ -43,6 +56,10 @@ const InPlay = () => {
   const [result, setResult] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [userAnswerHistory, setUserAnswerHistory] = useState([]);
+  const [submitted, setSubmitted] = useState(false);
+  const [questionStartTime, setQuestionStartTime] = useState(null);
+  const [userElapsedTimes, setUserElapsedTimes] = useState([]);
+  const myTotalElapsed = userElapsedTimes.reduce((sum, t) => sum + t, 0);
   const questionListRef = useRef([]);
   const { roomNo } = useParams();
   const nav = useNavigate();
@@ -64,6 +81,27 @@ const InPlay = () => {
 
   // 사용자별 최근 채팅 메시지를 저장할 상태
   const [userRecentChats, setUserRecentChats] = useState({});
+
+  // 제출 버튼 클릭 시 수정 불가
+  // [제출 버튼]
+  const handleSubmit = () => {
+    if (questionStartTime) {
+      const spentTimeSec = ((Date.now() - questionStartTime) / 1000).toFixed(3);
+      setUserElapsedTimes(prev => [...prev, Number(spentTimeSec)]);
+      handleAnswerSubmit(selectedAnswer, spentTimeSec);
+      setSubmitted(true);
+    }
+  }
+
+  useEffect(() => {
+    setSubmitted(false);
+    setSelectedAnswer(null);
+  }, [nextId]);
+
+  // [문제 시작/넘어갈 때] 소요 시간 계산
+  useEffect(() => {
+    if (play) setQuestionStartTime(Date.now());
+  }, [nextId, play]);
 
   // GameChatbox로부터 새 메시지를 받을 콜백 함수
   const handleNewChatMessage = useCallback((chatMessage) => {
@@ -120,6 +158,8 @@ const InPlay = () => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      console.log(data);
+      
       // ✅ 유저리스트(랭크 & 일반) 모두 처리
       if (
         data.type === 'roomUserList' && data.roomNo === roomNo &&
@@ -175,6 +215,7 @@ const InPlay = () => {
       ) {
         const nextId = Number(data.nextId);
         setNextId(nextId);
+        setTime(1);
 
         if (questionListRef.current.length === 0) {
           console.error("questionListRef가 비어 있습니다.");
@@ -198,13 +239,14 @@ const InPlay = () => {
         if (data.scores) {
           setUsers(users => users.map(u => ({
             ...u,
-            score: data.scores[u.userNick] ?? u.score
+            score: data.scores[u.userNick] ?? u.score,
+            elapsedTime: data.elapsedTimes ? data.elapsedTimes[u.userNick] ?? u.elapsedTime : u.elapsedTime
           })));
         }
         setUserAnswerHistory(prev=>[...prev, 
           {
             userNick: data.userNick,
-            question_id: data.questionListRef.current[data.questionIdx].id,
+            question_id: questionListRef.current[data.questionIdx].id,
             subject: setKoreanToCategory(questionListRef.current[data.questionIdx].subject),
             selected_answer: data.answer,
             correct_answer: data.correctAnswer,
@@ -248,25 +290,38 @@ const InPlay = () => {
 
   // 문제 풀이 타이머
   useEffect(() => {
-    if (play) {
+    if (play && typeof time === "number" && time > 0) {
       const timer = setInterval(() => {
-        setTime(time - 1);
+        setTime(prev => {
+          // 1 이하에서 멈추게
+          if (prev <= 1) {
+            clearInterval(timer); // 이거는 혹시 모를 race condition용. (불필요할 수도)
+            return 0;
+          }
+          return prev - 1;
+        });
       }, 1000);
 
-      if (time <= 0) {
-        handleAnswerSubmit(selectedAnswer);
-      }
-
-      return () => clearInterval(timer,);
+      // cleanup: 컴포넌트 언마운트/문제 전환/플레이 중지 시 interval 해제
+      return () => clearInterval(timer);
     }
-    if (!play && result) {
 
+    // 타이머가 0이 되면 자동 제출(한 번만)
+    if (play && typeof time === "number" && time === 0) {
+      const spentTimeSec = 10;
+      handleAnswerSubmit(selectedAnswer, spentTimeSec);
+      //setPlay(false);
+    }
+
+    // 결과 전송
+    if (!play && result) {
       const socket = sockets['room'];
       if (socket && socket.readyState === 1) {
         const myInfo = rankedUsers.find(u => u.userNick === userNick);
+        console.log(myInfo);
+        
         const myPoint = myInfo.point ?? 0;
         console.log(userAnswerHistory);
-        
         socket.send(JSON.stringify({
           action: 'rewardPointsAndSaveUserHistory',
           server,
@@ -279,10 +334,10 @@ const InPlay = () => {
         alert('웹소켓 연결이 준비되지 않았습니다 - rewardPoints');
       }
     }
-  }, [time, play, result]);
+  }, [play, time, result]);
 
   // 정답 판단
-  const handleAnswerSubmit = (answer) => {
+  const handleAnswerSubmit = (answer, spentTimeSec) => {
     
     const socket = sockets['room'];
     if (socket && socket.readyState === 1) {
@@ -293,12 +348,12 @@ const InPlay = () => {
         userNick,
         answer, // 내가 선택한 답 번호만 보냄!
         questionIndex: nextId, // 현재 문제 번호
+        spentTime: spentTimeSec, // 소요시간 서버에 전달
         game_mode: gameMode
       }));
     } else {
       alert('웹소켓 연결이 준비되지 않았습니다 - answer');
     }
-    setTime(1);
     setSelectedAnswer(null);
   };
 
@@ -411,10 +466,12 @@ const InPlay = () => {
                   <Test question={question} 
                         nextId={nextId}
                         onSelectAnswer={setSelectedAnswer} // 추가!
-                        selectedAnswer={selectedAnswer}/> : 
+                        selectedAnswer={selectedAnswer}
+                        submitted={submitted}/> : 
                   <h2>대기중</h2>
                 }
               </div>
+              <button onClick={handleSubmit} disabled={submitted || selectedAnswer === null}>제출</button>
               <button onClick={()=>setResult(true)}>결과창확인</button>
             </div>
           </div>
@@ -429,16 +486,19 @@ const InPlay = () => {
         <div className={styles.body_right}>
           <div className={styles.game_join_userList}>
             {users.length > 0 ? (
-              users.slice(0, 4).map(({ userNick, userNo, isOwner, score }) => (
+              users.slice(0, 4).map(({ userNick: nick, userNo, isOwner, score, elapsedTime }) => (
                 <div key={userNo} className={styles.user_card}>
-                  <div className={styles.role_badge}>{isOwner ? '방장' : '유저'}</div>
+                  <div className={styles.role_badge}>{isOwner ? '방장' : '유저'}</div>  
                   <div className={styles.user_info}>
-                    <span className={styles.nick}>{userNick}</span>
+                    <span className={styles.nick}>{nick}</span>
                     <span className={styles.score}>점수: {score ?? 0}</span>
+                    <span className={styles.score}>
+                      시간: {typeof elapsedTime === 'number' ? elapsedTime.toFixed(3) + "초" : "-"}
+                    </span>
                   </div>
-                  {userRecentChats[userNick] && (
+                  {userRecentChats[nick] && (
                     <div className={styles.chatBubble}>
-                      {userRecentChats[userNick].message}
+                      {userRecentChats[nick].message}
                     </div>
                   )}
                 </div>
@@ -452,7 +512,9 @@ const InPlay = () => {
           result &&
             <ResultModal users={rankedUsers}
               setResult={setResult}
-              gameMode={gameMode}/>
+              gameMode={gameMode}
+              myElapsedTimes={userElapsedTimes}
+              myTotalElapsed={myTotalElapsed}/>
         }
       </div>
     </div>
