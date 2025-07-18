@@ -48,7 +48,7 @@
 	</update>
 	
 	<!-- 유저 정보 조회 -->
-	<select id="getUserById" resultType="org.joonzis.domain.UserInfoDTO">
+	<select id="getUserById" parameterType="String" resultType="org.joonzis.domain.UserInfoDTO">
 		SELECT *
 		FROM users u
 		JOIN user_deco d ON u.user_no = d.user_no

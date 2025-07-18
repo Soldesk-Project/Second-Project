@@ -39,7 +39,7 @@ const LoginForm = () => {
       dispatch(setUser(res.data.user));
       navigate('/server');
     } catch (err) {
-      if (err.response?.status === 409) {
+      if (err.response.status === 409) {
         alert('이미 로그인된 사용자입니다.');
       } else {
         alert('로그인 실패');
