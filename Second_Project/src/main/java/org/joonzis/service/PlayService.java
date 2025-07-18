@@ -3,6 +3,7 @@ package org.joonzis.service;
 import java.util.List;
 
 import org.joonzis.domain.QuestionDTO;
+import org.joonzis.domain.UserQuestionHistoryDTO;
 
 public interface PlayService {
 	
@@ -10,4 +11,10 @@ public interface PlayService {
 	List<QuestionDTO> getQuestionsByCategory(String category);
 	
 	public void increaseRewardPoints(int point, String userNick);
+	
+	public void saveUserHistory(List<UserQuestionHistoryDTO> historyList);
+	
+	public List<UserQuestionHistoryDTO> getQuestionReviewList(String userNick);
+	
+	
 }

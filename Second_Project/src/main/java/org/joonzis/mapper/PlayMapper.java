@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 import org.joonzis.domain.QuestionDTO;
+import org.joonzis.domain.UserQuestionHistoryDTO;
 
 public interface PlayMapper {
 	
@@ -14,5 +15,9 @@ public interface PlayMapper {
 	List<QuestionDTO> getRandomQuestions();
 
 	public void increaseRewardPoints(@Param("point") int point, @Param("userNick") String userNick);
+	
+	public void insertHistory(UserQuestionHistoryDTO history);
+	
+	public List<UserQuestionHistoryDTO> getQuestionReviewList(@Param("userNick") String userNick);
 	
 }

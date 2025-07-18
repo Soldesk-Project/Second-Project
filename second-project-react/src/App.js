@@ -26,6 +26,7 @@ import AdminPage from './pages/AdminPage';
 import InquiryDetail from './pages/InquiryDetail';
 import NaverCallback from './pages/login/NaverCallback';
 import GoogleCallback from './pages/login/GoogleCallback';
+import QuestionReview from './pages/gameroom/QuestionReview';
 
 function App() {
   const dispatch = useDispatch();
@@ -63,6 +64,7 @@ function App() {
           <Route path="/main/:serverNo" element={<MainPage />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/gameRoom/:roomNo" element={<InPlay />} />
+          <Route path="/questionReview" element={<QuestionReview />} />
           <Route path="/inquiries" element={<CustomerServiceCenter />} />
           <Route path="/inquiry" element={<CustomerCenterNew />} />
           <Route path="/suggest" element={<Customersuggest />} />

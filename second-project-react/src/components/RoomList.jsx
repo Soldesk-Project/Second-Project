@@ -70,6 +70,17 @@ const RoomList = () => {
       matchSocket.onopen = () => console.log("🧩 매칭 소켓 연결 완료");
     }
 
+    socket.onmessage=(event)=>{
+      const data = JSON.parse(event.data);
+      if (data.type ==="joinQuestionReviewRoom") {
+        console.log(data.server);
+        console.log(data.roomNo);
+        console.log(data.player);
+        
+        nav('/questionReview');
+      }
+    }
+
     matchSocket.onmessage = (event) => {
       let data;
       try {
@@ -131,7 +142,7 @@ const RoomList = () => {
           setShowMatchModal(false);
           setMatchStatus('idle');
           break;
-
+        
         default:
           console.log("🟡 알 수 없는 매칭 메시지:", data);
       }
@@ -174,6 +185,21 @@ const RoomList = () => {
       alert('빠른 매칭 중 오류가 발생했습니다!');
     }
   };
+
+  const handleQuestionReview=()=>{
+    console.log(21341234123423);
+    
+    const socket = sockets['room'];
+    if (socket && socket.readyState === 1) {
+        socket.send(JSON.stringify({
+          action: "joinQuestionReviewRoom",
+          userNick
+        }));
+        // nav('/questionReview');
+    } else {
+      alert("웹소켓 연결이 준비되지 않았습니다 -- joinQuestionReviewRoom");
+    }
+  }
 
   const handleOpenModal = () => setModalOpen(true);
 
@@ -290,7 +316,7 @@ const RoomList = () => {
         <button onClick={handleOpenModal} className={styles.createBtn}>필터</button>
         <button onClick={handleOpenModal} className={styles.createBtn}>일반 게임</button>
         <button onClick={handleQuickMatch} className={styles.createBtn}>랭크 게임</button>
-        <button onClick={handleQuickMatch} className={styles.createBtn}>오답 풀이</button>
+        <button onClick={handleQuestionReview} className={styles.createBtn}>오답 풀이</button>
       </div>
 
       <div className={styles.roomListBody}>

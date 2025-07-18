@@ -3,6 +3,7 @@ package org.joonzis.service;
 import java.util.List;
 
 import org.joonzis.domain.QuestionDTO;
+import org.joonzis.domain.UserQuestionHistoryDTO;
 import org.joonzis.mapper.PlayMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,4 +39,16 @@ public class PlayServiceImpl implements PlayService {
 		playMapper.increaseRewardPoints(point, userNick);
 	}
 
+	@Override
+	public void saveUserHistory(List<UserQuestionHistoryDTO> historyList) {
+	    for (UserQuestionHistoryDTO dto : historyList) {
+	    	playMapper.insertHistory(dto);
+	    }
+	}
+
+	@Override
+	public List<UserQuestionHistoryDTO> getQuestionReviewList(String userNick) {
+		return playMapper.getQuestionReviewList(userNick);
+	}
+	
 }

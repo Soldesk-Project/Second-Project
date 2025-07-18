@@ -65,4 +65,25 @@
     	WHERE USER_NICK = #{userNick}
     </update>
     
+    <insert id="insertHistory" parameterType="org.joonzis.domain.UserQuestionHistoryDTO">
+	    INSERT INTO USER_QUESTION_HISTORY VALUES (
+	      user_q_seq.NEXTVAL,
+	      #{userNick}, #{questionId}, #{subject},
+	      #{selectedAnswer}, #{correctAnswer},
+	      #{isCorrect,jdbcType=CHAR}, #{submittedAt}, sysdate
+		)
+	</insert>
+    
+    
+    <select id="getQuestionReviewList" resultType="org.joonzis.domain.UserQuestionHistoryDTO">
+    	
+    	
+    
+    
+    
+    
+    
+    </select>
+    
+    
 </mapper>

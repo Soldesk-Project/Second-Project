@@ -8,11 +8,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.joonzis.domain.GameRoomDTO;
 import org.joonzis.domain.QuestionDTO;
+import org.joonzis.domain.UserQuestionHistoryDTO;
 import org.joonzis.service.PlayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
@@ -109,6 +111,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		case "rewardPointsAndSaveUserHistory":
 			handleRewardPointsAndSaveUserHistory(session, json);
 			break;
+		 case "joinQuestionReviewRoom":
+         	handleJoinQuestionReviewRoom(session, json);
+         	break;
 		}
 	}
 
@@ -220,14 +225,30 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 				}
 			}, 10_000);
 		}
-	}
-
-	// 게임 나가기
-	private void handleLeaveRoom(WebSocketSession session, JsonNode json) {
-		String server = (String) session.getAttributes().get("server");
-		String userNick = (String) session.getAttributes().get("userNick");
-		if (server == null || userNick == null)
-			return;
+    }
+    
+    private void handleJoinQuestionReviewRoom(WebSocketSession session, JsonNode json) {
+    	String server = (String) session.getAttributes().get("server");
+    	String userNick = json.get("userNick").asText();
+    	String roomNo = "questionReview";
+    	
+    	roomUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
+        .computeIfAbsent(roomNo, k -> ConcurrentHashMap.newKeySet())
+        .add(userNick);
+    	Map<String, Object> payload = Map.of(
+            "type", "joinQuestionReviewRoom",
+            "server", server,
+            "roomNo", roomNo,
+            "player", userNick
+        );
+        broadcast(server, payload);
+    }
+    
+    // 게임 나가기
+    private void handleLeaveRoom(WebSocketSession session, JsonNode json) {
+        String server = (String) session.getAttributes().get("server");
+        String userNick = (String) session.getAttributes().get("userNick");
+        if (server == null || userNick == null) return;
 
 		String roomNo = json.get("roomNo").asText();
 
@@ -349,7 +370,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	private void handleStartGame(String roomNo, String category, String server) {
 		Set<String> userNicks = roomUsers.getOrDefault(server, Collections.emptyMap()).getOrDefault(roomNo,
 				Collections.emptySet());
-
 		if (userNicks.isEmpty()) {
 			return;
 		}
@@ -504,20 +524,40 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		broadcast(server, payload);
 	}
 
-	private void handleRewardPointsAndSaveUserHistory(WebSocketSession session, JsonNode json) {
-		String server = json.get("server").asText();
-		String roomNo = json.get("roomNo").asText();
-		String userNick = json.get("userNick").asText();
-//        JsonNode historyArray = json.get("history");
-		int point = json.get("point").asInt();
+    private void handleRewardPointsAndSaveUserHistory(WebSocketSession session, JsonNode json) {
+    	String server = json.get("server").asText();
+        String roomNo = json.get("roomNo").asText();
+        String userNick = json.get("userNick").asText();
+        JsonNode historyArray = json.get("history");
+        int point = json.get("point").asInt();
+        
+        if (server == null || userNick == null || roomNo == null) {
+    		return;
+    	}
+        
+        String historyUuid = UUID.randomUUID().toString();
+        
+        playService.increaseRewardPoints(point, userNick);
+        
+        List<UserQuestionHistoryDTO> historyList = new ArrayList<>();
+        for (JsonNode item : historyArray) {
+            UserQuestionHistoryDTO dto = new UserQuestionHistoryDTO();
+            dto.setUserNick(userNick);
+            dto.setQuestionId(item.get("question_id").asInt());
+            dto.setSubject(item.get("subject").asText());
+            dto.setSelectedAnswer(item.get("selected_answer").asInt());
+            dto.setCorrectAnswer(item.get("correct_answer").asInt());
+            dto.setCorrect(item.get("is_correct").asBoolean());
+            dto.setSubmittedAt(historyUuid);
+            // 필요하면 roomNo, 게임모드 등도 같이
+            historyList.add(dto);
+        }
+        playService.saveUserHistory(historyList);
+        
+        
+    }
+    
 
-		if (server == null || userNick == null || roomNo == null) {
-			return;
-		}
-
-		playService.increaseRewardPoints(point, userNick);
-
-	}
 
 	private void broadcastUserList(String server) {
 		Set<String> users = serverUsers.getOrDefault(server, Collections.emptySet());

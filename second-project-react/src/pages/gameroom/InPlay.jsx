@@ -251,21 +251,19 @@ const InPlay = () => {
             selected_answer: data.answer,
             correct_answer: data.correctAnswer,
             is_correct: data.isCorrect,
-            submitted_at: data.isCorrect,
+            submitted_at: new Date().toISOString()
           }
         ])
         // console.log("-----------------");
         // console.log("userNick : "+data.userNick);
-        // console.log("isCorrect : "+data.isCorrect);
+        // console.log("questionId : "+questionListRef.current[data.questionIdx].id);
+        // console.log("subject : "+setKoreanToCategory(questionListRef.current[data.questionIdx].subject));
         // console.log("answer : "+data.answer);
         // console.log("correctAnswer : "+data.correctAnswer);
+        // console.log("isCorrect : "+data.isCorrect);
         // console.log("question : "+data.questionIdx);
-        // console.log("question : "+questionListRef.current[data.questionIdx].id);
-        // console.log("question : "+setKoreanToCategory(questionListRef.current[data.questionIdx].subject));
         // console.log("question : "+questionListRef.current[data.questionIdx].question_text);
         // console.log("question : "+questionListRef.current[data.questionIdx].correct_answer);
-        
-
       }
 
       // if (data.type === 'joinDenied') {
@@ -328,7 +326,7 @@ const InPlay = () => {
           roomNo,
           userNick,
           point: myPoint,
-          // history: userAnswerHistory
+          history: userAnswerHistory
         }));
       } else {
         alert('웹소켓 연결이 준비되지 않았습니다 - rewardPoints');
