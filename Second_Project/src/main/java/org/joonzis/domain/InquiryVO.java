@@ -18,10 +18,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class InquiryVO {
-	private Long    id;
-    private Long    userId;
+	private Long id;
+    private String  userNick;
     private String  subject;
     private String  message;
+    private int postPassword;
+    private String email;
     
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime createdAt;

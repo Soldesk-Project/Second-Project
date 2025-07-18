@@ -91,6 +91,11 @@ body {
   font-size: 0.9rem;
   background: none;
 }
+
+.login-option_1 button{
+  font-size: 20px;
+}
+
 .loginButton{
   width: 100%;
   background-image: url('../../public/images/Submit.png');
@@ -149,7 +154,8 @@ body {
   font-size: 1.9em;
 }
 
-.login_submit h4{
+.login_submit h6{
   color: white;
-  font-size: 1.2em;
+  margin-top: 20px;
+  margin-bottom: 30px;
 }

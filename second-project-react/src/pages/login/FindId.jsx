@@ -71,7 +71,6 @@ export default function FindId() {
       <div className="findId-box">
         <div className="findId_submit">
           <h1>CotePlay에 어서오세요.</h1>
-          <h4>Let's align our constellations!</h4>
           <div className="login-options">
             <div className="login-option_1">
               <button name="signUp" onClick={handleButtonOption}>Sign Up</button>

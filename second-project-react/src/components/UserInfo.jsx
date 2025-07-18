@@ -122,7 +122,10 @@ const UserInfo = () => {
     <div>
         <div className={styles.userInfo_Box}>
             <div className={styles.userInfo_Box_1}>
-            <img src='/images/womenProfileTest.png' alt='프로필' style={{ width: `120px`, height: `120px`}}/>
+                <div className={styles.profileWrapper}>
+                    <img src='/images/womenProfileTest.png' alt='프로필' style={{ width: `180px`, height: `180px`}} className={styles.profileImg}/>
+                    <img src='/images/dogProfile.png' alt='프로필테두리' className={styles.profileBorder}/>
+                </div>
             <div className={styles.userInfo_Name}>
                 <p>{user.user_nick}</p>
                 <p>{renderTier()}</p>

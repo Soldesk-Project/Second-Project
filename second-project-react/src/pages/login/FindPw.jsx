@@ -75,9 +75,7 @@ const FindPw = () => {
       <div className="findPw-box">
         <div className='findPw_submit'>
           
-          <h1>CotePlay에 어서오세요. </h1>
-          <h4>Let's align our constellations!
-          문구는 뭐 대애충 아무거나 환영글... </h4><br/>
+          <h1>CotePlay에 어서오세요. </h1><br/>
           <div className="login-options">
             <div className='login-option_1'>
               <button name="signUp" onClick={handleButtonOption}>Sign Up</button>

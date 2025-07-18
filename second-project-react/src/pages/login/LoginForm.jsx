@@ -84,8 +84,7 @@ const LoginForm = () => {
         <div className='login_submit'>
           
           <h1>CotePlay에 어서오세요. </h1>
-          <h4>Let's align our constellations!
-          문구는 뭐 대애충 아무거나 환영글... </h4>
+          <h6>it 자격증 시험 및 코딩 공부를 쉽게 할 수 있도록 도와주는 교육게임사이트입니다. </h6>
           <div className="login-options">
             <div className='login-option_1'>
               <button name="signUp" onClick={handleButtonOption}>Sing Up</button>

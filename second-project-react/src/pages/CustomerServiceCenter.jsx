@@ -7,7 +7,7 @@ import axios from 'axios';
 const PAGE_SIZE = 15;
 
 const CustomerServiceCenter = () => {
-  const tabs = ['1:1 문의', 'FAQ', '문제 제출', '고객 건의'];
+  const tabs = ['공지사항', 'FAQ', '문제 제출', '1:1 문의'];
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const [inquiries, setInquiries] = useState([]);
   const [page, setPage] = useState(1);
@@ -62,25 +62,37 @@ const CustomerServiceCenter = () => {
 
       {/* 탭 패널 */}
       <div className={styles.tabPanels}>
-        {activeTab === '1:1 문의' && (
+        {activeTab === '공지사항' && (
           <section role="tabpanel" className={styles.content}>
 
           <div className={styles.inquiryBox}>
             <ul className={styles.inquiryTitle}>
-              <li>Title</li>
-              <li>NickName</li>
-              <li>Data</li>
+              <li>번호</li>
+              <li>제목</li>
+              <li>닉네임</li>
+              <li>날짜</li>
             </ul>
               {/* 문의글 리스트 (간단하게 제목만 표시) */}
                <ul className={styles.inquiryList}>
                 {inquiries.map(inq => (
                   <li key={inq.id} className={styles.inquiryPersonal}>
+                    {/* 1) 번호 */}
+                    <span className={styles.inquiryNo}>
+                      {inq.id}
+                    </span>
+
+                    {/* 2) 제목 */}
                     <button
                       className={styles.inquiryLink}
                       onClick={() => navigate(`/inquiries/${inq.id}`)}
                     >
                       {inq.subject}
                     </button>
+
+                    {/* 3) 닉네임 */}
+                    <span className={styles.inquiryNick}>
+                      {inq.userNick}
+                    </span>
                     <span className={styles.inquiryDate}>
                       — {new Date(inq.createdAt).toLocaleDateString()}
                     </span>
@@ -220,24 +232,36 @@ const CustomerServiceCenter = () => {
           </section>
         )}
 
-        {activeTab === '고객 건의' && (
+        {activeTab === '1:1 문의' && (
           <section role="tabpanel" className={styles.content}>
             <div className={styles.inquiryBox}>
-              <ul className={styles.inquiryTitle}>
-                <li>Title</li>
-                <li>NickName</li>
-                <li>Data</li>
-              </ul>
-                {/* 건의글 리스트 */}
+            <ul className={styles.inquiryTitle}>
+              <li>번호</li>
+              <li>제목</li>
+              <li>닉네임</li>
+              <li>날짜</li>
+            </ul>
+              {/* 건의글 리스트 (간단하게 제목만 표시) */}
                <ul className={styles.inquiryList}>
                 {inquiries.map(inq => (
                   <li key={inq.id} className={styles.inquiryPersonal}>
+                    {/* 1) 번호 */}
+                    <span className={styles.inquiryNo}>
+                      {inq.id}
+                    </span>
+
+                    {/* 2) 제목 */}
                     <button
                       className={styles.inquiryLink}
-                      onClick={() => navigate(`/inquiry/${inq.id}`)}
+                      onClick={() => navigate(`/inquiries/${inq.id}`)}
                     >
                       {inq.subject}
                     </button>
+
+                    {/* 3) 닉네임 */}
+                    <span className={styles.inquiryNick}>
+                      {inq.userNick}
+                    </span>
                     <span className={styles.inquiryDate}>
                       — {new Date(inq.createdAt).toLocaleDateString()}
                     </span>
@@ -245,33 +269,33 @@ const CustomerServiceCenter = () => {
                 ))}
                </ul>
 
-              {/* 페이징 */}
-              <div className={styles.listBottom}>
-                <div className={styles.pagination}>
-                  <button
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    >
-                    이전
-                  </button>
-                  <span>{page} / {totalPages}</span>
-                  <button
-                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                    >
-                    다음
-                  </button>
-                </div>
-
-                {/* 새 건의글 등록 버튼 */}
+            {/* 페이징 */}
+            <div className={styles.listBottom}>
+              <div className={styles.pagination}>
                 <button
-                  className={styles.InqBtn}
-                  onClick={() => navigate('/inquiry')}
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
                   >
-                  건의글 등록
+                  이전
+                </button>
+                <span>{page} / {totalPages}</span>
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  >
+                  다음
                 </button>
               </div>
+
+              {/* 새 문의글 등록 버튼 */}
+              <button
+                className={styles.InqBtn}
+                onClick={() => navigate('/inquiry')}
+                >
+                문의글 등록
+              </button>
             </div>
+          </div>
           </section>
         )}
       </div>

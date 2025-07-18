@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.joonzis.mapper.InquiryFileMapper">
+
+  <!--
+    fileId를 시퀀스로 생성한 뒤,
+    inquiry_file 테이블에 메타정보 INSERT
+  -->
+  <insert id="insertFile" parameterType="org.joonzis.domain.InquiryFileVO">
+    <selectKey keyProperty="fileId" resultType="long" order="BEFORE">
+      SELECT seq_inquiry_file.NEXTVAL FROM dual
+    </selectKey>
+    INSERT INTO inquiry_file
+      ( file_id
+      , inquiry_id
+      , filename
+      , filepath
+      , uploaded_at
+      )
+    VALUES
+      ( #{fileId}
+      , #{inquiryId}
+      , #{filename}
+      , #{filepath}
+      , SYSDATE
+      )
+  </insert>
+
+</mapper>

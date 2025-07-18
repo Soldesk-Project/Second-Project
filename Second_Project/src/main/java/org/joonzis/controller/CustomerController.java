@@ -1,6 +1,6 @@
 package org.joonzis.controller;
 
-import java.util.Arrays;
+import java.io.IOException;
 
 import java.util.List;
 import java.util.Map;
@@ -10,16 +10,16 @@ import org.joonzis.domain.InquiryVO;
 import org.joonzis.service.InquiryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import lombok.Data;
 import lombok.extern.log4j.Log4j;
 
 @Log4j
@@ -28,18 +28,6 @@ import lombok.extern.log4j.Log4j;
 @RequestMapping("/api/customer")
 public class CustomerController {
 	
-    // 샘플 FAQ 데이터
-    private static final List<FAQ> faqList = Arrays.asList(
-        new FAQ(1, "주문 취소는 어떻게 하나요?", "마이페이지 > 주문내역에서 취소가 가능합니다.")
-    );
-
-    /* FAQ 목록 조회 */
-    @GetMapping("/faq")
-    public ResponseEntity<List<FAQ>> getFAQ() {
-        //log.info("FAQ 목록 조회 요청");
-        return ResponseEntity.ok(faqList);
-    }
-
     @Autowired
     private InquiryService inquiryService;
 
@@ -61,34 +49,32 @@ public class CustomerController {
         return ResponseEntity.ok(vo);
     }
 
-    /** 1:1 문의 생성 */
-    @PostMapping("/inquiry")
+    /** 1:1 문의 생성 (multipart/form-data) */
+    @PostMapping(
+      path = "/inquiry",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ResponseEntity<Map<String, String>> createInquiry(
-            @RequestBody Map<String, Object> payload) {
-        Long   userId  = Long.valueOf(payload.get("userId").toString());
-        String subject = (String) payload.get("subject");
-        String message = (String) payload.get("message");
+            @RequestParam String userNick,
+            @RequestParam String subject,
+            @RequestParam String message,
+            @RequestParam int postPassword,
+            @RequestParam String email,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files
+    ) throws IOException {
+        // VO에 담기
+        InquiryVO vo = new InquiryVO();
+        vo.setUserNick(userNick);
+        vo.setSubject(subject);
+        vo.setMessage(message);
+        vo.setPostPassword(postPassword);
+        vo.setEmail(email);
 
-        inquiryService.createInquiry(userId, subject, message);
+        // Service 호출 (파일 처리까지)
+        inquiryService.createInquiry(vo, files);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(Map.of("message", "문의가 정상적으로 접수되었습니다."));
-    }
-
-    /* FAQ 데이터 DTO */
-    @Data
-    static class FAQ {
-        private final int id;
-        private final String question;
-        private final String answer;
-    }
-
-    /* 문의 요청 DTO */
-    @Data
-    static class InquiryRequest {
-        private Long userId;
-        private String subject;
-        private String message;
     }
 }

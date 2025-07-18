@@ -3,9 +3,7 @@ package org.joonzis.controller;
 import java.util.List;
 
 import org.joonzis.domain.AchievementDTO;
-import org.joonzis.domain.AchievementVO;
 import org.joonzis.domain.UserAchievementDTO;
-import org.joonzis.domain.UsersVO;
 import org.joonzis.service.AchievementService;
 import org.joonzis.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

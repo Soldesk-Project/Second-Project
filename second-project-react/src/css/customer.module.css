@@ -107,7 +107,6 @@ button {
   border-bottom: 1px solid #48494e;
   display: flex;
   flex-direction: row;
-  gap: 150px;
   justify-content: space-between;
   align-items: center;
   width: 1000px;
@@ -169,6 +168,7 @@ textarea.textarea {
   flex-direction: row;
   gap: 20px;
   justify-content: center;
+  margin-bottom: 100px;
 }
 
 .InqBtn{
@@ -332,4 +332,80 @@ textarea.textarea {
   display: flex;
   flex-direction: row;
   gap: 10px;
+}
+
+.textareaBox{
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  margin-top: 50px;
+}
+
+.textareaBox_2{
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  margin-top: 50px;
+}
+
+.explanation p{
+  margin-top: 1rem;
+}
+
+.inquiryList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /* display: grid;  <-- 이 라인 삭제 */
+}
+
+/* 헤더(Title) */
+.inquiryTitle {
+  padding: 0;
+
+  display: grid;
+  grid-template-columns:
+    4ch    /* 번호 */
+    742px    /* 제목 */
+    86px   /* 닉네임 */
+    auto;  /* 날짜 */
+  gap: 1rem;
+  align-items: center;
+  padding-right: 30px;
+}
+
+/* 각 게시글 항목(LI) */
+.inquiryPersonal {
+  display: grid;
+  grid-template-columns:
+    3ch
+    1fr
+    auto
+    auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* 번호·날짜 우측 정렬 */
+.inquiryNo,
+.inquiryDate,
+.inquiryTitle li:nth-child(4) {
+  text-align: right;
+}
+
+/* 2) 각 셀 안에서의 정렬 */
+.inquiryNo {
+  justify-self: start;    /* 번호는 왼쪽 정렬 */
+}
+.inquiryLink {
+  justify-self: start;    /* 제목도 왼쪽 정렬 */
+  overflow: hidden;
+  text-overflow: ellipsis;/* 너무 길면 말줄임 */
+  white-space: nowrap;
+}
+.inquiryNick {
+  justify-self: center;   /* 닉네임은 가운데 정렬 */
+}
+.inquiryDate {
+  justify-self: end;      /* 날짜는 오른쪽 정렬 */
 }

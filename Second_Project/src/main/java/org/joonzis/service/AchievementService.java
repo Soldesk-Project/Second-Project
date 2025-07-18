@@ -3,7 +3,6 @@ package org.joonzis.service;
 import java.util.List;
 
 import org.joonzis.domain.AchievementDTO;
-import org.joonzis.domain.AchievementVO;
 import org.joonzis.domain.UserAchievementDTO;
 
 public interface AchievementService {
