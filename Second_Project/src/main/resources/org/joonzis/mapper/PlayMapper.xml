@@ -57,4 +57,12 @@
         )
         WHERE ROWNUM &lt;= 20
     </select>
+    
+    <update id="increaseRewardPoints">
+    	UPDATE USERS 
+    	SET
+    		USER_POINT = USER_POINT + #{point}
+    	WHERE USER_NICK = #{userNick}
+    </update>
+    
 </mapper>

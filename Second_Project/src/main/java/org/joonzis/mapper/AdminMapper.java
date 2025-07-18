@@ -1,11 +1,13 @@
 package org.joonzis.mapper;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.joonzis.domain.QuestionDTO;
+import org.joonzis.domain.UsersVO;
 
 @Mapper
 public interface AdminMapper {
@@ -29,5 +31,15 @@ public interface AdminMapper {
     //문제 수정 메소드
     void updateQuestion(@Param("question") QuestionDTO question, @Param("category") String category);
     
+    //문제 삭제 메소드
     int deleteQuestions(@Param("params") Map<String, Object> params);
+    
+    //유저 검색 메소드
+	List<UsersVO> selectAllUsers();
+	List<UsersVO> searchUsers(@Param("searchType")String searchType, @Param("searchValue")String searchValue);
+	
+	//유저 채금 확인/적용/해제메소드
+	List<UsersVO> getUsersChatBanStatus(@Param("userNos") List<Integer> userNos);
+	int updateChatBanStatus(@Param("userNos") List<Integer> userNos, @Param("bannedTimestamp") Timestamp bannedTimestamp);
+	void unbanChatUsers();
 }

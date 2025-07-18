@@ -60,55 +60,170 @@ public class LoginController {
     private LoggedInUsers loggedInUsers;
 	
 	@ResponseBody
-	@PostMapping("/kakao/login")
-	public Map<String, Object> kakaoLoagin(@RequestBody Map<String, String> request) throws Exception{
+	@PostMapping("/kakao/login") 
+	public ResponseEntity<?> kakaoLoagin(@RequestBody Map<String, String> request) throws Exception{// Map<String, Object>
 		String code = request.get("code");
-		
-		// 1. AccessToken 요청
-		String token = getAccessToken(code);
-		
-		// 2. 사용자 정보 요청
-		Map<String, Object> userInfo = getUserInfo(token);
-		
-		// 3. 사용자 처리 (예 : 자동 회원가입)
-		String kakaoId = String.valueOf(userInfo.get("id"));
-		String nickname = (String)((Map<String, Object>)userInfo.get("properties")).get("nickname");
-		
-		Map<String, Object> response = new HashMap<>();
-		response.put("id", kakaoId);
-		response.put("nickname", nickname);
-		return response;
+	    // 1. AccessToken 요청
+	    String token = getAccessToken(code);
+
+	    // 2. 사용자 정보 요청
+	    Map<String, Object> userInfo = getUserInfo(token);
+	    // 3. 사용자 처리
+	    String kakaoId = String.valueOf(userInfo.get("id"));
+	    Map<String, Object> properties = (Map<String, Object>) userInfo.get("properties");
+	    String nickname = properties != null ? (String) properties.get("nickname") : null;
+
+	    // 이메일 등 카카오 계정 정보가 필요하면 여기서 꺼내기
+	    Map<String, Object> kakaoAccount = (Map<String, Object>) userInfo.get("kakao_account");
+	    String email = kakaoAccount != null ? (String) kakaoAccount.get("email") : null;
+
+	    // 4. DB에서 사용자 조회 (예: kakaoId를 기준)
+	    UserInfoDTO user = memberservice.getUserById("kakao_" + kakaoId);
+
+	    if (user == null) {
+	        // 5. 회원가입 처리 (자동가입)
+	    	String uniqueNickname = generateUniqueNickname(nickname);
+	    	String baseEmailPrefix = email != null ? email.split("@")[0] : "kakao_" + kakaoId;
+	    	String uniqueEmail = generateUniqueEmail(baseEmailPrefix);
+	        UsersVO newUser = new UsersVO();
+	        newUser.setUser_id("kakao_" + kakaoId); // 유니크 아이디 생성 (예: kakao_123456)
+	        newUser.setUser_nick(uniqueNickname);
+	        newUser.setUser_email(uniqueEmail);
+	        newUser.setUser_pw(kakaoId); // DB 컬럼 있어야 함
+	        // 필요시 기본 권한, 가입일 등 세팅
+
+	        memberservice.insertMember(newUser);
+
+	        // 자동가입 후 다시 조회 (또는 바로 JWT 발급)
+	        user = memberservice.getUserById("kakao_" + kakaoId);
+	    }
+
+	    // 6. 로그인 처리 (이미 회원이거나 방금 가입한 경우)
+	    if (user != null) {
+	        if (loggedInUsers.isLoggedIn(user.getUser_id())) {
+	            return ResponseEntity.status(HttpStatus.CONFLICT)
+	                    .body("이미 로그인된 사용자입니다.");
+	        }
+
+	        loggedInUsers.addUser(user.getUser_id());
+
+	        String jwtToken = jwtUtil.generateToken(user.getUser_id());
+
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("token", jwtToken);
+	        response.put("user", user);
+
+	        return ResponseEntity.ok(response);
+	    } else {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 처리 실패");
+	    }
 	}
 	
-	public String getAccessToken(String code) throws Exception{
-		URL url = new URL("https://kauth.kakao.com/oauth/token");
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		conn.setRequestMethod("POST");
-		conn.setDoOutput(true);
-		
-		conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-		
-		String param = "grant_type=authorization_code"
-				+ "&client_id=" + clientId
-				+ "&redirect_uri=" + redirectUri
-				+ "&code=" + code;
-		
-		try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()))) {
-			bw.write(param);
-			bw.flush();
-		} 
-		
-		StringBuilder sb = new StringBuilder();
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-			String line;
-			while((line = br.readLine()) != null) {
-				sb.append(line);
-			}
-		}
-		
-		JSONObject json = new JSONObject(sb.toString());
-		return json.getString("access_token");
+	@PostMapping("/kakao/logout")
+	public ResponseEntity<?> kakaoLogout(@RequestBody Map<String, String> request) {
+	    String accessToken = request.get("accessToken");
+	    log.info("accessToken: " + accessToken);
+	    if (accessToken == null || accessToken.isEmpty()) {
+	        return ResponseEntity.badRequest().body("accessToken is required");
+	    }
+
+	    try {
+	        URL url = new URL("https://kapi.kakao.com/v1/user/logout");
+	        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+	        conn.setRequestMethod("POST");
+	        conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+	        conn.setDoOutput(true);
+
+	        int responseCode = conn.getResponseCode();
+
+	        if (responseCode == 200) {
+	            // 로그아웃 성공
+	            return ResponseEntity.ok("카카오 로그아웃 성공");
+	        } else {
+	            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+	            StringBuilder sb = new StringBuilder();
+	            String line;
+	            while ((line = br.readLine()) != null) {
+	                sb.append(line);
+	            }
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                    .body("카카오 로그아웃 실패: " + sb.toString());
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("카카오 로그아웃 중 오류 발생");
+	    }
 	}
+
+	
+	private String generateUniqueNickname(String baseNickname) {
+	    String nickname = baseNickname != null ? baseNickname : "카카오유저";
+	    String finalNickname = nickname;
+	    int suffix = 1;
+
+	    while (userservice.isUserNickTaken(finalNickname)) {
+	        finalNickname = nickname + "_" + suffix;
+	        suffix++;
+	    }
+
+	    return finalNickname;
+	}
+	
+	private String generateUniqueEmail(String baseEmailPrefix) {
+	    String domain = "@kakao.com";
+	    String email = baseEmailPrefix + domain;
+	    int suffix = 1;
+
+	    while (userservice.isUserEmailTaken(email)) {
+	        email = baseEmailPrefix + "_" + suffix + domain;
+	        suffix++;
+	    }
+
+	    return email;
+	}
+	
+	public String getAccessToken(String code) throws Exception {
+	    URL url = new URL("https://kauth.kakao.com/oauth/token");
+	    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+	    conn.setRequestMethod("POST");
+	    conn.setDoOutput(true);
+	    conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+	    String param = "grant_type=authorization_code"
+	            + "&client_id=" + clientId
+	            + "&redirect_uri=" + redirectUri
+	            + "&code=" + code;
+
+	    try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()))) {
+	        bw.write(param);
+	        bw.flush();
+	    }
+
+	    int responseCode = conn.getResponseCode();
+
+	    BufferedReader br;
+	    if (responseCode == 200) {
+	        br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+	    } else {
+	        // 👇 에러 메시지 출력
+	        br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+	    }
+
+	    StringBuilder sb = new StringBuilder();
+	    String line;
+	    while ((line = br.readLine()) != null) {
+	        sb.append(line);
+	    }
+
+	    if (responseCode != 200) {
+	        throw new RuntimeException("카카오 토큰 요청 실패: " + sb);
+	    }
+
+	    JSONObject json = new JSONObject(sb.toString());
+	    return json.getString("access_token");
+	}
+
 	
 	public Map<String, Object> getUserInfo(String token) throws Exception {
 		URL url = new URL("https://kapi.kakao.com/v2/user/me");

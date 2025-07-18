@@ -17,10 +17,13 @@ public class UserInfoDTO {
 	private long user_point;
 	private String user_nick, user_id, user_pw, user_email;
 	private Date user_date;
+	private int ischatbanned; // 0: 정상, 1: 채팅 금지
+    private Date banned_timestamp;
 	
 	private String boundary_class_name;
     private String title_class_name;
     private String background_class_name;
     private String balloon_class_name;
     private String fontcolor_class_name;
+
 }

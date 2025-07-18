@@ -25,9 +25,9 @@ import styles from '../../css/ResultModal.module.css';
 const ResultModal = ({users, setResult, gameMode}) => {
   // const rankedUsers = getRankedUsers(users);
 
-  console.log(gameMode);
-  console.log(users);
-  console.log(setResult);
+  // console.log(gameMode);
+  // console.log(users);
+  // console.log(setResult);
   
   const close=()=>{
     setResult(false);

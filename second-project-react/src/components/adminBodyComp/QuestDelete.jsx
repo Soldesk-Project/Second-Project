@@ -146,9 +146,9 @@ const QuestDelete = () => {
 
   return (
     <div>
-      <h1>문제 삭제 🗑️</h1>
+      <h1>문제 삭제</h1>
       <div className='category'>
-        <h3>1. 카테고리 선택 및 문제 검색 🔍</h3>
+        <h3>1. 카테고리 선택 및 문제 검색</h3>
         <select name="cateSelect" value={category} onChange={handleCategoryChange}>
           {categories.map((cat, index) => (
             <option key={index} value={cat}>
@@ -212,7 +212,7 @@ const QuestDelete = () => {
         <>
           <hr />
           <div className='question-detail-form'>
-            <h2>선택된 문제 정보 (수정 불가) ℹ️</h2>
+            <h2>선택된 문제 정보</h2>
             <p>선택된 문제 ID: <strong>{selectedQuestData.id}</strong></p>
             <div className='questionText'>
               <h3>문제 본문</h3>
@@ -237,7 +237,7 @@ const QuestDelete = () => {
               </div>
             </div>
             <div className="photo-input-section">
-              <h3 className="section-title">이미지 (있는 경우)</h3>
+              <h3 className="section-title">이미지</h3>
               <div className="image-preview-container">
               {selectedQuestData.image_data_base64 ? (
                 <div>

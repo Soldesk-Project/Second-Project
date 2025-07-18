@@ -32,5 +32,10 @@ public class PlayServiceImpl implements PlayService {
 
 		    return playMapper.getQuestionsByCategory(category);
 		}
+		
+	@Override
+	public void increaseRewardPoints(int point, String userNick) {
+		playMapper.increaseRewardPoints(point, userNick);
+	}
 
 }

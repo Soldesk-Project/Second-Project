@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState, useCallback } from 'react'; // useC
 import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import '../../css/chatbox.css'; // 동일한 CSS 사용 가능
-// import { useSelector } from 'react-redux'; // GameChatbox는 InPlay에서 props로 user 정보 받을 예정이므로 제거
-import ChatReportModal from './ChatReportModal';
+import ChatReportModal from '../modal/ChatReportModal';
+import ChatBanModal from '../modal/ChatBanModal';
 
 function formatTimestamp(timestamp) {
     if (!timestamp) return '';
@@ -20,8 +20,7 @@ function formatTimestamp(timestamp) {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
-// ⭐ GameChatbox 컴포넌트: gameroomNo, userNick, userNo, onNewMessage를 props로 받습니다.
-const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
+    const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage, currentUser }) => {
     // STOMP 클라이언트 인스턴스, 구독 정보, JOIN 메시지 전송 여부를 관리할 useRef
     const stompClientRef = useRef(null); // 이름 변경: stompClientInstanceRef -> stompClientRef
     const subscriptionRef = useRef(null); // 구독 객체 참조 추가
@@ -34,21 +33,20 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
     const hasSentJoinRef = useRef(false); // hasSentAddUserRef -> hasSentJoinRef (게임방 JOIN 메시지)
     const [isConnected, setIsConnected] = useState(false);
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [isChatBanModalOpen, setIsChatBanModalOpen] = useState(false);
 
-    // ⭐⭐ useSelector는 InPlay.jsx에서 user 정보를 받아 props로 전달하므로 여기서는 제거합니다.
-    // const currentUser = useSelector((state) => state.user.user);
-    // const userNick = currentUser?.user_nick;
-    // const userNo = currentUser?.user_no;
+    const isCurrentUserChatBanned = currentUser?.ischatbanned === 1;
+    const currentUserBanTimestamp = currentUser?.banned_timestamp;
 
     useEffect(() => {
-        // ⭐ 필수 props 유효성 검사 (gameroomNo 추가)
+        // props 유효성 검사
         if (!userNick || userNo == null || !gameroomNo) {
             console.warn("GameChatbox: 필수 props 누락. 연결 시도하지 않음.");
             // 필요한 경우 여기서 기존 연결을 끊는 로직 추가 (아래 cleanupExistingConnection 재활용 가능)
             return;
         }
 
-        // ⭐ 기존 연결을 정리하는 함수
+        // 기존 연결을 정리 함수
         const cleanupExistingConnection = () => {
             const client = stompClientRef.current;
             const subscription = subscriptionRef.current;
@@ -93,10 +91,10 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
             setMessages([]); // 연결 해제 시 메시지 목록 초기화
         };
 
-        // ⭐ 이펙트가 다시 실행될 때마다 기존 연결을 먼저 정리
+        // 이펙트가 다시 실행될 때마다 기존 연결을 먼저 정리
         cleanupExistingConnection();
 
-        // ⭐ 새로운 STOMP 연결 시도
+        // 새로운 STOMP 연결 시도
         const socket = new SockJS('http://192.168.0.112:9099/ws-game-chat'); // ⭐ 게임방 채팅 엔드포인트 변경
         const client = Stomp.over(() => socket);
         client.debug = () => {};
@@ -107,7 +105,7 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
             setMessages([]); // 새 연결 성공 시 메시지 목록 초기화
             hasSentJoinRef.current = false; // 새 연결이므로 GAME_JOIN 메시지 보낼 준비
 
-            // ⭐ 게임방 채팅 구독 (`/serverChat/public` -> `/gameChat/{gameroomNo}`)
+            // 게임방 채팅 구독 (`/serverChat/public` -> `/gameChat/{gameroomNo}`)
             const sub = client.subscribe(`/gameChat/${gameroomNo}`, message => {
                 try {
                     const receivedMessage = JSON.parse(message.body);
@@ -132,7 +130,7 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
             });
             subscriptionRef.current = sub; // 구독 객체 참조 저장
 
-            // ⭐ 'addUser' (GAME_JOIN) 메시지 전송 (`/app/serverChat.addUser` -> `/app/gameChat.addUser/{gameroomNo}`)
+            // 'addUser' (GAME_JOIN) 메시지 전송 (`/app/serverChat.addUser` -> `/app/gameChat.addUser/{gameroomNo}`)
             if (!hasSentJoinRef.current) {
                 client.send(`/app/gameChat.addUser/${gameroomNo}`, {}, JSON.stringify({
                     mType: 'GAME_JOIN',
@@ -153,13 +151,13 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
             hasSentJoinRef.current = false;
         });
 
-        // ⭐ 클린업 함수 (컴포넌트 언마운트 또는 의존성 변경 시 실행)
+        // 클린업 함수 (컴포넌트 언마운트 또는 의존성 변경 시 실행)
         return () => {
             cleanupExistingConnection(); // 기존 연결 정리 로직 재사용
         };
-    // ⭐ 의존성 배열에 gameroomNo 추가 (이게 바뀌면 useEffect 재실행)
+    // 의존성 배열에 gameroomNo 추가 (이게 바뀌면 useEffect 재실행)
     // onNewMessage는 InPlay.jsx에서 useCallback으로 감싸져야 함
-    }, [gameroomNo, userNick, userNo, onNewMessage]);
+    }, [gameroomNo, userNick, userNo, onNewMessage, currentUser]);
 
     // 메시지 목록이 업데이트될 때마다 스크롤을 최하단으로 이동
     useEffect(() => {
@@ -170,15 +168,22 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
 
     // 메시지 전송 함수
     const sendMessage = () => {
-        // ⭐ 게임방 채팅은 귓속말 없음. 항상 GAME_CHAT 타입
+        // 채팅 금지 상태 확인
+        if (isCurrentUserChatBanned) {
+            setIsChatBanModalOpen(true); // 채팅 금지 모달 띄우기
+            setMessageInput(''); // 입력창 비우기
+            return; // 메시지 전송 로직 중단
+        }
+
+        // 게임방 채팅은 귓속말 없음. 항상 GAME_CHAT 타입
         if (stompClientRef.current && isConnected && messageInput.trim() && userNick && userNo !== undefined && userNo !== null) {
             const messageToSend = {
-                mType: 'GAME_CHAT', // ⭐ 게임방 채팅 메시지 타입 고정
+                mType: 'GAME_CHAT', // 게임방 채팅 메시지 타입 고정
                 mSender: userNick,
                 mSenderNo: userNo,
                 mContent: messageInput,
                 mTimestamp: Date.now(),
-                gameroomNo: gameroomNo // ⭐ 게임방 번호 추가
+                gameroomNo: gameroomNo // 게임방 번호 추가
             };
 
             stompClientRef.current.send(`/app/gameChat.sendMessage/${gameroomNo}`, {}, JSON.stringify(messageToSend)); // ⭐ 전송 주소 변경
@@ -274,6 +279,13 @@ const GameChatbox = ({ gameroomNo, userNick, userNo, onNewMessage }) => {
                 onClose={closeReportModal}
                 onReportSubmit={handleReportSubmit}
             />
+
+            <ChatBanModal
+                isOpen={isChatBanModalOpen}
+                onClose={() => setIsChatBanModalOpen(false)}
+                bannedTimestamp={currentUserBanTimestamp} // 모달에 채팅 금지 시간 전달
+            />
+
         </div>
     );
 };

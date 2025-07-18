@@ -3,13 +3,16 @@ package org.joonzis.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Base64;
 
 import org.joonzis.domain.QuestionDTO;
+import org.joonzis.domain.UsersVO;
 import org.joonzis.mapper.AdminMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.log4j.Log4j;
 
@@ -175,15 +178,14 @@ public class AdminServiceImpl implements AdminService {
         return result;
     }
 
-    // 새롭게 추가된 문제 수정 메서드 구현
+    //문제 수정 메서드
     @Override
     public void updateQuestion(QuestionDTO questionDTO, String category) {
-        // 문제 ID(questionDTO.getId())를 사용하여 해당 카테고리 테이블에서 문제 수정
-        // 예: adminMapper.updateQuestion(questionDTO, category);
         System.out.println("ServiceImpl: 문제 수정 실행 - 카테고리: " + category + ", DTO: " + questionDTO);
         adminMapper.updateQuestion(questionDTO, category);
     }
     
+    //문제 삭제 메소드
     @Override
     public void deleteQuestions(String category, List<Integer> questionIds) {
         log.info("ServiceImpl: deleteQuestions 호출 - 카테고리: " + category + ", 삭제할 ID 목록: " + questionIds);
@@ -206,5 +208,65 @@ public class AdminServiceImpl implements AdminService {
             log.error("문제 삭제 중 매퍼 오류 발생: " + e.getMessage(), e);
             throw new RuntimeException("데이터베이스에서 문제를 삭제하는 중 오류가 발생했습니다.", e);
         }
+    }
+    
+    //유저 조회
+    @Override
+    public List<UsersVO> getAllUsers() {
+        return adminMapper.selectAllUsers();
+    }
+    
+    //유저 검색
+    @Override
+    public List<UsersVO> searchUsers(String searchType, String searchValue) {
+        // 필요하다면 여기에서 검색어 유효성 검사 등 추가적인 비즈니스 로직을 구현할 수 있습니다.
+        return adminMapper.searchUsers(searchType, searchValue);
+    }
+    
+    //유저 채금 적용
+    @Override
+    @Transactional
+    public int banChatusers(List<Integer> userNos) {
+        if (userNos == null || userNos.isEmpty()) {
+            return 0; // 처리할 사용자 번호가 없으면 0 반환
+        }
+
+        List<Integer> actualUsersToBan = new ArrayList<>(); // 실제로 채팅 금지를 적용할 사용자 목록
+
+        // 1. 전달받은 userNos에 대해 현재 ischatbanned 상태를 조회
+        List<UsersVO> currentStatuses = adminMapper.getUsersChatBanStatus(userNos);
+
+        // 2. 현재 상태를 확인하여 이미 금지된 사용자는 제외
+        for (Integer userNo : userNos) {
+            boolean alreadyBanned = false;
+            for (UsersVO user : currentStatuses) {
+                if (user.getUser_no() == userNo.intValue()) {
+                	if (user.getIschatbanned() == 1) {
+                        alreadyBanned = true;
+                        System.out.println("DEBUG: User " + user.getUser_nick() + "(" + userNo + ") is already chat banned. Skipping.");
+                        break;
+                	}
+                }
+            }
+            if (!alreadyBanned) {
+                actualUsersToBan.add(userNo); // 아직 금지되지 않은 사용자만 목록에 추가
+            }
+        }
+
+        // 3. 실제로 금지되지 않은 사용자에게만 업데이트 쿼리 실행
+        if (!actualUsersToBan.isEmpty()) {
+            // 현재 시간을 타임스탬프로 생성하여 전달
+            return adminMapper.updateChatBanStatus(actualUsersToBan, new Timestamp(System.currentTimeMillis()));
+        } else {
+            return 0; // 업데이트할 사용자가 없으면 0 반환
+        }
+    }
+    
+    //유저 채금 해제
+    @Override
+    @Transactional
+    public void unbanChatUsers() {
+        // 매퍼를 호출하여 72시간이 경과한 사용자들의 밴 상태를 해제
+        adminMapper.unbanChatUsers();
     }
 }
