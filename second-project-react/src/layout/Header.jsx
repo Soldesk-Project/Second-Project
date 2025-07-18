@@ -22,6 +22,8 @@ const Header = () => {
   }, []);
 
   const isKakaoUser = () => user.user_id.startsWith('kakao_');
+  const isNaverUser = () => user.user_id.startsWith('naver_');
+  const isGoogleUser = () => user.user_id.startsWith('google_');
 
   const clickToGoMain = () => nav(`/main/${server}`);
 
@@ -64,6 +66,58 @@ const Header = () => {
     window.location.href = logoutUrl;
   };
 
+  const logoutNaver = async () => {
+    try {
+      // 1. access_token 삭제
+      await axios.post('/api/naver/logout', {
+        accessToken: user.access_token,
+      });
+
+      // 2. 네이버 세션 로그아웃 요청을 숨겨서 보냄 (iframe 등)
+      const logoutWin = window.open(
+        'https://nid.naver.com/nidlogin.logout',
+        '_blank',
+        'width=1,height=1,left=-1000,top=-1000'
+      );
+
+      setTimeout(() => {
+        if (logoutWin) logoutWin.close();
+        // 3. 클라이언트 상태 초기화
+        dispatch(clearUser());
+        dispatch(clearServer());
+        localStorage.clear();
+        nav('/'); // 또는 window.location.href = '/'
+      }, 1000); // 약간의 시간 여유
+    } catch (err) {
+      console.error('네이버 로그아웃 실패:', err);
+    }
+  };
+
+  const logoutGoogle = async () => {
+    try {
+      // 1. 서버 측 로그아웃 처리 (옵션)
+      await axios.post('/api/google/logout', {
+        accessToken: user.access_token, // 서버에서 토큰 무효화 처리
+      });
+
+      // 2. 구글 로그아웃 URL 호출 (iframe으로)
+      const iframe = document.createElement('iframe');
+      iframe.src = 'https://accounts.google.com/Logout';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      // 3. 약간의 시간 기다린 후 클라이언트 상태 초기화
+      setTimeout(() => {
+        dispatch(clearUser());
+        dispatch(clearServer());
+        localStorage.clear();
+        nav('/');
+      }, 1000);
+    } catch (err) {
+      console.error('구글 로그아웃 실패:', err);
+    }
+  };
+
   const logOut = async () => {
     try {
       if (user.user_id) {
@@ -72,8 +126,19 @@ const Header = () => {
 
       if (isKakaoUser()) {
         await logoutKakao();
-        return; // 리다이렉트 하므로 함수 종료
+        return;
       }
+
+      if (isNaverUser()) {
+        await logoutNaver();
+        return;
+      }
+
+      if (isGoogleUser()) {
+      await logoutGoogle();
+      return;
+    }
+
     } catch (error) {
       console.error('로그아웃 처리 중 오류:', error);
     } finally {

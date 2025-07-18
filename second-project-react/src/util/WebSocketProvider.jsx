@@ -21,8 +21,8 @@ export const WebSocketProvider = ({ children }) => {
   }
   useEffect(() => {
     if (!socketsRef.current["server"]) {
-      socketsRef.current["server"] = new WebSocket("ws://192.168.0.112:9099/ws/server");
-      // socketsRef.current["server"] = new WebSocket("ws://localhost:9099/ws/server");
+      // socketsRef.current["server"] = new WebSocket("ws://192.168.0.112:9099/ws/server");
+      socketsRef.current["server"] = new WebSocket("ws://localhost:9099/ws/server");
     }
   }, []);
   // :흰색_확인_표시: match 소켓은 userId 있을 때만 연결

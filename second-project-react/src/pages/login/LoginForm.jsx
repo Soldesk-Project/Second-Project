@@ -14,8 +14,29 @@ const LoginForm = () => {
   const user = useSelector(state => state.user.user);
 
   const KAKAO_CLIENT_ID = "99ddb7e910a924e51b633490da611ead";
-  const REDIRECT_URI = "http://localhost:3000/kakao/callback";
+  const KAKAO_REDIRECT_URI = "http://localhost:3000/kakao/callback";
+  const GOOGLE_CLIENT_ID = "633570415561-hcl7dpl18608021a7lof369flivcklv7.apps.googleusercontent.com";
+  const GOOGLE_REDIRECT_URI = "http://localhost:3000/google/callback";
 
+  const handleGoogleLogin = () => {
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_REDIRECT_URI}&response_type=code&scope=profile email&access_type=offline`;
+    window.location.href = url;
+  };
+
+  const generateState = () => {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  };
+
+  const handleNaverLogin = () => {
+    const state = generateState();
+    localStorage.setItem('naver_oauth_state', state); // ✅ 저장해두기
+
+    const NAVER_CLIENT_ID = "NxeIC3yi_Oc0_aO3Ybv6";
+    const NAVER_REDIRECT_URI = encodeURIComponent("http://localhost:3000/api/naver/callback");
+    const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${NAVER_CLIENT_ID}&redirect_uri=${NAVER_REDIRECT_URI}&state=${state}`;
+
+    window.location.href = naverAuthUrl;
+  };
   useEffect(() => {
     if (user) {
       // 이미 로그인 상태면 서버 메인 페이지 등으로 이동
@@ -48,7 +69,7 @@ const LoginForm = () => {
   };
 
   const handleKakaoLogin = () => {
-    window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+    window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&KAKAO_redirect_uri=${KAKAO_REDIRECT_URI}&response_type=code`;
   }
 
   const handleButtonOption = (e) => {
@@ -111,6 +132,8 @@ const LoginForm = () => {
           />
           <button onClick={handleLogin} className='loginButton'>login</button>
           <button onClick={handleKakaoLogin} className='kakao-login'>kakao login</button>
+          <button onClick={handleNaverLogin} className='naver-login'>naver login</button>
+          <button onClick={handleGoogleLogin} className='google-login'>google login</button>
         </div>
         <div className='login-image'>
           <img 

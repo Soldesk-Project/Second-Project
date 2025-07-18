@@ -24,6 +24,8 @@ import Customersuggest from './pages/Customersuggest';
 import CustomerProblemSubmit from './pages/CustomerProblemSubmit';
 import AdminPage from './pages/AdminPage';
 import InquiryDetail from './pages/InquiryDetail';
+import NaverCallback from './pages/login/NaverCallback';
+import GoogleCallback from './pages/login/GoogleCallback';
 
 function App() {
   const dispatch = useDispatch();
@@ -56,6 +58,8 @@ function App() {
           <Route path="/findId" element={<FindId />} />
           <Route path="/findPw" element={<FindPw />} />
           <Route path="/kakao/callback" element={<KakaoCallback />} />
+          <Route path="/api/naver/callback" element={<NaverCallback />} />
+          <Route path="/google/callback" element={<GoogleCallback />} />
           <Route path="/main/:serverNo" element={<MainPage />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/gameRoom/:roomNo" element={<InPlay />} />
