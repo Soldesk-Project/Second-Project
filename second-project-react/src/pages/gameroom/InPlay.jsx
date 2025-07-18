@@ -86,7 +86,7 @@ const InPlay = () => {
       const timerId = setTimeout(() => {
         setUserRecentChats(prev => {
           const newState = { ...prev };
-          // ⭐ 중요: 타이머가 만료될 때, 해당 메시지가 여전히 해당 유저의 최신 메시지인지 확인
+          // 타이머가 만료될 때, 해당 메시지가 여전히 해당 유저의 최신 메시지인지 확인
           // (그 사이에 같은 유저가 다른 메시지를 보내면 이전 메시지를 지우지 않음)
           if (newState[chatMessage.mSender] && newState[chatMessage.mSender].timestamp === chatMessage.mTimestamp) {
             delete newState[chatMessage.mSender];
@@ -420,7 +420,7 @@ const InPlay = () => {
           </div>
           <div className={styles.chat_box}>
             {userNick && userNo != null && roomNo ? (
-              <GameChatbox gameroomNo={roomNo} userNick={userNick} userNo={userNo} onNewMessage={handleNewChatMessage}/>
+              <GameChatbox gameroomNo={roomNo} userNick={userNick} userNo={userNo} onNewMessage={handleNewChatMessage} currentUser={user}/>
             ) : (
               <p>채팅을 로드할 수 없습니다. 사용자 정보 또는 게임방 번호를 확인 중...</p>
             )}

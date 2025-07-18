@@ -9,8 +9,8 @@
 		<selectKey keyProperty="user_no" resultType="int" order="BEFORE">
 	        SELECT SEQ_USERS.NEXTVAL FROM dual
 	    </selectKey>
-		INSERT INTO USERS (USER_NO, USER_NICK, USER_ID, USER_PW, USER_EMAIL, USER_DATE)
-		VALUES (#{user_no}, #{user_nick}, #{user_id}, #{user_pw}, #{user_email}, sysdate)
+		INSERT INTO USERS (USER_NO, USER_NICK, USER_ID, USER_PW, USER_EMAIL, USER_DATE, ISCHATBANNED)
+		VALUES (#{user_no}, #{user_nick}, #{user_id}, #{user_pw}, #{user_email}, sysdate, 0)
 	</insert>
 	<!-- 유저 데코,리워드에 추가 -->
 	<insert id="insertDeco">

@@ -3,7 +3,8 @@ import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import '../../css/chatbox.css'; // 동일한 CSS 사용 가능
 import { useSelector } from 'react-redux';
-import ChatReportModal from './ChatReportModal';
+import ChatReportModal from '../modal/ChatReportModal';
+import ChatBanModal from '../modal/ChatBanModal';
 
 function formatTimestamp(timestamp) {
     if (!timestamp) return '';
@@ -30,10 +31,13 @@ const ServerChatbox = () => {
     const hasSentAddUserRef = useRef(false);
     const [isConnected, setIsConnected] = useState(false); // 웹소켓 연결 상태를 추적하는 state
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [isChatBanModalOpen, setIsChatBanModalOpen] = useState(false);
 
     const currentUser = useSelector((state) => state.user.user);
     const userNick = currentUser?.user_nick;
     const userNo = currentUser?.user_no;
+    const isCurrentUserChatBanned = currentUser?.ischatbanned === 1;
+    const currentUserBanTimestamp = currentUser?.banned_timestamp;
 
     useEffect(() => {
 
@@ -133,30 +137,36 @@ const ServerChatbox = () => {
 
     // 메시지 전송 함수
     const sendMessage = () => {
-    if (stompClientInstanceRef.current && isConnected && messageInput.trim() && userNick && userNo !== undefined && userNo !== null) {
-        const messageToSend = {
-            mSender: userNick,
-            mSenderNo: userNo,
-            mContent: messageInput,
-            mTimestamp: Date.now()
-        };
-
-        if (isWhisperMode && whisperTarget.trim()) {
-            messageToSend.mType = 'WHISPER_CHAT';
-            messageToSend.mReceiver = whisperTarget;
-
-            stompClientInstanceRef.current.send("/app/whisperChat.sendMessage", {}, JSON.stringify(messageToSend));
-            // 귓속말은 자신에게도 바로 표시되도록 추가
-            setMessages(prevMessages => [...prevMessages, {
-                ...messageToSend,
-                mReceiver: whisperTarget
-            }]);
-        } else {
-            messageToSend.mType = 'SERVER_CHAT';
-            stompClientInstanceRef.current.send("/app/serverChat.sendMessage", {}, JSON.stringify(messageToSend));
+        if (isCurrentUserChatBanned) {
+            setIsChatBanModalOpen(true); // 채팅 금지 모달 띄우기
+            setMessageInput(''); // 입력창 비우기
+            return;
         }
-        setMessageInput('');
-    } else {
+
+        if (stompClientInstanceRef.current && isConnected && messageInput.trim() && userNick && userNo !== undefined && userNo !== null) {
+            const messageToSend = {
+                mSender: userNick,
+                mSenderNo: userNo,
+                mContent: messageInput,
+                mTimestamp: Date.now()
+            };
+
+            if (isWhisperMode && whisperTarget.trim()) {
+                messageToSend.mType = 'WHISPER_CHAT';
+                messageToSend.mReceiver = whisperTarget;
+
+                stompClientInstanceRef.current.send("/app/whisperChat.sendMessage", {}, JSON.stringify(messageToSend));
+                // 귓속말은 자신에게도 바로 표시되도록 추가
+                setMessages(prevMessages => [...prevMessages, {
+                    ...messageToSend,
+                    mReceiver: whisperTarget
+                }]);
+            } else {
+                messageToSend.mType = 'SERVER_CHAT';
+                stompClientInstanceRef.current.send("/app/serverChat.sendMessage", {}, JSON.stringify(messageToSend));
+            }
+            setMessageInput('');
+        } else {
             if (!stompClientInstanceRef.current) {
                 console.warn("메시지 전송 실패 (ServerChatbox): STOMP Client 인스턴스가 없습니다.");
             } else if (!isConnected) {
@@ -263,13 +273,19 @@ const ServerChatbox = () => {
                 <button id="sendBtn" className="sendBtn" onClick={sendMessage} disabled={!isConnected}>전달</button>
             </div>
 
-            {/* ★ 분리된 ChatReportModal 컴포넌트 사용 */}
+            {/* ChatReportModal 컴포넌트 */}
             <ChatReportModal
                 isOpen={isReportModalOpen}
                 onClose={closeReportModal}
                 onReportSubmit={handleReportSubmit}
                 // recentMessages={messages.slice(-5)} // 필요하다면 최근 메시지를 props로 전달
-            />            
+            />
+            {/* 채팅 금지 모달 컴포넌트 */}
+            <ChatBanModal
+                isOpen={isChatBanModalOpen}
+                onClose={() => setIsChatBanModalOpen(false)}
+                bannedTimestamp={currentUserBanTimestamp} // 모달에 채팅 금지 시간 전달
+            />
         </div>
     );
 };

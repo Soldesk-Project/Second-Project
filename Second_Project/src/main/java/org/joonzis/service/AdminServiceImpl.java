@@ -3,6 +3,7 @@ package org.joonzis.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Base64;
 
@@ -227,9 +228,38 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     public int banChatusers(List<Integer> userNos) {
         if (userNos == null || userNos.isEmpty()) {
-            return 0;
+            return 0; // 처리할 사용자 번호가 없으면 0 반환
         }
-        return adminMapper.banChatusers(userNos);
+
+        List<Integer> actualUsersToBan = new ArrayList<>(); // 실제로 채팅 금지를 적용할 사용자 목록
+
+        // 1. 전달받은 userNos에 대해 현재 ischatbanned 상태를 조회
+        List<UsersVO> currentStatuses = adminMapper.getUsersChatBanStatus(userNos);
+
+        // 2. 현재 상태를 확인하여 이미 금지된 사용자는 제외
+        for (Integer userNo : userNos) {
+            boolean alreadyBanned = false;
+            for (UsersVO user : currentStatuses) {
+                if (user.getUser_no() == userNo.intValue()) {
+                	if (user.getIschatbanned() == 1) {
+                        alreadyBanned = true;
+                        System.out.println("DEBUG: User " + user.getUser_nick() + "(" + userNo + ") is already chat banned. Skipping.");
+                        break;
+                	}
+                }
+            }
+            if (!alreadyBanned) {
+                actualUsersToBan.add(userNo); // 아직 금지되지 않은 사용자만 목록에 추가
+            }
+        }
+
+        // 3. 실제로 금지되지 않은 사용자에게만 업데이트 쿼리 실행
+        if (!actualUsersToBan.isEmpty()) {
+            // 현재 시간을 타임스탬프로 생성하여 전달
+            return adminMapper.updateChatBanStatus(actualUsersToBan, new Timestamp(System.currentTimeMillis()));
+        } else {
+            return 0; // 업데이트할 사용자가 없으면 0 반환
+        }
     }
     
     //유저 채금 해제

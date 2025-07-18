@@ -87,25 +87,40 @@ const UserRestrict = () => {
       return;
     }
 
-    // confirm 대화 상자를 사용하여 사용자에게 확인 요청
-    const isConfirmed = window.confirm('정말 선택된 회원에 대한 채팅금지를 적용하시겠습니까?');
+    const usersToBan = [];
+    const userMap = new Map(users.map(user => [user.user_no, user]));
+
+    // 먼저, 이미 금지된 사용자들을 걸러내고 메시지를 띄웁니다.
+    for (const userNo of selectedUserNos) {
+        const user = userMap.get(userNo);
+        if (user) {
+            if (user.ischatbanned === 1) {
+                alert(`${user.user_nick} 회원은 이미 채팅 금지가 적용되었습니다.`);
+            } else {
+                usersToBan.push(userNo); // 아직 금지되지 않은 사용자만 목록에 추가
+            }
+        }
+    }
+
+    if (usersToBan.length === 0) {
+        // 모든 선택된 사용자가 이미 금지되었거나, 선택된 사용자가 없는 경우
+        setSelectedUserNos(new Set()); // 선택된 항목 초기화
+        return; // 백엔드 요청을 보내지 않고 함수 종료
+    }
+
+    const isConfirmed = window.confirm(`선택된 회원 중 ${usersToBan.length}명에 대해 채팅금지를 적용하시겠습니까?`);
 
     if (isConfirmed) {
-      // 로딩 상태 설정
       setLoading(true);
       setError(null);
 
       try {
-        // 선택된 userNo 배열로 변환
-        const userNosToBan = Array.from(selectedUserNos);
-        console.log("Applying chat ban to:", userNosToBan);
-
         const response = await fetch('/admin/users/ban-chat', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ userNos: userNosToBan }),
+          body: JSON.stringify({ userNos: usersToBan }), // 실제 금지할 사용자만 보냅니다.
         });
 
         if (!response.ok) {
@@ -215,11 +230,12 @@ const UserRestrict = () => {
                 <th style={{ padding: '8px' }}>포인트</th>
                 <th style={{ padding: '8px' }}>랭크</th>
                 <th style={{ padding: '8px' }}>채팅금지 여부</th>
+                <th style={{ padding: '8px' }}>선택</th> {/* 체크박스 열 */}
               </tr>
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.userNo} style={{ borderBottom: '1px solid #eee' }}>
+                <tr key={user.user_no} style={{ borderBottom: '1px solid #eee' }}>
                   
                   <td style={{ padding: '10px', border: '1px solid #ddd' }}>{user.user_no}</td>
                   <td style={{ padding: '10px', border: '1px solid #ddd' }}>{user.user_id}</td>
@@ -247,8 +263,8 @@ const UserRestrict = () => {
                   <td style={{ padding: '10px', border: '1px solid #ddd', textAlign: 'center' }}>
                     <input
                       type="checkbox"
-                      checked={selectedUserNos.has(user.userNo)}
-                      onChange={() => handleCheckboxChange(user.userNo)}
+                      checked={selectedUserNos.has(user.user_no)}
+                      onChange={() => handleCheckboxChange(user.user_no)}
                     />
                   </td>
                 </tr>
