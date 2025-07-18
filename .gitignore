@@ -114,8 +114,8 @@ build/
 
 ###
 
-# .gitignore
-Project/src/main/resources/application.properties
+# 모든 application.properties 무시
+**/application.properties
 
 # Tomcat 서버 설정 파일 무시
 Servers/Tomcat\ v9.0\ Server\ at\ localhost-config/server.xml
