@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.joonzis.domain.ItemVO;
+import org.joonzis.domain.ProfileImageDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDecoDTO;
 import org.joonzis.domain.UserRewardVO;
+import org.joonzis.domain.UsersVO;
 import org.joonzis.service.UserService;
 import org.joonzis.websocket.ServerUserWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -117,4 +121,28 @@ public class UserController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업데이트 실패");
 	    }
 	}
+	
+//	 /** 사용자 통계 조회 */
+//    @GetMapping("/{userNo}/stats")
+//    public ResponseEntity<UserStatsDTO> getUserStats(@PathVariable int userNo) {
+//        UserStatsDTO stats = service.getUserStats(userNo);
+//        return ResponseEntity.ok(stats);
+//    }
+	
+	/** DTO 대신 VO를 내려주는 엔드포인트 */
+    @GetMapping("/{userNo}")
+    public ResponseEntity<UsersVO> getUser(@PathVariable int userNo) {
+        UsersVO vo = service.getUsersByUserNo(userNo);
+        return ResponseEntity.ok(vo);
+    }
+
+    /** 프로필 이미지 업데이트는 그대로 유지 */
+    @PatchMapping("/{userNo}/profile-image")
+    public ResponseEntity<Void> updateProfileImage(
+            @PathVariable int userNo,
+            @RequestBody ProfileImageDTO req
+    ) {
+        service.changeProfileImage(userNo, req.getImageUrl());
+        return ResponseEntity.ok().build();
+    }
 }

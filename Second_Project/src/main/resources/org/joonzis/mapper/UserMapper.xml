@@ -157,4 +157,25 @@
 		SELECT USER_PW FROM USERS WHERE USER_EMAIL = #{user_email} AND USER_ID = #{user_id}
 	</select>
 	
+	<!-- 유저프로필이미지선택 -->
+	<update id="updateProfileImage" parameterType="map">
+	    UPDATE users
+	      SET user_profile_img = #{imageUrl}
+	    WHERE user_no = #{userNo}
+	</update>
+	
+	<!-- VO용 조회 쿼리 -->
+	<select id="getUsersByUserNo" parameterType="int" resultType="org.joonzis.domain.UsersVO">
+	    SELECT 
+	      user_no,
+	      user_id,
+	      user_nick,
+	      user_email,
+	      user_rank,
+	      user_point,
+	      user_profile_img
+	    FROM users
+	    WHERE user_no = #{userNo}
+	</select>
+	
 </mapper>

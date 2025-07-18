@@ -13,6 +13,7 @@ import org.joonzis.domain.UsersVO;
 import org.joonzis.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.log4j.Log4j;
 
@@ -118,4 +119,20 @@ public class UserServiceImpl implements UserService{
 	public String findPwByIdAndEmail(UsersVO vo) {
 		return mapper.findPwByIdAndEmail(vo);
 	}
+	
+	@Override
+	@Transactional
+	public int changeProfileImage(int userNo, String imageUrl) {
+		int updated = mapper.updateProfileImage(userNo, imageUrl);
+	    log.info("프로필 이미지 업데이트 건수: " + updated);
+	    if (updated != 1) {
+	      throw new IllegalStateException("프로필 이미지 업데이트 실패: userNo=" + userNo);
+	    }
+	    return updated;
+	  }
+	
+	@Override
+    public UsersVO getUsersByUserNo(int userNo) {
+        return mapper.getUsersByUserNo(userNo);
+    }
 }

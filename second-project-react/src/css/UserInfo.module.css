@@ -76,24 +76,28 @@
 
 .userInfo_Box{
   margin-top: 40px;
-  margin-left: 30px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
 }
 
 .userInfo_Box_1{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  align-items: center;
 }
 
 .userInfo_Name{
   display: flex;
   flex-direction: column;
-  margin-left: 30px;
   margin-top: 20px;
   justify-content: center;
 }
 
 .bar_set{
-  margin-top: 35px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .progressLine {
@@ -101,7 +105,7 @@
   height: 6px;
   background: #2e3650;
   border-radius: 3px;
-  margin: 12px 0 4px;
+  margin: 12px auto 4px;
 }
 
 .progressFill {
@@ -114,6 +118,7 @@
   font-size: 12px;
   color: #ddd;
   margin-bottom: 8px;
+  margin-left: 155px;
 }
 
 .invenBtn{
@@ -142,4 +147,50 @@
   height: calc(100% + 40px);
   pointer-events: none; /* 테두리를 클릭해도 이벤트가 사진에 닿게 */
   /* 필요하면 z-index: 1; 등 추가 */
+}
+
+/* 프로필 변경 아이콘 */
+.changeProfileIcon {
+  position: absolute;
+  bottom: 8px;   /* 프로필 원의 아래쪽 안쪽에 붙이기 */
+  right: 8px;    /* 오른쪽 안쪽에 붙이기 */
+  width: 30px;   /* 아이콘 크기 */
+  height: 30px;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.profileModalBackdrop {
+  position: fixed; top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.5);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1000;
+}
+.profileModal {
+  background: #1f222d;
+  padding: 20px;
+  border-radius: 8px;
+  width: 360px;
+  text-align: center;
+}
+.profileOptionsGrid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 12px;
+  margin: 16px 0;
+}
+.profileOptionImg {
+  width: 80px; height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform .1s ease-in-out;
+}
+.profileOptionImg:hover { transform: scale(1.05); }
+.closeProfileModal {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: #444; color: #fff;
+  border: none; border-radius: 4px;
+  cursor: pointer;
 }

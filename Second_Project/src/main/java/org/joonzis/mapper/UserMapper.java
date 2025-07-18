@@ -3,6 +3,7 @@ package org.joonzis.mapper;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserAchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
@@ -54,4 +55,11 @@ public interface UserMapper {
 	public String findIdByEmail(String user_email);
 	// 비밀번호 찾기
 	public String findPwByIdAndEmail(UsersVO vo);
+	
+	int updateProfileImage(@Param("userNo") int userNo,
+            @Param("imageUrl") String imageUrl);
+	
+	//유저정보 가져오기
+	UsersVO getUsersByUserNo(@Param("userNo") int userNo);
+	
 }

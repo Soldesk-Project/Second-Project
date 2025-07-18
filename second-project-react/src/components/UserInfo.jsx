@@ -22,6 +22,49 @@ const UserInfo = () => {
     const { isTop10 } = useSelector((state) => state.ranking);
     const sockets = useContext(WebSocketContext);
     const socket = sockets['server'];
+
+    // --- 1) 프로필 상태
+    const [profileSrc, setProfileSrc] = useState('');
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+    // 페이지 로드 시, 백엔드에서 유저 정보(프로필 포함) 가져오기
+    useEffect(() => {
+        if (!user?.user_no) return;
+        axios.get(`/user/${user.user_no}`)
+        .then(res => {
+            // 실제 JSON 필드는 user_profile_img 입니다
+            const img = res.data.user_profile_img;
+            setProfileSrc(img || '/images/profile_default.png');
+            // (선택) redux user 상태 업데이트
+            dispatch({ type: 'user/setProfileImage', payload: img });
+        })
+        .catch(console.error);
+    }, [user.user_no, dispatch]);
+
+    // --- 2) 프로필 변경 요청
+    const PROFILE_OPTIONS = [
+        '/images/profile_1.png',
+        '/images/profile_2.png',
+        '/images/profile_3.png',
+        '/images/profile_4.png',
+        '/images/profile_5.png',
+        '/images/profile_6.png',
+        '/images/profile_7.png',
+        '/images/profile_8.png',
+    ];
+
+    const onSelectProfile = (src) => {
+        axios.patch(`/user/${user.user_no}/profile-image`, { imageUrl: src })
+        .then(() => {
+            setProfileSrc(src);
+            dispatch({ type: 'user/setProfileImage', payload: src });
+            setIsProfileModalOpen(false);
+        })
+        .catch(err => {
+            console.error('프로필 변경 실패', err);
+            alert('서버 저장 중 오류가 발생했습니다.');
+        });
+    };
     
     const openButtonStyle = {
         padding: '8px 16px',
@@ -100,55 +143,98 @@ const UserInfo = () => {
         }, [socket]);
 
     // 2) 사용자 통계 가져오기
-        const [stats, setStats] = useState(null);
-        useEffect(() => {
-            if (!user.user_no) return;
-            axios
-            .get(`/api/users/${user.user_no}/stats`)
-            .then(res => setStats(res.data))
-            .catch(err => console.error(err));
-        }, [user.user_no]);    
+        // const [stats, setStats] = useState(null);
+        // useEffect(() => {
+        //     if (!user.user_no) return;
+        //     axios
+        //     .get(`/user/${user.user_no}/stats`)
+        //     .then(res => setStats(res.data))
+        //     .catch(err => console.error(err));
+        // }, [user.user_no]);    
 
-    // 2) 퍼센트 계산
-    // --- 퍼센트 계산 (통계가 로딩되지 않았으면 0으로)
-        const expPercent = stats
-            ? Math.floor((stats.exp / stats.nextExp) * 100)
-            : 0;
-        const answerPercent = stats && stats.totalCount > 0
-            ? Math.floor((stats.correctCount / stats.totalCount) * 100)
-            : 0;
+    // // 2) 퍼센트 계산
+    // // --- 퍼센트 계산 (통계가 로딩되지 않았으면 0으로)
+    //     const expPercent = stats
+    //         ? Math.floor((stats.exp / stats.nextExp) * 100)
+    //         : 0;
+    //     const answerPercent = stats && stats.totalCount > 0
+    //         ? Math.floor((stats.correctCount / stats.totalCount) * 100)
+    //         : 0;
 
   return (
     <div>
         <div className={styles.userInfo_Box}>
             <div className={styles.userInfo_Box_1}>
                 <div className={styles.profileWrapper}>
-                    <img src='/images/womenProfileTest.png' alt='프로필' style={{ width: `180px`, height: `180px`}} className={styles.profileImg}/>
-                    <img src='/images/dogProfile.png' alt='프로필테두리' className={styles.profileBorder}/>
+                    <img 
+                        src={profileSrc} 
+                        alt='프로필' 
+                        style={{ width: `180px`, height: `180px`}} 
+                        className={styles.profileImg}/>
+                    <img
+                        src='/images/switch.png'
+                        alt='프로필변경'
+                        className={styles.changeProfileIcon}
+                        onClick={() => setIsProfileModalOpen(true)}
+                    />
+                    <img src='/images/dogProfile.png' 
+                    alt='프로필테두리' 
+                    className={styles.profileBorder}/>
                 </div>
+
             <div className={styles.userInfo_Name}>
                 <p>{user.user_nick}</p>
                 <p>{renderTier()}</p>
             </div>
             </div>
+
+            {/* 프로필 선택 모달 */}
+            {isProfileModalOpen && (
+            <div
+                className={styles.profileModalBackdrop}
+                onClick={() => setIsProfileModalOpen(false)}
+            >
+                <div className={styles.profileModal} onClick={e=>e.stopPropagation()}>
+                <h4>프로필 이미지 선택</h4>
+                <div className={styles.profileOptionsGrid}>
+                    {PROFILE_OPTIONS.map(src=>(
+                    <img
+                        key={src}
+                        src={src}
+                        alt='선택 이미지'
+                        className={styles.profileOptionImg}
+                        onClick={()=>onSelectProfile(src)}
+                    />
+                    ))}
+                </div>
+                <button
+                    className={styles.closeProfileModal}
+                    onClick={()=>setIsProfileModalOpen(false)}
+                >
+                    닫기
+                </button>
+                </div>
+            </div>
+            )}
+
+            {/* ... 경험치/정답률 바, 인벤토리 버튼 등 ... */}
             <div className={styles.bar_set}>
-                {/* 경험치 바 */}
                 <div className={styles.progressLine}>
                     <div
                     className={styles.progressFill}
-                    style={{ width: `${expPercent}%` }}
+                    // style={{ width: `${expPercent}%` }}
                     />
                 </div>
-                <div className={styles.label}>{expPercent}% 경험치</div>
+                {/* <div className={styles.label}>{expPercent}% 경험치</div> */}
 
                 {/* 정답률 바 */}
                 <div className={styles.progressLine}>
                     <div
                     className={styles.progressFill}
-                    style={{ width: `${answerPercent}%` }}
+                    // style={{ width: `${answerPercent}%` }}
                     />
                 </div>
-                <div className={styles.label}>{answerPercent}% 정답률</div>
+                {/* <div className={styles.label}>{answerPercent}% 정답률</div> */}
             </div>
         </div>
         <div className={styles.invenBtn}>

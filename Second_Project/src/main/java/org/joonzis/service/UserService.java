@@ -54,4 +54,10 @@ public interface UserService {
 	public String findIdByEmail(String user_email);
 	// 비밀번호 찾기
 	public String findPwByIdAndEmail(UsersVO vo);
+	
+	//유저프로필이미지선택
+	public int changeProfileImage(int userNo, String imageUrl);
+	
+	//유저정보 가져오기
+	UsersVO getUsersByUserNo(int userNo);
 }

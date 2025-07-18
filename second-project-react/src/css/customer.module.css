@@ -409,3 +409,20 @@ textarea.textarea {
 .inquiryDate {
   justify-self: end;      /* 날짜는 오른쪽 정렬 */
 }
+
+.textareaBox_1{
+  display: flex;
+  flex-direction: row;
+  justify-items: center;
+  margin-top: 50px;
+}
+
+.textarea_1{
+  font-size: 15px;
+  margin-left: 20px;
+}
+
+.textarea_2{
+  margin-top: 50px;
+  font-size: 15px;
+}
