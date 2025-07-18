@@ -47,7 +47,18 @@ const ServerUserList = () => {
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === "userList" && data.server === server) {
-        setUsers(data.users);
+        // 1. 서버에서 유저 목록 받아옴
+        const receivedUsers = data.users;
+
+        // 2. 본인 정보 기준으로 본인을 맨 앞에 정렬
+        const sortedUsers = [...receivedUsers].sort((a, b) => {
+          if (a.userNo === String(userNo)) return -1; // 본인 맨 위로
+          if (b.userNo === String(userNo)) return 1;
+          return 0;
+        });
+
+        // 3. 상태 업데이트
+        setUsers(sortedUsers);
       }
     };
 
