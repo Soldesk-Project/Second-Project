@@ -1,11 +1,12 @@
 import React, { useRef, useState } from 'react';
-import Header from '../layout/Header';
-import styles from '../css/customer.module.css';
+import Header from '../../layout/Header';
+import styles from '../../css/customer.module.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 
-const CustomerCenterNew = () => {
+const CustomerProblemSubmit = () => {
+  
   const navigate = useNavigate();
 
   // 1) state 정의
@@ -29,10 +30,10 @@ const CustomerCenterNew = () => {
 
   // 2) 폼 제출 핸들러
   const handleSubmit = async (e) => {
-    if (!userId) {
-      alert('로그인이 필요합니다.');
-      return navigate('/');
-    }
+    // if (!userId) {
+    //   alert('로그인이 필요합니다.');
+    //   return navigate('/');
+    // }
 
     e.preventDefault();
     if (!consent) {
@@ -64,7 +65,7 @@ const CustomerCenterNew = () => {
       alert('등록 중 오류가 발생했습니다.');
     }
   };
-
+  
   return (
     <div className={styles.customerServiceCenter}>
       <div className={styles.topNav}><Header/></div>
@@ -72,12 +73,11 @@ const CustomerCenterNew = () => {
       <div className={styles.inqueriesBox}>
         <form onSubmit={handleSubmit}>
         <div className={styles.title}>
-          <h1>고객 문의</h1>
+          <h1 style={{ color: 'white' }}>문제 접수</h1>
         </div>
         <div className={styles.explanation}>
-          <p>문의하신 내용에 대해 유저의 이메일로 안내해드리고 있습니다.</p>
-          <p>각 서비스의 카테고리 확인 후 문의를 접수해 주세요.</p>
-          <p>보내주신 의견은 서비스 개선을 위해 소중히 활용하고 있습니다.</p>
+          <p>접수하신 문제가 등록되었는지의 유무는 유저의 이메일로 안내해드리고 있습니다.</p>
+          <p>보내주신 문제는 서비스 개선을 위해 소중히 활용하고 있습니다.</p>
         </div>
         
         <div className={styles.inqContainer}>
@@ -86,6 +86,7 @@ const CustomerCenterNew = () => {
             <div className={styles.inqInfoBox_1}>
               <h6>게시글 비밀번호</h6>
               <input
+              className={styles.inputPassword}
               type="password"
               value={postPassword}
               onChange={e => setPostPassword(e.target.value)}
@@ -135,55 +136,59 @@ const CustomerCenterNew = () => {
         </div>
 
         <div className={styles.textareaBox}>
-          <h6>첨부 파일 (선택)</h6>
-        <div className={styles.textareaBox_1}>
-          <h6>첨부 파일</h6>
-          <div className={styles.textarea_1}>
-            <p>파일명은 - , _를 제외한 특수문자는 허용되지 않습니다.</p>
-            <p>아래 파일 형식만 첨부할 수 있습니다.</p>
-            <input
-                type="file"
-                multiple
-                accept=".jpeg,.jpg,.gif,.bmp,.png"
-                style={{ display: 'none' }}
-                ref={fileInputRef}
-                onChange={handleFileChange}
-              />
+          <div className={styles.textareaBox_1}>
+            <h6>첨부 파일 (선택)</h6>
+            <div className={styles.textarea_1}>
+              <p>파일명은 - , _를 제외한 특수문자는 허용되지 않습니다.</p>
+              <p>아래 파일 형식만 첨부할 수 있습니다.</p>
+              <input
+                  type="file"
+                  multiple
+                  accept=".jpeg,.jpg,.gif,.bmp,.png"
+                  style={{ display: 'none' }}
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                />
 
-            <button className={styles.submitBtn} onClick={triggerFileInput}>
-              파일 첨부
-            </button>
+              <button className={styles.submitBtn} onClick={triggerFileInput}>
+                파일 첨부
+              </button>
 
-            {/* 첨부된 파일명 출력 */}
-            <ul style={{ marginTop: '10px', color: 'white' }}>
-              {selectedFiles.map((file, idx) => (
-                <li key={idx}>{file.name}</li>
-              ))}
-            </ul>
-            <p>이미지: .jpeg, .jpg, .gif, .bmp, .png</p>
+              {/* 첨부된 파일명 출력 */}
+              <ul style={{ marginTop: '10px', color: 'white' }}>
+                {selectedFiles.map((file, idx) => (
+                  <li key={idx}>{file.name}</li>
+                ))}
+              </ul>
+              <p>이미지: .jpeg, .jpg, .gif, .bmp, .png</p>
 
+            </div>
           </div>
-        </div>
 
-        <div className={styles.textareaBox_2}>
-          <h6>개인정보 수집 동의(필수)</h6>
-          <div className={styles.textarea_2}>
-            <p>수집하는 개인정보 항목: 이메일 주소</p>
-            <p>작성해 주시는 개인정보는 문의 접수 및 고객 불만 해결을 위해 3년간 보관됩니다.</p>
-            <p>이용자는 본 동의를 거부할 수 있으나, 미동의 시 문의 접수가 불가능합니다.</p>
-            <input
-              type="checkbox"
-              checked={consent}
-              onChange={e => setConsent(e.target.checked)}
-            />&nbsp;<span>동의합니다.</span>
+          <div className={styles.textareaBox_2}>
+            <h6>개인정보 수집 동의(필수)</h6>
+            <div className={styles.textarea_2}>
+              <p>수집하는 개인정보 항목: 이메일 주소</p>
+              <p>작성해 주시는 개인정보는 문제 접수 및 문제 활용을 위해 3년간 보관됩니다.</p>
+              <p>이용자는 본 동의를 거부할 수 있으나, 미동의 시 문제 접수가 불가능합니다.</p>
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={e => setConsent(e.target.checked)}
+              />&nbsp;<span>동의합니다.</span>
+            </div>
           </div>
-        </div>
         </div>
         
         {/* 버튼 */}
           <div className={styles.inqBtns}>
             <button type="submit" className={styles.submitBtn}>등록</button>
-            <button type="button" className={styles.submitBtn} onClick={() => navigate('/inquiries')}>
+            <button 
+              type="button" 
+              className={styles.submitBtn} 
+              onClick={() => navigate('/inquiries' , {
+              state: { initialTab: '문제 제출' }
+            })}>
               돌아가기
             </button>
             </div>
@@ -195,4 +200,4 @@ const CustomerCenterNew = () => {
   );
 };
 
-export default CustomerCenterNew;
+export default CustomerProblemSubmit;

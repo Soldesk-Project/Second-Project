@@ -1,37 +1,37 @@
 import React from 'react';
-import Header from '../layout/Header';
-import styles from '../css/customer.module.css';
+import Header from '../../layout/Header';
+import styles from '../../css/customer.module.css';
 import { useNavigate } from 'react-router-dom';
 
-const CustomerProblemSubmit = () => {
-  
+const Customersuggest = () => {
+
   const navigate = useNavigate();
-  
+
   const Backinquiries = () => {
-      
+    
   }
-  
+
   return (
-    <div className={styles.customerServiceCenter}>
-      <div className={styles.topNav}><Header/></div>
+    <div className='customer-service-center'>
+      <div className='top-nav'><Header/></div>
 
-      <div className={styles.inqueriesBox}>
+      <div className='inqueries-box'>
 
-        <div className={styles.title}>
-          <p>문제 제출</p>
+        <div className='title'>
+          <p>고객 건의</p>
         </div>
         <div>
           <p>간단한 설명</p>
         </div>
         
-        <div className={styles.inqContainer}>
-        <div className={styles.inqContainerTwo}>
-          <div className={styles.inqPwBox}>
+        <div className='inq-container'>
+        <div className='inq-container-two'>
+          <div className='inqPw-Box'>
             <p>아이디(db에서 불러오기)</p>
             <p>게시글 비밀번호</p>
             <input></input>
           </div>
-          <div className={styles.email}>
+          <div className='email'>
             <input
               type="email"
               placeholder="문의 결과 안내받을 외부 이메일"
@@ -39,20 +39,20 @@ const CustomerProblemSubmit = () => {
             />
           </div>
 
-          <div className={styles.inqTextBox}>
-            <div className={styles.inqTitle}>
+          <div className='inq-text-Box'>
+            <div className='inq-title'>
               <p>제목</p>
               <input type='text' placeholder='제목을 입력하세요.'/>
             </div>
             <textarea
-              placeholder="1. 제출하실 문제를 등록해주세요."
-              defaultValue="제출 문제 내용"
+              placeholder="1. 건의 내용을 입력하세요."
+              defaultValue="건의 내용"
               maxLength={1000}
             />
           </div>
         </div>
-          <div className={styles.textLimit}>
-            <p>0자 입력 / 최대 10000자</p>
+          <div className='text-limit'>
+            <p>0자 입력 / 최대 1000자</p>
           </div>
 
         <div>
@@ -69,9 +69,9 @@ const CustomerProblemSubmit = () => {
           <p>동의합니다.</p>
         </div>
         
-        <div className={styles.inqBtns}>
-          <button className={styles.submitBtn}>등록</button>
-          <button className={styles.submitBtn} onClick={() => navigate('/inquiries')}>돌아가기</button>
+        <div className='inqBtns'>
+          <button className='submitBtn'>등록</button>
+          <button className='submitBtn' onClick={() => navigate('/inquiries')}>돌아가기</button>
         </div>
         </div>
         
@@ -80,4 +80,4 @@ const CustomerProblemSubmit = () => {
   );
 };
 
-export default CustomerProblemSubmit;
+export default Customersuggest;

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.joonzis.mapper.FaqMapper">
+  <select id="selectFaqs" resultType="org.joonzis.domain.FaqVO">
+    SELECT * FROM (
+      SELECT ROWNUM rn, t.* FROM (
+        SELECT id, question, answer, category, created_at AS createdAt
+          FROM faq
+         ORDER BY created_at DESC
+      ) t
+      WHERE ROWNUM &lt;= #{offset} + #{limit}
+    )
+    WHERE rn &gt; #{offset}
+  </select>
+
+  <select id="countFaqs" resultType="int">
+    SELECT COUNT(*) FROM faq
+  </select>
+
+  <insert id="insertFaq" parameterType="org.joonzis.domain.FaqVO" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO faq (id, question, answer, category, created_at)
+    VALUES (seq_faq.nextval, #{question}, #{answer}, #{category}, SYSTIMESTAMP)
+  </insert>
+
+  <select id="selectById" parameterType="long" resultType="org.joonzis.domain.FaqVO">
+    SELECT id, question, answer, category, created_at AS createdAt
+      FROM faq
+     WHERE id = #{id}
+  </select>
+</mapper>

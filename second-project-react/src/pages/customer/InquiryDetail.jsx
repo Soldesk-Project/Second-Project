@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Header from '../layout/Header';
-import styles from '../css/customer.module.css';
+import Header from '../../layout/Header';
+import styles from '../../css/customer.module.css';
 import axios from 'axios';
 
 const InquiryDetail = () => {

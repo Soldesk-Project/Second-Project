@@ -29,10 +29,10 @@
   <!-- 등록 -->
   <insert id="insertInquiry" parameterType="org.joonzis.domain.InquiryVO">
     INSERT INTO inquiry (
-      id, user_id, subject, message, created_at, post_password, email
+      id, user_nick, subject, message, created_at, post_password, email
     ) VALUES (
       seq_inquiry.nextval,
-      #{user_nick},
+      #{userNick},
       #{subject},
       #{message},
       SYSDATE,
@@ -44,7 +44,7 @@
   <!-- 상세 조회 -->
   <select id="selectById" parameterType="long" resultType="org.joonzis.domain.InquiryVO">
     SELECT id,
-           user_nick,
+           user_nick AS userNick,
            subject,
            message,
            created_at AS createdAt

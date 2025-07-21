@@ -17,7 +17,7 @@ import lombok.ToString;
 public class UsersVO {
 	private int user_no, user_rank, user_play_count, user_1st_count;
 	private long user_point;
-	private String user_nick, user_id, user_pw, user_email;
+	private String user_nick, user_id, user_pw, user_email, user_profile_img;
 	private Date user_date;
 	private int ischatbanned;
     private Timestamp banned_timestamp;
