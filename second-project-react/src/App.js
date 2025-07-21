@@ -20,7 +20,6 @@ import CustomerCenterNew from './pages/customer/CustomerCenterNew';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { WebSocketProvider } from './util/WebSocketProvider';
-import Customersuggest from './pages/customer/Customersuggest';
 import CustomerProblemSubmit from './pages/customer/CustomerProblemSubmit';
 import AdminPage from './pages/AdminPage';
 import InquiryDetail from './pages/customer/InquiryDetail';
@@ -67,7 +66,6 @@ function App() {
           <Route path="/questionReview" element={<QuestionReview />} />
           <Route path="/inquiries" element={<CustomerServiceCenter />} />
           <Route path="/inquiry" element={<CustomerCenterNew />} />
-          <Route path="/suggest" element={<Customersuggest />} />
           <Route path="/problemsubmit" element={<CustomerProblemSubmit />} />
           <Route path="/admin" element={<AdminPage/>}/>
           <Route path="/inquiries/:id" element={<InquiryDetail />} />

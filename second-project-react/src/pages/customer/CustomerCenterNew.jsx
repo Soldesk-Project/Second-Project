@@ -137,53 +137,52 @@ const CustomerCenterNew = () => {
         </div>
 
         <div className={styles.textareaBox}>
-          <h6>첨부 파일 (선택)</h6>
-        <div className={styles.textareaBox_1}>
-          <h6>첨부 파일</h6>
-          <div className={styles.textarea_1}>
-            <p>파일명은 - , _를 제외한 특수문자는 허용되지 않습니다.</p>
-            <p>아래 파일 형식만 첨부할 수 있습니다.</p>
-            <input
-                type="file"
-                multiple
-                accept=".jpeg,.jpg,.gif,.bmp,.png"
-                style={{ display: 'none' }}
-                ref={fileInputRef}
-                onChange={handleFileChange}
-              />
+          <div className={styles.textareaBox_1}>
+            <h6>첨부 파일 (선택)</h6>
+            <div className={styles.textarea_1}>
+              <p>파일명은 - , _를 제외한 특수문자는 허용되지 않습니다.</p>
+              <p>아래 파일 형식만 첨부할 수 있습니다.</p>
+              <input
+                  type="file"
+                  multiple
+                  accept=".jpeg,.jpg,.gif,.bmp,.png"
+                  style={{ display: 'none' }}
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                />
 
-            <button 
-              type="button" 
-              className={styles.submitBtn} 
-              onClick={triggerFileInput}
-            >
-              파일 첨부
-            </button>
+              <button 
+                type="button" 
+                className={styles.submitBtn} 
+                onClick={triggerFileInput}
+              >
+                파일 첨부
+              </button>
 
-            {/* 첨부된 파일명 출력 */}
-            <ul style={{ marginTop: '10px', color: 'white' }}>
-              {selectedFiles.map((file, idx) => (
-                <li key={idx}>{file.name}</li>
-              ))}
-            </ul>
-            <p>이미지: .jpeg, .jpg, .gif, .bmp, .png</p>
+              {/* 첨부된 파일명 출력 */}
+              <ul style={{ marginTop: '10px', color: 'white' }}>
+                {selectedFiles.map((file, idx) => (
+                  <li key={idx}>{file.name}</li>
+                ))}
+              </ul>
+              <p>이미지: .jpeg, .jpg, .gif, .bmp, .png</p>
 
+            </div>
           </div>
-        </div>
 
-        <div className={styles.textareaBox_2}>
-          <h6>개인정보 수집 동의(필수)</h6>
-          <div className={styles.textarea_2}>
-            <p>수집하는 개인정보 항목: 이메일 주소</p>
-            <p>작성해 주시는 개인정보는 문의 접수 및 고객 불만 해결을 위해 3년간 보관됩니다.</p>
-            <p>이용자는 본 동의를 거부할 수 있으나, 미동의 시 문의 접수가 불가능합니다.</p>
-            <input
-              type="checkbox"
-              checked={consent}
-              onChange={e => setConsent(e.target.checked)}
-            />&nbsp;<span>동의합니다.</span>
+          <div className={styles.textareaBox_2}>
+            <h6>개인정보 수집 동의(필수)</h6>
+            <div className={styles.textarea_2}>
+              <p>수집하는 개인정보 항목: 이메일 주소</p>
+              <p>작성해 주시는 개인정보는 문의 접수 및 고객 불만 해결을 위해 3년간 보관됩니다.</p>
+              <p>이용자는 본 동의를 거부할 수 있으나, 미동의 시 문의 접수가 불가능합니다.</p>
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={e => setConsent(e.target.checked)}
+              />&nbsp;<span>동의합니다.</span>
+            </div>
           </div>
-        </div>
         </div>
         
         {/* 버튼 */}
