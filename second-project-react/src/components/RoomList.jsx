@@ -33,9 +33,11 @@ const RoomList = () => {
         socket.send(JSON.stringify({ action: "join", server, userNick }));
       };
     }
-
+    console.log(socket);
+    
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      
       switch (data.type) {
         case "roomList":
           setGameRoomList(data.rooms);
@@ -51,6 +53,12 @@ const RoomList = () => {
           }));
           
           nav('/gameRoom/' + data.gameroom_no, { state: { category: data.category, gameMode: data.game_mode } });
+          break;
+        case "joinQuestionReviewRoom":
+          console.log(data.server);
+          console.log(data.roomNo);
+          console.log(data.player);
+          nav('/questionReview');
           break;
         default:
           break;
@@ -68,17 +76,6 @@ const RoomList = () => {
 
     if (matchSocket.readyState !== 1) {
       matchSocket.onopen = () => console.log("🧩 매칭 소켓 연결 완료");
-    }
-
-    socket.onmessage=(event)=>{
-      const data = JSON.parse(event.data);
-      if (data.type ==="joinQuestionReviewRoom") {
-        console.log(data.server);
-        console.log(data.roomNo);
-        console.log(data.player);
-        
-        nav('/questionReview');
-      }
     }
 
     matchSocket.onmessage = (event) => {
@@ -187,8 +184,6 @@ const RoomList = () => {
   };
 
   const handleQuestionReview=()=>{
-    console.log(21341234123423);
-    
     const socket = sockets['room'];
     if (socket && socket.readyState === 1) {
         socket.send(JSON.stringify({
