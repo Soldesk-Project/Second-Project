@@ -16,5 +16,6 @@ public interface PlayService {
 	
 	public List<UserQuestionHistoryDTO> getQuestionReviewList(String userNick);
 	
+	public List<UserQuestionHistoryDTO> getUserQuestionHistory(String submittedAt);
 	
 }

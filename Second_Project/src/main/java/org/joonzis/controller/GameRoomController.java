@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.log4j.Log4j;
@@ -45,12 +44,25 @@ public class GameRoomController {
 	}
 
 	@PostMapping("/questionReviewList")
-	public ResponseEntity<UserQuestionHistoryDTO> questionReviewList(@RequestParam String userNick) {
-		
+	public ResponseEntity<List<UserQuestionHistoryDTO>> questionReviewList(@RequestBody Map<String, String> userMap) {
+		String userNick = userMap.get("userNick");
 		List<UserQuestionHistoryDTO> list = playService.getQuestionReviewList(userNick);
 		
-		return null;
-//		return ResponseEntity.ok();
+		log.info(list.size());
+		log.info(list);
+		return ResponseEntity.ok(list);
 	}
 
+	@PostMapping("/userQuestionHistory")
+	public ResponseEntity<List<UserQuestionHistoryDTO>> getUserQuestionHistory(@RequestBody Map<String, String> userMap) {
+		String submittedAt = userMap.get("submittedAt");
+		List<UserQuestionHistoryDTO> list = playService.getUserQuestionHistory(submittedAt);
+		
+		log.info(list.size());
+		log.info(list);
+		return ResponseEntity.ok(list);
+	}
+	
+	
+	
 }

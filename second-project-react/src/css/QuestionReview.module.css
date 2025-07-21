@@ -42,6 +42,7 @@
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   box-shadow: 0px 1px 3px 1px rgb(0, 0, 0, 0.3);
+  overflow-y: auto;
 }
 
 /* 상단 컨텐츠: 유저정보 + 중앙 */
@@ -84,7 +85,7 @@
 
 /* Inplay css 추후 수정 --------------------------------------------- */
 .questionList{
-  height: 901px;
+  /* height: 901px; */
   color: white;
   padding: 10px;
   box-sizing: border-box;
@@ -118,7 +119,11 @@
 .leaveBtn{
   margin-left: auto;
 }
-
+.playBtn{
+  width: 80px;
+  border: 1px solid white;
+  border-radius: 20px;
+}
 .questionList {
   position: relative;
   background-color: rgba(0, 0, 0, 0.6);
@@ -143,7 +148,7 @@
 .questionList_info {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .nick {

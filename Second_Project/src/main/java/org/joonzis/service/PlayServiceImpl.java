@@ -48,7 +48,15 @@ public class PlayServiceImpl implements PlayService {
 
 	@Override
 	public List<UserQuestionHistoryDTO> getQuestionReviewList(String userNick) {
+		System.out.println("getQuestionReviewList : " +userNick);
+		System.out.println("getQuestionReviewList : " +playMapper.getQuestionReviewList(userNick).size());
 		return playMapper.getQuestionReviewList(userNick);
 	}
+	
+	@Override
+	public List<UserQuestionHistoryDTO> getUserQuestionHistory(String submittedAt) {
+		return playMapper.getUserQuestionHistory(submittedAt);
+	}
+	
 	
 }

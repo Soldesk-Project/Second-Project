@@ -76,13 +76,42 @@
     
     
     <select id="getQuestionReviewList" resultType="org.joonzis.domain.UserQuestionHistoryDTO">
-    	
-    	
+    	SELECT 
+    		USER_NICK,
+    		SUM(CASE WHEN IS_CORRECT='1' THEN 1 ELSE 0 END) AS CORRECT_COUNT,
+    		SUBMIT_DATE,
+    		SUBMITTED_AT
+    	FROM
+    		USER_QUESTION_HISTORY
+    	WHERE 
+    		USER_NICK = #{userNick}
+		GROUP BY 
+		    SUBMITTED_AT, USER_NICK, SUBMIT_DATE
+		ORDER BY 
+		    SUBMIT_DATE DESC
+    </select>
     
     
-    
-    
-    
+    <select id="getUserQuestionHistory" resultType="org.joonzis.domain.UserQuestionHistoryDTO">
+    	SELECT
+		    q.id,
+		    q.question_text,
+		    q.option_1,
+		    q.option_2,
+		    q.option_3,
+		    q.option_4,
+		    q.correct_answer,
+		    q.image_data,
+		    h.selected_answer,
+		    h.is_correct
+		FROM 
+			USER_QUESTION_HISTORY h 
+		INNER JOIN
+			${subject} q
+		ON 
+			h.question_id=q.id
+		WHERE
+			submitted_at=#{submiitedAt}
     </select>
     
     

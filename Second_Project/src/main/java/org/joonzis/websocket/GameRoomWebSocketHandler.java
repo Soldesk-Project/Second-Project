@@ -542,13 +542,13 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         List<UserQuestionHistoryDTO> historyList = new ArrayList<>();
         for (JsonNode item : historyArray) {
             UserQuestionHistoryDTO dto = new UserQuestionHistoryDTO();
-            dto.setUserNick(userNick);
-            dto.setQuestionId(item.get("question_id").asInt());
+            dto.setUser_nick(userNick);
+            dto.setQuestion_id(item.get("question_id").asInt());
             dto.setSubject(item.get("subject").asText());
-            dto.setSelectedAnswer(item.get("selected_answer").asInt());
-            dto.setCorrectAnswer(item.get("correct_answer").asInt());
-            dto.setCorrect(item.get("is_correct").asBoolean());
-            dto.setSubmittedAt(historyUuid);
+            dto.setSelected_answer(item.get("selected_answer").asInt());
+            dto.setCorrect_answer(item.get("correct_answer").asInt());
+            dto.set_correct(item.get("is_correct").asBoolean());
+            dto.setSubmitted_at(historyUuid);
             // 필요하면 roomNo, 게임모드 등도 같이
             historyList.add(dto);
         }
