@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../../css/adminPage/UserRestrict.css';
 
 const UserRestrict = () => {
   // 검색 조건을 위한 상태
@@ -60,7 +61,7 @@ const UserRestrict = () => {
         
     } catch (err) {
       console.error("Error fetching users:", err);
-      setError(`사용자 정보를 가져오는 데 실패했습니다. ${err.message || '네트워크 문제일 수 있습니다.'}`);
+      setError(`사용자 정보를 가져오는 데 실패했습니다.`);
       setUsers([]);
     } finally {
       setLoading(false);
@@ -137,7 +138,7 @@ const UserRestrict = () => {
 
       } catch (err) {
         console.error("Error applying chat ban:", err);
-        setError(`채팅금지 적용에 실패했습니다. ${err.message || '네트워크 문제일 수 있습니다.'}`);
+        setError(`채팅금지 적용에 실패했습니다. `);
       } finally {
         setLoading(false);
       }
@@ -160,27 +161,26 @@ const UserRestrict = () => {
   };
 
   return (
-    <div>
+    <div className="user-restrict-container">
       <h1>유저 제재</h1>
       <hr/>
       {/* 검색 폼 */}
-      <div>
+      <div className="search-section">
         <h3>제재 현황/대상 검색</h3>
-        <div style={{ marginBottom: '10px' }}>
-          <label htmlFor="searchType" style={{ marginRight: '10px' }}>검색 기준: </label>
+        <div className="search-controls">
+          <label htmlFor="searchType">검색 기준: </label>
           <select
             id="searchType"
             name="searchType"
             value={searchConditions.searchType}
             onChange={handleChange}
-            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+            className="search-select"
           >
             <option value="userId">ID</option>
             <option value="userNick">별명</option>
             <option value="userRank">랭크</option>
           </select>
-          &nbsp;&nbsp;&nbsp;
-          <label htmlFor="searchValue" style={{ marginRight: '10px' }}>검색어: </label>
+          <label htmlFor="searchValue">검색어: </label>
           <input
             type="text"
             id="searchValue"
@@ -188,22 +188,13 @@ const UserRestrict = () => {
             value={searchConditions.searchValue}
             onChange={handleChange}
             placeholder={getPlaceholderText()}
-            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '200px' }}
+            className="search-input"
           />
-          &nbsp;&nbsp;&nbsp;&nbsp;
           <button
             onClick={handleSearch}
             disabled={loading}
-            style={{
-              padding: '10px 20px',
-              marginTop: '15px',
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '16px'
-            }}>
+            className="search-button"
+          >
             {loading ? '검색중' : '검색'}
           </button>
         </div>
@@ -212,36 +203,35 @@ const UserRestrict = () => {
       <hr />
         
       {/* 로딩 및 에러 메시지 표시 */}
-      {loading && <p>사용자 정보를 불러오는 중입니다...</p>}
-      {error && <p style={{ color: 'red', fontWeight: 'bold' }}>오류: {error}</p>}
+      {loading && <p className="loading-message">사용자 정보를 불러오는 중입니다...</p>}
+      {error && <p className="error-message">오류: {error}</p>}
 
       {/* 검색 결과 표 조건부 렌더링 */}
       {!loading && !error && users.length > 0 ? (
-        <div>
+        <div className="search-results">
           <h3>검색 결과</h3>
-          <table border="1" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <table className="user-table">
             <thead>
               <tr>
-                <th style={{ padding: '8px' }}>회원번호</th>
-                <th style={{ padding: '8px' }}>ID</th>
-                <th style={{ padding: '8px' }}>별명</th>
-                <th style={{ padding: '8px' }}>이메일</th>
-                <th style={{ padding: '8px' }}>가입일</th>
-                <th style={{ padding: '8px' }}>포인트</th>
-                <th style={{ padding: '8px' }}>랭크</th>
-                <th style={{ padding: '8px' }}>채팅금지 여부</th>
-                <th style={{ padding: '8px' }}>선택</th> {/* 체크박스 열 */}
+                <th>회원번호</th>
+                <th>ID</th>
+                <th>별명</th>
+                <th>이메일</th>
+                <th>가입일</th>
+                <th>포인트</th>
+                <th>랭크</th>
+                <th>채팅금지 여부</th>
+                <th>선택</th> {/* 체크박스 열 */}
               </tr>
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.user_no} style={{ borderBottom: '1px solid #eee' }}>
-                  
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{user.user_no}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{user.user_id}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{user.user_nick}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{user.user_email}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>
+                <tr key={user.user_no}>
+                  <td className="user-no-col">{user.user_no}</td>
+                  <td>{user.user_id}</td>
+                  <td>{user.user_nick}</td>
+                  <td>{user.user_email}</td>
+                  <td>
                     {user.user_date ? (() => {
                       const timestamp = user.user_date;
                       const dateObject = new Date(timestamp);
@@ -250,17 +240,17 @@ const UserRestrict = () => {
                         : 'N/A (날짜 변환 오류)';
                     })() : 'N/A'}
                   </td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{user.user_point}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{user.user_rank}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd', textAlign: 'center' }}>
+                  <td>{user.user_point}</td>
+                  <td>{user.user_rank}</td>
+                  <td className="chat-ban-status">
                     {user.ischatbanned === 1 ? '금지' : '정상'}
                     {user.ischatbanned === 1 && user.banned_timestamp && (
-                      <span style={{ fontSize: '0.8em', color: '#888', display: 'block' }}>
+                      <span className="ban-duration">
                         (~ {new Date(new Date(user.banned_timestamp).getTime() + 72 * 60 * 60 * 1000).toLocaleDateString('ko-KR')}까지)
                       </span>
                     )}
                   </td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd', textAlign: 'center' }}>
+                  <td className="checkbox-col">
                     <input
                       type="checkbox"
                       checked={selectedUserNos.has(user.user_no)}
@@ -273,25 +263,18 @@ const UserRestrict = () => {
           </table>
 
           {/*채팅금지 적용 버튼 */}
-          <div style={{ marginTop: '20px', textAlign: 'right' }}>
+          <div className="chat-ban-action">
             <button
               onClick={handleApplyChatBan}
               disabled={loading || selectedUserNos.size === 0}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#dc3545',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '16px'
-              }}>
+              className="apply-ban-button"
+            >
               {loading ? '적용중...' : `채팅금지 적용 (${selectedUserNos.size}명)`}
             </button>
           </div>
         </div>
       ) : (
-        !loading && !error && <p style={{ marginTop: '20px', color: '#555' }}>검색 결과가 없습니다. 검색 조건을 선택하고 '검색' 버튼을 눌러주세요.</p>
+        !loading && !error && <p className="no-results-message">검색 결과가 없습니다. 검색 조건을 선택하고 '검색' 버튼을 눌러주세요.</p>
       )}
     </div>
   );

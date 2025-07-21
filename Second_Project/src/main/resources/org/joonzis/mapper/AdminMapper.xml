@@ -203,7 +203,7 @@
         AND ISCHATBANNED = 0
     </update>
     
-    <update id="performUnbanExpiredChatUsers">
+    <update id="unbanChatUsers">
         UPDATE USERS
         SET
             ISCHATBANNED = 0,

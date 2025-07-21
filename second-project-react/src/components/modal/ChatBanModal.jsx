@@ -35,7 +35,7 @@ const ChatBanModal = ({ isOpen, onClose, bannedTimestamp }) => {
                 </div>
                 <div className="modal-body">
                     <p>해당 계정은 비매너적인 언어폭력 행위가 확인되어 채팅 제재 시스템에 따라 3일간 채팅이 불가능합니다.</p>
-                    <p>채팅 제한 해제 시점: {expiryMessage} 까지</p>
+                    <p>채팅 제한은 {expiryMessage} 이후 주기적인 점검을 통해 해제됩니다.</p>
                     <p>향후 매너있는 채팅 행위 부탁드립니다.</p>
                 </div>
                 <div className="modal-footer">

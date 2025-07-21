@@ -11,6 +11,7 @@ import org.joonzis.domain.QuestionDTO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.mapper.AdminMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import lombok.extern.log4j.Log4j;
 
 @Log4j
 @Service // 이 클래스가 서비스 계층의 컴포넌트임을 나타냅니다.
+@Transactional
 public class AdminServiceImpl implements AdminService {
 
     @Autowired
@@ -263,10 +265,12 @@ public class AdminServiceImpl implements AdminService {
     }
     
     //유저 채금 해제
+    @Scheduled(fixedRate = 3600000)
     @Override
     @Transactional
     public void unbanChatUsers() {
         // 매퍼를 호출하여 72시간이 경과한 사용자들의 밴 상태를 해제
-        adminMapper.unbanChatUsers();
+        int unbannedCount = adminMapper.unbanChatUsers();
+        log.info(unbannedCount + "명의 사용자의 채팅 금지가 해체되었습니다.");
     }
 }

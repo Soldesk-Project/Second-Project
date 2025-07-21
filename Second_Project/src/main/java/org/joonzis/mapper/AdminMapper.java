@@ -41,5 +41,5 @@ public interface AdminMapper {
 	//유저 채금 확인/적용/해제메소드
 	List<UsersVO> getUsersChatBanStatus(@Param("userNos") List<Integer> userNos);
 	int updateChatBanStatus(@Param("userNos") List<Integer> userNos, @Param("bannedTimestamp") Timestamp bannedTimestamp);
-	void unbanChatUsers();
+	int unbanChatUsers();
 }
