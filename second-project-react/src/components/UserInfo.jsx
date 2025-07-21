@@ -8,11 +8,14 @@ import axios from 'axios';
 import PreviewModal from './modal/PreviewModal';
 import { WebSocketContext } from '../util/WebSocketProvider';
 import { triggerRefreshRanking } from '../store/rankingSlice';
+import NickModal from './modal/NickModal';
+import { setUser } from '../store/userSlice';
 
 const TABS = ['테두리', '칭호', '글자색', '배경', '말풍선'];
 
 const UserInfo = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isNickModalOpen, setIsNickModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState(TABS[0]);
     const [items, setItems]   = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -160,6 +163,21 @@ const UserInfo = () => {
     //     const answerPercent = stats && stats.totalCount > 0
     //         ? Math.floor((stats.correctCount / stats.totalCount) * 100)
     //         : 0;
+    const handleNicknameChange = (newNick) => {
+        axios.patch(`/user/${user.user_no}/nickname`, { user_nick: newNick })
+            .then(res => {
+                const updatedUser = {
+                    ...user,
+                    user_nick: newNick,
+                };
+                dispatch(setUser(updatedUser));
+                alert('닉네임이 변경되었습니다!');
+            })
+            .catch(err => {
+                console.error('닉네임 변경 실패', err);
+                alert('닉네임 변경 중 오류가 발생했습니다.');
+            });
+    };
 
   return (
     <div>
@@ -240,6 +258,11 @@ const UserInfo = () => {
         <div className={styles.invenBtn}>
             <button style={openButtonStyle} onClick={() => setIsModalOpen(true)}>Inventory</button>
         </div>
+        <div className={styles.invenBtn}>
+            <button style={openButtonStyle} onClick={() => setIsNickModalOpen(true)}>닉네임 변경</button>
+        </div>
+
+        <NickModal isOpen={isNickModalOpen} onClose={() => setIsNickModalOpen(false)}  onSubmit={handleNicknameChange}/>
 
       <InventoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div role="tablist" className={styles.subTabContainer}>

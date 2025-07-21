@@ -56,6 +56,9 @@ public interface UserMapper {
 	// 비밀번호 찾기
 	public String findPwByIdAndEmail(UsersVO vo);
 	
+	// 유저 닉네임 변경
+	public void updateNickname(@Param("user_no") Long user_no, @Param("user_nick") String user_nick);
+	
 	int updateProfileImage(@Param("userNo") int userNo,
             @Param("imageUrl") String imageUrl);
 	

@@ -157,6 +157,13 @@
 		SELECT USER_PW FROM USERS WHERE USER_EMAIL = #{user_email} AND USER_ID = #{user_id}
 	</select>
 	
+	<!-- 유저 닉네임 변경 -->
+	<update id="updateNickname">
+	    UPDATE USERS
+	    SET USER_NICK = #{user_nick}
+	    WHERE USER_NO = #{user_no}
+	</update>
+	
 	<!-- 유저프로필이미지선택 -->
 	<update id="updateProfileImage" parameterType="map">
 	    UPDATE users

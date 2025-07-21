@@ -85,7 +85,7 @@ const UserRanking = () => {
     // 유저 랭킹 불러오기 (최초)
     useEffect(() => {
         fetchUserRanking();
-    }, [refreshRanking]);
+    }, [refreshRanking, user.user_nick]);
 
     // 모달이 열릴 때 아이템 목록 불러오기
     useEffect(() => {

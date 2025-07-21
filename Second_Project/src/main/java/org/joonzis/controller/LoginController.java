@@ -575,7 +575,7 @@ public class LoginController {
 	@PostMapping("/login")
 	@ResponseBody
 	public ResponseEntity<?> login(@RequestBody UserInfoDTO dto, HttpSession session) {
-		
+		log.info("UserInfoDTO: " + dto);
 		if (loggedInUsers.isLoggedIn(dto.getUser_id())) {
 	        return ResponseEntity.status(HttpStatus.CONFLICT)
 	                .body("이미 로그인된 사용자입니다.");

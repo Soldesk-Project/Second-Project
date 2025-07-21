@@ -122,6 +122,22 @@ public class UserController {
 	    }
 	}
 	
+	// 유저 닉네임 변경
+	@PatchMapping("/{user_no}/nickname")
+    public ResponseEntity<?> updateNickname(@PathVariable("user_no") Long user_no,
+                                            @RequestBody Map<String, String> body) {
+        String user_nick = body.get("user_nick");
+        if (user_nick == null || user_nick.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("닉네임이 비어 있습니다.");
+        }
+        try {
+            service.updateNickname(user_no, user_nick);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("닉네임 변경 실패");
+        }
+	}
+	
 //	 /** 사용자 통계 조회 */
 //    @GetMapping("/{userNo}/stats")
 //    public ResponseEntity<UserStatsDTO> getUserStats(@PathVariable int userNo) {

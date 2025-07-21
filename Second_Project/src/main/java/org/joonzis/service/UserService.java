@@ -60,4 +60,7 @@ public interface UserService {
 	
 	//유저정보 가져오기
 	UsersVO getUsersByUserNo(int userNo);
+	
+	// 유저 닉네임 변경
+	public void updateNickname(Long user_no, String user_nick);
 }

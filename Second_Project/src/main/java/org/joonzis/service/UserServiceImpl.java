@@ -120,6 +120,11 @@ public class UserServiceImpl implements UserService{
 		return mapper.findPwByIdAndEmail(vo);
 	}
 	
+	// 유저 닉네임 변경
+	public void updateNickname(Long user_no, String user_nick) {
+		mapper.updateNickname(user_no, user_nick);
+    }
+	
 	@Override
 	@Transactional
 	public int changeProfileImage(int userNo, String imageUrl) {
