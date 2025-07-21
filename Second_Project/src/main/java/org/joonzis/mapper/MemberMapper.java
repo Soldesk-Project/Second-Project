@@ -23,4 +23,8 @@ public interface MemberMapper {
 	
 	// 유저 정보 조회
 	UserInfoDTO getUserById(@Param("user_id") String user_id);
+	
+	// 유저 접속 정보 업데이트
+	void updateLoginStatus(@Param("userId") String userId, @Param("status") int status);
+
 }

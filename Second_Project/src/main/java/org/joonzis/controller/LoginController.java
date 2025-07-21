@@ -15,7 +15,6 @@ import javax.servlet.http.HttpSession;
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.security.JwtUtil;
-import org.joonzis.service.LoggedInUsers;
 import org.joonzis.service.MemberService;
 import org.joonzis.service.UserService;
 import org.json.JSONObject;
@@ -74,9 +73,6 @@ public class LoginController {
     
     @Autowired
     JwtUtil jwtUtil;
-    
-    @Autowired
-    private LoggedInUsers loggedInUsers;
 	
 	@ResponseBody
 	@PostMapping("/kakao/login") 
@@ -119,12 +115,12 @@ public class LoginController {
 
 	    // 6. 로그인 처리 (이미 회원이거나 방금 가입한 경우)
 	    if (user != null) {
-	        if (loggedInUsers.isLoggedIn(user.getUser_id())) {
+	        if (user.getIs_logged_in() == 1) {
 	            return ResponseEntity.status(HttpStatus.CONFLICT)
 	                    .body("이미 로그인된 사용자입니다.");
 	        }
 
-	        loggedInUsers.addUser(user.getUser_id());
+	        memberservice.updateLoginStatus(user.getUser_id(), 1);
 
 	        String jwtToken = jwtUtil.generateToken(user.getUser_id());
 
@@ -316,11 +312,13 @@ public class LoginController {
 	    }
 
 	    if (user != null) {
-	        if (loggedInUsers.isLoggedIn(user.getUser_id())) {
-	            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 로그인된 사용자입니다.");
+	        if (user.getIs_logged_in() == 1) {
+	            return ResponseEntity.status(HttpStatus.CONFLICT)
+	                    .body("이미 로그인된 사용자입니다.");
 	        }
 
-	        loggedInUsers.addUser(user.getUser_id());
+	        memberservice.updateLoginStatus(user.getUser_id(), 1);
+
 	        String jwtToken = jwtUtil.generateToken(user.getUser_id());
 
 	        Map<String, Object> response = new HashMap<>();
@@ -425,20 +423,25 @@ public class LoginController {
 	        memberservice.insertMember(newUser);
 	        user = memberservice.getUserById(userId);
 	    }
+	    if (user != null) {
+	        if (user.getIs_logged_in() == 1) {
+	            return ResponseEntity.status(HttpStatus.CONFLICT)
+	                    .body("이미 로그인된 사용자입니다.");
+	        }
 
-	    if (loggedInUsers.isLoggedIn(user.getUser_id())) {
-	        return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 로그인된 사용자입니다.");
+	        memberservice.updateLoginStatus(user.getUser_id(), 1);
+
+	        String jwtToken = jwtUtil.generateToken(user.getUser_id());
+
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("token", jwtToken);
+	        response.put("user", user);
+	        response.put("access_token", accessToken);
+
+	        return ResponseEntity.ok(response);
+	    } else {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 처리 실패");
 	    }
-
-	    loggedInUsers.addUser(user.getUser_id());
-	    String jwt = jwtUtil.generateToken(user.getUser_id());
-
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("token", jwt);
-	    response.put("user", user);
-	    response.put("access_token", accessToken);
-
-	    return ResponseEntity.ok(response);
 	}
 	
 	@PostMapping("/google/logout")
@@ -575,15 +578,14 @@ public class LoginController {
 	@PostMapping("/login")
 	@ResponseBody
 	public ResponseEntity<?> login(@RequestBody UserInfoDTO dto, HttpSession session) {
-		log.info("UserInfoDTO: " + dto);
-		if (loggedInUsers.isLoggedIn(dto.getUser_id())) {
-	        return ResponseEntity.status(HttpStatus.CONFLICT)
-	                .body("이미 로그인된 사용자입니다.");
-	    }
-	    
 	    UserInfoDTO user = memberservice.isValidUser(dto.getUser_id(), dto.getUser_pw());
+	    
 	    if (user != null) {
-	    	loggedInUsers.addUser(dto.getUser_id());
+	    	if (user.getIs_logged_in() == 1) {
+	            return ResponseEntity.status(HttpStatus.CONFLICT)
+	                    .body("이미 로그인된 사용자입니다.");
+	        }
+	    	memberservice.updateLoginStatus(dto.getUser_id(), 1);
 	    	
 	        String token = jwtUtil.generateToken(user.getUser_id());
 
@@ -604,7 +606,7 @@ public class LoginController {
 	public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {
 	    String userId = request.get("userId");
 	    if (userId != null) {
-	        loggedInUsers.removeUser(userId);
+	        memberservice.updateLoginStatus(userId, 0);  // DB에 로그아웃 상태 저장
 	        return ResponseEntity.ok("로그아웃 완료");
 	    }
 	    return ResponseEntity.badRequest().body("잘못된 요청");

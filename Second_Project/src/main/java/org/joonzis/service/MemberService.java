@@ -19,4 +19,7 @@ public interface MemberService {
 	
 	// 유저 정보 조회
 	UserInfoDTO getUserById(String user_id);
+	
+	// 유저 접속 정보 업데이트
+	public void updateLoginStatus(String userId, int status);
 }

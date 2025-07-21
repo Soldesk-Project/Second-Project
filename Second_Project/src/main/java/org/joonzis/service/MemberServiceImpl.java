@@ -53,4 +53,10 @@ public class MemberServiceImpl implements MemberService {
 	public UserInfoDTO getUserById(String user_id) {
 		return mapper.getUserById(user_id);
 	}
+	
+	// 유저 접속 정보 업데이트
+	@Override
+	public void updateLoginStatus(String userId, int status) {
+		mapper.updateLoginStatus(userId, status);
+	}
 }

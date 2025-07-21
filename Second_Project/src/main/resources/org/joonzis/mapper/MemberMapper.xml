@@ -54,4 +54,12 @@
 		JOIN user_deco d ON u.user_no = d.user_no
 		WHERE u.user_id = #{user_id}
 	</select>
+	
+	<!-- 유저 접속 정보 업데이트 -->
+	<update id="updateLoginStatus">
+	    UPDATE users
+	    SET is_logged_in = #{status}
+	    WHERE user_id = #{userId}
+	</update>
+	
 </mapper>
