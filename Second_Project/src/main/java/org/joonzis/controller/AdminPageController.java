@@ -28,21 +28,25 @@ public class AdminPageController {
     // 문제 등록
     @PostMapping("/registerQuestion")
     public ResponseEntity<?> registerQuestion(@RequestBody QuestionDTO questionDTO,
-                                              @RequestParam("category") String categoryParam) {
+                                            @RequestParam("category") String categoryParam) {
         System.out.println("문제 등록 요청 수신: " + questionDTO);
         System.out.println("수신된 카테고리 (테이블 결정용): " + categoryParam);
 
         try {
             String decodedCategory = URLDecoder.decode(categoryParam, "UTF-8");
+            
+            // 이미지 데이터 처리 (현재와 동일)
             if (questionDTO.getImage_data_base64() != null && !questionDTO.getImage_data_base64().isEmpty()) {
                 byte[] decodedBytes = Base64.getDecoder().decode(questionDTO.getImage_data_base64());
                 questionDTO.setImage_data(decodedBytes);
-                questionDTO.setImage_data_base64(null);
+                questionDTO.setImage_data_base64(null); // byte[]로 변환 후 base64 필드는 비움
             } else {
                 questionDTO.setImage_data(null);
             }
             
-            adminService.registerQuestion(questionDTO, decodedCategory);
+            // 변경된 서비스 메서드 호출 (category도 함께 전달)
+            adminService.registerQuestion(questionDTO, decodedCategory); 
+            
             return new ResponseEntity<>("문제 등록 성공!", HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();

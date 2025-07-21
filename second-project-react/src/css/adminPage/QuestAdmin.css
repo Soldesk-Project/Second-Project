@@ -70,8 +70,6 @@ h1 {
 .searchResults ul {
   list-style: none;
   padding: 0;
-  max-height: 300px; /* 스크롤바 생성 */
-  overflow-y: auto;
   border: 1px solid #f0f0f0;
   border-radius: 5px;
   background-color: #fdfdfd;

@@ -7,156 +7,108 @@
     <sql id="questionColumns">
         id, question_text, option_1, option_2, option_3, option_4, correct_answer, image_data, created_at
     </sql>
-	
-	<!-- 문제 등록 관련 쿼리들 -->
-    <insert id="insertCPE_Q" parameterType="org.joonzis.domain.QuestionDTO">
-        INSERT INTO CPE_Q (
-            <include refid="questionColumns" />
+    
+    <!-- 문제 등록 -->
+    <insert id="insertQuestion" parameterType="map">
+        INSERT INTO ${tableName} (
+            id, question_text, option_1, option_2, option_3, option_4, correct_answer,
+            <if test="image_data != null">image_data,</if>
+            created_at
         ) VALUES (
-            CPE_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
+            ${tableName}_SEQ.NEXTVAL,
+            #{question_text},
+            #{option_1},
+            #{option_2},
+            #{option_3},
+            #{option_4},
+            #{correct_answer},
+            <if test="image_data != null">#{image_data, jdbcType=BLOB},</if>
+            SYSTIMESTAMP
         )
     </insert>
-
-    <insert id="insertCPEI_Q" parameterType="org.joonzis.domain.QuestionDTO">
-        INSERT INTO CPEI_Q (
-            <include refid="questionColumns" />
-        ) VALUES (
-            CPEI_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
-        )
-    </insert>
-
-    <insert id="insertCPET_Q" parameterType="org.joonzis.domain.QuestionDTO">
-        INSERT INTO CPET_Q (
-            <include refid="questionColumns" />
-        ) VALUES (
-            CPET_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
-        )
-    </insert>
-
-    <insert id="insertLM1_Q" parameterType="org.joonzis.domain.QuestionDTO">
-        INSERT INTO LM1_Q (
-            <include refid="questionColumns" />
-        ) VALUES (
-            LM1_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
-        )
-    </insert>
-
-    <insert id="insertLM2_Q" parameterType="org.joonzis.domain.QuestionDTO">
-        INSERT INTO LM2_Q (
-            <include refid="questionColumns" />
-        ) VALUES (
-            LM2_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
-        )
-    </insert>
-
-    <insert id="insertICTI_Q" parameterType="org.joonzis.domain.QuestionDTO">
-        INSERT INTO ICTI_Q (
-            <include refid="questionColumns" />
-        ) VALUES (
-            ICTI_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
-        )
-    </insert>
-
-    <insert id="insertICT_Q" parameterType="org.joonzis.domain.QuestionDTO">
-        INSERT INTO ICT_Q (
-            <include refid="questionColumns" />
-        ) VALUES (
-            ICT_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
-        )
-    </insert>
-
-    <insert id="insertSEC_Q" parameterType="org.joonzis.domain.QuestionDTO">
-        INSERT INTO SEC_Q (
-            <include refid="questionColumns" />
-        ) VALUES (
-            SEC_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
-        )
-    </insert>
-
-    <insert id="insertNET1_Q" parameterType="org.joonzis.domain.QuestionDTO">
-        INSERT INTO NET1_Q (
-            <include refid="questionColumns" />
-        ) VALUES (
-            NET1_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
-        )
-    </insert>
-
-    <insert id="insertNET2_Q" parameterType="org.joonzis.domain.QuestionDTO">
-        INSERT INTO NET2_Q (
-            <include refid="questionColumns" />
-        ) VALUES (
-            NET2_Q_SEQ.NEXTVAL, #{question_text}, #{option_1}, #{option_2}, #{option_3}, #{option_4}, #{correct_answer}, #{image_data, jdbcType=BLOB}, SYSTIMESTAMP
-        )
-    </insert>
-	
-	<!-- 문제 검색 쿼리들 -->
+    
+    <!-- 문제 검색 -->
 	<select id="getQuestionsBySearch" resultType="org.joonzis.domain.QuestionDTO" parameterType="map">
-    SELECT
-        id,
-        question_text,
-        option_1,
-        option_2,
-        option_3,
-        option_4,
-        correct_answer,
-        image_data
-    FROM
-        ${category}
-    <where>
-        <if test="query != null and query != ''">
-            question_text LIKE '%' || #{query} || '%'
-        </if>
-    </where>
-    ORDER BY id DESC
-</select>
+		SELECT
+			id,
+			question_text,
+			option_1,
+			option_2,
+			option_3,
+			option_4,
+			correct_answer,
+			image_data
+		FROM (
+			SELECT
+				id,
+				question_text,
+				option_1,
+				option_2,
+				option_3,
+				option_4,
+				correct_answer,
+				image_data,
+				ROWNUM AS rn  FROM (
+				SELECT
+					id,
+					question_text,
+					option_1,
+					option_2,
+					option_3,
+					option_4,
+					correct_answer,
+					image_data
+				FROM ${tableName}
+				ORDER BY id DESC
+			)
+		)
+		WHERE rn BETWEEN #{offset} + 1 AND #{offset} + #{limit}
+    </select>
 
     <select id="getTotalQuestionCount" resultType="int" parameterType="map">
         SELECT COUNT(*)
-        FROM ${category}
+        FROM ${tableName}
         <where>
             <if test="query != null and query != ''">
                 question_text LIKE '%' || #{query} || '%'
             </if>
         </where>
     </select>
-	
-	<!-- 문제 수정쿼리 -->
+    
+    <!-- 문제 수정 -->
     <update id="updateQuestion" parameterType="map">
-        UPDATE ${category}
+        UPDATE ${tableName}
         SET
-            question_text = #{question.question_text},
-            option_1 = #{question.option_1},
-            option_2 = #{question.option_2},
-            option_3 = #{question.option_3},
-            option_4 = #{question.option_4},
-            correct_answer = #{question.correct_answer},
-            <if test="question.image_data != null">
-                image_data = #{question.image_data, jdbcType=BLOB}
+            question_text = #{question_text},
+            option_1 = #{option_1},
+            option_2 = #{option_2},
+            option_3 = #{option_3},
+            option_4 = #{option_4},
+            correct_answer = #{correct_answer},
+            <if test="image_data != null">
+                image_data = #{image_data, jdbcType=BLOB}
             </if>
-            <if test="question.image_data == null">
-                image_data = NULL
-            </if>
+            <if test="image_data == null">
+                image_data = NULL </if>
         WHERE
-            id = #{question.id}
+            id = #{id}
     </update>
-	
-	<!-- 문제삭제 -->
-	<delete id="deleteQuestions">
-        DELETE FROM ${params.category}
-        WHERE id IN
-        <foreach collection="params.questionIds" item="id" open="(" separator="," close=")">
+    
+    <!-- 문제 삭제 -->
+    <delete id="deleteQuestions" parameterType="map"> DELETE FROM ${tableName} WHERE id IN
+        <foreach collection="questionIds" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>
     
-    <!-- 유저조회 -->
+    <!-- 유저 전체 조회 -->
     <select id="selectAllUsers" resultType="org.joonzis.domain.UsersVO">
         SELECT USER_NO, USER_ID, USER_NICK, USER_EMAIL, USER_DATE, USER_POINT, USER_RANK, USER_PLAY_COUNT, USER_1ST_COUNT, USER_PW, ISCHATBANNED, BANNED_TIMESTAMP
         FROM USERS
     </select>
-	
-	<!-- 유저 검색 -->
-    <select id="searchUsers" resultType="org.joonzis.domain.UsersVO">
+    
+    <!-- 유저 검색 -->
+    <select id="searchUsers" resultType="org.joonzis.domain.UsersVO" parameterType="map">
         SELECT USER_NO, USER_ID, USER_NICK, USER_EMAIL, USER_DATE, USER_POINT, USER_RANK, USER_PLAY_COUNT, USER_1ST_COUNT, USER_PW, ISCHATBANNED, BANNED_TIMESTAMP
         FROM USERS
         <where>
@@ -180,8 +132,8 @@
         ORDER BY USER_NO DESC
     </select>
     
-    <!-- 유저 채금 확인 -->
-    <select id="getUsersChatBanStatus" resultType="org.joonzis.domain.UsersVO">
+    <!-- 유저 챗밴 현황 조회 -->
+    <select id="getUsersChatBanStatus" resultType="org.joonzis.domain.UsersVO" parameterType="map">
         SELECT user_no, ISCHATBANNED, user_nick
         FROM users
         WHERE user_no IN
@@ -189,9 +141,9 @@
             #{userNo}
         </foreach>
     </select>
-	
-	<!-- 유저 채금 적용 -->
-    <update id="updateChatBanStatus">
+    
+    <!-- 유저 챗밴 적용 -->
+    <update id="updateChatBanStatus" parameterType="map">
         UPDATE users
         SET
             ISCHATBANNED = 1,
@@ -203,6 +155,7 @@
         AND ISCHATBANNED = 0
     </update>
     
+    <!-- 유저 챗밴 해제 -->
     <update id="unbanChatUsers">
         UPDATE USERS
         SET

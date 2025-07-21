@@ -1,20 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../../css/adminPage/QuestEdit.css'; // 수정된 QuestEdit.css 임포트
 
 const QuestEdit = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-  const [questionText, setQuestionText] = useState(''); // 문제 본문 상태
-  const [options, setOptions] = useState(['', '', '', '']); // 선택지 상태
-  const [correctAnswer, setCorrectAnswer] = useState('1'); // 정답 상태
-  const [category, setCategory] = useState('정보처리기사'); // 카테고리 상태 (기본값)
-  const [base64ImageString, setBase64ImageString] = useState(''); // Base64 이미지 문자열 저장
-  const [searchQuery, setSearchQuery] = useState(''); // 문제 검색어 상태
-  const [searchResults, setSearchResults] = useState([]); // 검색 결과 상태
-  const [selectedQuestId, setSelectedQuestId] = useState(null); // 선택된 문제 ID
-  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
-  const [totalPages, setTotalPages] = useState(1); // 총 페이지 수
-  const itemsPerPage = 5; // 페이지당 표시할 문제 수
+  const [questionText, setQuestionText] = useState('');
+  const [options, setOptions] = useState(['', '', '', '']);
+  const [correctAnswer, setCorrectAnswer] = useState('1');
+  const [category, setCategory] = useState('정보처리기사');
+  const [base64ImageString, setBase64ImageString] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedQuestId, setSelectedQuestId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10;
+  const [startPage, setStartPage] = useState(1);
+  const pagesToShow = 5;
+
+  // 이전 검색어를 저장할 useRef (searchQuery가 변경되었는지 확인하기 위함)
+  const lastSearchQuery = useRef('');
 
   const categories = [
     '정보처리기사', '정보처리산업기사', '정보처리기능사',
@@ -45,6 +50,8 @@ const QuestEdit = () => {
     handleReset();
     setCurrentPage(1);
     setTotalPages(1);
+    setStartPage(1);
+    lastSearchQuery.current = '';
   };
 
   const handleImageChange = (event) => {
@@ -72,7 +79,13 @@ const QuestEdit = () => {
       return;
     }
 
+    if (searchQuery !== lastSearchQuery.current || page === 1) {
+      setStartPage(1);
+    }
+    lastSearchQuery.current = searchQuery;
+
     try {
+      // itemsPerPage를 서버 요청에 사용
       const response = await fetch(`/admin/searchQuestions?category=${tableName}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -81,11 +94,18 @@ const QuestEdit = () => {
       setSearchResults(data.questions);
       setTotalPages(data.totalPages);
       setCurrentPage(page);
+
+      if (page < startPage || page >= startPage + pagesToShow) {
+        setStartPage(Math.floor((page - 1) / pagesToShow) * pagesToShow + 1);
+      }
+
     } catch (error) {
       console.error('문제 검색 중 오류 발생:', error);
       alert('문제 검색 중 오류가 발생했습니다. 서버 상태를 확인해주세요.');
       setSearchResults([]);
       setTotalPages(1);
+      setCurrentPage(1);
+      setStartPage(1);
     }
   };
 
@@ -155,6 +175,7 @@ const QuestEdit = () => {
         setSearchResults([]);
         setSearchQuery('');
         setSelectedQuestId(null);
+        handleSearchQuest(currentPage); // 수정 후 현재 페이지를 다시 불러와 목록 업데이트
       } else {
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
@@ -181,14 +202,6 @@ const QuestEdit = () => {
     setBase64ImageString('');
   };
 
-  useEffect(() => {
-    setSearchResults([]);
-    setSearchQuery('');
-    setSelectedQuestId(null);
-    setCurrentPage(1);
-    setTotalPages(1);
-  }, [category]);
-
   return (
     <div>
       <h1>문제 수정</h1>
@@ -208,15 +221,15 @@ const QuestEdit = () => {
           placeholder="문제 본문 검색어를 입력하세요."
           onKeyPress={(e) => {
             if (e.key === 'Enter') {
-              handleSearchQuest();
+              handleSearchQuest(1);
             }
           }}
         />
-        <button onClick={() => handleSearchQuest()} className="search-button">검색</button>
+        <button onClick={() => handleSearchQuest(1)} className="search-button">검색</button>
       </div>
 
       {searchResults.length > 0 && (
-        <div className='searchResults'>
+        <div className='searchResults'> {/* 이 div에 CSS를 적용하여 스크롤 방지 */}
           <h3>검색 결과 ({searchResults.length}개): 문제를 클릭하여 수정하세요.</h3>
           <ul>
             {searchResults.map((quest) => (
@@ -232,15 +245,36 @@ const QuestEdit = () => {
           </ul>
           {totalPages > 1 && (
             <div className="pagination">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
-                <button
-                  key={pageNumber}
-                  onClick={() => handleSearchQuest(pageNumber)}
-                  className={currentPage === pageNumber ? 'active' : ''}
-                >
-                  {pageNumber}
-                </button>
-              ))}
+              {/* 이전 버튼 */}
+              <button
+                onClick={() => setStartPage(prev => Math.max(1, prev - pagesToShow))}
+                disabled={startPage === 1}
+                className="pagination-button"
+              >
+                이전
+              </button>
+
+              {/* 페이지 번호들 */}
+              {Array.from({ length: pagesToShow }, (_, i) => startPage + i)
+                .filter(pageNumber => pageNumber <= totalPages)
+                .map(pageNumber => (
+                  <button
+                    key={pageNumber}
+                    onClick={() => handleSearchQuest(pageNumber)}
+                    className={currentPage === pageNumber ? 'active pagination-button' : 'pagination-button'}
+                  >
+                    {pageNumber}
+                  </button>
+                ))}
+
+              {/* 다음 버튼 */}
+              <button
+                onClick={() => setStartPage(prev => prev + pagesToShow)}
+                disabled={startPage + pagesToShow > totalPages}
+                className="pagination-button"
+              >
+                다음
+              </button>
             </div>
           )}
         </div>

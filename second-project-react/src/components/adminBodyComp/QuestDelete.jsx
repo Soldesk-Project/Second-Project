@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import '../../css/adminPage/QuestDelete.css'; // 수정된 QuestDelete.css 임포트
+import React, { useState, useRef } from 'react';
+import '../../css/adminPage/QuestDelete.css';
 
 const QuestDelete = () => {
   const [category, setCategory] = useState('정보처리기사');
@@ -9,8 +9,12 @@ const QuestDelete = () => {
   const [selectedQuestData, setSelectedQuestData] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   const [selectedQuestionsToDelete, setSelectedQuestionsToDelete] = useState(new Set());
+  const [startPage, setStartPage] = useState(1);
+  const pagesToShow = 5;
+
+  const lastSearchQuery = useRef('');
 
   const categories = [
     '정보처리기사', '정보처리산업기사', '정보처리기능사',
@@ -41,7 +45,8 @@ const QuestDelete = () => {
     setSelectedQuestData(null);
     setCurrentPage(1);
     setTotalPages(1);
-    setSelectedQuestionsToDelete(new Set()); // 카테고리 변경 시 선택된 문제 초기화
+    setSelectedQuestionsToDelete(new Set());
+    setStartPage(1);
   };
 
   const handleSearchQuest = async (page = 1) => {
@@ -50,6 +55,11 @@ const QuestDelete = () => {
       alert('유효하지 않은 카테고리입니다.');
       return;
     }
+
+    if (searchQuery !== lastSearchQuery.current || page === 1) {
+        setStartPage(1);
+    }
+    lastSearchQuery.current = searchQuery;
 
     try {
       const response = await fetch(`/admin/searchQuestions?category=${tableName}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`);
@@ -60,23 +70,26 @@ const QuestDelete = () => {
       setSearchResults(data.questions);
       setTotalPages(data.totalPages);
       setCurrentPage(page);
+
+      if (page < startPage || page >= startPage + pagesToShow) {
+        setStartPage(Math.floor((page - 1) / pagesToShow) * pagesToShow + 1);
+      }
     } catch (error) {
       console.error('문제 검색 중 오류 발생:', error);
       alert('문제 검색 중 오류가 발생했습니다. 서버 상태를 확인해주세요.');
       setSearchResults([]);
       setTotalPages(1);
+      setCurrentPage(1);
+      setStartPage(1);
     }
   };
 
-  // 1. <li> 요소 클릭 시 문제 상세 정보만 표시하도록 변경
   const handleQuestListItemClick = (question) => {
     setSelectedQuestId(question.id);
     setSelectedQuestData(question);
   };
 
-  // 2. 체크박스 변경 시에만 삭제 목록 Set을 업데이트하도록 분리
   const handleCheckboxChange = (event, questionId) => {
-    // 이벤트 버블링 방지 (li의 onClick 이벤트가 동시에 발생하지 않도록)
     event.stopPropagation();
     setSelectedQuestionsToDelete(prev => {
       const newSet = new Set(prev);
@@ -115,7 +128,7 @@ const QuestDelete = () => {
         setSelectedQuestionsToDelete(new Set());
         setSelectedQuestId(null);
         setSelectedQuestData(null);
-        handleSearchQuest(currentPage); // 삭제 후 현재 페이지의 검색 결과 새로고침
+        handleSearchQuest(currentPage); 
       } else {
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
@@ -132,17 +145,6 @@ const QuestDelete = () => {
       alert('문제 삭제 중 클라이언트 오류가 발생했습니다.');
     }
   };
-
-  useEffect(() => {
-    // 카테고리 변경 시 검색 결과 및 선택 상태 초기화
-    setSearchResults([]);
-    setSearchQuery('');
-    setSelectedQuestId(null);
-    setSelectedQuestData(null);
-    setCurrentPage(1);
-    setTotalPages(1);
-    setSelectedQuestionsToDelete(new Set());
-  }, [category]);
 
   return (
     <div>
@@ -163,11 +165,11 @@ const QuestDelete = () => {
           placeholder="문제 본문 검색어를 입력하세요."
           onKeyPress={(e) => {
             if (e.key === 'Enter') {
-              handleSearchQuest();
+              handleSearchQuest(1);
             }
           }}
         />
-        <button onClick={() => handleSearchQuest()} className="search-button">검색</button>
+        <button onClick={() => handleSearchQuest(1)} className="search-button">검색</button>
       </div>
 
       {searchResults.length > 0 && (
@@ -177,14 +179,12 @@ const QuestDelete = () => {
             {searchResults.map((quest) => (
               <li
                 key={quest.id}
-                // <li> 클릭 시에는 문제 상세 정보만 보여줌
                 onClick={() => handleQuestListItemClick(quest)}
                 className={selectedQuestionsToDelete.has(quest.id) ? 'selected-delete' : ''}
               >
                 <input
                   type="checkbox"
                   checked={selectedQuestionsToDelete.has(quest.id)}
-                  // 3. 체크박스 클릭 시에만 삭제 목록 업데이트 (이벤트 버블링 방지)
                   onChange={(e) => handleCheckboxChange(e, quest.id)}
                 />
                 <span className="quest-id">[ID: {quest.id}]</span>
@@ -194,15 +194,42 @@ const QuestDelete = () => {
           </ul>
           {totalPages > 1 && (
             <div className="pagination">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
-                <button
-                  key={pageNumber}
-                  onClick={() => handleSearchQuest(pageNumber)}
-                  className={currentPage === pageNumber ? 'active' : ''}
-                >
-                  {pageNumber}
-                </button>
-              ))}
+              {/* 이전 페이지 블록 버튼 */}
+              <button
+                onClick={() => {
+                  const newStartPage = Math.max(1, startPage - pagesToShow);
+                  setStartPage(newStartPage);
+                  handleSearchQuest(newStartPage);
+                }}
+                disabled={startPage === 1}
+                className="pagination-button"
+              >
+                이전
+              </button>
+              {/* 페이지 번호들 */}
+              {Array.from({ length: pagesToShow }, (_, i) => startPage + i)
+                .filter(pageNumber => pageNumber <= totalPages)
+                .map(pageNumber => (
+                  <button
+                    key={pageNumber}
+                    onClick={() => handleSearchQuest(pageNumber)}
+                    className={currentPage === pageNumber ? 'active' : ''}
+                  >
+                    {pageNumber}
+                  </button>
+                ))}
+              {/* 다음 페이지 블록 버튼 */}
+              <button
+                onClick={() => {
+                  const newStartPage = startPage + pagesToShow;
+                  setStartPage(newStartPage);
+                  handleSearchQuest(newStartPage); // 다음 블록의 첫 페이지로 검색
+                }}
+                disabled={startPage + pagesToShow > totalPages}
+                className="pagination-button"
+              >
+                다음
+              </button>
             </div>
           )}
         </div>

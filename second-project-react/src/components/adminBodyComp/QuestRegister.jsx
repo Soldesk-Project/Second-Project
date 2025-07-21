@@ -4,11 +4,11 @@ import '../../css/adminPage/QuestRegister.css'; // CSS 파일 임포트
 const QuestRegister = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-  const [questionText, setQuestionText] = useState(''); // 문제 본문 상태
-  const [options, setOptions] = useState(['', '', '', '']); // 선택지 상태
-  const [correctAnswer, setCorrectAnswer] = useState('1'); // 정답 상태
-  const [category, setCategory] = useState('정보처리기사'); // 카테고리 상태 (기본값)
-  const [base64ImageString, setBase64ImageString] = useState(''); // Base64 이미지 문자열 저장
+  const [questionText, setQuestionText] = useState('');
+  const [options, setOptions] = useState(['', '', '', '']);
+  const [correctAnswer, setCorrectAnswer] = useState('1');
+  const [category, setCategory] = useState('정보처리기사');
+  const [base64ImageString, setBase64ImageString] = useState('');
 
   const categories = [
     '정보처리기사',
@@ -22,6 +22,19 @@ const QuestRegister = () => {
     '네트워크관리사1급',
     '네트워크관리사2급',
   ];
+
+  const categoryTableMap = {
+    '정보처리기사': 'CPE_Q',
+    '정보처리산업기사': 'CPEI_Q',
+    '정보처리기능사': 'CPET_Q',
+    '리눅스마스터1급': 'LM1_Q',
+    '리눅스마스터2급': 'LM2_Q',
+    '정보통신산업기사': 'ICTI_Q',
+    '정보통신기사': 'ICT_Q',
+    '정보보안기사': 'SEC_Q',
+    '네트워크관리사1급': 'NET1_Q',
+    '네트워크관리사2급': 'NET2_Q',
+  };
 
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
@@ -60,6 +73,13 @@ const QuestRegister = () => {
       }
     }
 
+    // 백엔드로 보낼 때는 맵에서 변환된 테이블 이름을 사용
+    const tableName = categoryTableMap[category];
+    if (!tableName) {
+      alert('유효하지 않은 카테고리입니다.');
+      return;
+    }
+
     const questData = {
       subject: "임시주제",
       question_text: questionText,
@@ -79,7 +99,7 @@ const QuestRegister = () => {
     console.log('Option 4:', questData.option_4);
 
     try {
-      const response = await fetch(`/admin/registerQuestion?category=${encodeURIComponent(category)}`, {
+      const response = await fetch(`/admin/registerQuestion?category=${encodeURIComponent(tableName)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
