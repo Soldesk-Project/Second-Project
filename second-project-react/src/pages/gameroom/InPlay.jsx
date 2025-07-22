@@ -414,16 +414,16 @@ const InPlay = () => {
       case "SEC_Q": return "정보보안기사";
       case "NET1_Q": return "네트워크관리사 1급";
       case "NET2_Q": return "네트워크관리사 2급";
-      case "정보처리기사": return "CPE_Q";
-      case "정보처리산업기사": return "CPEI_Q";
-      case "정보처리기능사": return "CPET_Q";
-      case "리눅스마스터 1급": return "LM1_Q";
-      case "리눅스마스터 2급": return "LM2_Q";
-      case "정보통신산업기사": return "ICTI_Q";
-      case "정보통신기사": return "ICT_Q";
-      case "정보보안기사": return "SEC_Q";
-      case "네트워크관리사 1급": return "NET1_Q";
-      case "네트워크관리사 2급": return "NET2_Q";
+      case "정보처리기사": return "cpe";
+      case "정보처리산업기사": return "cpei";
+      case "정보처리기능사": return "cpet";
+      case "리눅스마스터 1급": return "lm1";
+      case "리눅스마스터 2급": return "lm2";
+      case "정보통신산업기사": return "icti";
+      case "정보통신기사": return "ict";
+      case "정보보안기사": return "sec";
+      case "네트워크관리사 1급": return "net1";
+      case "네트워크관리사 2급": return "net2";
       default: return category || "알 수 없음";
     }
   };

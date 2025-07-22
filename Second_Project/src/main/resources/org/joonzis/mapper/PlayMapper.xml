@@ -107,7 +107,7 @@
 		FROM 
 			USER_QUESTION_HISTORY h 
 		INNER JOIN
-			${subject} q
+			QUESTION q
 		ON 
 			h.question_id=q.id
 		WHERE

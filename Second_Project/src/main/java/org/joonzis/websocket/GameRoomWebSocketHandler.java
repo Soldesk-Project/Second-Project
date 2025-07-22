@@ -241,7 +241,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             "roomNo", roomNo,
             "player", userNick
         );
-        broadcast(server, payload);
+    	sendMessageToSession(session, payload);
     }
     
     // 게임 나가기
@@ -639,6 +639,16 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	        }
 	    }
 	    closedSessions.forEach(sessions::remove);
+	}
+	
+	private void sendMessageToSession(WebSocketSession session, Map<String, Object> payload) {
+	    try {
+	        ObjectMapper objectMapper = new ObjectMapper();
+	        String json = objectMapper.writeValueAsString(payload);
+	        session.sendMessage(new TextMessage(json));
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
 	}
 
 	@Override
