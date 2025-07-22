@@ -527,22 +527,22 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     private void handleRewardPointsAndSaveUserHistory(WebSocketSession session, JsonNode json) {
     	String server = json.get("server").asText();
         String roomNo = json.get("roomNo").asText();
-        String userNick = json.get("userNick").asText();
+        String user_nick = json.get("userNick").asText();
         JsonNode historyArray = json.get("history");
         int point = json.get("point").asInt();
         
-        if (server == null || userNick == null || roomNo == null) {
+        if (server == null || user_nick == null || roomNo == null) {
     		return;
     	}
         
         String historyUuid = UUID.randomUUID().toString();
         
-        playService.increaseRewardPoints(point, userNick);
+        playService.increaseRewardPoints(point, user_nick);
         
         List<UserQuestionHistoryDTO> historyList = new ArrayList<>();
         for (JsonNode item : historyArray) {
             UserQuestionHistoryDTO dto = new UserQuestionHistoryDTO();
-            dto.setUser_nick(userNick);
+            dto.setUser_nick(user_nick);
             dto.setQuestion_id(item.get("question_id").asInt());
             dto.setSubject(item.get("subject").asText());
             dto.setSelected_answer(item.get("selected_answer").asInt());

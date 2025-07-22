@@ -54,9 +54,14 @@
 
 /* 유저 목록 */
 .user_list {
-  height: 53vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* 각 슬롯 사이 간격 동일하게 */
+  height: 53vh; /* 기존 유지 */
   color: white;
   box-sizing: border-box;
+  gap: 14px; /* 슬롯 간격, 원하면 조절 */
+  padding: 16px 0; /* 상하 패딩 */
 }
 
 /* 상단 컨텐츠: 유저정보 + 중앙 */
@@ -75,6 +80,26 @@
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   box-shadow: 0px 1px 3px 1px rgb(0, 0, 0, 0.3);
+}
+
+.user_slot {
+  flex: 1 1 0;  /* 모든 슬롯 동일한 높이, 공간 나눔 */
+  min-height: 0;
+  background: rgba(0,0,0,0.3);  /* 빈슬롯도 약간 배경 */
+  border-radius: 12px;
+  margin: 0 8px;  /* 좌우 여백 */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 12px 18px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.13);
+  border: 1px solid rgba(255,255,255,0.18);
+  transition: background 0.15s;
+}
+
+/* 실제 유저가 있는 경우엔, 추가적으로 내부 내용 렌더링 */
+.user_slot.filled {
+  background: rgba(0,0,0,0.7);
 }
 
 /* 유저 정보 영역 */
@@ -140,11 +165,13 @@
 }
 
 /* Inplay css 추후 수정 --------------------------------------------- */
-.game_join_userList{
-  height: 901px;
-  color: white;
-  padding: 10px;
-  box-sizing: border-box;
+.game_join_userList {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 901px; /* 이미 px로 고정이면 그대로, 아니면 vh로 추천 */
+  gap: 16px;
+  padding: 16px 0;
 }
 .solving{
   display: flex;
@@ -213,12 +240,19 @@ button:disabled {
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   padding: 12px 16px;
-  margin-bottom: 12px;
+  /* margin-bottom: 12px; → 제거 (slot간 gap/justify로 띄움) */
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: white;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+
+  /* ★ 추가 */
+  flex: 1 1 0;           /* <- 4칸 균등 분배의 핵심! */
+  min-height: 0;         /* (부모의 높이 초과 방지) */
+  margin: 0 8px;         /* 양 옆 여백, 원하면 조절 */
+  /* margin-bottom 대신 부모에서 gap 사용 */
+  transition: background 0.15s;
 }
 
 /* 방장 / 유저 뱃지 */

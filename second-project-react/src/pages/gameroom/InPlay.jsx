@@ -482,30 +482,34 @@ const InPlay = () => {
           </div>
         </div>
         <div className={styles.body_right}>
-          <div className={styles.game_join_userList}>
-            {users.length > 0 ? (
-              users.slice(0, 4).map(({ userNick: nick, userNo, isOwner, score, elapsedTime }) => (
-                <div key={userNo} className={styles.user_card}>
-                  <div className={styles.role_badge}>{isOwner ? '방장' : '유저'}</div>  
-                  <div className={styles.user_info}>
-                    <span className={styles.nick}>{nick}</span>
-                    <span className={styles.score}>점수: {score ?? 0}</span>
-                    <span className={styles.score}>
-                      시간: {typeof elapsedTime === 'number' ? elapsedTime.toFixed(3) + "초" : "-"}
-                    </span>
-                  </div>
-                  {userRecentChats[nick] && (
-                    <div className={styles.chatBubble}>
-                      {userRecentChats[nick].message}
-                    </div>
-                  )}
+        <div className={styles.game_join_userList}>
+          {Array.from({ length: 4 }).map((_, i) => {
+            const user = users[i];  // 없는 인덱스면 undefined
+            return user ? (
+              <div key={user.userNo} className={styles.user_card}>
+                <div className={styles.role_badge}>{user.isOwner ? '방장' : '유저'}</div>
+                <div className={styles.user_info}>
+                  <span className={styles.nick}>{user.userNick}</span>
+                  <span className={styles.score}>점수: {user.score ?? 0}</span>
+                  <span className={styles.score}>
+                    시간: {typeof user.elapsedTime === 'number' ? user.elapsedTime.toFixed(3) + "초" : "-"}
+                  </span>
                 </div>
-              ))
+                {userRecentChats[user.userNick] && (
+                  <div className={styles.chatBubble}>
+                    {userRecentChats[user.userNick].message}
+                  </div>
+                )}
+              </div>
             ) : (
-              <p>현재 접속 유저가 없습니다.</p>
-            )}
-          </div>
+              // 빈 자리 슬롯
+              <div key={`empty_${i}`} className={styles.user_card} style={{ opacity: 0.4, justifyContent: 'center' }}>
+                <span>빈 자리</span>
+              </div>
+            );
+          })}
         </div>
+      </div>
         {
           result &&
             <ResultModal users={rankedUsers}

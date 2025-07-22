@@ -35,8 +35,8 @@ public class PlayServiceImpl implements PlayService {
 		}
 		
 	@Override
-	public void increaseRewardPoints(int point, String userNick) {
-		playMapper.increaseRewardPoints(point, userNick);
+	public void increaseRewardPoints(int point, String user_nick) {
+		playMapper.increaseRewardPoints(point, user_nick);
 	}
 
 	@Override
@@ -47,10 +47,10 @@ public class PlayServiceImpl implements PlayService {
 	}
 
 	@Override
-	public List<UserQuestionHistoryDTO> getQuestionReviewList(String userNick) {
-		System.out.println("getQuestionReviewList : " +userNick);
-		System.out.println("getQuestionReviewList : " +playMapper.getQuestionReviewList(userNick).size());
-		return playMapper.getQuestionReviewList(userNick);
+	public List<UserQuestionHistoryDTO> getQuestionReviewList(String user_nick) {
+		System.out.println("getQuestionReviewList : " +user_nick);
+		System.out.println("getQuestionReviewList : " +playMapper.getQuestionReviewList(user_nick).size());
+		return playMapper.getQuestionReviewList(user_nick);
 	}
 	
 	@Override
