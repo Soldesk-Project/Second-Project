@@ -1,5 +1,6 @@
 package org.joonzis.controller;
 
+import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.QuestionDTO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.service.AdminService;
@@ -162,7 +163,7 @@ public class AdminPageController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
- // 채팅 금지 적용 API
+    // 채팅 금지 적용 API
     @PostMapping(value = "/users/ban-chat", produces = "application/json; charset=UTF-8")
     public ResponseEntity<Map<String, String>> banChatUsers(@RequestBody Map<String, List<Integer>> requestBody) {
         List<Integer> userNos = requestBody.get("userNos");
@@ -181,6 +182,95 @@ public class AdminPageController {
             e.printStackTrace();
             response.put("message", "채팅 금지 적용 중 오류가 발생했습니다: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    // 업적 등록
+    @PostMapping("/registerAchievement")
+    public ResponseEntity<?> registerAchievement(@RequestBody AchievementDTO achievementDTO) {
+        System.out.println("업적 등록 요청 수신: " + achievementDTO);
+
+        // 필수 입력 필드 검증
+        if (achievementDTO.getAch_title() == null || achievementDTO.getAch_title().trim().isEmpty()) {
+            return new ResponseEntity<>("업적 제목을 입력해주세요.", HttpStatus.BAD_REQUEST);
+        }
+        if (achievementDTO.getAch_content() == 0) {
+            return new ResponseEntity<>("업적 내용(숫자)을 입력해주세요.", HttpStatus.BAD_REQUEST);
+        }
+        if (achievementDTO.getAch_reward() == 0) {
+        	return new ResponseEntity<>("업적 보상(숫자)을 입력해주세요.", HttpStatus.BAD_REQUEST);
+        }
+        
+        try {
+            adminService.registerAchievement(achievementDTO);
+            return new ResponseEntity<>("업적 등록 성공!", HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("업적 등록 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    // 업적 검색
+    @GetMapping(value = "/searchAchievements", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> searchAchievements(
+            @RequestParam("type") String type,
+            @RequestParam(value = "query", required = false, defaultValue = "") String query,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "limit", defaultValue = "5") int limit) {
+        try {
+            // type 값을 URL 디코딩 (프론트에서 encodeURIComponent로 보냈을 수 있으므로)
+            String decodedType = URLDecoder.decode(type, "UTF-8");
+            String decodedQuery = URLDecoder.decode(query, "UTF-8");
+
+            // 서비스 계층으로 'decodedType'을 넘겨서 ach_type 컬럼을 필터링
+            Map<String, Object> result = adminService.searchAchievement(decodedType, decodedQuery, page, limit);
+            
+            if (result == null || !result.containsKey("achievements") || !result.containsKey("totalPages")) {
+                return new ResponseEntity<>("검색 결과 형식이 올바르지 않습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            
+            return new ResponseEntity<>(result, HttpStatus.OK);
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("타입 또는 검색어 디코딩 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "업적 검색 중 서버 내부 오류 발생.");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    // 업적 삭제
+    @DeleteMapping("/deleteAchievements")
+    public ResponseEntity<?> deleteAchievements(
+            @RequestParam("type") String type,
+            @RequestParam("titles") String titles) {
+        System.out.println("업적 삭제 요청 수신 - 타입: " + type + ", 이름 목록: " + titles);
+
+        try {
+            String decodedType = URLDecoder.decode(type, "UTF-8");
+        	List<String> achievementTitles = Arrays.stream(titles.split(","))
+        					 								.map(String::trim)
+        					 								.collect(Collectors.toList());
+
+        	boolean success = adminService.deleteAchievementsByTitles(decodedType, achievementTitles); 
+
+            if (success) {
+                return new ResponseEntity<>("선택된 업적이 성공적으로 삭제되었습니다.", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("업적 삭제에 실패했습니다. 일부 업적이 존재하지 않거나 오류가 발생했습니다.", HttpStatus.BAD_REQUEST);
+            }
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("타입 디코딩 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "업적 삭제 중 서버 내부 오류가 발생했습니다.");
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

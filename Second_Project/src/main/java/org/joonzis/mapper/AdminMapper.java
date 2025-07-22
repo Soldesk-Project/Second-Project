@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.QuestionDTO;
 import org.joonzis.domain.UsersVO;
 
@@ -33,4 +34,18 @@ public interface AdminMapper {
 	List<UsersVO> getUsersChatBanStatus(@Param("userNos") List<Integer> userNos);
 	int updateChatBanStatus(@Param("userNos") List<Integer> userNos, @Param("bannedTimestamp") Timestamp bannedTimestamp);
 	int unbanChatUsers();
+	
+	//업적 등록 메소드
+	void insertAchievement(AchievementDTO achievementDTO);
+	
+	//업적 검색 메소드
+	List<AchievementDTO> searchAchievements(Map<String, Object> params);
+	int getTotalAchievementCount(Map<String, Object> params);
+	
+	//업적 삭제 메소드
+	int deleteAchievementsByTitles(Map<String, Object> params);
+
+
+
+
 }

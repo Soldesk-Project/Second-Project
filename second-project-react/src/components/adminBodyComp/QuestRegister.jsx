@@ -62,6 +62,10 @@ const QuestRegister = () => {
   // 전체 문제 등록 제출 핸들러
   const handleQuestRegisterSubmit = async () => {
     // 필수 입력 필드 검증
+    if (!category.trim()) {
+      alert('카테고리를 선택해주세요.');
+      return;
+    }
     if (!questionText.trim()) {
       alert('문제 본문을 입력해주세요.');
       return;
@@ -71,6 +75,10 @@ const QuestRegister = () => {
         alert(`${i + 1}번 선택지를 입력해주세요.`);
         return;
       }
+    }
+    if (!correctAnswer.trim()) {
+      alert('정답을 선택해주세요.');
+      return;
     }
 
     // 백엔드로 보낼 때는 맵에서 변환된 테이블 이름을 사용
@@ -90,13 +98,6 @@ const QuestRegister = () => {
       correct_answer: parseInt(correctAnswer),
       image_data_base64: base64ImageString,
     };
-
-    console.log('등록할 문제 데이터:', questData);
-    console.log('선택된 카테고리 (테이블 결정용):', category);
-    console.log('Option 1:', questData.option_1);
-    console.log('Option 2:', questData.option_2);
-    console.log('Option 3:', questData.option_3);
-    console.log('Option 4:', questData.option_4);
 
     try {
       const response = await fetch(`/admin/registerQuestion?category=${encodeURIComponent(tableName)}`, {
@@ -135,7 +136,7 @@ const QuestRegister = () => {
   };
 
   return (
-    <div className="quest-register-container"> {/* 최상위 div에 클래스 추가 */}
+    <div className="quest-register-container">
       <h1 className="quest-register-title">문제 등록</h1>
       
       <div className='category-section'>
@@ -210,7 +211,7 @@ const QuestRegister = () => {
       
       <div className="button-group">
         <button onClick={handleReset} className="reset-button">초기화</button>
-        <button onClick={handleQuestRegisterSubmit} className="submit-button">등록 완료</button>
+        <button onClick={handleQuestRegisterSubmit} className="submit-button">제출</button>
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 
+import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.QuestionDTO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.mapper.AdminMapper;
@@ -26,8 +27,10 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private AdminMapper adminMapper;
 
-    // 테이블 이름-한글 카테고리 이름 매핑 Map 정의
+    // 문제 테이블 이름-한글 카테고리 이름 매핑 Map 정의
     private static final Map<String, String> TABLE_TO_CATEGORY_MAP;
+    // 업적 타입(한글) -> 실제 DB 테이블 이름 매핑
+    private static final Map<String, String> TYPE_TO_TABLE_MAP;
 
     static {
         Map<String, String> ttcMap = new HashMap<>();
@@ -41,21 +44,26 @@ public class AdminServiceImpl implements AdminService {
         ttcMap.put("SEC_Q", "정보보안기사");
         ttcMap.put("NET1_Q", "네트워크관리사1급");
         ttcMap.put("NET2_Q", "네트워크관리사2급");
-        // 여기에 사용 중인 모든 실제 DB 테이블 이름과 한글 카테고리 이름을 정확히 매핑하세요.
-
-        TABLE_TO_CATEGORY_MAP = Collections.unmodifiableMap(ttcMap); // 맵을 불변(Immutable)으로 만듭니다.
+        TABLE_TO_CATEGORY_MAP = Collections.unmodifiableMap(ttcMap);
+        		
+                
+        Map<String, String> attMap = new HashMap<>();
+        attMap.put("tier", "tier");
+        attMap.put("gamePlay", "gamePlay");
+        attMap.put("game1st", "game1st");
+        TYPE_TO_TABLE_MAP = Collections.unmodifiableMap(attMap);
     }
 
-    // 유효한 테이블 이름(category 파라미터로 넘어오는 값)인지 확인하는 헬퍼 메소드
+    // 유효한 문제 카테고리인지 확인하는 헬퍼 메소드
     private boolean isValidCategory(String category) {
         return TABLE_TO_CATEGORY_MAP.containsKey(category);
     }
-
-    // 테이블 이름으로 한글 카테고리 이름을 가져오는 헬퍼 메소드 (필요시 사용)
+    
+    // 문제 테이블 이름으로 한글 카테고리 이름을 가져오는 헬퍼 메소드
     private String getCategoryNameFromTableName(String tableName) {
         return TABLE_TO_CATEGORY_MAP.get(tableName);
     }
-
+    
     // 문제 등록
     @Override
     public void registerQuestion(QuestionDTO questionDTO, String category) {
@@ -336,4 +344,113 @@ public class AdminServiceImpl implements AdminService {
             log.info("해제할 채팅 금지 사용자가 없습니다.");
         }
     }
+    
+    //업적 등록
+    @Override
+    @Transactional
+    public void registerAchievement(AchievementDTO achievementDTO) {
+        
+        if (achievementDTO.getIs_reward() == null || achievementDTO.getIs_reward().isEmpty()) {
+            achievementDTO.setIs_reward("N"); // 기본값 설정 예시
+        }
+
+        adminMapper.insertAchievement(achievementDTO); // 매퍼 호출
+    }
+    
+    //업적 검색
+    @Override
+    public Map<String, Object> searchAchievement(String type, String query, int page, int limit) {
+        List<AchievementDTO> achievements = new ArrayList<>();
+        int totalCount = 0;
+        int totalPages = 0;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("achievements", achievements);
+        result.put("totalPages", totalPages);
+        result.put("totalCount", totalCount);
+        result.put("error", null);
+
+        log.info("ServiceImpl: searchAchievement 호출 - 타입(ach_type 필터링): " + type + ", 검색어: " + query + ", 페이지: " + page + ", 제한: " + limit);
+
+        // 더 이상 isValidAchType과 getAchievementTableNameFromType은 필요하지 않습니다.
+        // 유효한 ach_type 값인지 확인하는 로직이 필요하다면 여기에 추가할 수 있습니다.
+        // 예: if (!Arrays.asList("티어", "게임 플레이", "게임 1등").contains(type)) { ... }
+
+        try {
+            int offset = (page - 1) * limit;
+            log.debug("계산된 OFFSET: " + offset);
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("type", type); // 'type' 파라미터를 ach_type 컬럼 필터링에 사용
+            params.put("query", query);
+            params.put("offset", offset);
+            params.put("limit", limit);
+            log.debug("매퍼 파라미터 Map 준비: " + params);
+
+            try {
+                // 매퍼를 통해 총 업적 개수 조회
+                // 매퍼 메서드 시그니처가 (String type, String query) 또는 (Map<String, Object> params) 일 수 있습니다.
+                // 여기서는 Map<String, Object>를 받는 것으로 가정하고, 이 Map에 type이 포함되어 있습니다.
+                totalCount = adminMapper.getTotalAchievementCount(params); 
+                log.info("총 업적 개수 조회 성공: " + totalCount);
+                totalPages = (int) Math.ceil((double) totalCount / limit);
+                log.debug("계산된 총 페이지 수: " + totalPages);
+            } catch (Exception e) {
+                log.error("Mapper.getTotalAchievementCount 호출 중 오류 발생: " + e.getMessage(), e);
+                result.put("error", "총 업적 개수 조회 중 오류 발생: " + e.getMessage());
+            }
+
+            if (result.get("error") == null) {
+                try {
+                    // 매퍼를 통해 업적 목록 조회
+                    // 이 또한 type 파라미터가 포함된 Map을 매퍼에 전달합니다.
+                    achievements = adminMapper.searchAchievements(params); 
+                    log.info("Mapper.searchAchievements 호출 성공. 조회된 업적 수: " + (achievements != null ? achievements.size() : 0));
+
+                } catch (Exception e) {
+                    log.error("Mapper.searchAchievements 호출 중 오류 발생: " + e.getMessage(), e);
+                    achievements = new ArrayList<>();
+                    result.put("error", "업적 목록 조회 중 오류 발생: " + e.getMessage());
+                }
+            }
+
+            result.put("achievements", achievements);
+            result.put("totalPages", totalPages);
+            result.put("totalCount", totalCount);
+
+        } catch (Exception e) {
+            log.error("ServiceImpl.searchAchievement 메서드 실행 중 알 수 없는 예외 발생: " + e.getMessage(), e);
+            result.put("error", "서버 내부 오류가 발생했습니다: " + e.getMessage());
+        }
+
+        log.info("ServiceImpl: searchAchievement 결과 반환. achievements size: " + ((List)result.get("achievements")).size() + ", totalCount: " + result.get("totalCount") + ", error: " + result.get("error"));
+        return result;
+    }
+    
+    //업적 삭제
+    @Override
+    @Transactional
+    public boolean deleteAchievementsByTitles(String type, List<String> achievementTitles) {
+        log.info("ServiceImpl: deleteAchievementsByTitles 호출 - 타입(ach_type 필터링): " + type + ", 삭제할 이름 목록: " + achievementTitles);
+
+        if (achievementTitles == null || achievementTitles.isEmpty()) {
+            log.warn("삭제할 업적 이름이 제공되지 않았습니다.");
+            return false;
+        }
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("type", type); 
+        params.put("titles", achievementTitles);
+
+        try {
+            int deletedCount = adminMapper.deleteAchievementsByTitles(params);
+            log.info("ach_type이 '" + type + "'인 " + deletedCount + "개의 업적이 삭제되었습니다.");
+
+            return deletedCount > 0;
+        } catch (Exception e) {
+            log.error("업적 삭제 중 매퍼 오류 발생: " + e.getMessage(), e);
+            throw new RuntimeException("데이터베이스에서 업적을 삭제하는 중 오류가 발생했습니다.", e);
+        }
+    }
+
 }

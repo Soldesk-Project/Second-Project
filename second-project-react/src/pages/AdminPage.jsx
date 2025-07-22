@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Header from '../layout/Header';
-import QnaAdminSidebar from '../components/AdminSidebar/QnaAdminSidebar';
+import QuestAdminSidebar from '../components/AdminSidebar/QuestAdminSidebar';
 import UserAdminSidebar from '../components/AdminSidebar/UserAdminSidebar';
 import Headerstyles from '../css/MainPage.module.css';
 import styles from '../css/adminPage/AdminPage.module.css';
@@ -13,27 +13,35 @@ import QuestErrRepoManage from '../components/adminBodyComp/QuestErrRepoManage';
 import UserInfoView from '../components/adminBodyComp/UserInfoView';
 import LoginRecordView from '../components/adminBodyComp/LoginRecordView';
 import UserRestrict from '../components/adminBodyComp/UserRestrict';
+import AchAdminSidebar from '../components/AdminSidebar/AchAdminSidebar';
+import AchRegister from '../components/adminBodyComp/AchRegister';
+import AchDelete from '../components/adminBodyComp/AchDelete';
 
 const AdminPage = () => {
   const currentUser = useSelector((state) => state.user.user);
   const userNick = currentUser?.user_nick;
-  const [activeSidebar, setActiveSidebar] = useState('qna');
+  const [activeSidebar, setActiveSidebar] = useState('quest');
   // Q&A 관리 메뉴의 현재 활성화된 페이지 상태
-  const [activeQnaMenu, setActiveQnaMenu] = useState('default');
+  const [activeQuestMenu, setActiveQuestMenu] = useState('default');
   const [activeUserMenu, setActiveUserMenu] = useState('default');
+  const [activeAchMenu, setActiveAchMenu] = useState('default');
 
-  const setPageQnaAdmin = () => {
-    setActiveSidebar('qna');
-    setActiveQnaMenu('default');
+  const setPageQuestAdmin = () => {
+    setActiveSidebar('quest');
+    setActiveQuestMenu('default');
   };
   const setpageUserAdmin = () => {
     setActiveSidebar('user');
     setActiveUserMenu('default');
   };
+  const setPageAchAdmin = () => {
+    setActiveSidebar('achievement');
+    setActiveAchMenu('default');
+  }
 
-  // activeQnaMenu 값에 따라 렌더링할 컴포넌트를 결정하는 함수
-  const renderQnaContent = () => {
-    switch (activeQnaMenu) {
+  // activeQuestMenu 값에 따라 렌더링할 컴포넌트를 결정하는 함수
+  const renderQuestContent = () => {
+    switch (activeQuestMenu) {
       case 'register':
         return <QuestRegister/>;
       case 'edit':
@@ -63,13 +71,26 @@ const AdminPage = () => {
     }
   };
 
+  //activeAchieveMenu 값에 따라 렌더링할 컴포넌트를 결정하는 함수
+  const renderAchContent = () => {
+    switch (activeAchMenu){
+      case 'register' :
+        return <AchRegister/>;
+      case 'delete' :
+        return <AchDelete/>;
+      default:
+        return <AchRegister/>;
+    }
+  }
+
   return (
     <div className={styles.container}>
       {/* 상단 바 (로고 + 메뉴 + 검색) */}
       <div className={Headerstyles.top_nav}><Header /></div>
       <div className={styles.top_nav}>
-        <button className="QnaAdminBtn" onClick={setPageQnaAdmin}>문제/제보관리</button>
+        <button className="QuestAdminBtn" onClick={setPageQuestAdmin}>문제/제보관리</button>
         <button className="UserAdminBtn" onClick={setpageUserAdmin}>유저/권한관리</button>
+        <button className="AchAdminBtn" onClick={setPageAchAdmin}>업적관리</button>
         <span>관리자 {userNick} 님</span>
       </div>
       {/*메인 바디 */}
@@ -77,13 +98,15 @@ const AdminPage = () => {
         {/*좌측 바*/}
         <div className={styles.body_left}>
           {/* activeSidebar 값에 따라 다른 사이드바 컴포넌트를 조건부 렌더링*/}
-          {activeSidebar === 'qna' && <QnaAdminSidebar setActiveQnaMenu={setActiveQnaMenu} />}
+          {activeSidebar === 'quest' && <QuestAdminSidebar setActiveQuestMenu={setActiveQuestMenu} />}
           {activeSidebar === 'user' && <UserAdminSidebar setActiveUserMenu={setActiveUserMenu}/>}
+          {activeSidebar === 'achievement' && <AchAdminSidebar setActiveAchMenu={setActiveAchMenu}/>}
         </div>
         {/* 우측 본문*/}
         <div className={styles.body_content}>
-          {activeSidebar === 'qna' && renderQnaContent()}
+          {activeSidebar === 'quest' && renderQuestContent()}
           {activeSidebar === 'user' && renderUserContent()}
+          {activeSidebar === 'achievement' && renderAchContent()}
         </div>
       </div>
     </div>

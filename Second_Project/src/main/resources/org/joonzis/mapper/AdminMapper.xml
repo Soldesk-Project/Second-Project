@@ -166,4 +166,68 @@
             AND BANNED_TIMESTAMP IS NOT NULL
             AND BANNED_TIMESTAMP <![CDATA[ <= ]]> (SYSTIMESTAMP - INTERVAL '72' HOUR)
     </update>
+    
+    
+    <!-- 업적 등록 -->
+    <insert id="insertAchievement">
+        INSERT INTO ACHIEVEMENTS (ach_title, ach_content, ach_reward, ach_type)
+        VALUES (
+            #{ach_title},
+            #{ach_content},
+            #{ach_reward},
+            #{ach_type, jdbcType=VARCHAR}
+        )
+    </insert>
+    
+    <!-- 업적 검색 -->
+    <select id="searchAchievements" resultType="org.joonzis.domain.AchievementDTO">
+    	SELECT ach_title, ach_content, ach_reward, ach_type
+    	FROM (
+        	SELECT
+            	ach_title, ach_content, ach_reward, ach_type,
+            	ROWNUM rn
+        	FROM (
+            	SELECT ach_title, ach_content, ach_reward, ach_type
+            	FROM ACHIEVEMENTS
+            	<where>
+                	<if test="type != null and type != ''">
+                    	ach_type = #{type, jdbcType=VARCHAR} </if>
+                	<if test="query != null and query != ''">
+                    	AND (ach_title LIKE '%' || #{query, jdbcType=VARCHAR} || '%' OR ach_content LIKE '%' || #{query, jdbcType=VARCHAR} || '%') </if>
+            	</where>
+            	ORDER BY ach_title ASC
+        	)
+        	WHERE ROWNUM &lt;= #{offset, jdbcType=NUMERIC} + #{limit, jdbcType=NUMERIC}
+    	)
+    	WHERE rn > #{offset, jdbcType=NUMERIC}
+	</select>
+    
+    <select id="getTotalAchievementCount" resultType="int">
+        SELECT COUNT(*)
+        FROM ACHIEVEMENTS
+        <where>
+            <if test="type != null and type != ''">
+                ach_type = #{type}
+            </if>
+            <if test="query != null and query != ''">
+                AND (ach_title LIKE '%' || #{query} || '%' OR ach_content LIKE '%' || #{query} || '%')
+            </if>
+        </where>
+    </select>
+    
+    <!-- 업적 삭제 -->
+    <delete id="deleteAchievementsByTitles">
+        DELETE FROM ACHIEVEMENTS
+        <where>
+            <if test="type != null and type != ''">
+                ach_type = #{type}
+            </if>
+            <if test="titles != null and titles.size > 0">
+                AND ach_title IN
+                <foreach item="title" collection="titles" open="(" separator="," close=")">
+                    #{title}
+                </foreach>
+            </if>
+        </where>
+    </delete>
 </mapper>

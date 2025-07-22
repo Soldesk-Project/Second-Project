@@ -1,5 +1,6 @@
 package org.joonzis.service;
 
+import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.QuestionDTO;
 import org.joonzis.domain.UsersVO;
 
@@ -27,4 +28,14 @@ public interface AdminService {
 	int banChatusers(List<Integer> userNos);
     //유저 채금 해제 메소드
 	void unbanChatUsers();
+	
+	//업적 관련 메소드
+	//업적 등록 메소드
+	void registerAchievement(AchievementDTO achievementDTO);
+	//업적 검색 메소드
+	Map<String, Object> searchAchievement(String type, String query, int page, int limit);
+	//업적 삭제 메소드
+	boolean deleteAchievementsByTitles(String type, List<String> achievementTitles);
+
+	
 }

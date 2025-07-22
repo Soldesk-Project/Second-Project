@@ -1,0 +1,87 @@
+@import './QuestAdmin.css';
+
+.achievement-register-container {
+  padding: 20px;
+  width: 100%;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.achievement-register-title {
+  color: #333;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2em;
+}
+
+.section-title {
+  color: #555;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+/* 카테고리 선택 */
+.type-section,
+.achievement-text-section {
+  margin-bottom: 25px;
+}
+
+.achtype-select{
+  width: auto;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+/* 업적 본문 입력 */
+.achievement-text-input {
+  width: 100%; /* 부모 div의 100%를 차지하도록 수정 */
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+  box-sizing: border-box;
+  margin-bottom: 25px;
+}
+
+/* 버튼 그룹 */
+.button-group {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.reset-button,
+.submit-button {
+  padding: 12px 25px;
+  font-size: 1.1em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.reset-button {
+  background-color: #6c757d;
+  color: white;
+  margin-right: 15px;
+}
+
+.reset-button:hover {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+}
+
+.submit-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.submit-button:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}

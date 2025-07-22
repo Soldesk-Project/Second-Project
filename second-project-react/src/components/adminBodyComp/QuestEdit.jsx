@@ -206,7 +206,7 @@ const QuestEdit = () => {
     <div>
       <h1>문제 수정</h1>
       <div className='category'>
-        <h3>1. 카테고리 선택 및 문제 검색 🔍</h3>
+        <h3>1. 카테고리 선택 및 문제 검색</h3>
         <select name="cateSelect" value={category} onChange={handleCategoryChange}>
           {categories.map((cat, index) => (
             <option key={index} value={cat}>
