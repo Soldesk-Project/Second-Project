@@ -13,11 +13,11 @@ const ServerUserList = () => {
   const socketRef = useRef(null);
   const userNick = user.user_nick;
   const userNo = user.user_no;
-  const bgName = user.background_class_name;
-  const blName = user.balloon_class_name;
-  const bdName = user.boundary_class_name;
-  const titleName = user.title_class_name;
-  const fontColorName = user.fontcolor_class_name;
+  const bgItemNo = user.backgroundItemNo;
+  const blItemNo = user.balloonItemNo;
+  const bdItemNo = user.boundaryItemNo;
+  const titleItemNo = user.titleItemNo;
+  const fontColorItemNo = user.fontcolorItemNo;
   
 
   useEffect(() => {
@@ -31,11 +31,11 @@ const ServerUserList = () => {
       server,
       userNick,
       userNo,
-      bgName,
-      blName,
-      bdName,
-      titleName,
-      fontColorName,
+      bgItemNo,
+      blItemNo,
+      bdItemNo,
+      titleItemNo,
+      fontColorItemNo,
     };
 
     if (socket.readyState === WebSocket.OPEN) {
@@ -67,7 +67,7 @@ const ServerUserList = () => {
     return () => {
       setUsers([]);
     };
-  }, [server, userNick, userNo, bgName, blName, bdName, titleName, fontColorName]);
+  }, [server, userNick, userNo, bgItemNo, blItemNo, bdItemNo, titleItemNo, fontColorItemNo]);
 
   return (
     <div className={styles.container}>
@@ -75,17 +75,17 @@ const ServerUserList = () => {
       <div className={styles.userList}>
         {
           users.length > 0 ? (
-            users.map(({ userNick, userNo, bgName, titleName, bdName, fontColorName }) => (
+            users.map(({ userNick, userNo, bgItemNo, titleItemNo, bdItemNo, fontColorItemNo }) => (
               <div 
                 key={`user-${userNo}`} 
-                className={`${styles.user} ${decoStyles[bgName]} ${decoStyles[bdName]}`}>
+                className={`${styles.user} ${decoStyles[bgItemNo]} ${decoStyles[bdItemNo]}`}>
                   <div>
-                            {titleName && titleTextMap[titleName] && (
-                                <span className={decoStyles[titleName]} style={{marginRight: '5px', fontWeight: 'bold'}}>
-                                    [{titleTextMap[titleName]}]
+                            {titleItemNo && titleTextMap[titleItemNo] && (
+                                <span className={decoStyles[titleItemNo]} style={{marginRight: '5px', fontWeight: 'bold'}}>
+                                    [{titleTextMap[titleItemNo]}]
                                 </span>
                                 )}
-                            <span className={decoStyles[fontColorName]}>
+                            <span className={decoStyles[fontColorItemNo]}>
                                 {userNick}
                             </span>
                         </div>

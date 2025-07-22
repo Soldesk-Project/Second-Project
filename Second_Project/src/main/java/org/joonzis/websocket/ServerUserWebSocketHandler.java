@@ -29,6 +29,14 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
 	
     @Autowired
     private ObjectMapper objectMapper; // Jackson 사용
+    
+    private Integer parseInteger(String value) {
+        try {
+            return value != null ? Integer.valueOf(value) : null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
@@ -37,15 +45,15 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         String server = data.get("server");
         String userNick = data.get("userNick");
         String userNo = data.get("userNo");
-        String bgName = data.get("bgName");
-        String blName = data.get("blName");
-        String bdName = data.get("bdName");
-        String titleName = data.get("titleName");
-        String fontColorName = data.get("fontColorName");
+        Integer bgItemNo = parseInteger(data.get("bgItemNo"));
+        Integer blItemNo = parseInteger(data.get("blItemNo"));
+        Integer bdItemNo = parseInteger(data.get("bdItemNo"));
+        Integer titleItemNo = parseInteger(data.get("titleItemNo"));
+        Integer fontColorItemNo = parseInteger(data.get("fontColorItemNo"));
         if ("join".equals(action) && server != null && userNick != null) {
             removeSessionFromAllServers(session);
             serverSessions.putIfAbsent(server, new ConcurrentHashMap<>());
-            serverSessions.get(server).put(session, new UserInfo(userNick, userNo, bgName, blName, bdName, titleName, fontColorName));
+            serverSessions.get(server).put(session, new UserInfo(userNick, userNo, bgItemNo, blItemNo, bdItemNo, titleItemNo, fontColorItemNo));
 //            log.info("[WebSocket] 세션 추가됨. 서버: " + server + ", 세션ID: " + session.getId()
 //            + ", 현재 접속 유저 수: " + serverSessions.get(server).size());
             // 3) 해당 서버에 접속한 유저 목록 전송
@@ -70,11 +78,11 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
                 for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
                     UserInfo info = entry.getValue();
                     if (userNo.equals(info.getUserNo())) {
-                        info.setBgName(updatedUser.getBackground_class_name());
-                        info.setBlName(updatedUser.getBalloon_class_name());
-                        info.setBdName(updatedUser.getBoundary_class_name());
-                        info.setTitleName(updatedUser.getTitle_class_name());
-                        info.setFontColorName(updatedUser.getFontcolor_class_name());
+                        info.setBgItemNo(updatedUser.getBackgroundItemNo());
+                        info.setBlItemNo(updatedUser.getBalloonItemNo());
+                        info.setBdItemNo(updatedUser.getBoundaryItemNo());
+                        info.setTitleItemNo(updatedUser.getTitleItemNo());
+                        info.setFontColorItemNo(updatedUser.getFontcolorItemNo());
                         updated = true;
                     }
                 }
@@ -154,11 +162,11 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
             UserInfo info = entry.getValue();
             if (userNo.equals(String.valueOf(info.getUserNo()))) {
-                info.setBgName(updatedUser.getBackground_class_name());
-                info.setBlName(updatedUser.getBalloon_class_name());
-                info.setBdName(updatedUser.getBoundary_class_name());
-                info.setTitleName(updatedUser.getTitle_class_name());
-                info.setFontColorName(updatedUser.getFontcolor_class_name());
+            	info.setBgItemNo(updatedUser.getBackgroundItemNo());
+                info.setBlItemNo(updatedUser.getBalloonItemNo());
+                info.setBdItemNo(updatedUser.getBoundaryItemNo());
+                info.setTitleItemNo(updatedUser.getTitleItemNo());
+                info.setFontColorItemNo(updatedUser.getFontcolorItemNo());
                 updated = true;
             }
         }
@@ -195,11 +203,11 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             Map<String, String> userMap = new HashMap<>();
             userMap.put("userNick", userInfo.getUserNick());
             userMap.put("userNo", userInfo.getUserNo());
-            userMap.put("bgName", userInfo.getBgName());
-            userMap.put("blName", userInfo.getBlName());
-            userMap.put("bdName", userInfo.getBdName());
-            userMap.put("titleName", userInfo.getTitleName());
-            userMap.put("fontColorName", userInfo.getFontColorName());
+            userMap.put("bgItemNo", String.valueOf(userInfo.getBgItemNo()));
+            userMap.put("blItemNo", String.valueOf(userInfo.getBlItemNo()));
+            userMap.put("bdItemNo", String.valueOf(userInfo.getBdItemNo()));
+            userMap.put("titleItemNo", String.valueOf(userInfo.getTitleItemNo()));
+            userMap.put("fontColorItemNo", String.valueOf(userInfo.getFontColorItemNo()));
             userList.add(userMap);
         }
         // 응답 JSON 생성

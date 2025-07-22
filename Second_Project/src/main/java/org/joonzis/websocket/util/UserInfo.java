@@ -14,9 +14,9 @@ import lombok.ToString;
 public class UserInfo {
 	private String userNick;
     private String userNo;
-    private String bgName;
-    private String blName;
-    private String bdName;
-    private String titleName;
-    private String fontColorName;
+    private Integer bgItemNo;
+    private Integer blItemNo;
+    private Integer bdItemNo;
+    private Integer titleItemNo;
+    private Integer fontColorItemNo;
 }
