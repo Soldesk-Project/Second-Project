@@ -24,11 +24,11 @@
 			    U.USER_NO AS user_no,
 			    U.USER_RANK AS user_rank,
 			    U.USER_NICK AS user_nick,
-			    COALESCE(D.BOUNDARY_CLASS_NAME, 'default-boundary') AS boundary_class_name,
-			    COALESCE(D.TITLE_CLASS_NAME, 'default-title') AS title_class_name,
-			    COALESCE(D.FONTCOLOR_CLASS_NAME, 'default-color') AS fontcolor_class_name,
-			    COALESCE(D.BACKGROUND_CLASS_NAME, 'default-background') AS background_class_name,
-			    COALESCE(D.BALLOON_CLASS_NAME, 'default-balloon') AS balloon_class_name
+			    COALESCE(D.BOUNDARY_ITEM_NO, 0) AS boundaryItemNo,
+			    COALESCE(D.TITLE_ITEM_NO, 0) AS titleItemNo,
+			    COALESCE(D.FONTCOLOR_ITEM_NO, 0) AS fontcolorItemNo,
+			    COALESCE(D.BACKGROUND_ITEM_NO, 0) AS backgroundItemNo,
+			    COALESCE(D.BALLOON_ITEM_NO, 0) AS balloonItemNo
 			  FROM USERS U
 			  LEFT JOIN USER_DECO D ON U.USER_NO = D.USER_NO
 			  ORDER BY U.USER_RANK DESC
