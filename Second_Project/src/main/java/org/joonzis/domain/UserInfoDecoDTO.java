@@ -16,9 +16,9 @@ public class UserInfoDecoDTO {
     private int user_rank;
 	private String user_nick;
 	
-	private String boundary_class_name;
-    private String title_class_name;
-    private String background_class_name;
-    private String balloon_class_name;
-    private String fontcolor_class_name;
+    private Integer boundaryItemNo;
+    private Integer titleItemNo;
+    private Integer fontcolorItemNo;
+    private Integer backgroundItemNo;
+    private Integer balloonItemNo;
 }

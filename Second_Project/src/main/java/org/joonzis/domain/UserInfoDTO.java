@@ -20,10 +20,10 @@ public class UserInfoDTO {
 	private int ischatbanned; // 0: 정상, 1: 채팅 금지
     private Date banned_timestamp;
 	
-	private String boundary_class_name;
-    private String title_class_name;
-    private String background_class_name;
-    private String balloon_class_name;
-    private String fontcolor_class_name;
+    private Integer boundaryItemNo;
+    private Integer titleItemNo;
+    private Integer fontcolorItemNo;
+    private Integer backgroundItemNo;
+    private Integer balloonItemNo;
 
 }

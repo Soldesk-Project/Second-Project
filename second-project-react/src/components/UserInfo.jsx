@@ -27,7 +27,7 @@ const UserInfo = () => {
     const socket = sockets['server'];
 
     // --- 1) 프로필 상태
-    const [profileSrc, setProfileSrc] = useState('');
+    const [profileSrc, setProfileSrc] = useState('/images/profile_default.png');
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     // 페이지 로드 시, 백엔드에서 유저 정보(프로필 포함) 가져오기
@@ -35,11 +35,16 @@ const UserInfo = () => {
         if (!user?.user_no) return;
         axios.get(`/user/${user.user_no}`)
         .then(res => {
-            // 실제 JSON 필드는 user_profile_img 입니다
-            const img = res.data.user_profile_img;
-            setProfileSrc(img || '/images/profile_default.png');
-            // (선택) redux user 상태 업데이트
-            dispatch({ type: 'user/setProfileImage', payload: img });
+            const raw = res.data.user_profile_img;
+            // 이미 /images/ 로 시작하면 그대로, 아니면 prefix
+            const src = raw
+                ? raw.startsWith('/images/')
+                    ? raw
+                    : `/images/${raw}`
+                : '/images/profile_default.png';
+            setProfileSrc(src);
+                        // (선택) redux user 상태 업데이트
+            dispatch({ type: 'user/setProfileImage', payload: raw });
         })
         .catch(console.error);
     }, [user.user_no, dispatch]);
@@ -82,15 +87,29 @@ const UserInfo = () => {
 
     useEffect(() => {
         if (!user.user_no) return;
-        axios
-        .get('/user/inventory/category', {
-            params: {
-            category: activeTab,
-            user_no: user.user_no
-            }
-        })
-        .then((res) => setItems(res.data))
-        .catch(() => setItems([]));
+            axios
+      .get('/user/inventory/category', {
+        params: { category: activeTab, user_no: user.user_no }
+      })
+      .then(({ data }) => {
+        console.log('Inventory raw data:', data);
+        const withImg = data.map(item => {
+        // 1) camelCase 프로퍼티부터 시도
+        const raw =
+          item.imageFileName ||
+          'profile_default.png';
+
+        // prefix 중복 제거
+        const filename = raw.replace(/^\/images\//, '');
+
+        const src = `/images/${filename}`;
+        console.log('Inventory imgUrl:', src);
+
+          return { ...item, imgUrl: src };
+        });
+        setItems(withImg);
+      })
+      .catch(() => setItems([]));
     }, [activeTab, user.user_no]);
     
     const renderTier = () => {
@@ -127,6 +146,10 @@ const UserInfo = () => {
                 console.error('아이템 전송 실패:', status);
             }
         } catch (error) {
+            console.error('Status:', error.response?.status);
+            console.error('Body:', error.response?.data);
+            console.error('Full error:', error);
+
             console.error('아이템 전송 중 에러:', error);
         }
     }
@@ -290,22 +313,32 @@ const UserInfo = () => {
                 {items.length ? (
                 items.map(item => (
                     <div key={item.item_no} className={styles.card} onClick={() => setSelectedItem(item)}>
-                    <div className={styles.itemCss}>
-                        <div>
-                            {item.item_type === 'title' && titleTextMap[item.css_class_name] && (
-                                <span className={decoStyles[item.css_class_name]} style={{marginRight: '5px', fontWeight: 'bold'}}>
-                                    [{titleTextMap[item.css_class_name]}]
-                                </span>
-                                )}
+                        <div className={styles.itemCss}>
+                        {/* title 타입은 텍스트 데코, 그 외엔 이미지 */}
+                        {item.item_type === 'title' ? (
+                        <span className={decoStyles[item.css_class_name]}>
+                            [{titleTextMap[item.css_class_name]}]
+                        </span>
+                        ) : (
+                        <img 
+                            src={item.imgUrl}
+                            alt={item.item_name}
+                            className={styles.itemImage}
+                        />
+                        )}
+                    </div>
+                            {/* <span className={decoStyles[item.css_class_name]} style={{marginRight: '5px', fontWeight: 'bold'}}>
+                                [{titleTextMap[item.css_class_name]}]
+                            </span>
+                            )}
                             <span
                             className={
                                 item.item_type !== 'title' ? decoStyles[item.css_class_name] : undefined
                             }
                             >
                             아이템
-                            </span>
-                        </div>
-                    </div>
+                            </span> */}
+                    
                     <div className={styles.itemName}>이름 : {item.item_name}</div>
                     </div>
                 ))
@@ -316,7 +349,17 @@ const UserInfo = () => {
             </div>
         </div>
       </InventoryModal>
-      {selectedItem && (<PreviewModal action={'UserInfo'} user={user} item={selectedItem} onClose={() => setSelectedItem(null)} on_click={() => clickItem(selectedItem)} />)}
+      {selectedItem && (
+        <PreviewModal
+            action="UserInfo"
+            user={user}
+            item={selectedItem}
+            profileSrc={profileSrc}            // ← pass the current profile image URL
+            inventoryItems={items}             // ← pass entire inventory array
+            onClose={() => setSelectedItem(null)}
+            on_click={() => clickItem(selectedItem)}
+        />
+ )}
     </div>
   );
 };

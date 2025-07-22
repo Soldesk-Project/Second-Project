@@ -3,7 +3,16 @@ import React, { useEffect } from 'react';
 import decoStyles from '../../css/Decorations.module.css';
 import titleTextMap from '../../js/Decorations';
 
-const PreviewModal = ({ action, user, item, onClose, on_click }) => {
+const PreviewModal = ({ 
+  action, 
+  user, 
+  item, 
+  profileSrc,
+  inventoryItems, 
+  onClose, 
+  on_click
+}) => {
+
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') onClose();
@@ -59,7 +68,46 @@ const PreviewModal = ({ action, user, item, onClose, on_click }) => {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h4 style={{color: 'black'}}>미리보기</h4>
+        
+        {/* ① 프로필 이미지 */}
+        <div className='previewImg'
+         style={{
+           position: 'relative',
+           width: 180,
+           height: 180,
+           margin: '0 auto 20px',
+           overflow: 'visible',
+         }}
+       >
+         {/* 실제 프로필 */}
+         <img
+           src={profileSrc}
+           alt="Profile"
+           style={{
+             width: '100%',
+             height: '100%',
+             borderRadius: '50%',
+             objectFit: 'cover',
+           }}
+         />
+         {/* 선택된 테두리 이미지 (previewStyle.boundary_class_name 에 맞춘 파일명) */}
+         <img
+           src={`/images/${item.imageFileName}`}
+           alt="Profile Border"
+           style={{
+              position: 'absolute',
+              bottom: 0,                // 컨테이너 바닥에 링을 붙이고
+              left: '50%',              // 가로 중앙 정렬
+              transform: 'translateX(-50%)', // 중앙에서 반만 이동
+              width: '101%',            // intrinsic width
+              height: 'auto',           // intrinsic height
+              objectFit: 'contain',
+              pointerEvents: 'none',
+           }}
+         />
+       </div>
+        
+        {/* ② 텍스트 데코 미리보기 */}
         <div
           className={[
             decoStyles[previewStyle.background_class_name],
@@ -78,6 +126,7 @@ const PreviewModal = ({ action, user, item, onClose, on_click }) => {
             {user.user_nick}
           </span>   
         </div>
+
         <div style={{ marginTop: '20px', color:'black' }}>
             {
               action === 'Shop' ? <button onClick={on_click} style={{marginRight:"10px"}}>구매</button> : <button onClick={on_click} style={{marginRight:"10px"}}>장착</button>

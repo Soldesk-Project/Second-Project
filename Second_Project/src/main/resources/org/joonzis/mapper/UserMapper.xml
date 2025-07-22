@@ -42,12 +42,20 @@
 		SELECT * FROM ITEMS
 	</select>
 	<!-- 인벤토리 - 카테고리별 아이템 목록 -->
-	<select id="getInventoryCategory" resultType="org.joonzis.domain.ItemVO">
-	    SELECT *
-	    FROM INVENTORY
-	    WHERE ITEM_TYPE = #{category}
-	      AND USER_NO = #{user_no}
-	</select>
+	<select id="getInventoryCategory" parameterType="map" resultType="org.joonzis.domain.ItemVO">
+	    SELECT 
+	      i.ITEM_NO          AS item_no,
+	      i.ITEM_PRICE       AS item_price,
+	      i.ITEM_NAME        AS item_name,
+	      i.ITEM_TYPE        AS item_type,
+	      i.IMAGE_FILE_NAME  AS imageFileName
+	    FROM INVENTORY inv
+	    JOIN ITEMS     i
+	      ON inv.ITEM_NAME = i.ITEM_NAME
+	     AND inv.ITEM_TYPE = i.ITEM_TYPE
+	    WHERE inv.USER_NO   = #{user_no}
+	      AND inv.ITEM_TYPE = #{category}
+  	</select>
 	<!-- 보유 아이템 목록 -->
 	<select id="getInventory" resultType="org.joonzis.domain.ItemVO">
 		SELECT ITEM_NAME
@@ -59,26 +67,26 @@
 	<update id="updateItem" parameterType="org.joonzis.domain.UserDecoUpdateDTO">
 		UPDATE USER_DECO
 	    <set>
-	        <choose>
-	            <when test="item_type == 'background'">
-	                BACKGROUND_CLASS_NAME = #{css_class_name}
-	            </when>
-	            <when test="item_type == 'title'">
-	                TITLE_CLASS_NAME = #{css_class_name}
-	            </when>
-	            <when test="item_type == 'fontColor'">
-	                FONTCOLOR_CLASS_NAME = #{css_class_name}
-	            </when>
-	            <when test="item_type == 'boundary'">
-	                BOUNDARY_CLASS_NAME = #{css_class_name}
-	            </when>
-	            <when test="item_type == 'balloon'">
-	                BALLOON_CLASS_NAME = #{css_class_name}
-	            </when>
-	        </choose>
+	      <choose>
+	        <when test="itemType == 'boundary'">
+	          BOUNDARY_ITEM_NO  = #{itemNo, jdbcType=INTEGER}
+	        </when>
+	        <when test="itemType == 'title'">
+	          TITLE_ITEM_NO     = #{itemNo, jdbcType=INTEGER}
+	        </when>
+	        <when test="itemType == 'fontColor'">
+	          FONTCOLOR_ITEM_NO = #{itemNo, jdbcType=INTEGER}
+	        </when>
+	        <when test="itemType == 'background'">
+	          BACKGROUND_ITEM_NO = #{itemNo, jdbcType=INTEGER}
+	        </when>
+	        <when test="itemType == 'balloon'">
+	          BALLOON_ITEM_NO   = #{itemNo, jdbcType=INTEGER}
+	        </when>
+	      </choose>
 	    </set>
-	    WHERE USER_NO = #{user_no}
-	</update>
+	    WHERE USER_NO = #{userNo}
+  </update>
 	
 	<!-- userNo로 유저 정보+css 찾기	 -->
 	<select id="getUserInfoByUserNo" resultType="org.joonzis.domain.UserInfoDecoDTO">

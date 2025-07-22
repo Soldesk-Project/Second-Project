@@ -49,13 +49,16 @@ const Shop = () => {
   }, [user.user_no]);
   
   useEffect(() => {
-    // 포인트 충전 탭이 아니므로, activeTab만으로 fetch
+    // 아이템 탭
     axios.get(`/api/shop/items?category=${encodeURIComponent(activeTab)}`)
       .then(res => {
-        const withImg = res.data.map(item => ({
+        console.log(res.data)
+        const withImg = res.data.map(item => {
+          const filename = item.imageFileName;
+          return {
           ...item,
-          imgUrl: `/images/${item.imageFileName}`
-        }));
+          imgUrl: `/images/${filename}`
+        }});
         setItems(withImg);
       })
       .catch(() => setItems([]));
@@ -138,9 +141,15 @@ const Shop = () => {
           <div className={styles.grid}>
             {items.length ? (
               items.map(item => (
-                <div key={item.item_no} className={styles.card} onClick={() => setSelectedItem(item)}>
+                <div 
+                  key={item.item_no} 
+                  className={styles.card} 
+                  onClick={() => setSelectedItem(item)}>
                   <div className={styles.itemCss}>
-                  <img src={`/images/${item.imageFileName}`} alt={item.item_name} className={styles.itemImage} />
+                  <img 
+                    src={`/images/${item.imageFileName}`} 
+                    alt={item.item_name} 
+                    className={styles.itemImage} />
                     {/* <div>
                         {item.item_type === 'title' && titleTextMap[item.css_class_name] && (
                             <span className={decoStyles[item.css_class_name]} style={{marginRight: '5px', fontWeight: 'bold'}}>

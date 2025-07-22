@@ -5,8 +5,15 @@
 <mapper namespace="org.joonzis.mapper.ShopMapper">
 	 
 	 <!-- 상점 - 카테고리별 아이템 목록 -->
-	 <select id="getItemCategory" resultType="org.joonzis.domain.ItemVO" parameterType="String">
-	 	SELECT * FROM ITEMS WHERE ITEM_TYPE = #{category}
+	<select id="getItemCategory" resultType="org.joonzis.domain.ItemVO" parameterType="String">
+	SELECT
+    	ITEM_NO            AS item_no,
+    	ITEM_PRICE         AS item_price,
+    	ITEM_NAME          AS item_name,
+    	ITEM_TYPE          AS item_type,
+    	IMAGE_FILE_NAME    AS imageFileName
+		FROM ITEMS
+    	WHERE ITEM_TYPE = #{category}
 	 </select>
 	 
 </mapper>

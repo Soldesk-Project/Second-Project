@@ -17,6 +17,6 @@ public class ItemVO {
 	
 	private String item_name;
 	private String item_type;
-	private String css_class_name;
+//	private String css_class_name;
 	private String imageFileName;
 }
