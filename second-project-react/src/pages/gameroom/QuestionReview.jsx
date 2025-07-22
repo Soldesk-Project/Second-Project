@@ -108,7 +108,7 @@ const QuestionReview = () => {
               </div>
               <div className={styles.initiatorBtn}>
                 <button onClick={nextQuestion} >다음 문제</button>
-                <butzton onClick={leaveRoom} className={styles.leaveBtn}>나가기</butzton>
+                <button onClick={leaveRoom} className={styles.leaveBtn}>나가기</button>
               </div>
               <div className={styles.gamePlay}>
                 {/* {

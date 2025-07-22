@@ -66,16 +66,16 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
             <td>
               <select value={category} onChange={(e) => setCategory(e.target.value)}>
                 <option value="random">랜덤</option>
-                <option value="CPE_Q">정보처리기사</option>
-                <option value="CPEI_Q">정보처리산업기사</option>
-                <option value="CPET_Q">정보처리기능사</option>
-                <option value="LM1_Q">리눅스마스터1급</option>
-                <option value="LM2_Q">리눅스마스터2급</option>
-                <option value="ICTI_Q">정보통신산업기사</option>
-                <option value="ICT_Q">정보통신기사</option>
-                <option value="SEC_Q">정보보안기사</option>
-                <option value="NET1_Q">네트워크관리사1급</option>
-                <option value="NET2_Q">네트워크관리사2급</option>
+                <option value="cpe">정보처리기사</option>
+                <option value="cpei">정보처리산업기사</option>
+                <option value="cpet">정보처리기능사</option>
+                <option value="lm1">리눅스마스터1급</option>
+                <option value="lm2">리눅스마스터2급</option>
+                <option value="icti">정보통신산업기사</option>
+                <option value="ict">정보통신기사</option>
+                <option value="sec">정보보안기사</option>
+                <option value="net1">네트워크관리사1급</option>
+                <option value="net2">네트워크관리사2급</option>
               </select>
             </td>
           </tr>

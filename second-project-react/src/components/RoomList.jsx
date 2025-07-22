@@ -238,25 +238,25 @@ const RoomList = () => {
     switch (category) {
       case "random":
         return "랜덤";
-      case "CPE_Q":
+      case "cpe":
         return "정보처리기사";
-      case "CPEI_Q":
+      case "cpei":
         return "정보처리산업기사";
-      case "CPET_Q":
+      case "cpet":
         return "정보처리기능사";
-      case "LM1_Q":
+      case "lm1":
         return "리눅스마스터1급";
-      case "LM2_Q":
+      case "lm2":
         return "리눅스마스터2급";
-      case "ICTI_Q":
+      case "icti":
         return "정보통신산업기사";
-      case "ICT_Q":
+      case "ict":
         return "정보통신기사";
-      case "SEC_Q":
+      case "sec":
         return "정보보안기사";
-      case "NET1_Q":
+      case "net1":
         return "네트워크관리사1급";
-      case "NET2_Q":
+      case "net2":
         return "네트워크관리사2급";
       default:
         return category || "알 수 없음";

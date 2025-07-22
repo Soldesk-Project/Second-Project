@@ -16,23 +16,23 @@ public class PlayServiceImpl implements PlayService {
 	
 	// 카테고리 별 문제 가져오기
 	private static final List<String> ALLOWED_TABLES = List.of(
-			"CPE_Q", "CPEI_Q", "CPET_Q", "ICT_Q", "ICTI_Q", "LM1_Q",
-			"LM2_Q", "NET1_Q", "NET2_Q", "SEC_Q"
-		);
+		"cpe", "cpei", "cpet", "ict", "icti", "lm1",
+		"lm2", "net1", "net2", "sec"
+	);
 
-		@Override
-		public List<QuestionDTO> getQuestionsByCategory(String category) {
-		    if ("random".equalsIgnoreCase(category)) {
-		        return playMapper.getRandomQuestions();  // 10개 테이블 통합 랜덤
-		    }
+	@Override
+	public List<QuestionDTO> getQuestionsByCategory(String category) {
+	    if ("random".equalsIgnoreCase(category)) {
+	        return playMapper.getRandomQuestions();  // 10개 테이블 통합 랜덤
+	    }
 
-		    // ✅ 안전한 테이블명만 허용
-		    if (!ALLOWED_TABLES.contains(category)) {
-		        throw new IllegalArgumentException("허용되지 않은 테이블 이름입니다: " + category);
-		    }
+	    // ✅ 안전한 카테고리명만 허용
+	    if (!ALLOWED_TABLES.contains(category)) {
+	        throw new IllegalArgumentException("허용되지 않은 카테고리 이름입니다: " + category);
+	    }
 
-		    return playMapper.getQuestionsByCategory(category);
-		}
+	    return playMapper.getQuestionsByCategory(category);
+	}
 		
 	@Override
 	public void increaseRewardPoints(int point, String user_nick) {

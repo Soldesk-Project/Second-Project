@@ -158,7 +158,7 @@ const InPlay = () => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data);
+      // console.log(data);
       
       // ✅ 유저리스트(랭크 & 일반) 모두 처리
       if (
@@ -247,7 +247,7 @@ const InPlay = () => {
           {
             userNick: data.userNick,
             question_id: questionListRef.current[data.questionIdx].id,
-            subject: setKoreanToCategory(questionListRef.current[data.questionIdx].subject),
+            subject: questionListRef.current[data.questionIdx].subject,
             selected_answer: data.answer,
             correct_answer: data.correctAnswer,
             is_correct: data.isCorrect,
@@ -257,7 +257,7 @@ const InPlay = () => {
         // console.log("-----------------");
         // console.log("userNick : "+data.userNick);
         // console.log("questionId : "+questionListRef.current[data.questionIdx].id);
-        // console.log("subject : "+setKoreanToCategory(questionListRef.current[data.questionIdx].subject));
+        // console.log("subject : "+questionListRef.current[data.questionIdx].subject);
         // console.log("answer : "+data.answer);
         // console.log("correctAnswer : "+data.correctAnswer);
         // console.log("isCorrect : "+data.isCorrect);
@@ -316,8 +316,7 @@ const InPlay = () => {
       const socket = sockets['room'];
       if (socket && socket.readyState === 1) {
         const myInfo = rankedUsers.find(u => u.userNick === userNick);
-        console.log(myInfo);
-        
+        // console.log(myInfo);
         const myPoint = myInfo.point ?? 0;
         console.log(userAnswerHistory);
         socket.send(JSON.stringify({
@@ -404,26 +403,26 @@ const InPlay = () => {
   const setKoreanToCategory = (category) => {
     switch (category) {
       case "random": return "랜덤";
-      case "CPE_Q": return "정보처리기사";
-      case "CPEI_Q": return "정보처리산업기사";
-      case "CPET_Q": return "정보처리기능사";
-      case "LM1_Q": return "리눅스마스터 1급";
-      case "LM2_Q": return "리눅스마스터 2급";
-      case "ICTI_Q": return "정보통신산업기사";
-      case "ICT_Q": return "정보통신기사";
-      case "SEC_Q": return "정보보안기사";
-      case "NET1_Q": return "네트워크관리사 1급";
-      case "NET2_Q": return "네트워크관리사 2급";
-      case "정보처리기사": return "cpe";
-      case "정보처리산업기사": return "cpei";
-      case "정보처리기능사": return "cpet";
-      case "리눅스마스터 1급": return "lm1";
-      case "리눅스마스터 2급": return "lm2";
-      case "정보통신산업기사": return "icti";
-      case "정보통신기사": return "ict";
-      case "정보보안기사": return "sec";
-      case "네트워크관리사 1급": return "net1";
-      case "네트워크관리사 2급": return "net2";
+      case "cpe": return "정보처리기사";
+      case "cpei": return "정보처리산업기사";
+      case "cpet": return "정보처리기능사";
+      case "lm1": return "리눅스마스터 1급";
+      case "lm2": return "리눅스마스터 2급";
+      case "icti": return "정보통신산업기사";
+      case "ict": return "정보통신기사";
+      case "sec": return "정보보안기사";
+      case "net1": return "네트워크관리사 1급";
+      case "net2": return "네트워크관리사 2급";
+      // case "정보처리기사": return "cpe";
+      // case "정보처리산업기사": return "cpei";
+      // case "정보처리기능사": return "cpet";
+      // case "리눅스마스터 1급": return "lm1";
+      // case "리눅스마스터 2급": return "lm2";
+      // case "정보통신산업기사": return "icti";
+      // case "정보통신기사": return "ict";
+      // case "정보보안기사": return "sec";
+      // case "네트워크관리사 1급": return "net1";
+      // case "네트워크관리사 2급": return "net2";
       default: return category || "알 수 없음";
     }
   };

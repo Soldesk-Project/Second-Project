@@ -21,7 +21,8 @@
 	    SELECT *
 	    FROM (
 	        SELECT *
-	        FROM ${category}
+	        FROM QUESTION
+	        WHERE SUBJECT=#{category}
 	        ORDER BY DBMS_RANDOM.VALUE
 	    )
 	    WHERE ROWNUM &lt;= 20
@@ -32,27 +33,7 @@
 	<select id="getRandomQuestions" resultMap="questionResultMap">
         SELECT *
         FROM (
-            SELECT * FROM (
-                SELECT * FROM cpe_q
-                UNION ALL
-                SELECT * FROM cpei_q
-                UNION ALL
-                SELECT * FROM cpet_q
-                UNION ALL
-                SELECT * FROM ict_q
-                UNION ALL
-                SELECT * FROM icti_q
-                UNION ALL
-                SELECT * FROM lm1_q
-                UNION ALL
-                SELECT * FROM lm2_q
-                UNION ALL
-                SELECT * FROM net1_q
-                UNION ALL
-                SELECT * FROM net2_q
-                UNION ALL
-                SELECT * FROM sec_q
-            )
+            SELECT * FROM QUESTION
             ORDER BY DBMS_RANDOM.VALUE
         )
         WHERE ROWNUM &lt;= 20
