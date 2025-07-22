@@ -16,6 +16,10 @@ const SignUp = () => {
     const [isDuplicateId, setIsDuplicateId] = useState(null);
     const [isDuplicateNick, setIsDuplicateNick] = useState(null);
     const [isDuplicateEmail, setIsDuplicateEmail] = useState(null);
+    const [lastCheckedId, setLastCheckedId] = useState('');
+    const [lastCheckedNickname, setLastCheckedNickname] = useState('');
+    const [lastCheckedEmail, setLastCheckedEmail] = useState('');
+
     const [emailId, setEmailId] = useState('');
     const [emailDomain, setEmailDomain] = useState('');
 
@@ -70,12 +74,24 @@ const SignUp = () => {
             return;
         }
 
+        if (user_id !== lastCheckedId) {
+            alert('아이디 중복 확인 중입니다. 잠시만 기다려주세요.');
+            return;
+        }
         if (isDuplicateId === true) {
             alert("이미 사용 중인 아이디입니다.");
             return;
         }
+        if (user_nick !== lastCheckedNickname) {
+            alert('닉네임 중복 확인 중입니다. 잠시만 기다려주세요.');
+            return;
+        }
         if (isDuplicateNick === true) {
             alert("이미 사용 중인 닉네임입니다.");
+            return;
+        }
+        if (user_email !== lastCheckedEmail) {
+            alert('이메일 중복 확인 중입니다. 잠시만 기다려주세요.');
             return;
         }
         if (isDuplicateEmail === true) {
@@ -108,6 +124,7 @@ const SignUp = () => {
             try {
             const res = await axios.get(`/api/signUp/checkId?user_id=${userId}`);
             setIsDuplicateId(res.data.duplicate);
+            setLastCheckedId(userId);
             } catch (err) {
             console.error("중복 확인 실패:", err);
             }
@@ -126,6 +143,7 @@ const SignUp = () => {
             try {
             const res = await axios.get(`/api/signUp/checkNick?user_nick=${userNick}`);
             setIsDuplicateNick(res.data.duplicate);
+            setLastCheckedNickname(userNick);
             } catch (err) {
             console.error("중복 확인 실패:", err);
             }
@@ -142,6 +160,7 @@ const SignUp = () => {
             try {
             const res = await axios.get(`/api/signUp/checkEmail?user_email=${userEmail}`);
             setIsDuplicateEmail(res.data.duplicate);
+            setLastCheckedEmail(userEmail);
             } catch (err) {
             console.error("중복 확인 실패:", err);
             }

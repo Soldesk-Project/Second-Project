@@ -6,10 +6,19 @@ import axios from 'axios';
 const NickModal = ({ isOpen, onClose, onSubmit }) => {
   const [nickname, setNickname] = useState('');
   const [isDuplicateNick, setIsDuplicateNick] = useState(null);
+  const [lastCheckedNickname, setLastCheckedNickname] = useState('');
 
   const handleSubmit = () => {
     if (!nickname.trim()) {
       alert('닉네임을 입력해주세요.');
+      return;
+    }
+    if (nickname !== lastCheckedNickname) {
+      alert('닉네임 중복 확인 중입니다. 잠시만 기다려주세요.');
+      return;
+    }
+    if (isDuplicateNick === true) {
+      alert('이미 사용 중인 닉네임입니다.');
       return;
     }
     onSubmit(nickname);  // 부모(UserInfo)에서 처리
@@ -22,6 +31,7 @@ const NickModal = ({ isOpen, onClose, onSubmit }) => {
             try {
             const res = await axios.get(`/api/signUp/checkNick?user_nick=${userNick}`);
             setIsDuplicateNick(res.data.duplicate);
+            setLastCheckedNickname(userNick);
             } catch (err) {
             console.error("중복 확인 실패:", err);
             }
@@ -33,16 +43,23 @@ const NickModal = ({ isOpen, onClose, onSubmit }) => {
         }
     }, [nickname]);
 
+  const handleKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        handleSubmit();
+      }
+    };
+
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay}>
+    <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <h3 style={{color:'black', textAlign:'center'}}>닉네임 변경</h3>
         <input
           type="text"
           placeholder="새 닉네임"
           value={nickname}
+          onKeyDown={handleKeyDown}
           onChange={(e) => setNickname(e.target.value)}
         />
         {nickname && isDuplicateNick === true && (<p style={{ color: 'red' }}>이미 사용 중인 닉네임입니다.</p>)}
