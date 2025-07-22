@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -73,6 +75,9 @@ public class LoginController {
     
     @Autowired
     JwtUtil jwtUtil;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 	
 	@ResponseBody
 	@PostMapping("/kakao/login") 
@@ -569,39 +574,104 @@ public class LoginController {
 	    return email;
 	}
 	
+//	@PostMapping("/findPw/checkIdAndEmail")
+//	public String findPwByIdAndEmail(@RequestBody UsersVO vo) {
+//	    String pw = userservice.findPwByIdAndEmail(vo);
+//	    return pw;
+//	}
 	@PostMapping("/findPw/checkIdAndEmail")
-	public String findPwByIdAndEmail(@RequestBody UsersVO vo) {
-	    String pw = userservice.findPwByIdAndEmail(vo);
-	    return pw;
+	public ResponseEntity<Map<String, Object>> findPassword(@RequestBody Map<String, String> request) {
+	    String userId = request.get("user_id");
+	    String userEmail = request.get("user_email");
+
+	    UserInfoDTO user = userservice.findUserByIdAndEmail(userId, userEmail);
+	    Map<String, Object> result = new HashMap<>();
+
+	    if (user == null) {
+	        result.put("success", false);
+	        result.put("message", "아이디 또는 이메일이 일치하지 않습니다.");
+	        return ResponseEntity.ok(result);
+	    }
+
+	    // 임시 비밀번호 생성
+	    String tempPw = UUID.randomUUID().toString().substring(0, 10);
+
+	    try {
+	        // 비밀번호 암호화 후 저장
+	        String encodedPw = passwordEncoder.encode(tempPw);
+	        user.setUser_pw(encodedPw);
+	        userservice.updatePassword(user);
+
+	        // 이메일 전송
+	        userservice.sendTempPassword(userEmail, tempPw);
+	        result.put("success", true);
+	        return ResponseEntity.ok(result);
+	    } catch (Exception e) {
+	        result.put("success", false);
+	        result.put("message", "메일 전송에 실패했습니다.");
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+	    }
 	}
 	
 	@PostMapping("/login")
 	@ResponseBody
 	public ResponseEntity<?> login(@RequestBody UserInfoDTO dto, HttpSession session) {
-	    UserInfoDTO user = memberservice.isValidUser(dto.getUser_id(), dto.getUser_pw());
-	    
-	    if (user != null) {
-	    	if (user.getIs_logged_in() == 1) {
-	            return ResponseEntity.status(HttpStatus.CONFLICT)
-	                    .body("이미 로그인된 사용자입니다.");
-	        }
-	    	memberservice.updateLoginStatus(dto.getUser_id(), 1);
-	    	
-	        String token = jwtUtil.generateToken(user.getUser_id());
+	    // 사용자가 입력한 ID와 PW
+	    String inputId = dto.getUser_id();
+	    String inputPw = dto.getUser_pw();
 
-	        // ✅ 토큰과 함께 전체 유저 정보도 응답
-	        Map<String, Object> response = new HashMap<>();
-	        response.put("token", token);
-	        response.put("user", user);  // 전체 정보 포함 (user_pw 포함됨 주의)
+	    // DB에서 사용자 정보 조회 (비밀번호 포함)
+	    UserInfoDTO user = memberservice.getUserById(inputId);
 
-	        session.setAttribute("user_id", user.getUser_id());
-	        
-	        return ResponseEntity.ok(response);
-	    } else {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
+	    if (user == null) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("존재하지 않는 사용자입니다.");
 	    }
+
+	    // DB에 저장된 비밀번호
+	    String storedPw = user.getUser_pw();
+	    boolean isMatch = false;
+
+	    // 1. 비밀번호 암호화 여부 확인 후 비교
+	    if (storedPw.startsWith("$2a$") || storedPw.startsWith("$2b$")) {
+	        // 이미 암호화된 비밀번호인 경우
+	        isMatch = passwordEncoder.matches(inputPw, storedPw);
+	    } else {
+	        // 암호화되지 않은 비밀번호인 경우
+	        isMatch = inputPw.equals(storedPw);
+
+	        // 로그인 성공 시, 비밀번호를 암호화해서 업데이트
+	        if (isMatch) {
+	            String encodedPw = passwordEncoder.encode(inputPw);
+	            user.setUser_pw(encodedPw);
+	            userservice.updatePassword(user); // DB에 저장
+	        }
+	    }
+
+	    // 2. 비밀번호 불일치
+	    if (!isMatch) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 일치하지 않습니다.");
+	    }
+
+	    // 3. 이미 로그인된 사용자 확인
+	    if (user.getIs_logged_in() == 1) {
+	        return ResponseEntity.status(HttpStatus.CONFLICT)
+	                .body("이미 로그인된 사용자입니다.");
+	    }
+
+	    // 4. 로그인 처리
+	    memberservice.updateLoginStatus(inputId, 1);
+	    String token = jwtUtil.generateToken(inputId);
+
+	    // 5. 사용자 정보 및 토큰 반환
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("token", token);
+	    response.put("user", user); // 비밀번호 포함 주의 (프론트 전달 시 제거 권장)
+
+	    session.setAttribute("user_id", inputId);
+
+	    return ResponseEntity.ok(response);
 	}
-	
+
 	@PostMapping("/logout")
 	public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {
 	    String userId = request.get("userId");

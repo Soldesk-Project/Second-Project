@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserAchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
+import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserInfoDecoDTO;
 import org.joonzis.domain.UserRewardVO;
 import org.joonzis.domain.UsersVO;
@@ -55,6 +56,8 @@ public interface UserMapper {
 	public String findIdByEmail(String user_email);
 	// 비밀번호 찾기
 	public String findPwByIdAndEmail(UsersVO vo);
+	public void updatePassword(UserInfoDTO user);
+	public UserInfoDTO findUserByIdAndEmail(@Param("user_id") String user_id, @Param("user_email") String user_email);
 	
 	// 유저 닉네임 변경
 	public void updateNickname(@Param("user_no") Long user_no, @Param("user_nick") String user_nick);

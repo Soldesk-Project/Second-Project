@@ -3,9 +3,12 @@ package org.joonzis.service;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.MessagingException;
+
 import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserAchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
+import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserInfoDecoDTO;
 import org.joonzis.domain.UserRewardVO;
 import org.joonzis.domain.UsersVO;
@@ -54,6 +57,9 @@ public interface UserService {
 	public String findIdByEmail(String user_email);
 	// 비밀번호 찾기
 	public String findPwByIdAndEmail(UsersVO vo);
+	public UserInfoDTO findUserByIdAndEmail(String id, String email);
+	public void updatePassword(UserInfoDTO user);
+	public void sendTempPassword(String toEmail, String tempPassword) throws MessagingException;
 	
 	//유저프로필이미지선택
 	public int changeProfileImage(int userNo, String imageUrl);

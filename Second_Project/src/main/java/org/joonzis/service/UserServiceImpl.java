@@ -4,14 +4,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserAchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
+import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserInfoDecoDTO;
 import org.joonzis.domain.UserRewardVO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +31,9 @@ public class UserServiceImpl implements UserService{
 	
 	@Autowired
 	private UserMapper mapper;	
+	
+	@Autowired
+    private JavaMailSender mailSender;
 
 	// Top 10 유저 랭킹 목록
 	@Override
@@ -118,6 +127,26 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public String findPwByIdAndEmail(UsersVO vo) {
 		return mapper.findPwByIdAndEmail(vo);
+	}
+	public void sendTempPassword(String toEmail, String tempPassword) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        helper.setTo(toEmail);
+        helper.setSubject("[CotePlay] 임시 비밀번호 안내");
+        helper.setText("<p>안녕하세요.</p>"
+            + "<p>임시 비밀번호: <b>" + tempPassword + "</b></p>"
+            + "<p>로그인 후 반드시 비밀번호를 변경해 주세요.</p>", true);
+
+        mailSender.send(message);
+    }
+	@Override
+	public UserInfoDTO findUserByIdAndEmail(String id, String email) {
+	    return mapper.findUserByIdAndEmail(id, email);
+	}
+	@Override
+	public void updatePassword(UserInfoDTO user) {
+		mapper.updatePassword(user);
 	}
 	
 	// 유저 닉네임 변경

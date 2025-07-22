@@ -269,6 +269,21 @@
 		  <version>2.15.2</version> <!-- 사용 중인 Jackson 버전에 맞게 조정 -->
 		</dependency>
 		
+		<!-- 이메일 관련 -->
+		<!-- JavaMail API -->
+		<dependency>
+		    <groupId>com.sun.mail</groupId>
+		    <artifactId>jakarta.mail</artifactId>
+		    <version>1.6.7</version> <!-- 또는 javax.mail:mail:1.4.7 -->
+		</dependency>
+		
+		<!-- Spring Mail -->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-context-support</artifactId>
+		    <version>5.0.7.RELEASE</version> <!-- 사용 중인 Spring 버전에 맞게 -->
+		</dependency>
+		
 	</dependencies>
     <build>
         <plugins>
