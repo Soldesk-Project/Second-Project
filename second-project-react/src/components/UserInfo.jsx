@@ -9,7 +9,7 @@ import PreviewModal from './modal/PreviewModal';
 import { WebSocketContext } from '../util/WebSocketProvider';
 import { triggerRefreshRanking } from '../store/rankingSlice';
 import NickModal from './modal/NickModal';
-import { setUser } from '../store/userSlice';
+import { setUser, fetchUserInfo } from '../store/userSlice';
 
 const TABS = ['테두리', '칭호', '글자색', '배경', '말풍선'];
 
@@ -22,6 +22,12 @@ const UserInfo = () => {
     const dispatch = useDispatch();
 
     const { user } = useSelector((state) => state.user);
+
+    useEffect(() => {
+      if (!user?.user_no) return;
+      dispatch(fetchUserInfo(user.user_no));
+    }, [user.user_no, dispatch]);
+
     const { isTop10 } = useSelector((state) => state.ranking);
     const sockets = useContext(WebSocketContext);
     const socket = sockets['server'];
@@ -32,22 +38,13 @@ const UserInfo = () => {
 
     // 페이지 로드 시, 백엔드에서 유저 정보(프로필 포함) 가져오기
     useEffect(() => {
-        if (!user?.user_no) return;
-        axios.get(`/user/${user.user_no}`)
-        .then(res => {
-            const raw = res.data.user_profile_img;
-            // 이미 /images/ 로 시작하면 그대로, 아니면 prefix
-            const src = raw
-                ? raw.startsWith('/images/')
-                    ? raw
-                    : `/images/${raw}`
-                : '/images/profile_default.png';
-            setProfileSrc(src);
-                        // (선택) redux user 상태 업데이트
-            dispatch({ type: 'user/setProfileImage', payload: raw });
-        })
-        .catch(console.error);
-    }, [user.user_no, dispatch]);
+        if (!user?.user_profile_img) return;
+        const raw = user.user_profile_img;
+        const src = raw.startsWith('/images/')
+            ? raw
+            : `/images/${raw}`;
+        setProfileSrc(src);
+        }, [user.user_profile_img]);
 
     // --- 2) 프로필 변경 요청
     const PROFILE_OPTIONS = [
@@ -92,7 +89,7 @@ const UserInfo = () => {
         params: { category: activeTab, user_no: user.user_no }
       })
       .then(({ data }) => {
-        console.log('Inventory raw data:', data);
+        // console.log('Inventory raw data:', data);
         const withImg = data.map(item => {
         // 1) camelCase 프로퍼티부터 시도
         const raw =
@@ -103,7 +100,7 @@ const UserInfo = () => {
         const filename = raw.replace(/^\/images\//, '');
 
         const src = `/images/${filename}`;
-        console.log('Inventory imgUrl:', src);
+        // console.log('Inventory imgUrl:', src);
 
           return { ...item, imgUrl: src };
         });
@@ -123,15 +120,33 @@ const UserInfo = () => {
     };
 
     const clickItem = async (item) => {
+        // console.log('🔔 clickItem 호출됨', item);
       try {
              const { status } = await axios.post('/user/item/select', {
-                css_class_name : item.css_class_name,
-                item_type : item.item_type,
-                user_no : user.user_no
+                user_no : user.user_no,
+                item_no : item.item_no,
+                item_type : item.item_type
             });
+            // console.log('🔔 POST /user/item/select 리턴 status=', status);
 
             if (status === 200) {
+                // console.log('🔔 여기서 GET 날리기 직전');
+                // 1) 랭킹 업데이트
                 dispatch(triggerRefreshRanking());
+                
+                // 2) 최신 유저 정보 다시 가져오기
+                const res = await axios.get(`/user/${user.user_no}`);
+                // console.log('🔔 GET /user/4 리턴 data=', res.data);
+                dispatch(setUser({
+                user_no:               res.data.user_no,
+                user_nick:             res.data.user_nick,
+                user_profile_img:      res.data.user_profile_img,
+                boundaryItemNo:   res.data.boundaryItemNo,
+                titleItemNo:      res.data.titleItemNo,
+                fontcolorItemNo:  res.data.fontcolorItemNo,
+                backgroundItemNo: res.data.backgroundItemNo,
+                balloonItemNo:    res.data.balloonItemNo
+                }));
                 setSelectedItem(null);
                 if (socket && socket.readyState === 1) {
                     socket.send(JSON.stringify({
@@ -146,9 +161,6 @@ const UserInfo = () => {
                 console.error('아이템 전송 실패:', status);
             }
         } catch (error) {
-            console.error('Status:', error.response?.status);
-            console.error('Body:', error.response?.data);
-            console.error('Full error:', error);
 
             console.error('아이템 전송 중 에러:', error);
         }
@@ -160,7 +172,9 @@ const UserInfo = () => {
     
             const handleMessage = (event) => {
                 const data = JSON.parse(event.data);
-                if (data.type === 'styleUpdated') {dispatch(triggerRefreshRanking()); }
+                if (data.type === 'styleUpdated') {
+                    dispatch(triggerRefreshRanking()); 
+                    dispatch(fetchUserInfo(user.user_no)); }
             };
     
             socket.addEventListener('message', handleMessage);
@@ -218,9 +232,13 @@ const UserInfo = () => {
                         className={styles.changeProfileIcon}
                         onClick={() => setIsProfileModalOpen(true)}
                     />
-                    <img src='/images/dogProfile.png' 
-                    alt='프로필테두리' 
-                    className={styles.profileBorder}/>
+                    {user.imageFileName && (
+                    <img
+                        src={`/images/${user.imageFileName}`}
+                        alt="테두리 이미지"
+                        className={styles.frameOverlay}
+                    />
+                    )}
                 </div>
 
             <div className={styles.userInfo_Name}>

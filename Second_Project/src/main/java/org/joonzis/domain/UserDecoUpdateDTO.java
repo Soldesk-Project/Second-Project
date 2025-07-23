@@ -13,7 +13,8 @@ import lombok.ToString;
 @AllArgsConstructor
 public class UserDecoUpdateDTO {
 	private int user_no;
-	private String css_class_name;
+	private int item_no;
+//	private String css_class_name;
 	private String item_type;
 	private String item_name;
 }

@@ -8,11 +8,9 @@
 	    <result column="user_no" property="user_no"/>
 	    <result column="user_rank" property="user_rank"/>
 	    <result column="user_nick" property="user_nick"/>
-	    <result column="boundary_class_name" property="boundary_class_name"/>
-	    <result column="title_class_name" property="title_class_name"/>
-	    <result column="fontcolor_class_name" property="fontcolor_class_name"/>
-	    <result column="background_class_name" property="background_class_name"/>
-	    <result column="balloon_class_name" property="balloon_class_name"/>
+	    
+	    <result column="IMAGE_FILE_NAME"  property="imageFileName"/>
+	    <result column="USER_PROFILE_IMG" property="user_profile_img"/>
 	</resultMap>
 
 	 <!-- Top 10 유저 랭킹 목록 -->
@@ -68,32 +66,38 @@
 		UPDATE USER_DECO
 	    <set>
 	      <choose>
-	        <when test="itemType == 'boundary'">
-	          BOUNDARY_ITEM_NO  = #{itemNo, jdbcType=INTEGER}
+	        <when test="item_type == 'boundary'">
+	          BOUNDARY_ITEM_NO  = #{item_no, jdbcType=INTEGER}
 	        </when>
-	        <when test="itemType == 'title'">
-	          TITLE_ITEM_NO     = #{itemNo, jdbcType=INTEGER}
+	        <when test="item_type == 'title'">
+	          TITLE_ITEM_NO     = #{item_no, jdbcType=INTEGER}
 	        </when>
-	        <when test="itemType == 'fontColor'">
-	          FONTCOLOR_ITEM_NO = #{itemNo, jdbcType=INTEGER}
+	        <when test="item_type == 'fontColor'">
+	          FONTCOLOR_ITEM_NO = #{item_no, jdbcType=INTEGER}
 	        </when>
-	        <when test="itemType == 'background'">
-	          BACKGROUND_ITEM_NO = #{itemNo, jdbcType=INTEGER}
+	        <when test="item_type == 'background'">
+	          BACKGROUND_ITEM_NO = #{item_no, jdbcType=INTEGER}
 	        </when>
-	        <when test="itemType == 'balloon'">
-	          BALLOON_ITEM_NO   = #{itemNo, jdbcType=INTEGER}
+	        <when test="item_type == 'balloon'">
+	          BALLOON_ITEM_NO   = #{item_no, jdbcType=INTEGER}
 	        </when>
 	      </choose>
 	    </set>
-	    WHERE USER_NO = #{userNo}
+	    WHERE USER_NO = #{user_no}
   </update>
 	
 	<!-- userNo로 유저 정보+css 찾기	 -->
-	<select id="getUserInfoByUserNo" resultType="org.joonzis.domain.UserInfoDecoDTO">
-		SELECT *
-		FROM users u
-		JOIN user_deco d ON u.user_no = d.user_no
-		WHERE u.user_no = #{user_no}
+	<select id="getUserInfoByUserNo" parameterType="int" resultMap="userInfoDecoMap">
+		SELECT
+		  U.USER_NO,
+		  U.USER_PROFILE_IMG,
+		  U.USER_RANK,
+		  U.USER_NICK,
+		  I.IMAGE_FILE_NAME
+		FROM USERS U
+		LEFT JOIN USER_DECO D  ON U.USER_NO = D.USER_NO
+		LEFT JOIN ITEMS   I  ON D.BOUNDARY_ITEM_NO = I.ITEM_NO
+		WHERE U.USER_NO = #{user_no}
 	</select>
 	
 	<!-- 업적 달성 - 포인트 추가 -->

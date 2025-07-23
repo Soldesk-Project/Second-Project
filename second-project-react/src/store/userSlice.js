@@ -1,9 +1,19 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 const initialState = {
   user: null,
   server: null,
 };
+
+// 1) 비동기 Thunk 생성
+export const fetchUserInfo = createAsyncThunk(
+  'user/fetchUserInfo',
+  async (userNo, thunkAPI) => {
+    const res = await axios.get(`/user/${userNo}`);
+    return res.data;  // payload 로 넘어갑니다
+  }
+);
 
 const userSlice = createSlice({
   name: 'user',
@@ -32,8 +42,23 @@ const userSlice = createSlice({
       const storedServer = localStorage.getItem('server');
       if (storedUser) state.user = JSON.parse(storedUser);
       if (storedServer) state.server = storedServer;
-    }
+    },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUserInfo.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchUserInfo.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.user = action.payload;
+        localStorage.setItem('user', JSON.stringify(action.payload));
+      })
+      .addCase(fetchUserInfo.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      });
+  }
 });
 
 export const { setUser, setServer, clearUser, clearServer, loadUserFromStorage } = userSlice.actions;

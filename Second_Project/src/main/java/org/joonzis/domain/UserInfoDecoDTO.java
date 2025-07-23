@@ -16,9 +16,6 @@ public class UserInfoDecoDTO {
     private int user_rank;
 	private String user_nick;
 	
-    private Integer boundaryItemNo;
-    private Integer titleItemNo;
-    private Integer fontcolorItemNo;
-    private Integer backgroundItemNo;
-    private Integer balloonItemNo;
+    private String imageFileName;
+    private String user_profile_img;
 }
