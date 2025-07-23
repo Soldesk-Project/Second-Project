@@ -26,6 +26,7 @@ import InquiryDetail from './pages/customer/InquiryDetail';
 import NaverCallback from './pages/login/NaverCallback';
 import GoogleCallback from './pages/login/GoogleCallback';
 import QuestionReview from './pages/gameroom/QuestionReview';
+import ResetPasswordPage from './pages/login/ResetPasswordPage';
 
 function App() {
   const dispatch = useDispatch();
@@ -69,6 +70,7 @@ function App() {
           <Route path="/problemsubmit" element={<CustomerProblemSubmit />} />
           <Route path="/admin" element={<AdminPage/>}/>
           <Route path="/inquiries/:id" element={<InquiryDetail />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </Routes>
       </Router>
     </WebSocketProvider>

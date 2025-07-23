@@ -1,5 +1,6 @@
 package org.joonzis.mapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -67,5 +68,12 @@ public interface UserMapper {
 	
 	//유저정보 가져오기
 	UsersVO getUsersByUserNo(@Param("userNo") int userNo);
+	
+	public void insertResetToken(@Param("userId") String userId,
+            @Param("token") String token,
+            @Param("expiryDate") LocalDateTime expiryDate);
+	public UserInfoDTO findUserByToken(String token);
+	public LocalDateTime getExpiryByToken(String token);
+	public void deleteToken(String token);
 	
 }

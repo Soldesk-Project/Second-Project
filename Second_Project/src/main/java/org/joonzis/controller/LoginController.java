@@ -542,11 +542,13 @@ public class LoginController {
 	    JSONObject json = new JSONObject(sb.toString());
 	    return json.toMap();
 	}
-
-
 	
 	@PostMapping("/signUp")
 	public void signUp(@RequestBody UsersVO users) {
+		String rawPw = users.getUser_pw();
+        String encodedPw = passwordEncoder.encode(rawPw);
+        users.setUser_pw(encodedPw);
+        
 	    memberservice.insertMember(users);
 	}
 	
@@ -574,11 +576,57 @@ public class LoginController {
 	    return email;
 	}
 	
-//	@PostMapping("/findPw/checkIdAndEmail")
-//	public String findPwByIdAndEmail(@RequestBody UsersVO vo) {
-//	    String pw = userservice.findPwByIdAndEmail(vo);
-//	    return pw;
-//	}
+	@PostMapping("/findPw/sendResetLink")
+	public ResponseEntity<?> sendResetLink(@RequestBody Map<String, String> request) {
+	    String userId = request.get("user_id");
+	    String userEmail = request.get("user_email");
+
+	    UserInfoDTO user = userservice.findUserByIdAndEmail(userId, userEmail);
+	    if (user == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("정보가 일치하지 않습니다.");
+	    }
+
+	    // 임시 토큰 생성
+	    String token = UUID.randomUUID().toString();
+	    userservice.saveResetToken(userId, token); // DB에 토큰 저장 (만료시간 함께)
+
+	    String resetLink = "http://localhost:3000/reset-password?token=" + token;
+
+	    try {
+	        userservice.sendResetLinkEmail(userEmail, resetLink);
+	        return ResponseEntity.ok(Map.of("success", true, "message", "가입하신 이메일로 비밀번호 재설정 링크를 전송했습니다."));
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일 전송 실패");
+	    }
+	}
+	
+	@PostMapping("/reset-password")
+	public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+	    String token = request.get("token");
+	    String newPw = request.get("newPw");
+
+	    if (token == null || newPw == null) {
+	        return ResponseEntity.badRequest().body("token 또는 newPw 누락");
+	    }
+	    
+	    UserInfoDTO user = userservice.findUserByToken(token);
+	    if (user == null || userservice.tokenExpired(token)) {
+	    	Map<String, String> error = new HashMap<>();
+	    	error.put("message", "유효하지 않거나 만료된 링크입니다.");
+	    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+	    }
+
+	    // 암호화 및 저장
+	    user.setUser_pw(passwordEncoder.encode(newPw));
+	    userservice.updatePassword(user);
+	    userservice.deleteResetToken(token); // 보안 위해 삭제
+
+	    Map<String, String> response = new HashMap<>();
+	    response.put("message", "비밀번호가 변경되었습니다.");
+	    return ResponseEntity.ok(response);
+	}
+
+	
 	@PostMapping("/findPw/checkIdAndEmail")
 	public ResponseEntity<Map<String, Object>> findPassword(@RequestBody Map<String, String> request) {
 	    String userId = request.get("user_id");

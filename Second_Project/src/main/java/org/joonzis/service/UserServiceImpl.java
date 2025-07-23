@@ -1,5 +1,6 @@
 package org.joonzis.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -169,4 +170,39 @@ public class UserServiceImpl implements UserService{
     public UsersVO getUsersByUserNo(int userNo) {
         return mapper.getUsersByUserNo(userNo);
     }
+	
+	@Override
+	public void saveResetToken(String userId, String token) {
+	    LocalDateTime expiry = LocalDateTime.now().plusMinutes(30); // 30분 후 만료
+	    mapper.insertResetToken(userId, token, expiry);
+	}
+	@Override
+	public UserInfoDTO findUserByToken(String token) {
+	    return mapper.findUserByToken(token);
+	}
+	@Override
+	public boolean tokenExpired(String token) {
+	    LocalDateTime expiry = mapper.getExpiryByToken(token);
+	    return expiry == null || expiry.isBefore(LocalDateTime.now());
+	}
+	@Override
+	public void deleteResetToken(String token) {
+	    mapper.deleteToken(token);
+	}
+	
+	@Override
+	public void sendResetLinkEmail(String toEmail, String resetLink) throws MessagingException {
+		MimeMessage message = mailSender.createMimeMessage();
+	    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+	    helper.setTo(toEmail);
+	    helper.setSubject("[CotePlay] 비밀번호 재설정 링크");
+	    helper.setText("<p>안녕하세요.</p>"
+	        + "<p>비밀번호 재설정을 위해 아래 링크를 클릭하세요:</p>"
+	        + "<p><a href='" + resetLink + "'>비밀번호 재설정하기</a></p>"
+	        + "<p>이 링크는 30분간 유효합니다.</p>", true);
+
+	    mailSender.send(message);
+	}
+
 }

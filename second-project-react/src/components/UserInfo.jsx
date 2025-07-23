@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import InventoryModal from './modal/InventoryModal';
 import { useDispatch, useSelector } from 'react-redux';
 import titleTextMap from '../js/Decorations';
@@ -19,6 +19,7 @@ const UserInfo = () => {
     const [activeTab, setActiveTab] = useState(TABS[0]);
     const [items, setItems]   = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
 
     const { user } = useSelector((state) => state.user);
@@ -216,6 +217,26 @@ const UserInfo = () => {
             });
     };
 
+    const handleChangePw = useCallback(async () => {
+        if (loading) return;
+
+        setLoading(true);
+        try {
+        const { data } = await axios.post('/api/findPw/sendResetLink', {
+            user_id: user.user_id,
+            user_email: user.user_email,
+        });
+        
+        if (data.success) {
+            alert(data.message);
+        }
+        } catch (error) {
+         alert('비밀번호 변경 링크 요청 중 오류가 발생했습니다.');
+        } finally {
+            setLoading(false);
+        }
+    }, [user.user_id, user.user_email, loading]);
+
   return (
     <div>
         <div className={styles.userInfo_Box}>
@@ -301,6 +322,9 @@ const UserInfo = () => {
         </div>
         <div className={styles.invenBtn}>
             <button style={openButtonStyle} onClick={() => setIsNickModalOpen(true)}>닉네임 변경</button>
+        </div>
+        <div className={styles.invenBtn}>
+            <button style={openButtonStyle} onClick={handleChangePw} disabled={loading}>{loading ? '요청 중...' : '비밀번호 변경'}</button>
         </div>
 
         <NickModal isOpen={isNickModalOpen} onClose={() => setIsNickModalOpen(false)}  onSubmit={handleNicknameChange}/>

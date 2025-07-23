@@ -69,4 +69,11 @@ public interface UserService {
 	
 	// 유저 닉네임 변경
 	public void updateNickname(Long user_no, String user_nick);
+	
+	public void saveResetToken(String userId, String token);
+	public UserInfoDTO findUserByToken(String token);
+	public boolean tokenExpired(String token);
+	public void deleteResetToken(String token);
+	
+	public void sendResetLinkEmail(String toEmail, String resetLink) throws MessagingException;
 }
