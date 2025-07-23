@@ -6,13 +6,17 @@ import styles from '../css/RoomList.module.css';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { WebSocketContext } from '../util/WebSocketProvider';
+import PasswordModal from './modal/PasswordModal';
 
 const RoomList = () => {
   const [category, setCategory] = useState('random');
   const [gameRoomList, setGameRoomList] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [passwordModal, setPasswordModal] = useState(false);
   const [isWsOpen, setIsWsOpen] = useState(false);
   const [showMatchModal, setShowMatchModal] = useState(false);
+  const [password, setPassword] = useState('');
+  const [selectedRoom, setSelectedRoom] = useState(null);
   const [matchStatus, setMatchStatus] = useState('idle'); // 'idle' | 'pending' | 'waiting'
 
   const { user, server } = useSelector((state) => state.user);
@@ -60,6 +64,15 @@ const RoomList = () => {
           console.log(data.player);
           nav('/questionReview');
           break;
+        // case "joinRoom":
+        //   console.log('게임 중 아님 참여');
+        //   nav('/gameRoom/' + data.roomNo, {state : {gameMode : data.gameMode}});
+        //   break;
+        // case "joinDenied":
+        //   console.log('게임 중 참여불가');
+          
+        //   alert(data.reason);
+        //   break;
         default:
           break;
       }
@@ -199,7 +212,19 @@ const RoomList = () => {
   const handleOpenModal = () => setModalOpen(true);
 
   const joinRoom = (room) => {
-    console.log(room);
+    console.log(room.pwd);
+    console.log(room.is_private);
+
+    if (room.is_private==='Y') {
+      setPasswordModal(true);
+      setSelectedRoom(room);
+      return;
+    }
+    enterRoom(room);
+  };
+  
+  const enterRoom=(room)=>{
+    console.log('실행');
     
     const socket = sockets['room'];
     if (socket && socket.readyState === 1) {
@@ -213,14 +238,17 @@ const RoomList = () => {
           category: room.category,
           userNick
         }));
+        //
         nav('/gameRoom/' + room.gameroom_no, {state : {gameMode : room.game_mode}});
+        //
       } else {
         alert("인원수가 가득 찼습니다");
       }
     } else {
       alert("웹소켓 연결이 준비되지 않았습니다.");
     }
-  };
+    
+  }
 
   const handleCancelMatch = () => {
     const matchSocket = sockets['match'];
@@ -274,6 +302,19 @@ const RoomList = () => {
           
         />
       )}
+
+      {
+        passwordModal && (
+          <PasswordModal
+            password={password}
+            setPassword={setPassword}
+            setPasswordMadal={setPasswordModal}
+            selectedRoom={selectedRoom}
+            enterRoom={() => {enterRoom(selectedRoom)}}
+          />
+      
+      )}
+
 
       {/* ✅ 매칭 수락 모달 */}
       {showMatchModal && matchStatus === 'pending' && (
@@ -335,6 +376,7 @@ const RoomList = () => {
               <div className={styles.roomMeta}>
                 <span>{room.currentCount ?? 0} / {room.limit}명</span>
                 <span>{room.is_private === 'Y' ? '비공개' : '공개'}</span>
+                <span>{room.pwd}</span>
               </div>
             </div>
           ))

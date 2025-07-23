@@ -108,11 +108,12 @@
   display: flex;
   gap: 20px;
   margin: 10px;
+  align-items: center;
 }
 .initiatorBtn button{
   border: 1px solid white;
   border-radius: 40px;
-  width: 100px;
+  padding: 0 20px;
   height: 30px;
   font-size: 20px;
 }
@@ -137,7 +138,9 @@
   color: white;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
 }
-
+.isCorrect{
+  margin: 0;
+}
 .role_badge {
   font-size: 14px;
   font-weight: bold;

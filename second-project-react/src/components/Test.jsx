@@ -39,8 +39,7 @@ const ExamOMRViewer = ({question, onSelectAnswer, selectedAnswer, nextId}) => {
                     value={num}
                     checked={selectedAnswer === String(num)}
                     onChange={handleChange}
-                    /> {currentQuestion[`option_${num}`]}
-                  <br />
+                    />{currentQuestion[`option_${num}`]}
                 </label>
               </div>
             ))}

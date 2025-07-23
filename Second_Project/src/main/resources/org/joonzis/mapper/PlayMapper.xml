@@ -75,7 +75,9 @@
     
     <select id="getUserQuestionHistory" resultType="org.joonzis.domain.UserQuestionHistoryDTO">
     	SELECT
+    		h.user_nick,
 		    q.id,
+		    q.subject,
 		    q.question_text,
 		    q.option_1,
 		    q.option_2,
@@ -92,7 +94,7 @@
 		ON 
 			h.question_id=q.id
 		WHERE
-			submitted_at=#{submiitedAt}
+			submitted_at=#{submittedAt}
     </select>
     
     

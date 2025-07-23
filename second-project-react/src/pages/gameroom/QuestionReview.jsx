@@ -1,17 +1,30 @@
-import React, { useContext, useEffect, useState } from 'react';
+/* eslint-disable no-restricted-globals */
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import styles from '../../css/QuestionReview.module.css';
 import { useSelector } from 'react-redux';
 import { WebSocketContext } from '../../util/WebSocketProvider';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../../components/Loading';
+import Test from '../../components/Test';
 
 const QuestionReview = () => {
   const [questionReviewList, setQuestionReviewList]=useState([]);
   const [loading, setLoading] = useState(true);
+  const [play, setPlay] = useState(false);
+  const [nextId, setNextId] = useState(0);
+  const [question, setQuestion] = useState(null);
+  const [isCorrect, setIsCorrect] = useState(null);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [selectAnswer, setSelectAnswer] = useState(null);
+  const [answer, setAnswer] = useState(null);
+  const [point, setPoint] = useState(null);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const questionListRef = useRef([]);
   const { user, server } = useSelector((state) => state.user);
   const userNick = user.user_nick;
   const userNo = user.user_no;
+  const userId = user?.user_id;
   const nav = useNavigate();
 
   const sockets = useContext(WebSocketContext);
@@ -44,13 +57,11 @@ const QuestionReview = () => {
     }, [server, sockets, userNick]);
 
   useEffect(()=>{
-    asdf();
+    getQuestionReviewList();
+    getPoint();
   },[])
 
-
-
-
-  const asdf=async()=>{
+  const getQuestionReviewList=async()=>{
     const resp=await axios.post('/api/questionReviewList', {userNick});
     console.log('userNick:', userNick);
     const data=resp.data
@@ -59,30 +70,77 @@ const QuestionReview = () => {
     setQuestionReviewList(data);    
     setLoading(false);
   }
+  const getPoint=async()=>{
+    // console.log("userId : "+userId);
+    
+    if (!userId) return;
+    try {
+      const res = await axios.get(`/api/user/point?user_id=${userId}`);
+      setPoint(res.data);
+    } catch (error) {
+      console.error('포인트 불러오기 실패:', error);
+    }
+  }
   
   const formatDate=(timestamp)=>{
     const date = new Date(timestamp);
-  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
   }
 
-  const playQuestionReviewHistory=async(submmitedAt)=>{
-    console.log(submmitedAt);
-    const resp=await axios.post('/api/userQuestionHistory', {submmitedAt});
-    console.log('submmitedAt:', submmitedAt);
+  const playQuestionReviewHistory=async(submittedAt)=>{
+    // console.log(submittedAt);
+    const resp=await axios.post('/api/userQuestionHistory', {submittedAt});
+    // console.log('submmitedAt:', submittedAt);
     const data=resp.data
-    console.log(data);
-    
+    // console.log(data);
+    questionListRef.current = data
+    setNextId(0);
+    setQuestion(data[nextId])
+    setPlay(true);
+    // setIsCorrect(data[nextId]._correct)
   }
-
-
-
-
-
 
   // 다음 문제 버튼
   const nextQuestion=()=>{
-    
+    setNextId(prev=>prev+1);
   }
+  
+  // 포인트로 정답 확인 버튼
+  const getAnswer=async()=>{
+    if (play) {
+      if (confirm('포인트를 소모하여 정답을 확인하시겠습니까?')) {
+        await axios.post('/api/usePoint', {userNo});
+        // console.log("정답 : "+question.correct_answer);
+        // console.log("아이디 : "+question.history_id);
+        // console.log("고른답 : "+question.selected_answer);
+        // console.log("정답유무 : "+question._correct);
+        // console.log("문제 : "+question.question_text);
+        // console.log("과목 : "+question.subject);
+        setShowAnswer(true);
+        getPoint();
+      }
+    }else{
+      alert('문제 풀이 중이 아닙니다');
+    }
+  }
+
+  useEffect(()=>{
+    if (questionListRef.current.length>nextId) {
+      setQuestion(questionListRef.current[nextId]);
+      // setIsCorrect(question._correct);
+    } else {
+      setPlay(false);
+    }
+  },[nextId])
+
+  useEffect(() => {
+  if (question &&play) {
+    setIsCorrect(question._correct);
+    setSelectedAnswer(question.selected_answer);
+    setAnswer(question.correct_answer);
+    setShowAnswer(false);
+  }
+  }, [question]);
 
   // 나가기 버튼
   const leaveRoom = () => {
@@ -104,21 +162,32 @@ const QuestionReview = () => {
           <div className={styles.solving}>
             <div className={styles.problem}>
               <div className={styles.testHeader}>
-                <span>문제 다시 풀어 보기</span>
+                <h1>문제 다시 풀어 보기</h1>
               </div>
               <div className={styles.initiatorBtn}>
                 <button onClick={nextQuestion} >다음 문제</button>
+                <button onClick={getAnswer} >포인트로 정답 확인하기</button>
+                {
+                  play?(<p className={styles.isCorrect}>내가 {isCorrect?'맞춘':'틀린'} 문제 입니다</p>):null
+                }
+                <span>내 보유 포인트 : {point}p</span>
                 <button onClick={leaveRoom} className={styles.leaveBtn}>나가기</button>
               </div>
               <div className={styles.gamePlay}>
-                {/* {
+                {
                   play ? 
-                  <Test question={question} 
-                        nextId={nextId}
-                        onSelectAnswer={setSelectedAnswer} // 추가!
-                        selectedAnswer={selectedAnswer}/> : 
+                    <>
+                      <Test question={question} 
+                            nextId={nextId}
+                            onSelectAnswer={setSelectAnswer}
+                            selectedAnswer={selectAnswer}/> 
+                      <span>내가 선택한 정답 : {selectedAnswer!==0?selectedAnswer:'선택하지 않음'}</span>
+                    </> : 
                   <h2>대기중</h2>
-                } */}
+                }
+                {
+                  showAnswer? <span> 문제의 정답 : {answer}</span>:null
+                }
               </div>
             </div>
           </div>

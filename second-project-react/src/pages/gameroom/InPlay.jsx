@@ -189,6 +189,7 @@ const InPlay = () => {
           setNextId(0);
           questionListRef.current = data.list;
           setQuestion(data.list[0]);
+          setUserAnswerHistory([]);
           setPlay(true);
           setResult(false);
           setUsers(users => users.map(u => ({

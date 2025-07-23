@@ -21,4 +21,5 @@ public interface PlayMapper {
 	public List<UserQuestionHistoryDTO> getQuestionReviewList(@Param("user_nick") String user_nick);
 	
 	public List<UserQuestionHistoryDTO> getUserQuestionHistory(@Param("submittedAt") String submittedAt);
+	
 }

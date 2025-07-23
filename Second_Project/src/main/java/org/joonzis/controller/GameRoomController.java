@@ -1,5 +1,6 @@
 package org.joonzis.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserQuestionHistoryDTO;
 import org.joonzis.service.MemberService;
 import org.joonzis.service.PlayService;
+import org.joonzis.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,9 @@ public class GameRoomController {
 	
 	@Autowired
 	private PlayService playService;
+
+	@Autowired
+	private UserService userservice;
 	
 	@Autowired
     private StringRedisTemplate redisTemplate;
@@ -47,9 +52,8 @@ public class GameRoomController {
 	public ResponseEntity<List<UserQuestionHistoryDTO>> questionReviewList(@RequestBody Map<String, String> userMap) {
 		String userNick = userMap.get("userNick");
 		List<UserQuestionHistoryDTO> list = playService.getQuestionReviewList(userNick);
-		
-		log.info(list.size());
-		log.info(list);
+//		log.info(list.size());
+//		log.info(list);
 		return ResponseEntity.ok(list);
 	}
 
@@ -62,6 +66,24 @@ public class GameRoomController {
 		log.info(list);
 		return ResponseEntity.ok(list);
 	}
+	
+	@PostMapping("/getPoint")
+	public ResponseEntity<Integer> getPoint(@RequestBody Map<String, String> userMap) {
+		String userNick = userMap.get("userNick");
+		
+		
+		return ResponseEntity.ok(1);
+	}
+
+	@PostMapping("/usePoint")
+	public void usePoint(@RequestBody Map<String, String> userMap) {
+		String user_no = userMap.get("userNo");
+		Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("item_price", 50);
+        paramMap.put("user_no", user_no);
+    	userservice.userPointMinus(paramMap);
+	}
+	
 	
 	
 	

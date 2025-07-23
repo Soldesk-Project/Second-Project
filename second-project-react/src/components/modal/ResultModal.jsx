@@ -60,7 +60,7 @@ const ResultModal = ({users, setResult, gameMode}) => {
               </tr>
             ))
           ) : (
-            <p>현재 접속 유저가 없습니다.</p>
+            <tr></tr>
           )}
         </tbody>
       </table>

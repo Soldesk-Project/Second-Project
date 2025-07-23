@@ -200,6 +200,16 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 			}
 			return;
 		}
+		
+		System.out.println("게임 참가");
+		try {
+			// JSON으로 메시지 전송
+			session.sendMessage(new TextMessage(
+					objectMapper.writeValueAsString(Map.of("type", "joinRoom", "roomNo", roomNo, "gameMode", gameMode))));
+			session.close();
+		} catch (Exception e) {
+		}
+		
 
 		roomUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
 				.computeIfAbsent(roomNo, k -> ConcurrentHashMap.newKeySet()).add(userNick);

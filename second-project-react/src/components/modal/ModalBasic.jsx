@@ -18,13 +18,18 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
   };
 
   const handleCreateRoom = async () => {
-    
+    const regex = /^\d{4}$/;
+
     if (!isWsOpen) {  // 연결 상태 확인
       alert("웹소켓 연결 대기 중...");
       return;
     }
     if (isPrivate && password.trim() === '') {
       alert('비공개 방은 비밀번호를 입력해주세요.');
+      return;
+    }
+    if (isPrivate && !regex.test(password)) {
+      alert('비밀번호는 숫자 4자리만 입력 가능합니다.')
       return;
     }
 
@@ -69,13 +74,13 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
                 <option value="cpe">정보처리기사</option>
                 <option value="cpei">정보처리산업기사</option>
                 <option value="cpet">정보처리기능사</option>
-                <option value="lm1">리눅스마스터1급</option>
-                <option value="lm2">리눅스마스터2급</option>
+                <option value="lm1">리눅스마스터 1급</option>
+                <option value="lm2">리눅스마스터 2급</option>
                 <option value="icti">정보통신산업기사</option>
                 <option value="ict">정보통신기사</option>
                 <option value="sec">정보보안기사</option>
-                <option value="net1">네트워크관리사1급</option>
-                <option value="net2">네트워크관리사2급</option>
+                <option value="net1">네트워크관리사 1급</option>
+                <option value="net2">네트워크관리사 2급</option>
               </select>
             </td>
           </tr>
@@ -84,7 +89,7 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
             <td>
               <select value={mode} onChange={(e) => setMode(e.target.value)}>
                 <option value="normal">일반</option>
-                <option value="rank">랭크</option>
+                {/* <option value="rank">랭크</option> */}
               </select>
             </td>
           </tr>
@@ -101,7 +106,8 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
             <td>인원 제한</td>
             <td>
               <select value={limit} onChange={(e) => setLimit(Number(e.target.value))}>
-                {[2, 4, 6, 8, 10].map(num => (
+                {/* {[2, 4, 6, 8, 10].map(num => ( */}
+                {[4].map(num => (
                   <option key={num} value={num}>{num}명</option>
                 ))}
               </select>
@@ -110,13 +116,23 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
           <tr>
             <td>비밀번호</td>
             <td>
-              <input
+              {
+                isPrivate?
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="숫자 4자리 입력"
+                  disabled={!isPrivate}
+                />:
+                <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="비공개 방일 경우 입력"
                 disabled={!isPrivate}
-              />
+                />
+              } 
             </td>
           </tr>
           <tr>

@@ -18,7 +18,7 @@
   min-width: 300px;
 }
 
-input {
+.nickModalInput {
   width: 100%;
   padding: 8px;
   margin: 12px 0;

@@ -58,6 +58,7 @@ const NickModal = ({ isOpen, onClose, onSubmit }) => {
         <input
           type="text"
           placeholder="새 닉네임"
+          className={styles.nickModalInput}
           value={nickname}
           onKeyDown={handleKeyDown}
           onChange={(e) => setNickname(e.target.value)}
