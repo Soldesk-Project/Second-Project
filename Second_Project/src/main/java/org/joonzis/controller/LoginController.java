@@ -16,7 +16,6 @@ import javax.servlet.http.HttpSession;
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.security.JwtUtil;
-import org.joonzis.service.MemberService;
 import org.joonzis.service.UserService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,9 +67,6 @@ public class LoginController {
     private String googleRedirectUri;
     
     @Autowired
-    MemberService memberservice;
-    
-    @Autowired
     UserService userservice;
     
     @Autowired
@@ -98,7 +94,7 @@ public class LoginController {
 	    String email = kakaoAccount != null ? (String) kakaoAccount.get("email") : null;
 
 	    // 4. DB에서 사용자 조회 (예: kakaoId를 기준)
-	    UserInfoDTO user = memberservice.getUserById("kakao_" + kakaoId);
+	    UserInfoDTO user = userservice.getUserById("kakao_" + kakaoId);
 
 	    if (user == null) {
 	        // 5. 회원가입 처리 (자동가입)
@@ -112,10 +108,10 @@ public class LoginController {
 	        newUser.setUser_pw(kakaoId); // DB 컬럼 있어야 함
 	        // 필요시 기본 권한, 가입일 등 세팅
 
-	        memberservice.insertMember(newUser);
+	        userservice.insertMember(newUser);
 
 	        // 자동가입 후 다시 조회 (또는 바로 JWT 발급)
-	        user = memberservice.getUserById("kakao_" + kakaoId);
+	        user = userservice.getUserById("kakao_" + kakaoId);
 	    }
 
 	    // 6. 로그인 처리 (이미 회원이거나 방금 가입한 경우)
@@ -125,7 +121,7 @@ public class LoginController {
 	                    .body("이미 로그인된 사용자입니다.");
 	        }
 
-	        memberservice.updateLoginStatus(user.getUser_id(), 1);
+	        userservice.updateLoginStatus(user.getUser_id(), 1);
 
 	        String jwtToken = jwtUtil.generateToken(user.getUser_id());
 
@@ -298,7 +294,7 @@ public class LoginController {
 
 	    // 기존 회원 확인
 	    String userId = "naver_" + naverId;
-	    UserInfoDTO user = memberservice.getUserById(userId);
+	    UserInfoDTO user = userservice.getUserById(userId);
 
 	    if (user == null) {
 	        // 신규 회원 자동 가입 처리
@@ -312,8 +308,8 @@ public class LoginController {
 	        newUser.setUser_email(uniqueEmail);
 	        newUser.setUser_pw(naverId); // 네이버 ID를 PW로 사용
 
-	        memberservice.insertMember(newUser);
-	        user = memberservice.getUserById(userId);
+	        userservice.insertMember(newUser);
+	        user = userservice.getUserById(userId);
 	    }
 
 	    if (user != null) {
@@ -322,7 +318,7 @@ public class LoginController {
 	                    .body("이미 로그인된 사용자입니다.");
 	        }
 
-	        memberservice.updateLoginStatus(user.getUser_id(), 1);
+	        userservice.updateLoginStatus(user.getUser_id(), 1);
 
 	        String jwtToken = jwtUtil.generateToken(user.getUser_id());
 
@@ -413,7 +409,7 @@ public class LoginController {
 	    String name = (String) userInfo.get("name");
 
 	    String userId = "google_" + googleId;
-	    UserInfoDTO user = memberservice.getUserById(userId);
+	    UserInfoDTO user = userservice.getUserById(userId);
 
 	    if (user == null) {
 	        String nick = generateUniqueNickname(name);
@@ -425,8 +421,8 @@ public class LoginController {
 	        newUser.setUser_email(uniqueEmail);
 	        newUser.setUser_pw(googleId);
 
-	        memberservice.insertMember(newUser);
-	        user = memberservice.getUserById(userId);
+	        userservice.insertMember(newUser);
+	        user = userservice.getUserById(userId);
 	    }
 	    if (user != null) {
 	        if (user.getIs_logged_in() == 1) {
@@ -434,7 +430,7 @@ public class LoginController {
 	                    .body("이미 로그인된 사용자입니다.");
 	        }
 
-	        memberservice.updateLoginStatus(user.getUser_id(), 1);
+	        userservice.updateLoginStatus(user.getUser_id(), 1);
 
 	        String jwtToken = jwtUtil.generateToken(user.getUser_id());
 
@@ -549,7 +545,7 @@ public class LoginController {
         String encodedPw = passwordEncoder.encode(rawPw);
         users.setUser_pw(encodedPw);
         
-	    memberservice.insertMember(users);
+        userservice.insertMember(users);
 	}
 	
 	@GetMapping("/signUp/checkId")
@@ -670,7 +666,7 @@ public class LoginController {
 	    String inputPw = dto.getUser_pw();
 
 	    // DB에서 사용자 정보 조회 (비밀번호 포함)
-	    UserInfoDTO user = memberservice.getUserById(inputId);
+	    UserInfoDTO user = userservice.getUserById(inputId);
 
 	    if (user == null) {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("존재하지 않는 사용자입니다.");
@@ -708,7 +704,7 @@ public class LoginController {
 	    }
 
 	    // 4. 로그인 처리
-	    memberservice.updateLoginStatus(inputId, 1);
+	    userservice.updateLoginStatus(inputId, 1);
 	    String token = jwtUtil.generateToken(inputId);
 
 	    // 5. 사용자 정보 및 토큰 반환
@@ -725,7 +721,7 @@ public class LoginController {
 	public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {
 	    String userId = request.get("userId");
 	    if (userId != null) {
-	        memberservice.updateLoginStatus(userId, 0);  // DB에 로그아웃 상태 저장
+	    	userservice.updateLoginStatus(userId, 0);  // DB에 로그아웃 상태 저장
 	        return ResponseEntity.ok("로그아웃 완료");
 	    }
 	    return ResponseEntity.badRequest().body("잘못된 요청");
@@ -739,7 +735,7 @@ public class LoginController {
 	    }
 
 	    String user_id = jwtUtil.getUserIdFromToken(token);
-	    UserInfoDTO user = memberservice.getUserById(user_id);
+	    UserInfoDTO user = userservice.getUserById(user_id);
 
 	    return ResponseEntity.ok(user); // 전체 정보 그대로 전달
 	}

@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserQuestionHistoryDTO;
-import org.joonzis.service.MemberService;
 import org.joonzis.service.PlayService;
 import org.joonzis.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +24,6 @@ import lombok.extern.log4j.Log4j;
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class GameRoomController {
-	
-	@Autowired
-	private MemberService memberService;
-	
 	@Autowired
 	private PlayService playService;
 
@@ -41,7 +36,7 @@ public class GameRoomController {
 	@PostMapping("/rank/score")
 	public ResponseEntity<Integer> loadRank(@RequestBody Map<String, String> payload) {
 	    String userId = payload.get("userId");
-	    UserInfoDTO user = memberService.getUserById(userId);
+	    UserInfoDTO user = userservice.getUserById(userId);
 	    
 	    redisTemplate.opsForValue().set("rank:" + userId, String.valueOf(user.getUser_rank()));
 	    

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.joonzis.domain.UserInfoDecoDTO;
+import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.service.UserService;
 import org.joonzis.websocket.util.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         }
         else if ("updateStyle".equals(action) && userNo != null) {
 //            log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
-            UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));
+            UserInfoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));
             if (updatedUser == null) {
 //                log.warn("해당 userNo의 유저 정보를 DB에서 찾을 수 없습니다: " + userNo);
                 return;
@@ -130,7 +130,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
     public void notifyUserStyleUpdate(String userNo) throws Exception {
 //        log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
         String server = findServerByUserNo(userNo);  // ① 서버 탐색
-        UserInfoDecoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));  // ② DB 조회
+        UserInfoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));  // ② DB 조회
 //        log.info(updatedUser);
         if (updatedUser == null) return;  // :느낌표: A: 여기서 return 되면 그 이후 실행 안 됨
         boolean updated = false;
@@ -156,7 +156,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             }
         }
     }
-    private boolean updateUserStyleInSessions(Map<WebSocketSession, UserInfo> sessions, String userNo, UserInfoDecoDTO updatedUser) {
+    private boolean updateUserStyleInSessions(Map<WebSocketSession, UserInfo> sessions, String userNo, UserInfoDTO updatedUser) {
         if (sessions == null) return false;
         boolean updated = false;
         for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {

@@ -7,7 +7,7 @@ import java.util.Map;
 import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.ProfileImageDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
-import org.joonzis.domain.UserInfoDecoDTO;
+import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserRewardVO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.service.UserService;
@@ -42,7 +42,7 @@ public class UserController {
 
 	// Top 10 유저 랭킹 목록
 	@GetMapping(value = "/ranking", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<UserInfoDecoDTO> getUserRankingList() {
+    public List<UserInfoDTO> getUserRankingList() {
         return service.getUserRankingList();
     }
 	
@@ -147,9 +147,9 @@ public class UserController {
 	
 	/** 장식 정보까지 포함한 DTO를 내려주는 프로필 조회 */
     @GetMapping(value = "/{userNo}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserInfoDecoDTO> getUser(@PathVariable int userNo) {
+    public ResponseEntity<UserInfoDTO> getUser(@PathVariable int userNo) {
         // service.getUserInfoByUserNo()가 USER_DECO join 쿼리를 수행합니다
-        UserInfoDecoDTO dto = service.getUserInfoByUserNo(userNo);
+        UserInfoDTO dto = service.getUserInfoByUserNo(userNo);
         return ResponseEntity.ok(dto);
     }
 

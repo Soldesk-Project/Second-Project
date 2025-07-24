@@ -4,7 +4,7 @@
 
 <mapper namespace="org.joonzis.mapper.UserMapper">
 	 
-	 <resultMap id="userInfoDecoMap" type="org.joonzis.domain.UserInfoDecoDTO">
+	 <resultMap id="userInfoMap" type="org.joonzis.domain.UserInfoDTO">
 	    <result column="user_no" property="user_no"/>
 	    <result column="user_rank" property="user_rank"/>
 	    <result column="user_nick" property="user_nick"/>
@@ -14,7 +14,7 @@
 	</resultMap>
 
 	 <!-- Top 10 유저 랭킹 목록 -->
-	<select id="getUserRankingList" resultMap="userInfoDecoMap">
+	<select id="getUserRankingList" resultMap="userInfoMap">
 	    <![CDATA[
 	        SELECT *
 			FROM (
@@ -87,12 +87,10 @@
   </update>
 	
 	<!-- userNo로 유저 정보+css 찾기	 -->
-	<select id="getUserInfoByUserNo" parameterType="int" resultMap="userInfoDecoMap">
+	<select id="getUserInfoByUserNo" parameterType="int" resultType="org.joonzis.domain.UserInfoDTO">
 		SELECT
-		  U.USER_NO,
-		  U.USER_PROFILE_IMG,
-		  U.USER_RANK,
-		  U.USER_NICK,
+		  U.*,
+		  D.*,
 		  I.IMAGE_FILE_NAME
 		FROM USERS U
 		LEFT JOIN USER_DECO D  ON U.USER_NO = D.USER_NO
@@ -203,23 +201,78 @@
 	    WHERE user_no = #{userNo}
 	</select>
 	
+	<!-- 비밀번호 변경 - 임시 토큰 생성 -->
 	<insert id="insertResetToken">
 	    INSERT INTO password_reset_token (id, user_id, token, expiry_date)
 	    VALUES (seq_password_reset_token.NEXTVAL, #{userId}, #{token}, #{expiryDate, jdbcType=TIMESTAMP})
 	</insert>
-	
+	<!-- 비밀번호 변경 - 토큰으로 유저 정보 찾기 -->
 	<select id="findUserByToken" resultType="org.joonzis.domain.UserInfoDTO">
 	    SELECT u.* FROM users u
 	    JOIN password_reset_token t ON u.user_id = t.user_id
 	    WHERE t.token = #{token}
 	</select>
-	
+	<!-- 토큰 유효기간 비교 -->
 	<select id="getExpiryByToken" resultType="java.time.LocalDateTime">
 	    SELECT expiry_date FROM password_reset_token WHERE token = #{token}
 	</select>
-	
+	<!-- 비밀번호 변경 성공 후 토큰 삭제 -->
 	<delete id="deleteToken">
 	    DELETE FROM password_reset_token WHERE token = #{token}
 	</delete>
+	
+	<!-- 회원가입 -->
+	<insert id="insertMember" parameterType="org.joonzis.domain.UsersVO">
+		<selectKey keyProperty="user_no" resultType="int" order="BEFORE">
+	        SELECT SEQ_USERS.NEXTVAL FROM dual
+	    </selectKey>
+		INSERT INTO USERS (USER_NO, USER_NICK, USER_ID, USER_PW, USER_EMAIL, USER_DATE, ISCHATBANNED)
+		VALUES (#{user_no}, #{user_nick}, #{user_id}, #{user_pw}, #{user_email}, sysdate, 0)
+	</insert>
+	<!-- 유저 데코,리워드에 추가 -->
+	<insert id="insertDeco">
+		INSERT INTO USER_DECO (USER_NO) VALUES (#{user_no})
+	</insert>
+	<insert id="insertReward">
+		INSERT INTO USER_REWARDS (USER_NO) VALUES (#{user_no})
+	</insert>
+	
+	<!-- 로그인 -->
+	<select id="selectUserByIdAndPw" resultType="org.joonzis.domain.UserInfoDTO">
+		SELECT *
+		FROM users u
+		JOIN user_deco d ON u.user_no = d.user_no
+		WHERE u.user_id = #{user_id}
+		  AND u.user_pw = #{user_pw}
+    </select>
+    
+    <!-- 회원 포인트 조회 -->
+    <select id="getUserPoint" resultType="long">
+    	SELECT USER_POINT
+    	FROM USERS
+    	WHERE USER_ID = #{user_id}
+    </select>
+    
+    <!-- 포인트 구매 -->
+    <update id="updatePoint">
+	    UPDATE users
+	    SET user_point = user_point + #{amount}
+	    WHERE user_id = #{userId}
+	</update>
+	
+	<!-- 유저 정보 조회 -->
+	<select id="getUserById" parameterType="String" resultType="org.joonzis.domain.UserInfoDTO">
+		SELECT *
+		FROM users u
+		JOIN user_deco d ON u.user_no = d.user_no
+		WHERE u.user_id = #{user_id}
+	</select>
+	
+	<!-- 유저 접속 정보 업데이트 -->
+	<update id="updateLoginStatus">
+	    UPDATE users
+	    SET is_logged_in = #{status}
+	    WHERE user_id = #{userId}
+	</update>
 	
 </mapper>

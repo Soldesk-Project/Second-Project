@@ -9,14 +9,13 @@ import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDTO;
-import org.joonzis.domain.UserInfoDecoDTO;
 import org.joonzis.domain.UserRewardVO;
 import org.joonzis.domain.UsersVO;
 
 public interface UserMapper {
 
 	// Top 10 유저 랭킹 목록
-	public List<UserInfoDecoDTO> getUserRankingList();
+	public List<UserInfoDTO> getUserRankingList();
 	
 	// 모든 아이템 목록
 	public List<ItemVO> getItemList();
@@ -29,7 +28,7 @@ public interface UserMapper {
 	public boolean updateItem(UserDecoUpdateDTO UserDecoUpdateDTO);
 	
 	// userNo로 유저 정보+css 찾기
-	public UserInfoDecoDTO getUserInfoByUserNo(int userNo);
+	public UserInfoDTO getUserInfoByUserNo(int userNo);
 	
 	// 업적 달성 - 포인트 추가
 	public int updateUserPoint(AchievementDTO dto);
@@ -75,5 +74,26 @@ public interface UserMapper {
 	public UserInfoDTO findUserByToken(String token);
 	public LocalDateTime getExpiryByToken(String token);
 	public void deleteToken(String token);
+	
+	// 회원가입
+	int insertMember(UsersVO users);
+	// 유저 데코,리워드에 추가
+	void insertDeco(int user_no);
+	void insertReward(int user_no);
+	
+	// 로그인
+	UserInfoDTO selectUserByIdAndPw(@Param("user_id") String user_id, @Param("user_pw") String user_pw);
+	
+	// 회원 포인트 조회
+	long getUserPoint(@Param("user_id") String user_id);
+	
+	// 포인트 구매
+	void updatePoint(@Param("userId") String userId, @Param("amount") int amount);
+	
+	// 유저 정보 조회
+	UserInfoDTO getUserById(@Param("user_id") String user_id);
+	
+	// 유저 접속 정보 업데이트
+	void updateLoginStatus(@Param("userId") String userId, @Param("status") int status);
 	
 }

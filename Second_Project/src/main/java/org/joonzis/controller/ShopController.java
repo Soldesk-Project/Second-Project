@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.PaymentDTO;
-import org.joonzis.service.MemberService;
 import org.joonzis.service.ShopService;
 import org.joonzis.service.UserService;
 import org.joonzis.service.pay.PayService;
@@ -42,9 +41,6 @@ public class ShopController {
 	private TossPayService tossPayService;
 	
 	@Autowired
-	private MemberService memberservice;
-	
-	@Autowired
 	private ShopService shopservice;
 	
 	@Autowired
@@ -52,7 +48,7 @@ public class ShopController {
 	
 	@GetMapping("/user/point")
 	public ResponseEntity<Long> getUserPoint(@RequestParam("user_id") String user_id) {
-	    long point = memberservice.getUserPoint(user_id);
+	    long point = userservice.getUserPoint(user_id);
 	    return ResponseEntity.ok(point);
 	}
 	
@@ -76,7 +72,7 @@ public class ShopController {
                                              @RequestParam int amount) {
         try {
         	kakaoPay.approve(pg_token, userId);
-            memberservice.addPoint(userId, amount); // 포인트 적립
+        	userservice.addPoint(userId, amount); // 포인트 적립
             // 결제 완료 후 React로 리다이렉트
             return ResponseEntity.status(302)
                     .header("Location", "http://localhost:3000/shop")
@@ -95,7 +91,7 @@ public class ShopController {
                             HttpServletResponse response) throws IOException {
         try {
             tossPayService.confirmPayment(paymentKey, orderId, amount);
-            memberservice.addPoint(userId, amount);
+            userservice.addPoint(userId, amount);
 
             response.sendRedirect("http://localhost:3000/shop");
         } catch (Exception e) {

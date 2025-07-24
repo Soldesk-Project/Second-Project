@@ -9,14 +9,13 @@ import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDTO;
-import org.joonzis.domain.UserInfoDecoDTO;
 import org.joonzis.domain.UserRewardVO;
 import org.joonzis.domain.UsersVO;
 
 public interface UserService {
 	
 	// Top 10 유저 랭킹 목록
-	public List<UserInfoDecoDTO> getUserRankingList();
+	public List<UserInfoDTO> getUserRankingList();
 	
 	// 모든 아이템 목록
 	public List<ItemVO> getItemList();
@@ -26,7 +25,7 @@ public interface UserService {
 	public List<ItemVO> getInventory(int user_no);
 	
 	// userNo로 유저 정보+css 찾기	
-	public UserInfoDecoDTO getUserInfoByUserNo(int userNo);
+	public UserInfoDTO getUserInfoByUserNo(int userNo);
 	
 	// 유저 장식 업데이트	
 	public boolean updateItem(UserDecoUpdateDTO UserDecoUpdateDTO);
@@ -76,4 +75,22 @@ public interface UserService {
 	public void deleteResetToken(String token);
 	
 	public void sendResetLinkEmail(String toEmail, String resetLink) throws MessagingException;
+	
+	// 회원가입
+	void insertMember(UsersVO users);
+	
+	// 로그인
+	UserInfoDTO isValidUser(String user_id, String user_pw);
+	
+	// 유저 포인트 조회
+	long getUserPoint(String user_id);
+	
+	// 포인트 구매
+	void addPoint(String userId, int amount);
+	
+	// 유저 정보 조회
+	UserInfoDTO getUserById(String user_id);
+	
+	// 유저 접속 정보 업데이트
+	public void updateLoginStatus(String userId, int status);
 }
