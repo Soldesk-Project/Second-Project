@@ -5,7 +5,7 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('random');
   const [mode, setMode] = useState('normal');
-  const [limit, setLimit] = useState(2);
+  const [limit, setLimit] = useState(4);
   const [isPrivate, setIsPrivate] = useState(false);
   const [password, setPassword] = useState('');
 
@@ -39,7 +39,7 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
       category,
       game_mode : mode,
       is_private : isPrivate ? 'Y' : 'N',
-      limit,
+      limit : limit,
       pwd : isPrivate ? password : null
     };
 

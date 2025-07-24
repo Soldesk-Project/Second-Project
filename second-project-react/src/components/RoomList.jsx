@@ -8,6 +8,18 @@ import { useSelector } from 'react-redux';
 import { WebSocketContext } from '../util/WebSocketProvider';
 import PasswordModal from './modal/PasswordModal';
 
+const getUserIdFromToken = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.userId || payload.sub || payload.username;
+  } catch (e) {
+    console.error(":x: JWT 파싱 오류:", e);
+    return null;
+  }
+};
+
 const RoomList = () => {
   const [category, setCategory] = useState('random');
   const [gameRoomList, setGameRoomList] = useState([]);
@@ -18,12 +30,14 @@ const RoomList = () => {
   const [password, setPassword] = useState('');
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [matchStatus, setMatchStatus] = useState('idle'); // 'idle' | 'pending' | 'waiting'
-
+  
   const { user, server } = useSelector((state) => state.user);
+  const userId = getUserIdFromToken();
+  
   const userNick = user.user_nick;
   const nav = useNavigate();
   const sockets = useContext(WebSocketContext);
-
+  
   useEffect(() => {
     const socket = sockets['room'];
     if (!socket) return;
@@ -59,20 +73,17 @@ const RoomList = () => {
           nav('/gameRoom/' + data.gameroom_no, { state: { category: data.category, gameMode: data.game_mode } });
           break;
         case "joinQuestionReviewRoom":
-          console.log(data.server);
-          console.log(data.roomNo);
-          console.log(data.player);
           nav('/questionReview');
           break;
-        // case "joinRoom":
-        //   console.log('게임 중 아님 참여');
-        //   nav('/gameRoom/' + data.roomNo, {state : {gameMode : data.gameMode}});
-        //   break;
-        // case "joinDenied":
-        //   console.log('게임 중 참여불가');
+        case "joinRoom":
+          console.log('게임 중 아님 참여');
+          nav('/gameRoom/' + data.roomNo, {state : {gameMode : data.gameMode}});
+          break;
+        case "joinDenied":
+          console.log('게임 중 참여불가');
           
-        //   alert(data.reason);
-        //   break;
+          alert(data.reason);
+          break;
         default:
           break;
       }
@@ -95,7 +106,6 @@ const RoomList = () => {
       let data;
       try {
         data = JSON.parse(event.data);
-        console.log(data);
       } catch {
         console.warn("🟠 JSON 파싱 실패:", event.data);
         return;
@@ -108,7 +118,7 @@ const RoomList = () => {
           break;
           
         case "MATCH_FOUND":
-          if (data.roomLeaderId === user.user_id) {
+          if (data.roomLeaderId === userId) {
             const roomData = {
               action: "createRoom",
               title : "",
@@ -163,10 +173,11 @@ const RoomList = () => {
   }, [sockets, nav]);
 
   const handleQuickMatch = async () => {
+    
     setMatchStatus('searching');
 
     try {
-      await axios.post('/api/rank/score', { userId: user.user_id });
+      await axios.post('/api/rank/score', { userId: userId });
 
       const matchSocket = sockets['match'];
       if (!matchSocket) {
@@ -177,13 +188,13 @@ const RoomList = () => {
       if (matchSocket.readyState === 1) {
         matchSocket.send(JSON.stringify({
           action: 'quickMatch',
-          userId: user.user_id
+          userId: userId
         }));
       } else if (matchSocket.readyState === 0) {
         matchSocket.onopen = () => {
           matchSocket.send(JSON.stringify({
             action: 'quickMatch',
-            userId: user.user_id
+            userId: userId
           }));
         };
       } else {
@@ -239,7 +250,7 @@ const RoomList = () => {
           userNick
         }));
         //
-        nav('/gameRoom/' + room.gameroom_no, {state : {gameMode : room.game_mode}});
+        // nav('/gameRoom/' + room.gameroom_no, {state : {gameMode : room.game_mode}});
         //
       } else {
         alert("인원수가 가득 찼습니다");
@@ -255,7 +266,7 @@ const RoomList = () => {
     if (matchSocket && matchSocket.readyState === 1) {
       matchSocket.send(JSON.stringify({
         action: 'cancelMatch',
-        userId: user.user_id
+        userId: userId
       }));
     }
     setMatchStatus('idle');
@@ -286,13 +297,13 @@ const RoomList = () => {
         return "네트워크관리사1급";
       case "net2":
         return "네트워크관리사2급";
-      default:
-        return category || "알 수 없음";
-    }
-  }
-
-  return (
-    <>
+        default:
+          return category || "알 수 없음";
+        }
+      }
+      
+      return (
+        <>
       {modalOpen && (
         <ModalBasic
           setModalOpen={setModalOpen}
@@ -320,7 +331,7 @@ const RoomList = () => {
       {showMatchModal && matchStatus === 'pending' && (
         <MatchModal
           socket={sockets['match']}
-          currentUserId={user.user_id}
+          currentUserId={userId}
           setShowMatchModal={setShowMatchModal}
           setMatchStatus={setMatchStatus}
         />

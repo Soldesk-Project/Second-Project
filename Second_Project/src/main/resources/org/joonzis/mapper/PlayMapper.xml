@@ -42,7 +42,16 @@
     <update id="increaseRewardPoints">
     	UPDATE USERS 
     	SET
-    		USER_POINT = USER_POINT + #{point}
+    		USER_POINT = USER_POINT + #{point},
+    		USER_RANK = USER_RANK + #{rank_point},
+    		USER_PLAY_COUNT = USER_PLAY_COUNT + 1
+    	WHERE USER_NICK = #{user_nick}
+    </update>
+    
+    <update id="countFirst">
+    	UPDATE USERS
+    	SET
+    		USER_1ST_COUNT = USER_1ST_COUNT + 1
     	WHERE USER_NICK = #{user_nick}
     </update>
     
