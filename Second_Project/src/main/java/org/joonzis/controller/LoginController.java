@@ -655,6 +655,7 @@ public class LoginController {
 	        result.put("success", true);
 	        return ResponseEntity.ok(result);
 	    } catch (Exception e) {
+	    	e.printStackTrace();
 	        result.put("success", false);
 	        result.put("message", "메일 전송에 실패했습니다.");
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);

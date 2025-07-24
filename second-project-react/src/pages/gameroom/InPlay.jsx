@@ -194,8 +194,11 @@ const InPlay = () => {
           setResult(false);
           setUsers(users => users.map(u => ({
             ...u,
-            score: 0})));
+            score: 0,
+            elapsedTime: 0
+          })));
           setTime(5);
+          setUserElapsedTimes([])
         } else {
           console.error("질문 리스트가 유효하지 않습니다. 데이터:", data.list);
         }
@@ -319,6 +322,9 @@ const InPlay = () => {
         const myInfo = rankedUsers.find(u => u.userNick === userNick);
         // console.log(myInfo);
         const myPoint = myInfo.point ?? 0;
+        const rankPoint = myInfo.rankPoint ?? 0;
+        const myRank = myInfo.rank ?? 0;
+        
         console.log(userAnswerHistory);
         socket.send(JSON.stringify({
           action: 'rewardPointsAndSaveUserHistory',
@@ -326,6 +332,8 @@ const InPlay = () => {
           roomNo,
           userNick,
           point: myPoint,
+          rankPoint: rankPoint,
+          myRank: myRank,
           history: userAnswerHistory
         }));
       } else {

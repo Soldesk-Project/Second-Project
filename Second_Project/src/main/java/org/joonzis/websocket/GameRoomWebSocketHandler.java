@@ -351,6 +351,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		// 방별 questionId 초기화
 		AtomicInteger currentQuestionId = roomQuestionIds.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
 				.computeIfAbsent(roomNo, k -> new AtomicInteger(0));
+		
+		roomElapsedTimes.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
+    		.put(roomNo, new ConcurrentHashMap<>());
 
 		answerSubmittedUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).remove(roomNo);
 
@@ -391,6 +394,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		AtomicInteger currentQuestionId = roomQuestionIds.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
 				.computeIfAbsent(roomNo, k -> new AtomicInteger(0));
 		currentQuestionId.set(0);
+		
+		roomElapsedTimes.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
+        	.put(roomNo, new ConcurrentHashMap<>());
 
 		answerSubmittedUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).remove(roomNo);
 		int nextId = currentQuestionId.getAndIncrement();
@@ -504,10 +510,16 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		int submitted = answerSubmittedUsers.get(broadcastServer).get(roomNo).get(questionIdx).size();
 
 		// 9. 브로드캐스트 (점수 및 정답 여부, 누적 시간까지)
-		Map<String, Object> payload = Map.of("type", "sumScore", "server", broadcastServer, "roomNo", roomNo,
-				"userNick", userNick, "isCorrect", isCorrect, "answer", answer, "correctAnswer",
-				curQ.getCorrect_answer(), "questionIdx", questionIdx, "scores", scores, "elapsedTimes", elapsedTimes // ⭐
-																														// 추가!
+		Map<String, Object> payload = Map.of("type", "sumScore", 
+											 "server", broadcastServer, 
+											 "roomNo", roomNo,
+											 "userNick", userNick, 
+											 "isCorrect", isCorrect, 
+											 "answer", answer, 
+											 "correctAnswer", curQ.getCorrect_answer(), 
+											 "questionIdx", questionIdx, 
+											 "scores", scores, 
+											 "elapsedTimes", elapsedTimes // ⭐
 		);
 		broadcast(broadcastServer, payload);
 
@@ -540,14 +552,20 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         String user_nick = json.get("userNick").asText();
         JsonNode historyArray = json.get("history");
         int point = json.get("point").asInt();
+        int rankPoint = json.get("rankPoint").asInt();
+        int myRank = json.get("myRank").asInt();
         
         if (server == null || user_nick == null || roomNo == null) {
     		return;
     	}
         
+        if (myRank == 1) {
+        	playService.countFirst(user_nick);
+        }
+        
         String historyUuid = UUID.randomUUID().toString();
         
-        playService.increaseRewardPoints(point, user_nick);
+        playService.increaseRewardPoints(point, rankPoint, user_nick);
         
         List<UserQuestionHistoryDTO> historyList = new ArrayList<>();
         for (JsonNode item : historyArray) {

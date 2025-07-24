@@ -14,9 +14,11 @@ public interface PlayMapper {
 	// 올 랜덤 문제 가져오기(랭크모드)
 	List<QuestionDTO> getRandomQuestions();
 
-	public void increaseRewardPoints(@Param("point") int point, @Param("user_nick") String user_nick);
+	public void increaseRewardPoints(@Param("point") int point, @Param("rank_point") int rank_point, @Param("user_nick") String user_nick);
 	
 	public void insertHistory(UserQuestionHistoryDTO history);
+	
+	public void countFirst(@Param("user_nick") String user_nick);
 	
 	public List<UserQuestionHistoryDTO> getQuestionReviewList(@Param("user_nick") String user_nick);
 	

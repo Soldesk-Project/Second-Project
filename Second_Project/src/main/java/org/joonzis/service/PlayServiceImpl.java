@@ -35,8 +35,8 @@ public class PlayServiceImpl implements PlayService {
 	}
 		
 	@Override
-	public void increaseRewardPoints(int point, String user_nick) {
-		playMapper.increaseRewardPoints(point, user_nick);
+	public void increaseRewardPoints(int point, int rank_point, String user_nick) {
+		playMapper.increaseRewardPoints(point, rank_point, user_nick);
 	}
 
 	@Override
@@ -44,6 +44,11 @@ public class PlayServiceImpl implements PlayService {
 	    for (UserQuestionHistoryDTO dto : historyList) {
 	    	playMapper.insertHistory(dto);
 	    }
+	}
+	
+	@Override
+	public void countFirst(String user_nick) {
+		playMapper.countFirst(user_nick);
 	}
 
 	@Override

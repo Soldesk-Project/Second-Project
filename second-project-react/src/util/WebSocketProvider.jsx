@@ -16,8 +16,8 @@ export const WebSocketProvider = ({ children }) => {
   };
   // :흰색_확인_표시: room, server 소켓은 항상 고정 연결
   if (!socketsRef.current["room"]) {
-    socketsRef.current["room"] = new WebSocket("ws://localhost:9099/ws/room");
-    // socketsRef.current["room"] = new WebSocket("ws://192.168.0.112:9099/ws/room");
+    // socketsRef.current["room"] = new WebSocket("ws://localhost:9099/ws/room");
+    socketsRef.current["room"] = new WebSocket("ws://192.168.0.112:9099/ws/room");
   }
   useEffect(() => {
     if (!socketsRef.current["server"]) {
@@ -34,7 +34,6 @@ export const WebSocketProvider = ({ children }) => {
     }
     if (!socketsRef.current["match"]) {
       socketsRef.current["match"] = new WebSocket(`ws://192.168.0.112:9099/ws/match?userId=${userId}`);
-      console.log(":흰색_확인_표시: match 소켓 연결됨:", userId);
     }
   }, []);
   return (
