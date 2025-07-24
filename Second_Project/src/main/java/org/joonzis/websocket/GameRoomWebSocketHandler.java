@@ -555,13 +555,11 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     		return;
     	}
         
-<<<<<<< Updated upstream
         if (myRank == 1) {
         	playService.countFirst(user_nick);
         }
-=======
         roomStatus.getOrDefault(server, Collections.emptyMap()).put(roomNo, "waiting");
->>>>>>> Stashed changes
+
         
         String historyUuid = UUID.randomUUID().toString();
         
