@@ -7,6 +7,8 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.ItemVO;
+import org.joonzis.domain.UserAccuracyDTO;
+import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserRewardVO;
@@ -66,7 +68,12 @@ public interface UserMapper {
             @Param("imageUrl") String imageUrl);
 	
 	//유저정보 가져오기
-	UsersVO getUsersByUserNo(@Param("userNo") int userNo);
+	public UsersVO getUsersByUserNo(@Param("userNo") int userNo);
+	
+	//정답률 통계 가져오기
+	public List<UserAccuracyDTO> getUserAccuracyList();
+	
+	
 	
 	public void insertResetToken(@Param("userId") String userId,
             @Param("token") String token,

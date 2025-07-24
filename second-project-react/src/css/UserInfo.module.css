@@ -79,12 +79,16 @@
   display: flex;
   flex-direction: column;
   text-align: center;
+  gap: 30px;
+
 }
 
 .userInfo_Box_1{
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  justify-content: center;
+  gap: 30px;
 }
 
 .userInfo_Name{
@@ -94,31 +98,34 @@
   justify-content: center;
 }
 
-.bar_set{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.bar_set {
+  width: 150px;          /* 프로필 크기에 맞춰 조정 */
+  margin: 16px auto;     /* 중앙 정렬 */
 }
 
 .progressLine {
-  width: 80%;
-  height: 6px;
-  background: #2e3650;
-  border-radius: 3px;
-  margin: 12px auto 4px;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 8px;
+  margin-bottom: 4px;
 }
 
 .progressFill {
   height: 100%;
-  background: #fff;
-  border-radius: 3px 0 0 3px;
+  background-color: #4caf50;  /* 원하는 색으로 바꿔도 됩니다 */
+  transition: width 0.3s ease;
 }
 
 .label {
-  font-size: 12px;
-  color: #ddd;
-  margin-bottom: 8px;
-  margin-left: 155px;
+  font-size: 0.875rem;
+  text-align: center;
+  color: #333;
+}
+
+.invenBtnWrapper{
+  display: flex;
+  flex-direction: row;
 }
 
 .invenBtn{
@@ -197,8 +204,8 @@
 
 .profileWrapper {
   position: relative;      /* 자식 .frameOverlay 를 절대위치 기준으로 만들기 */
-  width: 180px;            /* 프로필 img width 와 동일하게 */
-  height: 180px;           /* 프로필 img height 와 동일하게 */
+  width: 150px;            /* 프로필 img width 와 동일하게 */
+  height: 150px;           /* 프로필 img height 와 동일하게 */
 }
 
 .profileImg {

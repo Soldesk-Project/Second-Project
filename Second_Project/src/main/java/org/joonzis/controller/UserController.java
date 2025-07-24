@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.ProfileImageDTO;
+import org.joonzis.domain.UserAccuracyDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserRewardVO;
@@ -161,5 +162,20 @@ public class UserController {
     ) {
         service.changeProfileImage(userNo, req.getImageUrl());
         return ResponseEntity.ok().build();
+    }
+    
+    /** 정답률 통계 */
+    @GetMapping(value = "/accuracy", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserAccuracyDTO>> getUserAccuracyList() {
+        try {
+            List<UserAccuracyDTO> list = service.getUserAccuracyList();
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            // 내부 예외 로깅
+            log.error("정답률 조회 중 오류", e);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
+        }
     }
 }

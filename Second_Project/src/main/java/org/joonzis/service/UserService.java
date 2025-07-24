@@ -7,6 +7,8 @@ import javax.mail.MessagingException;
 
 import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.ItemVO;
+import org.joonzis.domain.UserAccuracyDTO;
+import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserRewardVO;
@@ -64,7 +66,7 @@ public interface UserService {
 	public int changeProfileImage(int userNo, String imageUrl);
 	
 	//유저정보 가져오기
-	UsersVO getUsersByUserNo(int userNo);
+	public UsersVO getUsersByUserNo(int userNo);
 	
 	// 유저 닉네임 변경
 	public void updateNickname(Long user_no, String user_nick);
@@ -93,4 +95,8 @@ public interface UserService {
 	
 	// 유저 접속 정보 업데이트
 	public void updateLoginStatus(String userId, int status);
+
+	// 정답률 통계 가져오기
+	public List<UserAccuracyDTO> getUserAccuracyList();
+
 }

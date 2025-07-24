@@ -78,11 +78,12 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
                 for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
                     UserInfo info = entry.getValue();
                     if (userNo.equals(info.getUserNo())) {
-                        info.setBgItemNo(updatedUser.getBackgroundItemNo());
-                        info.setBlItemNo(updatedUser.getBalloonItemNo());
-                        info.setBdItemNo(updatedUser.getBoundaryItemNo());
-                        info.setTitleItemNo(updatedUser.getTitleItemNo());
-                        info.setFontColorItemNo(updatedUser.getFontcolorItemNo());
+                    	info.setBdItemNo(updatedUser.getBoundaryItemNo());
+                    	info.setTitleItemNo(updatedUser.getTitleItemNo());
+                    	info.setFontColorItemNo(updatedUser.getFontcolorItemNo());
+                    	info.setBgItemNo(updatedUser.getBackgroundItemNo());
+                    	info.setBlItemNo(updatedUser.getBalloonItemNo());
+                    	
                         updated = true;
                     }
                 }
@@ -162,11 +163,11 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
             UserInfo info = entry.getValue();
             if (userNo.equals(String.valueOf(info.getUserNo()))) {
+            	info.setBdItemNo(updatedUser.getBoundaryItemNo());
+            	info.setTitleItemNo(updatedUser.getTitleItemNo());
+            	info.setFontColorItemNo(updatedUser.getFontcolorItemNo());
             	info.setBgItemNo(updatedUser.getBackgroundItemNo());
-                info.setBlItemNo(updatedUser.getBalloonItemNo());
-                info.setBdItemNo(updatedUser.getBoundaryItemNo());
-                info.setTitleItemNo(updatedUser.getTitleItemNo());
-                info.setFontColorItemNo(updatedUser.getFontcolorItemNo());
+            	info.setBlItemNo(updatedUser.getBalloonItemNo());
                 updated = true;
             }
         }

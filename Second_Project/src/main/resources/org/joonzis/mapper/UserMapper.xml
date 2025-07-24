@@ -11,6 +11,7 @@
 	    
 	    <result column="IMAGE_FILE_NAME"  property="imageFileName"/>
 	    <result column="USER_PROFILE_IMG" property="user_profile_img"/>
+	    <result column="boundary_item_no" property="boundaryItemNo"/>
 	</resultMap>
 
 	 <!-- Top 10 유저 랭킹 목록 -->
@@ -87,7 +88,7 @@
   </update>
 	
 	<!-- userNo로 유저 정보+css 찾기	 -->
-	<select id="getUserInfoByUserNo" parameterType="int" resultType="org.joonzis.domain.UserInfoDTO">
+	<select id="getUserInfoByUserNo" parameterType="int" resultMap="userInfoMap">
 		SELECT
 		  U.*,
 		  D.*,
@@ -200,7 +201,7 @@
 	    FROM users
 	    WHERE user_no = #{userNo}
 	</select>
-	
+
 	<!-- 비밀번호 변경 - 임시 토큰 생성 -->
 	<insert id="insertResetToken">
 	    INSERT INTO password_reset_token (id, user_id, token, expiry_date)
@@ -274,5 +275,20 @@
 	    SET is_logged_in = #{status}
 	    WHERE user_id = #{userId}
 	</update>
+	
+	<!-- 전 체 유저 정답률 -->
+	<select id="getUserAccuracyList" resultType="org.joonzis.domain.UserAccuracyDTO">
+		SELECT
+		  USER_NICK                 AS userNick,
+		  COUNT(*)                  AS totalCount,
+		  SUM(DECODE(IS_CORRECT,'Y',1,0)) AS correctCount,
+		  ROUND(
+		    SUM(DECODE(IS_CORRECT,'Y',1,0))
+		    / COUNT(*) * 100
+		  , 2)                       AS accuracyPct
+		FROM USER_QUESTION_HISTORY
+		GROUP BY USER_NICK
+		ORDER BY accuracyPct DESC
+	</select>
 	
 </mapper>

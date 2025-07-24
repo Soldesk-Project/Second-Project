@@ -19,4 +19,5 @@ public class UserInfo {
     private Integer bdItemNo;
     private Integer titleItemNo;
     private Integer fontColorItemNo;
+    
 }
