@@ -195,21 +195,17 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 				// JSON으로 메시지 전송
 				session.sendMessage(new TextMessage(
 						objectMapper.writeValueAsString(Map.of("type", "joinDenied", "reason", "방이 이미 게임 중입니다."))));
-				session.close();
 			} catch (Exception e) {
 			}
 			return;
+		} else {
+			try {
+				// JSON으로 메시지 전송
+				session.sendMessage(new TextMessage(
+						objectMapper.writeValueAsString(Map.of("type", "joinRoom", "roomNo", roomNo, "gameMode", gameMode))));
+			} catch (Exception e) {
+			}
 		}
-		
-		System.out.println("게임 참가");
-		try {
-			// JSON으로 메시지 전송
-			session.sendMessage(new TextMessage(
-					objectMapper.writeValueAsString(Map.of("type", "joinRoom", "roomNo", roomNo, "gameMode", gameMode))));
-			session.close();
-		} catch (Exception e) {
-		}
-		
 
 		roomUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
 				.computeIfAbsent(roomNo, k -> ConcurrentHashMap.newKeySet()).add(userNick);
@@ -559,9 +555,13 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     		return;
     	}
         
+<<<<<<< Updated upstream
         if (myRank == 1) {
         	playService.countFirst(user_nick);
         }
+=======
+        roomStatus.getOrDefault(server, Collections.emptyMap()).put(roomNo, "waiting");
+>>>>>>> Stashed changes
         
         String historyUuid = UUID.randomUUID().toString();
         

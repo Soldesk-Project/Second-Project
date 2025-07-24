@@ -75,15 +75,15 @@ const RoomList = () => {
         case "joinQuestionReviewRoom":
           nav('/questionReview');
           break;
-        // case "joinRoom":
-        //   console.log('게임 중 아님 참여');
-        //   nav('/gameRoom/' + data.roomNo, {state : {gameMode : data.gameMode}});
-        //   break;
-        // case "joinDenied":
-        //   console.log('게임 중 참여불가');
+        case "joinRoom":
+          console.log('게임 중 아님 참여');
+          nav('/gameRoom/' + data.roomNo, {state : {gameMode : data.gameMode}});
+          break;
+        case "joinDenied":
+          console.log('게임 중 참여불가');
           
-        //   alert(data.reason);
-        //   break;
+          alert(data.reason);
+          break;
         default:
           break;
       }
@@ -250,7 +250,7 @@ const RoomList = () => {
           userNick
         }));
         //
-        nav('/gameRoom/' + room.gameroom_no, {state : {gameMode : room.game_mode}});
+        // nav('/gameRoom/' + room.gameroom_no, {state : {gameMode : room.game_mode}});
         //
       } else {
         alert("인원수가 가득 찼습니다");
