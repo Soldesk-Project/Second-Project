@@ -101,8 +101,4 @@ public interface UserMapper {
 	
 	// 유저 접속 정보 업데이트
 	void updateLoginStatus(@Param("userId") String userId, @Param("status") int status);
-	
-	// 테두리 번호로 테두리 이미지 가져오기
-//	void getBoundaryItemByNo(@Param(""));
-	
 }

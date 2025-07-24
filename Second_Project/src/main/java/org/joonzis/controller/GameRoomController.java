@@ -62,14 +62,7 @@ public class GameRoomController {
 		return ResponseEntity.ok(list);
 	}
 	
-	@PostMapping("/getPoint")
-	public ResponseEntity<Integer> getPoint(@RequestBody Map<String, String> userMap) {
-		String userNick = userMap.get("userNick");
-		
-		
-		return ResponseEntity.ok(1);
-	}
-
+	
 	@PostMapping("/usePoint")
 	public void usePoint(@RequestBody Map<String, String> userMap) {
 		String user_no = userMap.get("userNo");
@@ -78,8 +71,5 @@ public class GameRoomController {
         paramMap.put("user_no", user_no);
     	userservice.userPointMinus(paramMap);
 	}
-	
-	
-	
 	
 }

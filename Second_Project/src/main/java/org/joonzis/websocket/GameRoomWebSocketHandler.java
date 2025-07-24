@@ -122,6 +122,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		 case "joinQuestionReviewRoom":
          	handleJoinQuestionReviewRoom(session, json);
          	break;
+		 case "filterRoomList":
+			 handlefilterRoomList(session, json);
+			 break;
 		}
 	}
 
@@ -212,7 +215,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 			try {
 				// JSON으로 메시지 전송
 				session.sendMessage(new TextMessage(
-						objectMapper.writeValueAsString(Map.of("type", "joinRoom", "roomNo", roomNo, "gameMode", gameMode))));
+						objectMapper.writeValueAsString(Map.of("type", "joinRoom", "roomNo", roomNo, "category", category, "gameMode", gameMode))));
 			} catch (Exception e) {
 			}
 		}
@@ -619,11 +622,45 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             historyList.add(dto);
         }
         playService.saveUserHistory(historyList);
-        
-        
     }
     
+	private void handlefilterRoomList(WebSocketSession session, JsonNode json) {
+		System.out.println("handlefilterRoomList.....");
+		
+		String server = json.get("server").asText();
+		String category = json.get("category").asText();
+        String is_private = json.get("is_private").asText();
+        List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
+        Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
+        List<Map<String, Object>> roomListWithCount = new ArrayList<>();
 
+		for (GameRoomDTO room : rooms) {
+	        boolean categoryMatches = category.equals("all") || category.equals(room.getCategory());
+	        boolean isPrivateMatches = is_private.equals("all") || is_private.equals(room.getIs_private());
+
+	        if (categoryMatches && isPrivateMatches) {
+	            Map<String, Object> roomMap = new HashMap<>();
+	            roomMap.put("gameroom_no", room.getGameroom_no());
+	            roomMap.put("title", room.getTitle());
+	            roomMap.put("category", room.getCategory());
+	            roomMap.put("game_mode", room.getGame_mode());
+	            roomMap.put("is_private", room.getIs_private());
+	            roomMap.put("limit", room.getLimit());
+	            roomMap.put("pwd", room.getPwd());
+
+	            Set<String> users = roomUserMap.getOrDefault(room.getGameroom_no(), Collections.emptySet());
+	            roomMap.put("currentCount", users.size());
+
+	            roomListWithCount.add(roomMap);
+	        }
+	    }
+
+		try {
+			session.sendMessage(new TextMessage(
+					objectMapper.writeValueAsString(Map.of("type", "filterRoomList", "rooms", roomListWithCount))));
+		} catch (Exception e) {
+		}
+	}
 
 	private void broadcastUserList(String server) {
 		Set<String> users = serverUsers.getOrDefault(server, Collections.emptySet());

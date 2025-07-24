@@ -8,18 +8,6 @@ import axios from 'axios';
 import Loading from '../../components/Loading';
 import Test from '../../components/Test';
 
-const getUserIdFromToken = () => {
-  const token = localStorage.getItem("token");
-  if (!token) return null;
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.userId || payload.sub || payload.username;
-  } catch (e) {
-    console.error(":x: JWT 파싱 오류:", e);
-    return null;
-  }
-};
-
 const QuestionReview = () => {
   const [questionReviewList, setQuestionReviewList]=useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,7 +24,7 @@ const QuestionReview = () => {
   const { user, server } = useSelector((state) => state.user);
   const userNick = user.user_nick;
   const userNo = user.user_no;
-  const userId = getUserIdFromToken();
+  const userId = user?.user_id;
   const nav = useNavigate();
 
   const sockets = useContext(WebSocketContext);
@@ -113,6 +101,9 @@ const QuestionReview = () => {
   }
 
   // 다음 문제 버튼
+  const prevQuestion=()=>{
+    setNextId(prev=>prev-1);
+  }
   const nextQuestion=()=>{
     setNextId(prev=>prev+1);
   }
@@ -177,6 +168,7 @@ const QuestionReview = () => {
                 <h1>문제 다시 풀어 보기</h1>
               </div>
               <div className={styles.initiatorBtn}>
+                <button onClick={prevQuestion} >이전 문제</button>
                 <button onClick={nextQuestion} >다음 문제</button>
                 <button onClick={getAnswer} >포인트로 정답 확인하기</button>
                 {
