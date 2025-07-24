@@ -8,18 +8,6 @@ import { useSelector } from 'react-redux';
 import { WebSocketContext } from '../util/WebSocketProvider';
 import PasswordModal from './modal/PasswordModal';
 
-const getUserIdFromToken = () => {
-  const token = localStorage.getItem("token");
-  if (!token) return null;
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.userId || payload.sub || payload.username;
-  } catch (e) {
-    console.error(":x: JWT 파싱 오류:", e);
-    return null;
-  }
-};
-
 const RoomList = () => {
   const [category, setCategory] = useState('random');
   const [gameRoomList, setGameRoomList] = useState([]);
@@ -30,14 +18,12 @@ const RoomList = () => {
   const [password, setPassword] = useState('');
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [matchStatus, setMatchStatus] = useState('idle'); // 'idle' | 'pending' | 'waiting'
-  
+
   const { user, server } = useSelector((state) => state.user);
-  const userId = getUserIdFromToken();
-  
   const userNick = user.user_nick;
   const nav = useNavigate();
   const sockets = useContext(WebSocketContext);
-  
+
   useEffect(() => {
     const socket = sockets['room'];
     if (!socket) return;
@@ -118,7 +104,7 @@ const RoomList = () => {
           break;
           
         case "MATCH_FOUND":
-          if (data.roomLeaderId === userId) {
+          if (data.roomLeaderId === user.user_id) {
             const roomData = {
               action: "createRoom",
               title : "",
@@ -173,11 +159,10 @@ const RoomList = () => {
   }, [sockets, nav]);
 
   const handleQuickMatch = async () => {
-    
     setMatchStatus('searching');
 
     try {
-      await axios.post('/api/rank/score', { userId: userId });
+      await axios.post('/api/rank/score', { userId: user.user_id });
 
       const matchSocket = sockets['match'];
       if (!matchSocket) {
@@ -188,13 +173,13 @@ const RoomList = () => {
       if (matchSocket.readyState === 1) {
         matchSocket.send(JSON.stringify({
           action: 'quickMatch',
-          userId: userId
+          userId: user.user_id
         }));
       } else if (matchSocket.readyState === 0) {
         matchSocket.onopen = () => {
           matchSocket.send(JSON.stringify({
             action: 'quickMatch',
-            userId: userId
+            userId: user.user_id
           }));
         };
       } else {
@@ -266,7 +251,7 @@ const RoomList = () => {
     if (matchSocket && matchSocket.readyState === 1) {
       matchSocket.send(JSON.stringify({
         action: 'cancelMatch',
-        userId: userId
+        userId: user.user_id
       }));
     }
     setMatchStatus('idle');
@@ -297,13 +282,13 @@ const RoomList = () => {
         return "네트워크관리사1급";
       case "net2":
         return "네트워크관리사2급";
-        default:
-          return category || "알 수 없음";
-        }
-      }
-      
-      return (
-        <>
+      default:
+        return category || "알 수 없음";
+    }
+  }
+
+  return (
+    <>
       {modalOpen && (
         <ModalBasic
           setModalOpen={setModalOpen}
@@ -331,7 +316,7 @@ const RoomList = () => {
       {showMatchModal && matchStatus === 'pending' && (
         <MatchModal
           socket={sockets['match']}
-          currentUserId={userId}
+          currentUserId={user.user_id}
           setShowMatchModal={setShowMatchModal}
           setMatchStatus={setMatchStatus}
         />

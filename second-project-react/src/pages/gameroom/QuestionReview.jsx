@@ -8,6 +8,18 @@ import axios from 'axios';
 import Loading from '../../components/Loading';
 import Test from '../../components/Test';
 
+const getUserIdFromToken = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.userId || payload.sub || payload.username;
+  } catch (e) {
+    console.error(":x: JWT 파싱 오류:", e);
+    return null;
+  }
+};
+
 const QuestionReview = () => {
   const [questionReviewList, setQuestionReviewList]=useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +36,7 @@ const QuestionReview = () => {
   const { user, server } = useSelector((state) => state.user);
   const userNick = user.user_nick;
   const userNo = user.user_no;
-  const userId = user?.user_id;
+  const userId = getUserIdFromToken();
   const nav = useNavigate();
 
   const sockets = useContext(WebSocketContext);
