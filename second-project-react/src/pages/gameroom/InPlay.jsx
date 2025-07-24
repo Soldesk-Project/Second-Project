@@ -6,6 +6,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { WebSocketContext } from '../../util/WebSocketProvider';
 import GameChatbox from '../../components/chatbox/GameChatbox';
 import ResultModal from '../../components/modal/ResultModal';
+import axios from 'axios';
 
 const getRankedUsers = (users, gameMode) => {
   const sorted = [...users].sort((a, b) => {
@@ -57,6 +58,7 @@ const InPlay = () => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [userAnswerHistory, setUserAnswerHistory] = useState([]);
   const [submitted, setSubmitted] = useState(false);
+  const [userProfiles, setUserProfiles] = useState({});
   const [questionStartTime, setQuestionStartTime] = useState(null);
   const [userElapsedTimes, setUserElapsedTimes] = useState([]);
   const myTotalElapsed = userElapsedTimes.reduce((sum, t) => sum + t, 0);
@@ -72,6 +74,27 @@ const InPlay = () => {
   const gameMode = location.state?.gameMode || location.state?.game_mode || 'normal';
   const rankedUsers = useMemo(() => getRankedUsers(users, gameMode), [users, gameMode]);
   const messageTimeoutRef = useRef({});
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      const profiles = {};
+      await Promise.all(users.map(async (user) => {
+        try {
+          const res = await axios.get(`/user/${userNo}`);
+          console.log(res.data);
+          
+          profiles[user.userNick] = res.data; // 또는 user.userNo로 키 설정
+        } catch (error) {
+          console.error(`❌ 유저 프로필 불러오기 실패: ${userNick}`, error);
+        }
+      }));
+      setUserProfiles(profiles);
+    };
+
+    if (users.length > 0) {
+      fetchProfiles();
+    }
+  }, [users]);
   
   // 소켓
   const sockets = useContext(WebSocketContext);
@@ -493,16 +516,44 @@ const InPlay = () => {
         <div className={styles.game_join_userList}>
           {Array.from({ length: 4 }).map((_, i) => {
             const user = users[i];  // 없는 인덱스면 undefined
+            const profile = userProfiles[user?.userNick];
+
             return user ? (
               <div key={user.userNo} className={styles.user_card}>
                 <div className={styles.role_badge}>{user.isOwner ? '방장' : '유저'}</div>
+
+                {/* ✅ 프로필 이미지 + 테두리 */}
+                {profile && (
+                  <div className={styles.profileImageWrapper}>
+                    <img
+                      src={`/images/border/${profile.imageFileName}`}
+                      alt="테두리"
+                      className={styles.borderImage}
+                    />
+                    <img
+                      src={profile.user_profile_img}
+                      alt="프로필"
+                      className={styles.profileImage}
+                    />
+                  </div>
+                )}
+
                 <div className={styles.user_info}>
                   <span className={styles.nick}>{user.userNick}</span>
                   <span className={styles.score}>점수: {user.score ?? 0}</span>
                   <span className={styles.score}>
                     시간: {typeof user.elapsedTime === 'number' ? user.elapsedTime.toFixed(3) + "초" : "-"}
                   </span>
+
+                  {/* ✅ 랭크 및 칭호 추가 표시 */}
+                  {profile && (
+                    <>
+                      <span className={styles.rank}>랭크: {profile.user_rank}</span>
+                      <span className={styles.title}>칭호: {profile.titleItemNo ?? '-'}</span>
+                    </>
+                  )}
                 </div>
+
                 {userRecentChats[user.userNick] && (
                   <div className={styles.chatBubble}>
                     {userRecentChats[user.userNick].message}

@@ -20,7 +20,6 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
-      console.trace("🧨 setUser 호출됨 with payload:", action.payload);
       state.user = action.payload;
       localStorage.setItem('user', JSON.stringify(action.payload));
     },
