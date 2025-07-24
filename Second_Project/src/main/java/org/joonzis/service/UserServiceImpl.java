@@ -8,8 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.ItemVO;
-import org.joonzis.domain.UserAchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserInfoDecoDTO;
@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService{
 	
 	// 업적 달성 - 포인트 추가
 	@Override
-	public int updateUserPoint(UserAchievementDTO dto) {
+	public int updateUserPoint(AchievementDTO dto) {
 		return mapper.updateUserPoint(dto);
 	}
 	

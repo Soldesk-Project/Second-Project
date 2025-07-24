@@ -23,7 +23,7 @@
 	</select>
 	
 	<!-- 유저업적 저장 -->
-	<insert id="addUserAchievement" parameterType="org.joonzis.domain.UserAchievementDTO">
+	<insert id="addUserAchievement" parameterType="org.joonzis.domain.AchievementDTO">
 		INSERT INTO USER_ACHIEVEMENT (USER_NO, ACH_TITLE, ACHIEVED_DATE)
 		VALUES (#{user_no}, #{ach_title}, sysdate)
 	</insert>

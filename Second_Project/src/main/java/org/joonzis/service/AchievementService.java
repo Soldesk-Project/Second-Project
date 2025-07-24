@@ -3,7 +3,6 @@ package org.joonzis.service;
 import java.util.List;
 
 import org.joonzis.domain.AchievementDTO;
-import org.joonzis.domain.UserAchievementDTO;
 
 public interface AchievementService {
 	
@@ -11,5 +10,5 @@ public interface AchievementService {
 	public List<AchievementDTO> getAchievementList(int user_no);
 	
 	// 유저업적 저장
-	public int addUserAchievement(UserAchievementDTO dto);
+	public int addUserAchievement(AchievementDTO dto);
 }

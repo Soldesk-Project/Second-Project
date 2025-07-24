@@ -3,7 +3,6 @@ package org.joonzis.controller;
 import java.util.List;
 
 import org.joonzis.domain.AchievementDTO;
-import org.joonzis.domain.UserAchievementDTO;
 import org.joonzis.service.AchievementService;
 import org.joonzis.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,7 @@ public class AchievementController {
 	
 	// 유저업적 저장 및 리워드 적용
 	@PostMapping(value = "/achievement/add", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> addUserAchievement(@RequestBody UserAchievementDTO dto) {
+	public ResponseEntity<?> addUserAchievement(@RequestBody AchievementDTO dto) {
 		int addSuccess = service.addUserAchievement(dto);
 	    if (addSuccess != 0) {
 	    	int rewardSuccess = userService.updateUserPoint(dto);

@@ -5,8 +5,8 @@ import java.util.Map;
 
 import javax.mail.MessagingException;
 
+import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.ItemVO;
-import org.joonzis.domain.UserAchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserInfoDecoDTO;
@@ -32,7 +32,7 @@ public interface UserService {
 	public boolean updateItem(UserDecoUpdateDTO UserDecoUpdateDTO);
 	
 	// 업적 달성 - 포인트 추가
-	public int updateUserPoint(UserAchievementDTO dto);
+	public int updateUserPoint(AchievementDTO dto);
 	
 	// 아이템 구매 - 포인트 감소
 	public boolean userPointMinus(Map<String, Object> paramMap);

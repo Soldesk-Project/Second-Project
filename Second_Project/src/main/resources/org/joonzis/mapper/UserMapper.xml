@@ -101,7 +101,7 @@
 	</select>
 	
 	<!-- 업적 달성 - 포인트 추가 -->
-	<update id="updateUserPoint" parameterType="org.joonzis.domain.UserAchievementDTO">
+	<update id="updateUserPoint" parameterType="org.joonzis.domain.AchievementDTO">
 		UPDATE USERS
 	    SET USER_POINT = USER_POINT + #{ach_reward}
 	    WHERE USER_NO = #{user_no}

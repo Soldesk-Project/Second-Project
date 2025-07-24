@@ -12,6 +12,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AchievementDTO {
-	private int ach_content, ach_reward;
+	private int user_no, ach_content, ach_reward;
 	private String ach_title, is_reward, ach_type;
 }
