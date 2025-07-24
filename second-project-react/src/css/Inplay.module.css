@@ -104,8 +104,33 @@
 
 /* 유저 정보 영역 */
 .user_info {
-  width: 350px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  width: 100%;
+  align-items: center;
 }
+
+
+.userTopInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  gap: 4px;
+}
+
+.scoreBottomRow {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: auto; /* ✅ 핵심: 하단으로 밀기 */
+  padding-top: 6px;
+  border-top: 1px solid rgba(255,255,255,0.2);
+  width: 100%;
+}
+
 
 /* 중앙 로비 영역 */
 .lobby_center {
@@ -236,14 +261,15 @@ button:disabled {
 /* 게임 참여 유저 카드 스타일 (1열 세로 최대 4명) */
 .user_card {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
   background-color: rgba(0, 0, 0, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   padding: 12px 16px;
-  /* margin-bottom: 12px; → 제거 (slot간 gap/justify로 띄움) */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  height: 220px; /* 필요 시 조절 */
   color: white;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
 
@@ -263,13 +289,6 @@ button:disabled {
   margin-right: 10px;
 }
 
-/* 유저 정보 묶음 */
-.user_info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
 .nick {
   font-size: 16px;
   font-weight: 500;
@@ -278,4 +297,43 @@ button:disabled {
 .score {
   font-size: 14px;
   color: #bbb;
+  font-weight: 500;
+}
+
+.profileImageWrapper {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  margin: 6px auto;
+}
+
+.profileImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.borderImage {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+.rank {
+  display: block;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+.title {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
 }

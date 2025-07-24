@@ -21,6 +21,7 @@ const RoomList = () => {
 
   const { user, server } = useSelector((state) => state.user);
   const userNick = user.user_nick;
+  const userNo = user.user_no;
   const nav = useNavigate();
   const sockets = useContext(WebSocketContext);
 
@@ -37,7 +38,6 @@ const RoomList = () => {
         socket.send(JSON.stringify({ action: "join", server, userNick }));
       };
     }
-    console.log(socket);
     
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -53,7 +53,8 @@ const RoomList = () => {
             server: data.server,
             category: data.category,
             game_mode: data.game_mode,
-            userNick
+            userNick,
+            userNo: userNo
           }));
           
           nav('/gameRoom/' + data.gameroom_no, { state: { category: data.category, gameMode: data.game_mode } });
@@ -128,7 +129,8 @@ const RoomList = () => {
               server: data.server,
               game_mode: "rank",
               category: "random",
-              userNick: user.user_nick
+              userNick: user.user_nick,
+              userNo: userNo
             };
             if(socket && socket.readyState === 1){
               socket.send(JSON.stringify(joinData))
@@ -232,7 +234,8 @@ const RoomList = () => {
           roomNo: room.gameroom_no,
           game_mode: room.game_mode,
           category: room.category,
-          userNick
+          userNick,
+          userNo: userNo
         }));
         //
         // nav('/gameRoom/' + room.gameroom_no, {state : {gameMode : room.game_mode}});

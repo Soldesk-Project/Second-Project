@@ -57,6 +57,7 @@ const InPlay = () => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [userAnswerHistory, setUserAnswerHistory] = useState([]);
   const [submitted, setSubmitted] = useState(false);
+  const [userProfiles, setUserProfiles] = useState({});
   const [questionStartTime, setQuestionStartTime] = useState(null);
   const [userElapsedTimes, setUserElapsedTimes] = useState([]);
   const myTotalElapsed = userElapsedTimes.reduce((sum, t) => sum + t, 0);
@@ -147,7 +148,11 @@ const InPlay = () => {
 
     const joinAndRequestUserList = () => {
       socket.send(JSON.stringify({ action: 'join', server, userNick }));
-      socket.send(JSON.stringify({ action: 'roomUserList', server: gameMode === 'rank' ? 'rank' : server, roomNo }));
+      socket.send(JSON.stringify({ action: 'roomUserList', 
+                                   server: gameMode === 'rank' ? 'rank' : server, 
+                                   roomNo, 
+                                   userNo 
+                                }));
     };
 
     if (socket.readyState === 1) {
@@ -168,6 +173,7 @@ const InPlay = () => {
           (gameMode === 'rank' && data.server === 'rank')
         )
       ) {
+        
         const ownerNick = data.owner;
         const formattedUsers = data.userList.map((nick, no) => ({
           userNick: nick,
@@ -176,6 +182,13 @@ const InPlay = () => {
         }));
         
         setUsers(formattedUsers);
+
+        console.log(data.profiles);
+        
+
+        if (data.profiles) {
+          setUserProfiles(data.profiles); // ✅ 전체를 그대로 덮어쓰기
+        }
       }
 
       if (
@@ -189,12 +202,16 @@ const InPlay = () => {
           setNextId(0);
           questionListRef.current = data.list;
           setQuestion(data.list[0]);
+          setUserAnswerHistory([]);
           setPlay(true);
           setResult(false);
           setUsers(users => users.map(u => ({
             ...u,
-            score: 0})));
+            score: 0,
+            elapsedTime: 0
+          })));
           setTime(5);
+          setUserElapsedTimes([])
         } else {
           console.error("질문 리스트가 유효하지 않습니다. 데이터:", data.list);
         }
@@ -215,7 +232,7 @@ const InPlay = () => {
       ) {
         const nextId = Number(data.nextId);
         setNextId(nextId);
-        setTime(3);
+        setTime(1);
 
         if (questionListRef.current.length === 0) {
           console.error("questionListRef가 비어 있습니다.");
@@ -318,6 +335,9 @@ const InPlay = () => {
         const myInfo = rankedUsers.find(u => u.userNick === userNick);
         // console.log(myInfo);
         const myPoint = myInfo.point ?? 0;
+        const rankPoint = myInfo.rankPoint ?? 0;
+        const myRank = myInfo.rank ?? 0;
+        
         console.log(userAnswerHistory);
         socket.send(JSON.stringify({
           action: 'rewardPointsAndSaveUserHistory',
@@ -325,6 +345,8 @@ const InPlay = () => {
           roomNo,
           userNick,
           point: myPoint,
+          rankPoint: rankPoint,
+          myRank: myRank,
           history: userAnswerHistory
         }));
       } else {
@@ -484,16 +506,49 @@ const InPlay = () => {
         <div className={styles.game_join_userList}>
           {Array.from({ length: 4 }).map((_, i) => {
             const user = users[i];  // 없는 인덱스면 undefined
+            const profile = userProfiles[user?.userNick];
+
             return user ? (
               <div key={user.userNo} className={styles.user_card}>
                 <div className={styles.role_badge}>{user.isOwner ? '방장' : '유저'}</div>
+
+                {/* ✅ 프로필 이미지 + 테두리 */}
+                {profile && (
+                  <div className={styles.profileImageWrapper}>
+                    <img
+                      src={`/images/${profile.imageFileName}`}
+                      alt="테두리"
+                      className={styles.borderImage}
+                    />
+                    <img
+                      src={profile.user_profile_img}
+                      alt="프로필"
+                      className={styles.profileImage}
+                    />
+                  </div>
+                )}
+
                 <div className={styles.user_info}>
-                  <span className={styles.nick}>{user.userNick}</span>
-                  <span className={styles.score}>점수: {user.score ?? 0}</span>
-                  <span className={styles.score}>
-                    시간: {typeof user.elapsedTime === 'number' ? user.elapsedTime.toFixed(3) + "초" : "-"}
-                  </span>
+                  <div className={styles.userTopInfo}>
+                    <span className={styles.nick}>{user.userNick}</span>
+
+                    {profile && (
+                      <>
+                        <span className={styles.rank}>랭크: {profile.user_rank}</span>
+                        <span className={styles.title}>칭호: {profile.titleItemNo ?? '-'}</span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* ✅ 항상 아래에 위치하게 할 점수+시간 */}
+                  <div className={styles.scoreBottomRow}>
+                    <span className={styles.score}>점수: {user.score ?? 0}</span>
+                    <span className={styles.score}>
+                      시간: {typeof user.elapsedTime === 'number' ? user.elapsedTime.toFixed(3) + "초" : "-"}
+                    </span>
+                  </div>
                 </div>
+
                 {userRecentChats[user.userNick] && (
                   <div className={styles.chatBubble}>
                     {userRecentChats[user.userNick].message}

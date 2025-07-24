@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.Param;
 import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserAccuracyDTO;
-import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserRewardVO;
@@ -102,5 +101,8 @@ public interface UserMapper {
 	
 	// 유저 접속 정보 업데이트
 	void updateLoginStatus(@Param("userId") String userId, @Param("status") int status);
+	
+	// 테두리 번호로 테두리 이미지 가져오기
+//	void getBoundaryItemByNo(@Param(""));
 	
 }
