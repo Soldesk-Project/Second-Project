@@ -17,9 +17,9 @@ const QuestAdminSidebar = ({setActiveQuestMenu}) => {
       <button className='DbMenu' onClick={toggleDbMenu}>문제 DB 관리 {isDbMenuOpen ? '▼' : '▶'}</button><br/>
       {isDbMenuOpen && (
         <ul className="submenu-list">
-          <li><button className="questRegisterBtn" onClick={()=> setActiveQuestMenu('register')}>문제 등록</button></li>
-          <li><button className="questEditBtn" onClick={()=> setActiveQuestMenu('edit')}>문제 수정</button></li>
-          <li><button className="questDeleteBtn" onClick={()=> setActiveQuestMenu('delete')}>문제 삭제</button></li>
+          <li><button className="questRegisterBtn" onClick={()=> setActiveQuestMenu('questRegister')}>문제 등록</button></li>
+          <li><button className="questEditBtn" onClick={()=> setActiveQuestMenu('questEdit')}>문제 수정</button></li>
+          <li><button className="questDeleteBtn" onClick={()=> setActiveQuestMenu('questDelete')}>문제 삭제</button></li>
         </ul>
       )}
       <button className='ReportMenu' onClick={toggleReportMenu}>문제 제보 관리 {isReportMenuOpen ? '▼' : '▶'}</button>

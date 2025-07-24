@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../../css/adminPage/AchRegister.css';
+import '../../css/adminPage/Register.css';
 
 const AchRegister = () => {
   const [achTitle, setAchTitle] = useState('');

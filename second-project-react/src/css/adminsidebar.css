@@ -2,7 +2,8 @@
 .ReportMenu,
 .InfoMenu,
 .AuthMenu,
-.AchMenu {
+.AchMenu,
+.ItemMenu {
   width : 300px;
   color: white;
   background-color: grey;

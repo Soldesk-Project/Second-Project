@@ -16,6 +16,9 @@ import UserRestrict from '../components/adminBodyComp/UserRestrict';
 import AchAdminSidebar from '../components/AdminSidebar/AchAdminSidebar';
 import AchRegister from '../components/adminBodyComp/AchRegister';
 import AchDelete from '../components/adminBodyComp/AchDelete';
+import ItemRegister from '../components/adminBodyComp/ItemRegister';
+import ItemEdit from '../components/adminBodyComp/ItemEdit';
+import ItemDelete from '../components/adminBodyComp/ItemDelete';
 
 const AdminPage = () => {
   const currentUser = useSelector((state) => state.user.user);
@@ -42,11 +45,11 @@ const AdminPage = () => {
   // activeQuestMenu 값에 따라 렌더링할 컴포넌트를 결정하는 함수
   const renderQuestContent = () => {
     switch (activeQuestMenu) {
-      case 'register':
+      case 'questRegister':
         return <QuestRegister/>;
-      case 'edit':
+      case 'questEdit':
         return <QuestEdit/>;
-      case 'delete':
+      case 'questDelete':
         return <QuestDelete/>;
       case 'regiCallManage':
         return <QuestRegiCallManage />;
@@ -74,10 +77,16 @@ const AdminPage = () => {
   //activeAchieveMenu 값에 따라 렌더링할 컴포넌트를 결정하는 함수
   const renderAchContent = () => {
     switch (activeAchMenu){
-      case 'register' :
+      case 'achRegister' :
         return <AchRegister/>;
-      case 'delete' :
+      case 'achDelete' :
         return <AchDelete/>;
+      case 'itemRegister' : 
+        return <ItemRegister/>;
+      case 'itemEdit' : 
+        return <ItemEdit/>;
+      case 'itemDelete' : 
+        return <ItemDelete/>;
       default:
         return <AchRegister/>;
     }
@@ -90,7 +99,7 @@ const AdminPage = () => {
       <div className={styles.top_nav}>
         <button className="QuestAdminBtn" onClick={setPageQuestAdmin}>문제/제보관리</button>
         <button className="UserAdminBtn" onClick={setpageUserAdmin}>유저/권한관리</button>
-        <button className="AchAdminBtn" onClick={setPageAchAdmin}>업적관리</button>
+        <button className="AchAdminBtn" onClick={setPageAchAdmin}>업적/상점관리</button>
         <span>관리자 {userNick} 님</span>
       </div>
       {/*메인 바디 */}

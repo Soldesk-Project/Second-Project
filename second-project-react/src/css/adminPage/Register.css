@@ -1,8 +1,8 @@
-@import './QuestAdmin.css';
+@import './Admin.css';
 
-/* QuestRegister.css */
-
-.quest-register-container {
+.quest-register-container,
+.achievement-register-container,
+.item-register-container {
   padding: 20px;
   width: 100%;
   background-color: #f9f9f9;
@@ -10,7 +10,9 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.quest-register-title {
+.quest-register-title,
+.achievement-register-title,
+item-register-title {
   color: #333;
   text-align: center;
   margin-bottom: 30px;
@@ -30,22 +32,31 @@
 .question-text-section,
 .option-section,
 .correct-answer-section,
-.photo-input-section {
+.photo-input-section,
+.type-section,
+.achievement-text-section,
+.item-Name-section,
+.item-Price-section {
   margin-bottom: 25px;
 }
 
 .category-select,
-.correct-answer-select {
+.correct-answer-select,
+.achtype-select,
+.itemType-select {
   width: auto;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1em;
-  box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+  box-sizing: border-box;
 }
 
-/* 문제 본문 입력 */
-.question-text-input {
+/* 텍스트/넘버 입력 */
+.question-text-input,
+.achievement-text-input,
+.item-Name-input,
+.item-Price-input {
   width: 100%; /* 부모 div의 100%를 차지하도록 수정 */
   padding: 10px;
   border: 1px solid #ddd;

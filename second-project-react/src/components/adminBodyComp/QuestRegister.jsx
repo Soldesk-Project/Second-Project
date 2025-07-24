@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../../css/adminPage/QuestRegister.css'; // CSS 파일 임포트
+import '../../css/adminPage/Register.css'; // CSS 파일 임포트
 
 const QuestRegister = () => {
   const [selectedImage, setSelectedImage] = useState(null);

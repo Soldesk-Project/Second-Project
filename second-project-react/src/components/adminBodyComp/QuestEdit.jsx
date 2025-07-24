@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import '../../css/adminPage/QuestEdit.css'; // 수정된 QuestEdit.css 임포트
+import '../../css/adminPage/Edit.css';
 
 const QuestEdit = () => {
   const [selectedImage, setSelectedImage] = useState(null);
