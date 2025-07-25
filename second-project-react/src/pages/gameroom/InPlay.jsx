@@ -6,7 +6,6 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { WebSocketContext } from '../../util/WebSocketProvider';
 import GameChatbox from '../../components/chatbox/GameChatbox';
 import ResultModal from '../../components/modal/ResultModal';
-import axios from 'axios';
 
 const getRankedUsers = (users, gameMode) => {
   const sorted = [...users].sort((a, b) => {
@@ -74,27 +73,6 @@ const InPlay = () => {
   const gameMode = location.state?.gameMode || location.state?.game_mode || 'normal';
   const rankedUsers = useMemo(() => getRankedUsers(users, gameMode), [users, gameMode]);
   const messageTimeoutRef = useRef({});
-
-  useEffect(() => {
-    const fetchProfiles = async () => {
-      const profiles = {};
-      await Promise.all(users.map(async (user) => {
-        try {
-          const res = await axios.get(`/user/${userNo}`);
-          console.log(res.data);
-          
-          profiles[user.userNick] = res.data; // 또는 user.userNo로 키 설정
-        } catch (error) {
-          console.error(`❌ 유저 프로필 불러오기 실패: ${userNick}`, error);
-        }
-      }));
-      setUserProfiles(profiles);
-    };
-
-    if (users.length > 0) {
-      fetchProfiles();
-    }
-  }, [users]);
   
   // 소켓
   const sockets = useContext(WebSocketContext);
@@ -170,7 +148,11 @@ const InPlay = () => {
 
     const joinAndRequestUserList = () => {
       socket.send(JSON.stringify({ action: 'join', server, userNick }));
-      socket.send(JSON.stringify({ action: 'roomUserList', server: gameMode === 'rank' ? 'rank' : server, roomNo }));
+      socket.send(JSON.stringify({ action: 'roomUserList', 
+                                   server: gameMode === 'rank' ? 'rank' : server, 
+                                   roomNo, 
+                                   userNo 
+                                }));
     };
 
     if (socket.readyState === 1) {
@@ -191,6 +173,7 @@ const InPlay = () => {
           (gameMode === 'rank' && data.server === 'rank')
         )
       ) {
+        
         const ownerNick = data.owner;
         const formattedUsers = data.userList.map((nick, no) => ({
           userNick: nick,
@@ -199,6 +182,13 @@ const InPlay = () => {
         }));
         
         setUsers(formattedUsers);
+
+        console.log(data.profiles);
+        
+
+        if (data.profiles) {
+          setUserProfiles(data.profiles); // ✅ 전체를 그대로 덮어쓰기
+        }
       }
 
       if (
@@ -526,7 +516,7 @@ const InPlay = () => {
                 {profile && (
                   <div className={styles.profileImageWrapper}>
                     <img
-                      src={`/images/border/${profile.imageFileName}`}
+                      src={`/images/${profile.imageFileName}`}
                       alt="테두리"
                       className={styles.borderImage}
                     />
@@ -539,19 +529,24 @@ const InPlay = () => {
                 )}
 
                 <div className={styles.user_info}>
-                  <span className={styles.nick}>{user.userNick}</span>
-                  <span className={styles.score}>점수: {user.score ?? 0}</span>
-                  <span className={styles.score}>
-                    시간: {typeof user.elapsedTime === 'number' ? user.elapsedTime.toFixed(3) + "초" : "-"}
-                  </span>
+                  <div className={styles.userTopInfo}>
+                    <span className={styles.nick}>{user.userNick}</span>
 
-                  {/* ✅ 랭크 및 칭호 추가 표시 */}
-                  {profile && (
-                    <>
-                      <span className={styles.rank}>랭크: {profile.user_rank}</span>
-                      <span className={styles.title}>칭호: {profile.titleItemNo ?? '-'}</span>
-                    </>
-                  )}
+                    {profile && (
+                      <>
+                        <span className={styles.rank}>랭크: {profile.user_rank}</span>
+                        <span className={styles.title}>칭호: {profile.titleItemNo ?? '-'}</span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* ✅ 항상 아래에 위치하게 할 점수+시간 */}
+                  <div className={styles.scoreBottomRow}>
+                    <span className={styles.score}>점수: {user.score ?? 0}</span>
+                    <span className={styles.score}>
+                      시간: {typeof user.elapsedTime === 'number' ? user.elapsedTime.toFixed(3) + "초" : "-"}
+                    </span>
+                  </div>
                 </div>
 
                 {userRecentChats[user.userNick] && (

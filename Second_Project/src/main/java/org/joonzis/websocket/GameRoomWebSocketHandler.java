@@ -14,8 +14,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.joonzis.domain.GameRoomDTO;
 import org.joonzis.domain.QuestionDTO;
+import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserQuestionHistoryDTO;
 import org.joonzis.service.PlayService;
+import org.joonzis.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -65,6 +67,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
 	// 방별로 한 번만 시작하도록 관리
 	private final Set<String> startedRankRooms = ConcurrentHashMap.newKeySet();
+	
+	// userNo -> userNick
+	private final Map<String, Integer> nickToUserNoMap = new ConcurrentHashMap<>();
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -72,6 +77,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
 	@Autowired
 	private PlayService playService;
+	
+	@Autowired
+    private UserService userService;
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) {
@@ -114,6 +122,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		 case "joinQuestionReviewRoom":
          	handleJoinQuestionReviewRoom(session, json);
          	break;
+		 case "filterRoomList":
+			 handlefilterRoomList(session, json);
+			 break;
 		}
 	}
 
@@ -184,9 +195,11 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 				: (String) session.getAttributes().get("server");
 		String roomNo = json.get("roomNo").asText();
 		String userNick = json.get("userNick").asText();
+		int userNo = json.get("userNo").asInt(); // 클라이언트에서 이 값도 보내도록 해야 함
 		String gameMode = json.get("game_mode").asText();
 		String category = json.get("category").asText();
 		String status = roomStatus.getOrDefault(server, Collections.emptyMap()).get(roomNo);
+		nickToUserNoMap.put(userNick, userNo);
 		System.out.println("상태" + status);
 		// 게임 중 입장 거부
 		if ("playing".equals(status)) {
@@ -202,7 +215,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 			try {
 				// JSON으로 메시지 전송
 				session.sendMessage(new TextMessage(
-						objectMapper.writeValueAsString(Map.of("type", "joinRoom", "roomNo", roomNo, "gameMode", gameMode))));
+						objectMapper.writeValueAsString(Map.of("type", "joinRoom", "roomNo", roomNo, "category", category, "gameMode", gameMode))));
 			} catch (Exception e) {
 			}
 		}
@@ -297,32 +310,62 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	}
 
 	// 방별 유저 리스트
-	private void handleUserList(WebSocketSession session, JsonNode json) {
-		String roomNo = json.get("roomNo").asText();
-		String server = json.get("server").asText();
-		if (server == null || roomNo == null)
-			return;
+    private void handleUserList(WebSocketSession session, JsonNode json) {
+        String roomNo = json.get("roomNo").asText();
+        String server = json.get("server").asText();
+        int requestingUserNo = json.get("userNo").asInt();
 
-		String userNick = (String) session.getAttributes().get("userNick");
+        if (server == null || roomNo == null) return;
 
-		Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
-		Set<String> userNicks = roomUserMap.getOrDefault(roomNo, Collections.emptySet());
-		List<String> userList = new ArrayList<>(userNicks);
+        String userNick = (String) session.getAttributes().get("userNick");
 
-		Map<String, Object> payload = Map.of("type", "roomUserList", "server", server, "roomNo", roomNo, "userNick",
-				userNick, "userList", userList);
+        Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
+        Set<String> userNicks = roomUserMap.getOrDefault(roomNo, Collections.emptySet());
+        List<String> userList = new ArrayList<>(userNicks);
 
-		try {
-			String jsonStr = objectMapper.writeValueAsString(payload);
-			if (session.isOpen()) {
-				session.sendMessage(new TextMessage(jsonStr));
-			}
-		} catch (Exception e) {
-			System.out.println("Error sending roomUserList for roomNo " + roomNo + ": " + e.getMessage());
-			e.printStackTrace();
-		}
-		broadcastRoomUserList(server, roomNo);
-	}
+        Map<String, Map<String, Object>> profiles = new HashMap<>();
+        for (String nick : userList) {
+            Integer userNo = nickToUserNoMap.get(nick);
+            if (userNo != null) {
+                UserInfoDTO dto = userService.getUserInfoByUserNo(userNo);
+                
+//                String boundaryItemNo = userService.getBoundaryItemByNo(dto.getBoundaryItemNo());
+                
+                System.out.println("dto -> " + dto);
+
+                // ✅ null-safe 방식으로 HashMap 사용
+                Map<String, Object> profile = new HashMap<>();
+                profile.put("user_rank", dto.getUser_rank());
+                profile.put("user_profile_img", dto.getUser_profile_img());
+                profile.put("imageFileName", dto.getImageFileName());
+                profile.put("titleItemNo", dto.getTitleItemNo());
+                profile.put("backgroundItemNo", dto.getBackgroundItemNo());
+
+                profiles.put(nick, profile);
+            }
+        }
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("type", "roomUserList");
+        payload.put("server", server);
+        payload.put("roomNo", roomNo);
+        payload.put("userNick", userNick);
+        payload.put("userList", userList);
+        payload.put("profiles", profiles);
+
+        try {
+            String jsonStr = objectMapper.writeValueAsString(payload);
+            if (session.isOpen()) {
+                session.sendMessage(new TextMessage(jsonStr));
+            }
+        } catch (Exception e) {
+            System.out.println("Error sending roomUserList for roomNo " + roomNo + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        broadcastRoomUserList(server, roomNo); // 이건 필요하면 추후 리팩토링
+    }
+
 
 	// 일반 모드 게임 시작
 	private void handleStartGame(WebSocketSession session, JsonNode json) {
@@ -579,11 +622,45 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             historyList.add(dto);
         }
         playService.saveUserHistory(historyList);
-        
-        
     }
     
+	private void handlefilterRoomList(WebSocketSession session, JsonNode json) {
+		System.out.println("handlefilterRoomList.....");
+		
+		String server = json.get("server").asText();
+		String category = json.get("category").asText();
+        String is_private = json.get("is_private").asText();
+        List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
+        Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
+        List<Map<String, Object>> roomListWithCount = new ArrayList<>();
 
+		for (GameRoomDTO room : rooms) {
+	        boolean categoryMatches = category.equals("all") || category.equals(room.getCategory());
+	        boolean isPrivateMatches = is_private.equals("all") || is_private.equals(room.getIs_private());
+
+	        if (categoryMatches && isPrivateMatches) {
+	            Map<String, Object> roomMap = new HashMap<>();
+	            roomMap.put("gameroom_no", room.getGameroom_no());
+	            roomMap.put("title", room.getTitle());
+	            roomMap.put("category", room.getCategory());
+	            roomMap.put("game_mode", room.getGame_mode());
+	            roomMap.put("is_private", room.getIs_private());
+	            roomMap.put("limit", room.getLimit());
+	            roomMap.put("pwd", room.getPwd());
+
+	            Set<String> users = roomUserMap.getOrDefault(room.getGameroom_no(), Collections.emptySet());
+	            roomMap.put("currentCount", users.size());
+
+	            roomListWithCount.add(roomMap);
+	        }
+	    }
+
+		try {
+			session.sendMessage(new TextMessage(
+					objectMapper.writeValueAsString(Map.of("type", "filterRoomList", "rooms", roomListWithCount))));
+		} catch (Exception e) {
+		}
+	}
 
 	private void broadcastUserList(String server) {
 		Set<String> users = serverUsers.getOrDefault(server, Collections.emptySet());
@@ -613,28 +690,45 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	}
 
 	private void broadcastRoomUserList(String server, String roomNo) {
-		// 랭크/일반 구분을 위한 ownerKey와 userKey를 일관되게 지정
-		String key = "rank".equals(server) ? "rank" : server;
+	    String key = "rank".equals(server) ? "rank" : server;
 
-		Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(key, Collections.emptyMap());
-		Set<String> userNicks = roomUserMap.getOrDefault(roomNo, Collections.emptySet());
-		List<String> userList = new ArrayList<>(userNicks);
+	    Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(key, Collections.emptyMap());
+	    Set<String> userNicks = roomUserMap.getOrDefault(roomNo, Collections.emptySet());
+	    List<String> userList = new ArrayList<>(userNicks);
 
-		String owner = null;
-		Map<String, String> owners = roomOwners.get(key);
-		if (owners != null) {
-			owner = owners.get(roomNo);
-		}
+	    String owner = null;
+	    Map<String, String> owners = roomOwners.get(key);
+	    if (owners != null) {
+	        owner = owners.get(roomNo);
+	    }
 
-		Map<String, Object> payload = new HashMap<>();
-		payload.put("type", "roomUserList");
-		payload.put("server", key); // 항상 "rank" 또는 server
-		payload.put("roomNo", roomNo);
-		payload.put("userList", userList);
-		payload.put("owner", owner);
+	    // ✅ 유저 프로필 맵 생성
+	    Map<String, Map<String, Object>> profiles = new HashMap<>();
+	    for (String nick : userList) {
+	        Integer userNo = nickToUserNoMap.get(nick);
+	        if (userNo != null) {
+	            UserInfoDTO dto = userService.getUserInfoByUserNo(userNo);
+	            Map<String, Object> profile = new HashMap<>();
+	            profile.put("user_rank", dto.getUser_rank());
+	            profile.put("user_profile_img", dto.getUser_profile_img());
+	            profile.put("imageFileName", dto.getImageFileName());
+	            profile.put("titleItemNo", dto.getTitleItemNo());
+	            profile.put("backgroundItemNo", dto.getBackgroundItemNo());
+	            profiles.put(nick, profile);
+	        }
+	    }
 
-		broadcast(key, payload);
+	    Map<String, Object> payload = new HashMap<>();
+	    payload.put("type", "roomUserList");
+	    payload.put("server", key);
+	    payload.put("roomNo", roomNo);
+	    payload.put("userList", userList);
+	    payload.put("owner", owner);
+	    payload.put("profiles", profiles); // ✅ 추가
+
+	    broadcast(key, payload);
 	}
+
 
 	private void broadcast(String server, Object data) {
 	    String json;

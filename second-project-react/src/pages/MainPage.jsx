@@ -53,8 +53,7 @@ const MainPage = () => {
 
             {/* 좌측 유저 정보, 최근 플레이 목록 */}
             <div className={styles.user_info}>
-              {/* 유저 정보쪽
-              <h1> 컬러 안정했어여... 고뇌 중</h1> */}
+              {/* 유저 정보쪽 */}
               <UserInfo/>
             </div>
 

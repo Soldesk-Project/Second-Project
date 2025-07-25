@@ -7,10 +7,12 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { WebSocketContext } from '../util/WebSocketProvider';
 import PasswordModal from './modal/PasswordModal';
+import FilterModal from './modal/FilterModal';
 
 const RoomList = () => {
   const [category, setCategory] = useState('random');
   const [gameRoomList, setGameRoomList] = useState([]);
+  const [filterModal, setFilterModal] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [passwordModal, setPasswordModal] = useState(false);
   const [isWsOpen, setIsWsOpen] = useState(false);
@@ -21,6 +23,7 @@ const RoomList = () => {
 
   const { user, server } = useSelector((state) => state.user);
   const userNick = user.user_nick;
+  const userNo = user.user_no;
   const nav = useNavigate();
   const sockets = useContext(WebSocketContext);
 
@@ -37,8 +40,6 @@ const RoomList = () => {
         socket.send(JSON.stringify({ action: "join", server, userNick }));
       };
     }
-    console.log(socket);
-    
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       
@@ -53,22 +54,25 @@ const RoomList = () => {
             server: data.server,
             category: data.category,
             game_mode: data.game_mode,
-            userNick
+            userNick,
+            userNo: userNo
           }));
-          
-          nav('/gameRoom/' + data.gameroom_no, { state: { category: data.category, gameMode: data.game_mode } });
           break;
         case "joinQuestionReviewRoom":
           nav('/questionReview');
           break;
         case "joinRoom":
-          console.log('게임 중 아님 참여');
-          nav('/gameRoom/' + data.roomNo, {state : {gameMode : data.gameMode}});
+          nav('/gameRoom/' + data.roomNo, {state : {category: data.category, gameMode : data.gameMode}});
           break;
         case "joinDenied":
-          console.log('게임 중 참여불가');
-          
           alert(data.reason);
+          break;
+        case "filterRoomList":
+          console.log('filterRoomList 받음');
+          console.log(data.rooms);
+          
+          
+          setGameRoomList(data.rooms);
           break;
         default:
           break;
@@ -128,7 +132,8 @@ const RoomList = () => {
               server: data.server,
               game_mode: "rank",
               category: "random",
-              userNick: user.user_nick
+              userNick: user.user_nick,
+              userNo: userNo
             };
             if(socket && socket.readyState === 1){
               socket.send(JSON.stringify(joinData))
@@ -197,20 +202,20 @@ const RoomList = () => {
     if (socket && socket.readyState === 1) {
         socket.send(JSON.stringify({
           action: "joinQuestionReviewRoom",
-          userNick
+          userNick: userNick
         }));
-        // nav('/questionReview');
     } else {
       alert("웹소켓 연결이 준비되지 않았습니다 -- joinQuestionReviewRoom");
     }
   }
 
+  const handleOpenFilterModal=()=>{
+    setFilterModal(true);
+  }
+
   const handleOpenModal = () => setModalOpen(true);
 
   const joinRoom = (room) => {
-    console.log(room.pwd);
-    console.log(room.is_private);
-
     if (room.is_private==='Y') {
       setPasswordModal(true);
       setSelectedRoom(room);
@@ -232,11 +237,10 @@ const RoomList = () => {
           roomNo: room.gameroom_no,
           game_mode: room.game_mode,
           category: room.category,
-          userNick
+          userNick,
+          userNo: userNo
         }));
-        //
-        // nav('/gameRoom/' + room.gameroom_no, {state : {gameMode : room.game_mode}});
-        //
+        
       } else {
         alert("인원수가 가득 찼습니다");
       }
@@ -282,13 +286,22 @@ const RoomList = () => {
         return "네트워크관리사1급";
       case "net2":
         return "네트워크관리사2급";
-      default:
-        return category || "알 수 없음";
-    }
-  }
-
+        default:
+          return category || "알 수 없음";
+        }
+      }
+      
   return (
     <>
+      {
+        filterModal && (
+          <FilterModal
+            setFilterModal={setFilterModal}
+            server={server}
+          />
+        )
+      }
+
       {modalOpen && (
         <ModalBasic
           setModalOpen={setModalOpen}
@@ -345,7 +358,7 @@ const RoomList = () => {
       )}
 
       <div className={styles.roomListHeader}>
-        <button onClick={handleOpenModal} className={styles.createBtn}>필터</button>
+        <button onClick={handleOpenFilterModal} className={styles.createBtn}>필터</button>
         <button onClick={handleOpenModal} className={styles.createBtn}>일반 게임</button>
         <button onClick={handleQuickMatch} className={styles.createBtn}>랭크 게임</button>
         <button onClick={handleQuestionReview} className={styles.createBtn}>오답 풀이</button>

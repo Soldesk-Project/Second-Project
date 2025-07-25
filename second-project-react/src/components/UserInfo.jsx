@@ -142,6 +142,7 @@ const UserInfo = () => {
                 user_no:               res.data.user_no,
                 user_nick:             res.data.user_nick,
                 user_profile_img:      res.data.user_profile_img,
+                imageFileName:    res.data.imageFileName,
                 boundaryItemNo:   res.data.boundaryItemNo,
                 titleItemNo:      res.data.titleItemNo,
                 fontcolorItemNo:  res.data.fontcolorItemNo,
@@ -184,23 +185,21 @@ const UserInfo = () => {
         }, [socket]);
 
     // 2) 사용자 통계 가져오기
-        // const [stats, setStats] = useState(null);
-        // useEffect(() => {
-        //     if (!user.user_no) return;
-        //     axios
-        //     .get(`/user/${user.user_no}/stats`)
-        //     .then(res => setStats(res.data))
-        //     .catch(err => console.error(err));
-        // }, [user.user_no]);    
+        const [stats, setStats] = useState(null);
+        useEffect(() => {
+            if (!user.user_no) return;
+            axios
+            .get(`/user/accuracy`)
+            .then(res => setStats(res.data))
+            .catch(err => console.error(err));
+        }, [user.user_no]);    
 
-    // // 2) 퍼센트 계산
-    // // --- 퍼센트 계산 (통계가 로딩되지 않았으면 0으로)
-    //     const expPercent = stats
-    //         ? Math.floor((stats.exp / stats.nextExp) * 100)
-    //         : 0;
-    //     const answerPercent = stats && stats.totalCount > 0
-    //         ? Math.floor((stats.correctCount / stats.totalCount) * 100)
-    //         : 0;
+    // 2) 퍼센트 계산
+    // --- 퍼센트 계산 (통계가 로딩되지 않았으면 0으로)
+        const answerPercent = stats && stats.totalCount > 0
+            ? Math.floor((stats.correctCount / stats.totalCount) * 100)
+            : 0;
+
     const handleNicknameChange = (newNick) => {
         axios.patch(`/user/${user.user_no}/nickname`, { user_nick: newNick })
             .then(res => {
@@ -244,8 +243,7 @@ const UserInfo = () => {
                 <div className={styles.profileWrapper}>
                     <img 
                         src={profileSrc} 
-                        alt='프로필' 
-                        style={{ width: `180px`, height: `180px`}} 
+                        alt='프로필'  
                         className={styles.profileImg}/>
                     <img
                         src='/images/switch.png'
@@ -297,31 +295,24 @@ const UserInfo = () => {
             </div>
             )}
 
-            {/* ... 경험치/정답률 바, 인벤토리 버튼 등 ... */}
             <div className={styles.bar_set}>
-                <div className={styles.progressLine}>
-                    <div
-                    className={styles.progressFill}
-                    // style={{ width: `${expPercent}%` }}
-                    />
-                </div>
-                {/* <div className={styles.label}>{expPercent}% 경험치</div> */}
-
                 {/* 정답률 바 */}
                 <div className={styles.progressLine}>
                     <div
                     className={styles.progressFill}
-                    // style={{ width: `${answerPercent}%` }}
+                    style={{ width: `${answerPercent}%` }}
                     />
                 </div>
-                {/* <div className={styles.label}>{answerPercent}% 정답률</div> */}
+                <div className={styles.label}>{answerPercent}% 정답률</div>
             </div>
         </div>
-        <div className={styles.invenBtn}>
-            <button style={openButtonStyle} onClick={() => setIsModalOpen(true)}>Inventory</button>
-        </div>
-        <div className={styles.invenBtn}>
-            <button style={openButtonStyle} onClick={() => setIsNickModalOpen(true)}>닉네임 변경</button>
+        <div className={styles.invenBtnWrapper}>
+            <div className={styles.invenBtn}>
+                <button style={openButtonStyle} onClick={() => setIsModalOpen(true)}>Inventory</button>
+            </div>
+            <div className={styles.invenBtn}>
+                <button style={openButtonStyle} onClick={() => setIsNickModalOpen(true)}>닉네임 변경</button>
+            </div>
         </div>
         <div className={styles.invenBtn}>
             <button style={openButtonStyle} onClick={handleChangePw} disabled={loading}>{loading ? '요청 중...' : '비밀번호 변경'}</button>
