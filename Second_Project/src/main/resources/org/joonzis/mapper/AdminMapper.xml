@@ -230,4 +230,72 @@
             </if>
         </where>
     </delete>
+    
+    <!-- 아이템 등록 -->
+    <insert id="insertItem" parameterType="org.joonzis.domain.ItemVO" useGeneratedKeys="true" keyProperty="item_no">
+    	<selectKey keyProperty="item_no" resultType="int" order="BEFORE">
+            SELECT SEQ_ITEMS.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO items (
+        	item_no,
+            item_name,
+            item_price,
+            image_file_name,
+            item_type
+        ) VALUES (
+        	#{item_no},
+            #{item_name},
+            #{item_price},
+            #{imageFileName},
+            #{item_type}
+        )
+    </insert>
+    
+    <!-- 아이템 검색 -->
+    <select id="searchItems" resultType="org.joonzis.domain.ItemVO" parameterType="map">
+    SELECT item_no, item_name, item_price, item_type, image_file_name
+    FROM (
+        SELECT
+            item_no, item_name, item_price, item_type, image_file_name,
+            ROWNUM AS rn
+        FROM (
+            SELECT
+                item_no, item_name, item_price, item_type, image_file_name
+            FROM items
+            WHERE item_type = #{item_type}
+            <if test="query != null and query != ''">
+                AND item_name LIKE '%' || #{query} || '%'
+            </if>
+            ORDER BY item_no ASC
+        )
+        WHERE ROWNUM &lt;= #{offset} + #{limit}
+    )
+    WHERE rn > #{offset}
+	</select>
+
+    <select id="getTotalItemCount" resultType="int">
+        SELECT COUNT(*)
+        FROM items
+        WHERE item_type = #{item_type}
+        <if test="query != null and query != ''">
+            AND item_name LIKE '%' || #{query} || '%' </if>
+    </select>
+	
+	<!-- 아이템 수정 -->
+    <update id="updateItem" parameterType="org.joonzis.domain.ItemVO">
+        UPDATE items
+        SET
+            item_name = #{item_name},
+            item_price = #{item_price},
+            image_file_name = #{imageFileName}
+        WHERE item_no = #{item_no} AND item_type = #{item_type}
+    </update>
+    
+    <!-- 아이템 삭제 -->
+    <delete id="deleteItems" parameterType="map">
+        DELETE FROM items WHERE item_type = #{itemType} AND item_no IN
+        <foreach collection="itemNos" item="itemNo" open="(" separator="," close=")">
+            #{itemNo}
+        </foreach>
+    </delete>
 </mapper>

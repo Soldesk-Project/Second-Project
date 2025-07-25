@@ -3,12 +3,18 @@ package org.joonzis.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 
 import org.joonzis.domain.AchievementDTO;
+import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.QuestionDTO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.mapper.AdminMapper;
@@ -16,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.log4j.Log4j;
 
@@ -26,6 +33,23 @@ public class AdminServiceImpl implements AdminService {
 
     @Autowired
     private AdminMapper adminMapper;
+    
+    //임시 이미지 업로드 경로
+    private final String uploadDir = "C:/Dev/workspace/workspace_2ndProject/second-project-react/public/images/";
+    
+    private void deleteImageFile(String fileName) {
+        try {
+            Path filePath = Paths.get(uploadDir + fileName); // 이미지 저장 경로
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+                log.info("기존 이미지 파일 삭제 성공: " + fileName); // System.out 대신 log 사용
+            } else {
+                log.warn("삭제할 이미지 파일이 존재하지 않습니다: " + fileName);
+            }
+        } catch (IOException e) {
+            log.error("기존 이미지 파일 삭제 실패: " + fileName + " - " + e.getMessage(), e);
+        }
+    }
 
     // 문제 테이블 이름-한글 카테고리 이름 매핑 Map 정의
     private static final Map<String, String> TABLE_TO_CATEGORY_MAP;
@@ -453,4 +477,154 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
+	@Override
+	@Transactional
+	public void registerItem(ItemVO itemVO, MultipartFile itemImage) throws Exception {
+		// 1. 이미지 파일 처리 및 저장
+		String imageFileName = null;
+		if (itemImage != null && !itemImage.isEmpty()) {
+			try {
+				// 원본 파일명에서 확장자 추출
+				String originalFilename = itemImage.getOriginalFilename();
+				String fileExtension = "";
+				if (originalFilename != null && originalFilename.contains(".")) {
+					fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+				}
+				
+				// 고유한 파일명 생성 (UUID + 확장자)
+				imageFileName = UUID.randomUUID().toString() + fileExtension;
+				
+				// 파일을 저장할 경로 생성
+				Path uploadPath = Paths.get(uploadDir);
+				if (!Files.exists(uploadPath)) {
+					Files.createDirectories(uploadPath);
+				}
+				
+				Path filePath = uploadPath.resolve(imageFileName);
+				
+				// 파일 저장
+				itemImage.transferTo(filePath.toFile());
+				System.out.println("이미지 파일 저장 성공: " + filePath.toString());
+				
+			} catch (IOException e) {
+				System.err.println("이미지 파일 저장 실패: " + e.getMessage());
+				throw new IOException("이미지 파일 저장에 실패했습니다.", e);
+			}
+		} else {
+			throw new IllegalArgumentException("이미지 파일이 존재하지 않습니다.");
+		}
+		
+		// 2. ItemVO 객체에 이미지 파일명 설정
+		itemVO.setImageFileName(imageFileName);
+		
+		// 3. ItemVO의 'type'에 따라 해당 테이블에 아이템 정보 저장
+		try {
+			adminMapper.insertItem(itemVO);
+			System.out.println("DB에 아이템 정보 저장 성공: " + itemVO);
+		} catch (Exception e) {
+			System.err.println("DB 아이템 저장 실패 (타입: " + itemVO.getItem_type() + "): " + e.getMessage());
+			throw new Exception("아이템 정보를 데이터베이스에 저장하는 데 실패했습니다.", e);
+		}
+	}
+
+	@Override
+	public Map<String, Object> searchItems(String decodedType, String decodedQuery, int page, int limit) {
+		Map<String, Object> result = new HashMap<>();
+        List<ItemVO> items;
+        int totalItems;
+        int offset = (page - 1) * limit;
+
+        log.info("ServiceImpl: searchItems 호출 - decodedType: " + decodedType + ", decodedQuery: " + decodedQuery + ", page: " + page + ", limit: " + limit);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("item_type", decodedType); // items 테이블의 item_type 컬럼에 매핑
+        params.put("query", decodedQuery);
+        params.put("offset", offset);
+        params.put("limit", limit);
+
+        try {
+            // 총 아이템 수 조회
+            totalItems = adminMapper.getTotalItemCount(params);
+            log.info("총 아이템 개수 조회 성공: " + totalItems);
+            int totalPages = (int) Math.ceil((double) totalItems / limit);
+            
+            // 아이템 목록 조회
+            items = adminMapper.searchItems(params);
+            log.info("아이템 목록 조회 성공. 조회된 아이템 수: " + (items != null ? items.size() : 0));
+
+            result.put("items", items);
+            result.put("totalPages", totalPages);
+            result.put("currentPage", page);
+            result.put("totalCount", totalItems);
+        } catch (Exception e) {
+            log.error("아이템 검색 중 오류 발생: " + e.getMessage(), e);
+            result.put("error", "아이템 검색 중 서버 내부 오류 발생.");
+            // 오류 발생 시 빈 리스트와 0으로 초기화
+            result.put("items", new ArrayList<>());
+            result.put("totalPages", 0);
+            result.put("currentPage", page);
+            result.put("totalCount", 0);
+        }
+        return result;
+    }
+
+	@Override
+	public void updateItem(int itemNo, String type, String itemName, int itemPrice, MultipartFile itemImage,String originalImageFileName) {
+		String imageFileNameToUpdate = null; // DB에 업데이트할 최종 이미지 파일명
+
+	    log.info("ServiceImpl: updateItem 호출 - itemNo: " + itemNo + ", type: " + type + ", itemName: " + itemName + ", itemPrice: " + itemPrice + ", originalImageFileName: " + originalImageFileName);
+
+	    try{//1.. 기존 이미지 파일 삭제 (클라이언트가 넘겨준 originalImageFileName 사용)
+	    	if (originalImageFileName != null && !originalImageFileName.isEmpty()) {
+	    		deleteImageFile(originalImageFileName);
+	    	}
+
+	    	//2. 새 이미지 저장 
+	    	Path uploadPath = Paths.get(uploadDir);
+	    	if (!Files.exists(uploadPath)) {
+	    		Files.createDirectories(uploadPath);
+	    	}
+	    	String originalFileName = itemImage.getOriginalFilename();
+	    	String fileExtension = "";
+	    	if (originalFileName != null && originalFileName.contains(".")) {
+	    		fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+	    	}
+	    	imageFileNameToUpdate = UUID.randomUUID().toString() + fileExtension;
+	    	Path filePath = uploadPath.resolve(imageFileNameToUpdate);
+	    	Files.copy(itemImage.getInputStream(), filePath);
+	    	log.info("새 이미지 파일 저장 성공: " + imageFileNameToUpdate);
+		} catch (IOException e) {
+			log.error("아이템 이미지 처리 중 오류 발생: " + e.getMessage(), e);
+			throw new RuntimeException("아이템 이미지 파일 처리 중 오류가 발생했습니다.", e);
+		}
+
+	    // 3. ItemVO 객체 생성 및 DB 업데이트 (기존과 동일)
+	    ItemVO itemVO = new ItemVO();
+	    itemVO.setItem_no(itemNo);
+	    itemVO.setItem_type(type);
+	    itemVO.setItem_name(itemName);
+	    itemVO.setItem_price(itemPrice);
+	    itemVO.setImageFileName(imageFileNameToUpdate);
+
+	    try {
+	        int updatedRows = adminMapper.updateItem(itemVO);
+	        if (updatedRows == 0) {
+	            log.warn("아이템 수정 실패: item_no " + itemNo + ", item_type " + type + "에 해당하는 아이템을 찾을 수 없습니다.");
+	            throw new IllegalArgumentException("수정할 아이템을 찾을 수 없습니다.");
+	        }
+	        log.info("아이템 수정 성공: " + itemVO);
+	    } catch (Exception e) {
+	        log.error("DB 아이템 수정 실패: " + e.getMessage(), e);
+	        throw new RuntimeException("아이템 정보를 데이터베이스에서 수정하는 데 실패했습니다.", e);
+	    }
+	}
+
+	@Override
+	public void deleteItems(String itemType, List<Integer> itemNos) {
+		 Map<String, Object> params = new HashMap<>();
+	        params.put("itemType", itemType);
+	        params.put("itemNos", itemNos);
+
+	        adminMapper.deleteItems(params);
+	}
 }

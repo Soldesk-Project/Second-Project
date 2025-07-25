@@ -1,8 +1,10 @@
 package org.joonzis.service;
 
 import org.joonzis.domain.AchievementDTO;
+import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.QuestionDTO;
 import org.joonzis.domain.UsersVO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,15 @@ public interface AdminService {
 	Map<String, Object> searchAchievement(String type, String query, int page, int limit);
 	//업적 삭제 메소드
 	boolean deleteAchievementsByTitles(String type, List<String> achievementTitles);
-
+	
+	//아이템 관련 메소드
+	//아이템 등록 메소드
+	void registerItem(ItemVO itemVO, MultipartFile itemImage) throws Exception;
+	//아이템 검색 메소드
+	Map<String, Object> searchItems(String decodedType, String decodedQuery, int page, int limit);
+	//아이템 수정 메소드
+	void updateItem(int itemNo, String type, String itemName, int itemPrice, MultipartFile itemImage, String originalImageFileName);
+	//아이템 삭제 메소드
+	void deleteItems(String itemType, List<Integer> itemNos);
 	
 }

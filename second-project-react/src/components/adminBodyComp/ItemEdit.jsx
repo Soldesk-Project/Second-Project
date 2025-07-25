@@ -7,7 +7,6 @@ const ItemEdit = () => {
     const [itemName, setItemName] = useState('');
     const [itemPrice, setItemPrice] = useState('');
     const [type, setType] = useState('테두리');
-    const [base64ImageString, setBase64ImageString] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [selectedItemNo, setSelectedItemNo] = useState(null);
@@ -30,12 +29,12 @@ const ItemEdit = () => {
   ];
 
   const typeTableMap = {
-    '테두리' : 'boundaries',
-    '칭호': 'titles',
-    '글자색' : 'textColors',
-    '배경' : 'wallpapers',
-    '말풍선' : 'speechBubbles',
-    '랜덤박스' : 'randomBoxes',
+    '테두리' : 'boundary',
+    '칭호': 'title',
+    '글자색' : 'textColor',
+    '배경' : 'wallpaper',
+    '말풍선' : 'speechBubble',
+    '랜덤박스' : 'randomBoxe',
   };
   
     const handleTypeChange = (e) => {
@@ -53,20 +52,17 @@ const ItemEdit = () => {
   
     const handleImageChange = (event) => {
       const file = event.target.files[0];
-      if (file) {
-        setSelectedImage(file);
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreviewImage(reader.result);
-          const base64 = reader.result.split(',')[1];
-          setBase64ImageString(base64);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        setSelectedImage(null);
-        setPreviewImage(null);
-        setBase64ImageString('');
-      }
+        if (file) {
+            setSelectedImage(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewImage(reader.result);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setSelectedImage(null);
+            setPreviewImage(null);
+        }
     };
   
     const handleSearchItem = async (page = 1) => {
@@ -83,12 +79,18 @@ const ItemEdit = () => {
   
       try {
         // itemsPerPage를 서버 요청에 사용
-        const response = await fetch(`/admin/searchQuestions?type=${tableName}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`);
+        const response = await fetch(`/admin/searchItems?type=${tableName}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        setSearchResults(data.questions);
+
+        const itemsWithImageUrl = data.items.map(item => ({
+                ...item,
+                imageUrl: item.imageFileName ? `/images/${item.imageFileName}` : null
+            }));
+
+        setSearchResults(itemsWithImageUrl);
         setTotalPages(data.totalPages);
         setCurrentPage(page);
   
@@ -111,13 +113,13 @@ const ItemEdit = () => {
       setItemName(item.item_name);
       setItemPrice(item.item_price);
   
-      if (item.image_data_base64) {
-        setBase64ImageString(item.image_data_base64);
-        setPreviewImage(`data:image/png;base64,${item.image_data_base64}`);
-      } else {
-        setBase64ImageString('');
-        setPreviewImage(null);
-      }
+      if (item.imageFilename) {
+            setSelectedImage(null);
+            setPreviewImage(`/images/${item.imageFileName}`);
+        } else {
+            setPreviewImage(null);
+            setSelectedImage(null);
+        }
     };
   
     const handleItemEditSubmit = async () => {
@@ -125,33 +127,41 @@ const ItemEdit = () => {
         alert('수정할 아이템을 먼저 선택해주세요.');
         return;
       }
-  
+      if (!type.trim()) {
+      alert('아이템 타입 선택해주세요.');
+      return;
+      }
       if (!itemName.trim()) {
         alert('아이템 이름을 입력해주세요.');
         return;
       }
-      if (!itemPrice.trim()) {
+      if (itemPrice === null || itemPrice === undefined || isNaN(itemPrice) || itemPrice <= 0) {
         alert('아이템 가격을 입력해주세요.');
         return;
       }
-      
+      if (!selectedImage) {
+        alert('아이템 이미지를 선택해주세요.');
+        return;
+      }
   
-      const itemData = {
-        item_no: selectedItemNo,
-        item_name: itemName,
-        item_Price: itemPrice,
-        image_data_base64: base64ImageString,
-      };
-  
-      console.log('수정할 아이템 데이터:', itemData);
+      const formData = new FormData();
+      formData.append('item_no', selectedItemNo);
+      formData.append('item_name', itemName);
+      formData.append('item_price', itemPrice);
+      formData.append('type', typeTableMap[type]);
+      formData.append('item_image', selectedImage);
+
+      let currentImageFileName = null;
+      if (previewImage && typeof previewImage === 'string' && previewImage.startsWith('/images/')) {
+        currentImageFileName = previewImage.substring('/images/'.length);
+      }
+      formData.append('original_image_file_name', currentImageFileName || '');
+      console.log('수정할 아이템 데이터 (FormData):', Array.from(formData.entries()));
   
       try {
-        const response = await fetch(`/admin/editItem?type=${encodeURIComponent(typeTableMap[type])}`, {
+        const response = await fetch(`/admin/editItem`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(itemData),
+          body: formData,
         });
   
         if (response.ok) {
@@ -183,7 +193,9 @@ const ItemEdit = () => {
       setPreviewImage(null);
       setItemName('');
       setItemPrice('');
-      setBase64ImageString('');
+      setSelectedImage(null);
+      setPreviewImage(null);
+      setSelectedItemNo(null);
     };
   
     return (

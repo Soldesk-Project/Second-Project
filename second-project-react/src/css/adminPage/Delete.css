@@ -1,8 +1,8 @@
 @import './Admin.css';
 
-/* QuestDelete 고유 스타일 */
+
 .category button {
-  background-color: #dc3545; /* 검색 버튼 */
+  background-color: #dc3545;
 }
 
 .category button:hover {
@@ -10,7 +10,7 @@
 }
 
 .searchResults li.selected-delete {
-  background-color: #ffe0e6; /* 선택된 문제 강조 (QuestDelete: 붉은색 계열) */
+  background-color: #ffe0e6;
   font-weight: bold;
 }
 
@@ -23,7 +23,7 @@
   background-color: #e9ecef;
 }
 
-/* 문제 상세 표시 (수정 불가) 영역의 배경색 */
+/* 상세 표시 (수정 불가) 영역의 배경색 */
 .question-detail-form .read-only-field {
   padding: 8px;
   border: 1px solid #eee;

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.joonzis.domain.AchievementDTO;
+import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.QuestionDTO;
 import org.joonzis.domain.UsersVO;
 
@@ -44,8 +45,18 @@ public interface AdminMapper {
 	
 	//업적 삭제 메소드
 	int deleteAchievementsByTitles(Map<String, Object> params);
-
-
-
+	
+	//아이템 등록 메소드
+	void insertItem(ItemVO itemVO);
+	
+	//아이템 검색 메소드
+	int getTotalItemCount(Map<String, Object> params);
+	List<ItemVO> searchItems(Map<String, Object> params);
+	
+	//아이템 수정 메소드
+	int updateItem(ItemVO itemVO);
+	
+	//아이템 삭제 메소드
+	void deleteItems(Map<String, Object> params);
 
 }

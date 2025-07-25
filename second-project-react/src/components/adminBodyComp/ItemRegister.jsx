@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import '../../css/adminPage/Register.css';
 
 const ItemRegister = () => {
+  console.log("ItemRegister 컴포넌트 렌더링 시작");
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [itemName, setItemName] = useState('');
   const [itemPrice, setItemPrice] = useState('');
-  const [type, setType] = useState('테두리');
-  const [base64ImageString, setBase64ImageString] = useState('');
+  const [type, setType] = useState('테두리'); // 기본값 '테두리'
 
   const types = [
     '테두리',
@@ -19,19 +19,18 @@ const ItemRegister = () => {
   ];
 
   const typeTableMap = {
-    '테두리' : 'boundaries',
-    '칭호': 'titles',
-    '글자색' : 'textColors',
-    '배경' : 'wallpapers',
-    '말풍선' : 'speechBubbles',
-    '랜덤박스' : 'randomBoxes',
+    '테두리' : 'boundary',
+    '칭호': 'title',
+    '글자색' : 'textColor',
+    '배경' : 'wallpaper',
+    '말풍선' : 'speechBubble',
+    '랜덤박스' : 'randomBoxe',
   };
 
   const handleTypeChange = (e) => {
     setType(e.target.value);
   };
 
-  // 이미지 선택 핸들러
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -39,72 +38,74 @@ const ItemRegister = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result);
-        const base64 = reader.result.split(',')[1];
-        setBase64ImageString(base64);
       };
       reader.readAsDataURL(file);
     } else {
       setSelectedImage(null);
       setPreviewImage(null);
-      setBase64ImageString('');
     }
-  };if (!itemName.trim()) {
-        alert('문제 본문을 입력해주세요.');
-        return;
-      }
+  };
 
-  // 전체 아이템 등록 제출 핸들러
   const handleQuestRegisterSubmit = async () => {
     // 필수 입력 필드 검증
     if (!type.trim()) {
-      alert('아이템 타입 선택해주세요.');
+      alert('아이템 타입을 선택해주세요.');
       return;
     }
     if (!itemName.trim()) {
       alert('아이템 이름을 입력해주세요.');
       return;
     }
+    // itemPrice는 문자열로 입력받으므로, 숫자인지 확인하는 로직이 필요할 수 있습니다.
+    // 백엔드에서 int로 변환 실패 시 400 에러 발생할 수 있습니다.
     if (!itemPrice.trim()) {
       alert('아이템 가격을 입력해주세요.');
       return;
     }
+    if (!selectedImage) {
+        alert('아이템 이미지를 선택해주세요.');
+        return;
+    }
 
-    // 백엔드로 보낼 때는 맵에서 변환된 테이블 이름을 사용
     const tableName = typeTableMap[type];
     if (!tableName) {
       alert('유효하지 않은 타입입니다.');
       return;
     }
 
-    const itemData = {
-      item_name: itemName,
-      item_price: itemPrice,
-      image_data_base64: base64ImageString,
-    };
+    const formData = new FormData();
+    formData.append('item_name', itemName);
+    formData.append('item_price', itemPrice);
+    formData.append('item_image', selectedImage); // 백엔드 @RequestPart("item_image")에 맞춰 이름 일치
 
     try {
       const response = await fetch(`/admin/registerItem?type=${encodeURIComponent(tableName)}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(itemData),
+        // **!!! 여기 headers 블록을 완전히 제거해야 합니다 !!!**
+        // headers: { 
+        //   'Content-Type': 'application/json',
+        // },
+        body: formData,
       });
 
       if (response.ok) {
         alert('아이템 등록 성공!');
-        handleReset(); // 성공 시 폼 초기화
+        handleReset();
       } else {
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
           const errorData = await response.json();
           console.error('아이템 등록 실패 상세:', errorData);
           alert('아이템 등록 실패: ' + (errorData.message || '알 수 없는 오류'));
+        } else {
+          const errorText = await response.text();
+          console.error('아이템 등록 실패:', response.status, errorText);
+          alert(`아이템 등록 실패: ${response.status} - ${errorText || '알 수 없는 오류'}`);
         }
       }
     } catch (error) {
       console.error('아이템 등록 오류:', error);
-      alert('아이템 등록 중 오류가 발생했습니다.');
+      alert('아이템 등록 중 네트워크 오류가 발생했습니다. 서버가 실행 중인지 확인해주세요.');
     }
   };
 
@@ -114,12 +115,11 @@ const ItemRegister = () => {
     setItemName('');
     setType('테두리');
     setItemPrice('');
-    setBase64ImageString('');
   };
 
   return (
     <div className="item-register-container">
-      <h1 className="item-register-title">문제 등록</h1>
+      <h1 className="item-register-title">아이템 등록</h1>
       
       <div className='type-section'>
         <h3 className="section-title">1. 타입 선택</h3>
@@ -144,7 +144,7 @@ const ItemRegister = () => {
       </div>
 
       <div className='item-Price-section'>
-        <h3 className="section-title">2. 아이템 가격 입력</h3>
+        <h3 className="section-title">3. 아이템 가격 입력</h3>
         <input
           type="number"
           value={itemPrice}
