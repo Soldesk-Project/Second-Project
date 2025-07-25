@@ -50,6 +50,7 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
     
     if (socket && socket.readyState === 1) {
       socket.send(JSON.stringify(roomData));
+      
       setModalOpen(false);
       
     } else {

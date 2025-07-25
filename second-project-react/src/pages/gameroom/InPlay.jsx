@@ -260,17 +260,20 @@ const InPlay = () => {
             elapsedTime: data.elapsedTimes ? data.elapsedTimes[u.userNick] ?? u.elapsedTime : u.elapsedTime
           })));
         }
-        setUserAnswerHistory(prev=>[...prev, 
-          {
-            userNick: data.userNick,
-            question_id: questionListRef.current[data.questionIdx].id,
-            subject: questionListRef.current[data.questionIdx].subject,
-            selected_answer: data.answer,
-            correct_answer: data.correctAnswer,
-            is_correct: data.isCorrect,
-            submitted_at: new Date().toISOString()
-          }
-        ])
+        if (data.userNick === userNick) {
+          setUserAnswerHistory(prev=>[...prev, 
+            {
+              userNick: data.userNick,
+              question_id: questionListRef.current[data.questionIdx].id,
+              subject: questionListRef.current[data.questionIdx].subject,
+              selected_answer: data.answer,
+              correct_answer: data.correctAnswer,
+              is_correct: data.isCorrect,
+              submitted_at: new Date().toISOString()
+            }
+          ])
+          
+        }
         // console.log("-----------------");
         // console.log("userNick : "+data.userNick);
         // console.log("questionId : "+questionListRef.current[data.questionIdx].id);

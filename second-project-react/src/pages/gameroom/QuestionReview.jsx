@@ -107,7 +107,7 @@ const QuestionReview = () => {
     setNextId(prev=>prev-1);
   }
   const nextQuestion=()=>{
-    setNextId(prev=>prev+1);
+      setNextId(prev=>prev+1);
   }
   
   // 포인트로 정답 확인 버튼
