@@ -1,5 +1,8 @@
 package org.joonzis.config;
 
+import java.time.Instant; // Instant 임포트
+import java.util.Map; // Map 임포트 추가
+
 import org.joonzis.controller.ChatController; // ChatController 임포트
 import org.joonzis.domain.ChatRoomDTO; // ChatRoomDTO 임포트
 import org.springframework.context.event.EventListener;
@@ -8,11 +11,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.time.Instant; // Instant 임포트
-import java.util.Map; // Map 임포트 추가
 
 @Component // Spring Bean으로 등록하여 @EventListener가 동작하도록 합니다.
 @RequiredArgsConstructor // Lombok을 사용하여 final 필드를 주입받습니다.
@@ -43,9 +44,9 @@ public class WebSocketEventListener {
         String displayUserNo = (userNo != null) ? String.valueOf(userNo) : "N/A"; 
         String sessionId = (headerAccessor.getSessionId() != null) ? headerAccessor.getSessionId() : "N/A";
 
-        log.info("User connected: {} (Session ID: {})", 
-                 displayUsername + " (No: " + displayUserNo + ")", 
-                 sessionId);
+//        log.info("User connected: {} (Session ID: {})", 
+//                 displayUsername + " (No: " + displayUserNo + ")", 
+//                 sessionId);
 
         // 서버 채팅방에 연결 메시지 전송 (선택 사항 - 주석 해제 시 Null 처리된 displayUsername/userNo 사용 고려)
         // 예를 들어, 연결 시 메시지를 보낸다면 mSenderNo는 userNo가 null이 아닐 때만 사용해야 합니다.
@@ -87,9 +88,9 @@ public class WebSocketEventListener {
 
 
         if (userNo != null) { // userNo가 있을 때만 주요 로직 처리 (로그인한 사용자 대상)
-            log.info("User disconnected: {} (Session ID: {})", 
-                     displayUsername + " (No: " + displayUserNo + ")",
-                     sessionId);
+//            log.info("User disconnected: {} (Session ID: {})", 
+//                     displayUsername + " (No: " + displayUserNo + ")",
+//                     sessionId);
 
             // 게임룸에 접속해 있었다면 게임룸 퇴장 메시지 전송 및 로그 저장
             if (gameroomNo != null) {
@@ -103,16 +104,16 @@ public class WebSocketEventListener {
                         .build();
                 messagingTemplate.convertAndSend("/gameChat/" + gameroomNo, gameLeaveMessage);
                 
-                log.info("User {} disconnected from game room {}", 
-                         displayUsername + " (No: " + displayUserNo + ")", // 안전하게 조합된 문자열 사용
-                         displayGameroomNo);
+//                log.info("User {} disconnected from game room {}", 
+//                         displayUsername + " (No: " + displayUserNo + ")", // 안전하게 조합된 문자열 사용
+//                         displayGameroomNo);
 
                 // 핵심: 게임룸 로그 저장 메서드 호출
                 chatController.saveGameRoomLogs(gameroomNo); 
             }
         } else {
             // userNo가 null인 경우 (로그인 없이 웹소켓 연결 시도, 비정상 종료 등)
-            log.warn("Disconnected session with no userNo. Session ID: {}. Possibly an anonymous or unauthenticated user.", sessionId);
+//            log.warn("Disconnected session with no userNo. Session ID: {}. Possibly an anonymous or unauthenticated user.", sessionId);
         }
     }
 }

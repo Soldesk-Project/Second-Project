@@ -20,6 +20,8 @@ const QuestionReview = () => {
   const [answer, setAnswer] = useState(null);
   const [point, setPoint] = useState(null);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [explanation, setExplanation] = useState("");  // ← 해설 내용
+  const [explanationLoading, setExplanationLoading] = useState(false); // ← 로딩 표시용
   const questionListRef = useRef([]);
   const { user, server } = useSelector((state) => state.user);
   const userNick = user.user_nick;
@@ -119,8 +121,27 @@ const QuestionReview = () => {
         // console.log("정답유무 : "+question._correct);
         // console.log("문제 : "+question.question_text);
         // console.log("과목 : "+question.subject);
+        console.log(question);
+        
+        setExplanation("");
+        setExplanationLoading(true);
         setShowAnswer(true);
         getPoint();
+
+        const res = await axios.post('api/groq-explanation',{
+          question: question.question_text,
+          choices:[
+            question.option_1,
+            question.option_2,
+            question.option_3,
+            question.option_4
+          ],
+          correct: question.correct_answer,
+          userAnswer: question.selected_answer
+        });
+
+        setExplanation(res.data);
+        setExplanationLoading(false);
       }
     }else{
       alert('문제 풀이 중이 아닙니다');
@@ -189,9 +210,20 @@ const QuestionReview = () => {
                     </> : 
                   <h2>대기중</h2>
                 }
-                {
-                  showAnswer? <span> 문제의 정답 : {answer}</span>:null
-                }
+                {showAnswer && (
+                    <div className={styles.answerAndExplanation}>
+                      <p>문제의 정답: {answer}</p>
+
+                      <div className={styles.explanationBox}>
+                        <strong>AI 해설:</strong><br />
+                        {explanationLoading ? (
+                          <p>해설 생성 중...</p>
+                        ) : (
+                          <p>{explanation}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
               </div>
             </div>
           </div>

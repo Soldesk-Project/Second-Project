@@ -52,7 +52,7 @@ const InPlay = () => {
   const [users, setUsers] = useState([]);
   const [question, setQuestion] = useState(null);
   const [nextId, setNextId] = useState(0);
-  const [time, setTime] = useState('타이머');
+  const [time, setTime] = useState('30');
   const [result, setResult] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [userAnswerHistory, setUserAnswerHistory] = useState([]);
@@ -222,7 +222,7 @@ const InPlay = () => {
         (gameMode === 'rank' ? data.server === 'rank' : data.server === server)
       ) {
         setPlay(false);
-        setTime('타이머');
+        setTime('30');
       }
 
       if (
@@ -244,7 +244,7 @@ const InPlay = () => {
         } else {
           setPlay(false);
           setResult(true);
-          setTime('타이머');
+          setTime('30');
         }
       }
 
@@ -323,7 +323,7 @@ const InPlay = () => {
 
     // 타이머가 0이 되면 자동 제출(한 번만)
     if (play && typeof time === "number" && time === 0) {
-      const spentTimeSec = 10;
+      const spentTimeSec = 30;
       handleAnswerSubmit(selectedAnswer, spentTimeSec);
       //setPlay(false);
     }
@@ -344,6 +344,7 @@ const InPlay = () => {
           server,
           roomNo,
           userNick,
+          gameMode: gameMode,
           point: myPoint,
           rankPoint: rankPoint,
           myRank: myRank,
@@ -390,21 +391,6 @@ const InPlay = () => {
       }));
     } else {
       alert('웹소켓 연결이 준비되지 않았습니다 - startGame');
-    }
-  };
-
-  // 중지 버튼 (삭제 예정)
-  const stop = () => {
-    const socket = sockets['room'];
-    if (socket && socket.readyState === 1) {
-      socket.send(JSON.stringify({
-        action: 'stopGame',
-        server,
-        roomNo,
-        userNick
-      }));
-    } else {
-      alert('웹소켓 연결이 준비되지 않았습니다 - stopGame');
     }
   };
 
@@ -457,20 +443,20 @@ const InPlay = () => {
             <div className={styles.problem}>
               <div className={styles.testHeader}>
                 <span>{setKoreanToCategory(category)}</span>
-                <span className={styles.timer}>{time}</span>
+                <span className={`${styles.timer} ${Number(time) <= 3 ? styles.urgent : ''}`}>
+                  {time}초
+                </span>
               </div>
               <div className={styles.initiatorBtn}>
                 {
                   (play||result)?(
                     <>
                       <button onClick={start} disabled={true}>시작</button>
-                      <button onClick={stop} disabled={true}>중지</button>
-                      <button onClick={leaveRoom} className={styles.leaveBtn} disabled={true}>나가기</button>
+                      <button onClick={leaveRoom} className={styles.leaveBtn}>나가기</button>
                     </>
                   ):(
                     <>  
                       <button onClick={start} disabled={!isOwner}>시작</button>
-                      <button onClick={stop} disabled={!isOwner}>중지</button>
                       <button onClick={leaveRoom} className={styles.leaveBtn}>나가기</button>
                     </>
                   )
@@ -510,52 +496,57 @@ const InPlay = () => {
 
             return user ? (
               <div key={user.userNo} className={styles.user_card}>
-                <div className={styles.role_badge}>{user.isOwner ? '방장' : '유저'}</div>
+                {/* 방장/유저 뱃지 */}
+                <div className={styles.role_badge}>
+                  {user.isOwner ? '방장' : '유저'}
+                </div>
 
-                {/* ✅ 프로필 이미지 + 테두리 */}
-                {profile && (
-                  <div className={styles.profileImageWrapper}>
-                    <img
-                      src={`/images/${profile.imageFileName}`}
-                      alt="테두리"
-                      className={styles.borderImage}
-                    />
-                    <img
-                      src={profile.user_profile_img}
-                      alt="프로필"
-                      className={styles.profileImage}
-                    />
-                  </div>
-                )}
+                {/* 좌측 프로필 + 우측 닉네임/랭크/칭호 */}
+                <div className={styles.profileRow}>
+                  {profile && (
+                    <div className={styles.profileImageWrapper}>
+                      <img
+                        src={`/images/${profile.imageFileName}`}
+                        alt="테두리"
+                        className={styles.borderImage}
+                      />
+                      <img
+                        src={profile.user_profile_img}
+                        alt="프로필"
+                        className={styles.profileImage}
+                      />
+                    </div>
+                  )}
 
-                <div className={styles.user_info}>
-                  <div className={styles.userTopInfo}>
-                    <span className={styles.nick}>{user.userNick}</span>
-
-                    {profile && (
-                      <>
-                        <span className={styles.rank}>랭크: {profile.user_rank}</span>
-                        <span className={styles.title}>칭호: {profile.titleItemNo ?? '-'}</span>
-                      </>
-                    )}
-                  </div>
-
-                  {/* ✅ 항상 아래에 위치하게 할 점수+시간 */}
-                  <div className={styles.scoreBottomRow}>
-                    <span className={styles.score}>점수: {user.score ?? 0}</span>
-                    <span className={styles.score}>
-                      시간: {typeof user.elapsedTime === 'number' ? user.elapsedTime.toFixed(3) + "초" : "-"}
-                    </span>
+                  <div className={styles.user_info}>
+                    <div className={styles.userTopInfo}>
+                      <span className={styles.nick}>{user.userNick}</span>
+                      {profile && (
+                        <>
+                          <span className={styles.rank}>랭크: {profile.user_rank}</span>
+                          <span className={styles.title}>칭호: {profile.titleItemNo ?? '-'}</span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
 
+                {/* ✅ 반드시 profileRow 바깥에 있어야 아래로 정렬됨 */}
+                <div className={styles.scoreBottomRow}>
+                  <span className={styles.score}>점수: {user.score ?? 0}</span>
+                  <span className={styles.score}>
+                    시간: {typeof user.elapsedTime === 'number' ? user.elapsedTime.toFixed(3) + '초' : '-'}
+                  </span>
+                </div>
+
+                {/* 채팅 말풍선 */}
                 {userRecentChats[user.userNick] && (
                   <div className={styles.chatBubble}>
                     {userRecentChats[user.userNick].message}
                   </div>
                 )}
               </div>
-            ) : (
+            ): (
               // 빈 자리 슬롯
               <div key={`empty_${i}`} className={styles.user_card} style={{ opacity: 0.4, justifyContent: 'center' }}>
                 <span>빈 자리</span>

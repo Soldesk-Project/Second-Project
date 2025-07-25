@@ -110,9 +110,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		case "startGame":
 			handleStartGame(session, json);
 			break;
-		case "stopGame":
-			handleStopGame(session, json);
-			break;
 		case "submitAnswer":
 			handleSubmitAnswer(session, json);
 			break;
@@ -200,10 +197,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		String category = json.get("category").asText();
 		String status = roomStatus.getOrDefault(server, Collections.emptyMap()).get(roomNo);
 		nickToUserNoMap.put(userNick, userNo);
-		System.out.println("상태" + status);
+
 		// 게임 중 입장 거부
 		if ("playing".equals(status)) {
-			System.out.println("게임 플레이 중");
 			try {
 				// JSON으로 메시지 전송
 				session.sendMessage(new TextMessage(
@@ -328,10 +324,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
             Integer userNo = nickToUserNoMap.get(nick);
             if (userNo != null) {
                 UserInfoDTO dto = userService.getUserInfoByUserNo(userNo);
-                
-//                String boundaryItemNo = userService.getBoundaryItemByNo(dto.getBoundaryItemNo());
-                
-                System.out.println("dto -> " + dto);
 
                 // ✅ null-safe 방식으로 HashMap 사용
                 Map<String, Object> profile = new HashMap<>();
@@ -444,33 +436,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
 		Map<String, Object> payload = Map.of("type", "gameStart", "server", server, "roomNo", roomNo, "initiator",
 				initiator, "list", list, "nextId", nextId);
-		broadcast(server, payload);
-	}
-
-	private void handleStopGame(WebSocketSession session, JsonNode json) {
-		String server = json.get("server").asText();
-		String roomNo = json.get("roomNo").asText();
-		String userNick = json.get("userNick").asText();
-
-		if (server == null || userNick == null || roomNo == null) {
-			return;
-		}
-
-		// 방장체크
-		String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
-		if (owner == null || !owner.equals(userNick)) {
-			return;
-		}
-
-		AtomicInteger currentQuestionId = roomQuestionIds.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
-				.computeIfAbsent(roomNo, k -> new AtomicInteger(0));
-		currentQuestionId.set(0);
-
-		roomStatus.getOrDefault(server, Collections.emptyMap()).put(roomNo, "waiting");
-
-		// 해당 방의 모든 유저에게 게임 중지 메시지 브로드캐스트
-		Map<String, Object> payload = Map.of("type", "gameStop", "server", server, "roomNo", roomNo, "initiator",
-				userNick);
 		broadcast(server, payload);
 	}
 
@@ -589,10 +554,13 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     	String server = json.get("server").asText();
         String roomNo = json.get("roomNo").asText();
         String user_nick = json.get("userNick").asText();
+        String gameMode = json.get("gameMode").asText();
         JsonNode historyArray = json.get("history");
         int point = json.get("point").asInt();
         int rankPoint = json.get("rankPoint").asInt();
         int myRank = json.get("myRank").asInt();
+        
+        String broadcastServer = "rank".equals(gameMode) ? "rank" : server;
         
         if (server == null || user_nick == null || roomNo == null) {
     		return;
@@ -601,9 +569,11 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         if (myRank == 1) {
         	playService.countFirst(user_nick);
         }
-        roomStatus.getOrDefault(server, Collections.emptyMap()).put(roomNo, "waiting");
-
         
+        if (!"rank".equals(broadcastServer)) {
+            roomStatus.getOrDefault(broadcastServer, Collections.emptyMap()).put(roomNo, "waiting");
+        }
+
         String historyUuid = UUID.randomUUID().toString();
         
         playService.increaseRewardPoints(point, rankPoint, user_nick);
