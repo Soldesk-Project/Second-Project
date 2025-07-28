@@ -7,10 +7,11 @@ const QuestRegister = () => {
   const [questionText, setQuestionText] = useState('');
   const [options, setOptions] = useState(['', '', '', '']);
   const [correctAnswer, setCorrectAnswer] = useState('1');
-  const [category, setCategory] = useState('정보처리기사');
+  const [subject, setSubject] = useState('정보처리기사');
   const [base64ImageString, setBase64ImageString] = useState('');
 
-  const categories = [
+  // 사용자에게 보여줄 과목 목록
+  const subjects = [
     '정보처리기사',
     '정보처리산업기사',
     '정보처리기능사',
@@ -23,21 +24,22 @@ const QuestRegister = () => {
     '네트워크관리사2급',
   ];
 
-  const categoryTableMap = {
-    '정보처리기사': 'CPE_Q',
-    '정보처리산업기사': 'CPEI_Q',
-    '정보처리기능사': 'CPET_Q',
-    '리눅스마스터1급': 'LM1_Q',
-    '리눅스마스터2급': 'LM2_Q',
-    '정보통신산업기사': 'ICTI_Q',
-    '정보통신기사': 'ICT_Q',
-    '정보보안기사': 'SEC_Q',
-    '네트워크관리사1급': 'NET1_Q',
-    '네트워크관리사2급': 'NET2_Q',
+  // 사용자에게 보이는 과목명과 DB에 저장될 실제 값을 매핑하는 Map
+  const subjectValueMap = {
+    '정보처리기사': 'cpe',
+    '정보처리산업기사': 'cpei',
+    '정보처리기능사': 'cpet',
+    '리눅스마스터1급': 'lm1',
+    '리눅스마스터2급': 'lm2',
+    '정보통신산업기사': 'icti',
+    '정보통신기사': 'ict',
+    '정보보안기사': 'sec',
+    '네트워크관리사1급': 'net1',
+    '네트워크관리사2급': 'net2',
   };
 
-  const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
+  const handleSubjectChange = (e) => {
+    setSubject(e.target.value);
   };
 
   // 이미지 선택 핸들러
@@ -62,7 +64,7 @@ const QuestRegister = () => {
   // 전체 문제 등록 제출 핸들러
   const handleQuestRegisterSubmit = async () => {
     // 필수 입력 필드 검증
-    if (!category.trim()) {
+    if (!subject.trim()) {
       alert('카테고리를 선택해주세요.');
       return;
     }
@@ -81,15 +83,16 @@ const QuestRegister = () => {
       return;
     }
 
-    // 백엔드로 보낼 때는 맵에서 변환된 테이블 이름을 사용
-    const tableName = categoryTableMap[category];
-    if (!tableName) {
-      alert('유효하지 않은 카테고리입니다.');
+    // `subjectValueMap`을 사용하여 실제 DB에 저장될 값을 가져옴
+    const dbSubjectValue = subjectValueMap[subject];
+    console.log('클라이언트에서 서버로 보낼 subject 값:', dbSubjectValue);
+    if (!dbSubjectValue) {
+      alert('유효하지 않은 과목입니다.');
       return;
     }
 
     const questData = {
-      subject: "임시주제",
+      subject: dbSubjectValue,
       question_text: questionText,
       option_1: options[0],
       option_2: options[1],
@@ -100,7 +103,7 @@ const QuestRegister = () => {
     };
 
     try {
-      const response = await fetch(`/admin/registerQuestion?category=${encodeURIComponent(tableName)}`, {
+      const response = await fetch(`/admin/registerQuestion?`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -131,7 +134,7 @@ const QuestRegister = () => {
     setQuestionText('');
     setOptions(['', '', '', '']);
     setCorrectAnswer('1');
-    setCategory('정보처리기사');
+    setSubject('정보처리기사');
     setBase64ImageString('');
   };
 
@@ -141,10 +144,10 @@ const QuestRegister = () => {
       
       <div className='category-section'>
         <h3 className="section-title">1. 카테고리 선택</h3>
-        <select name="cateSelect" value={category} onChange={handleCategoryChange} className="category-select">
-          {categories.map((cat, index) => (
-            <option key={index} value={cat}>
-              {cat}
+        <select name="cateSelect" value={subject} onChange={handleSubjectChange} className="category-select">
+          {subjects.map((subject, index) => (
+            <option key={index} value={subject}>
+              {subject}
             </option>
           ))}
         </select>

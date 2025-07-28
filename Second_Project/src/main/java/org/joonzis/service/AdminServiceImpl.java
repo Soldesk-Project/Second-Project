@@ -50,56 +50,52 @@ public class AdminServiceImpl implements AdminService {
             log.error("기존 이미지 파일 삭제 실패: " + fileName + " - " + e.getMessage(), e);
         }
     }
-
-    // 문제 테이블 이름-한글 카테고리 이름 매핑 Map 정의
-    private static final Map<String, String> TABLE_TO_CATEGORY_MAP;
-    // 업적 타입(한글) -> 실제 DB 테이블 이름 매핑
-    private static final Map<String, String> TYPE_TO_TABLE_MAP;
-
+    
+    //DB 'Question' 테이블의 'subject' 컬럼 값과 한글 표시명을 매핑
+    private static final Map<String, String> SUBJECT_CODE_TO_NAME_MAP;
+    
     static {
-        Map<String, String> ttcMap = new HashMap<>();
-        ttcMap.put("CPE_Q", "정보처리기사");      // 테이블명 -> 한글 카테고리명
-        ttcMap.put("CPEI_Q", "정보처리기능사");
-        ttcMap.put("CPET_Q", "정보처리기술사");
-        ttcMap.put("LM1_Q", "리눅스마스터1급");
-        ttcMap.put("LM2_Q", "리눅스마스터2급");
-        ttcMap.put("ICTI_Q", "정보통신기사");
-        ttcMap.put("ICT_Q", "정보통신기술사");
-        ttcMap.put("SEC_Q", "정보보안기사");
-        ttcMap.put("NET1_Q", "네트워크관리사1급");
-        ttcMap.put("NET2_Q", "네트워크관리사2급");
-        TABLE_TO_CATEGORY_MAP = Collections.unmodifiableMap(ttcMap);
-        		
-                
-        Map<String, String> attMap = new HashMap<>();
-        attMap.put("tier", "tier");
-        attMap.put("gamePlay", "gamePlay");
-        attMap.put("game1st", "game1st");
-        TYPE_TO_TABLE_MAP = Collections.unmodifiableMap(attMap);
+        Map<String, String> map = new HashMap<>();
+        map.put("cpe", "정보처리기사");
+        map.put("cpei", "정보처리산업기사");
+        map.put("cpet", "정보처리기능사");
+        map.put("lm1", "리눅스마스터1급");
+        map.put("lm2", "리눅스마스터2급");
+        map.put("icti", "정보통신산업기사");
+        map.put("ict", "정보통신기사");
+        map.put("sec", "정보보안기사");
+        map.put("net1", "네트워크관리사1급");
+        map.put("net2", "네트워크관리사2급");
+        SUBJECT_CODE_TO_NAME_MAP = Collections.unmodifiableMap(map);
+        
+        log.info("SUBJECT_CODE_TO_NAME_MAP 초기화 완료. 키셋: " + SUBJECT_CODE_TO_NAME_MAP.keySet());
     }
 
-    // 유효한 문제 카테고리인지 확인하는 헬퍼 메소드
-    private boolean isValidCategory(String category) {
-        return TABLE_TO_CATEGORY_MAP.containsKey(category);
+    // 유효한 문제 주제인지 확인하는 헬퍼 메소드
+    private boolean isValidSubjectCode(String subjectCode) {
+        return SUBJECT_CODE_TO_NAME_MAP.containsKey(subjectCode);
     }
     
-    // 문제 테이블 이름으로 한글 카테고리 이름을 가져오는 헬퍼 메소드
-    private String getCategoryNameFromTableName(String tableName) {
-        return TABLE_TO_CATEGORY_MAP.get(tableName);
+    // 문제 주제 이름으로 한글 주제 이름을 가져오는 헬퍼 메소드
+    private String getSubjectDisplayName(String subjectCode) {
+        return SUBJECT_CODE_TO_NAME_MAP.get(subjectCode);
     }
     
     // 문제 등록
     @Override
-    public void registerQuestion(QuestionDTO questionDTO, String category) {
-        log.info("ServiceImpl: registerQuestion 호출 - category(tableName): " + category);
+    public void registerQuestion(QuestionDTO questionDTO) {
+    	 String subjectCode = questionDTO.getSubject();
+    	
+    	log.info("ServiceImpl: registerQuestion 호출 - 수신된 subject 코드: " + subjectCode);
 
-        // 1. 필수 필드 검증 (기존 로직 유지)
+        // 1. 필수 필드 검증
         if (questionDTO.getQuestion_text() == null || questionDTO.getQuestion_text().trim().isEmpty()) {
             throw new IllegalArgumentException("문제 본문은 필수 입력 값입니다.");
         }
         for (int i = 1; i <= 4; i++) {
             try {
-                String option = (String) QuestionDTO.class.getMethod("getOption_" + i).invoke(questionDTO);
+                java.lang.reflect.Method getter = QuestionDTO.class.getMethod("getOption_" + i);
+                String option = (String) getter.invoke(questionDTO);
                 if (option == null || option.trim().isEmpty()) {
                     throw new IllegalArgumentException(i + "번 선택지는 필수 입력 값입니다.");
                 }
@@ -112,39 +108,38 @@ public class AdminServiceImpl implements AdminService {
             throw new IllegalArgumentException("정답은 1에서 4 사이여야 합니다.");
         }
 
-        // 2. 카테고리(테이블 이름) 유효성 검사
-        // category 파라미터가 이제 테이블 이름이므로, isValidCategory는 테이블 이름 유효성을 검사합니다.
-        if (!isValidCategory(category)) {
-            throw new IllegalArgumentException("유효하지 않은 테이블 이름입니다: " + category);
+        // 2. subject 코드 유효성 검사
+        if (subjectCode == null || !isValidSubjectCode(subjectCode)) {
+            throw new IllegalArgumentException("유효하지 않은 과목(subject) 코드입니다: " + subjectCode);
         }
-        // tableName 변수를 별도로 선언할 필요 없이, category 파라미터 자체가 테이블 이름입니다.
-        String tableName = category;
-        log.debug("등록될 문제의 테이블: " + tableName);
 
-        // 3. Map에 필요한 모든 데이터 담기 (동적 테이블명 및 QuestionDTO 필드들)
-        Map<String, Object> params = new HashMap<>();
-        params.put("tableName", tableName); // ⭐ category 파라미터가 직접 tableName으로 사용됩니다.
-        params.put("question_text", questionDTO.getQuestion_text());
-        params.put("option_1", questionDTO.getOption_1());
-        params.put("option_2", questionDTO.getOption_2());
-        params.put("option_3", questionDTO.getOption_3());
-        params.put("option_4", questionDTO.getOption_4());
-        params.put("correct_answer", questionDTO.getCorrect_answer());
-        params.put("image_data", questionDTO.getImage_data());
+        // 3. Service 계층에서 Base64 디코딩 수행
+        if (questionDTO.getImage_data_base64() != null && !questionDTO.getImage_data_base64().isEmpty()) {
+            try {
+                byte[] decodedBytes = Base64.getDecoder().decode(questionDTO.getImage_data_base64());
+                questionDTO.setImage_data(decodedBytes);
+                questionDTO.setImage_data_base64(null);
+            } catch (IllegalArgumentException e) {
+                log.error("Base64 이미지 데이터 디코딩 실패: " + e.getMessage(), e);
+                throw new IllegalArgumentException("유효하지 않은 이미지 데이터 형식입니다.", e);
+            }
+        } else {
+            questionDTO.setImage_data(null);
+        }
 
-        // 4. 단일 Mapper 메서드 호출
+        // 4. Mapper 호출을 위한 QuestionDTO 직접 사용
         try {
-            adminMapper.insertQuestion(params);
-            log.info(getCategoryNameFromTableName(tableName) + "(" + tableName + ") 카테고리에 문제 등록 성공.");
+            adminMapper.insertQuestion(questionDTO); // ⭐ Map 대신 QuestionDTO를 직접 넘기도록 변경
+            log.info(getSubjectDisplayName(subjectCode) + " (" + subjectCode + ") 과목에 문제 등록 성공.");
         } catch (Exception e) {
-            log.error("문제 등록 중 매퍼 오류 발생: " + e.getMessage(), e);
+            log.error("문제 등록 중 데이터베이스 오류 발생: " + e.getMessage(), e);
             throw new RuntimeException("데이터베이스에 문제를 등록하는 중 오류가 발생했습니다.", e);
         }
     }
 
     // 수정 및 삭제를 위한 문제 검색
     @Override
-    public Map<String, Object> searchQuestions(String category, String query, int page, int limit) {
+    public Map<String, Object> searchQuestions(String subjectCode, String query, int page, int limit) {
         List<QuestionDTO> questions = new ArrayList<>();
         int totalCount = 0;
         int totalPages = 0;
@@ -155,31 +150,28 @@ public class AdminServiceImpl implements AdminService {
         result.put("totalCount", totalCount);
         result.put("error", null);
 
-        log.info("ServiceImpl: searchQuestions 호출 - category(tableName): " + category + ", 검색어: " + query + ", 페이지: " + page + ", 제한: " + limit);
+        log.info("ServiceImpl: searchQuestions 호출 - category(tableName): " + subjectCode + ", 검색어: " + query + ", 페이지: " + page + ", 제한: " + limit);
 
-        // 카테고리(테이블 이름) 유효성 검사
-        if (!isValidCategory(category)) {
-            result.put("error", "유효하지 않은 테이블 이름입니다: " + category);
-            log.warn("유효하지 않은 테이블 이름 요청: " + category);
+     // subject 코드 유효성 검사
+        if (subjectCode == null || !isValidSubjectCode(subjectCode)) {
+            result.put("error", "유효하지 않은 과목 코드입니다: " + subjectCode);
+            log.warn("유효하지 않은 과목 코드 요청: " + subjectCode);
             return result;
         }
 
         try {
-            // category 파라미터가 이미 테이블 이름이므로, 별도의 변환 없이 직접 사용합니다.
-            String tableName = category;
-            log.debug("사용될 테이블 이름: " + tableName);
-
-            int offset = (page - 1) * limit;
+        	int offset = (page - 1) * limit;
             log.debug("계산된 OFFSET: " + offset);
 
             Map<String, Object> params = new HashMap<>();
-            params.put("tableName", tableName); // ⭐ category 파라미터가 직접 tableName으로 사용됩니다.
+            params.put("subjectCode", subjectCode);
             params.put("query", query);
             params.put("offset", offset);
             params.put("limit", limit);
             log.debug("매퍼 파라미터 Map 준비: " + params);
 
             try {
+                // getTotalQuestionCount 메서드도 subjectCode를 필터링 기준으로 사용해야 함
                 totalCount = adminMapper.getTotalQuestionCount(params);
                 log.info("총 문제 개수 조회 성공: " + totalCount);
                 totalPages = (int) Math.ceil((double) totalCount / limit);
@@ -237,30 +229,32 @@ public class AdminServiceImpl implements AdminService {
 
     // 문제 수정 메서드
     @Override
-    public void updateQuestion(QuestionDTO questionDTO, String category) {
-        log.info("ServiceImpl: 문제 수정 실행 - category(tableName): " + category + ", DTO: " + questionDTO);
+    public void updateQuestion(QuestionDTO questionDTO) {
+    	String subjectCode = questionDTO.getSubject();
+    	log.info("ServiceImpl: 문제 수정 실행 - subjectCode: " + subjectCode + ", DTO: " + questionDTO);
 
-        // 카테고리(테이블 이름) 유효성 검사
-        if (!isValidCategory(category)) {
-            throw new IllegalArgumentException("유효하지 않은 테이블 이름입니다: " + category);
+    	// subject 코드 유효성 검사
+        if (subjectCode == null || !isValidSubjectCode(subjectCode)) {
+            throw new IllegalArgumentException("유효하지 않은 과목 코드입니다: " + subjectCode);
         }
-        String tableName = category;
-        log.debug("수정될 문제의 테이블: " + tableName);
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("tableName", tableName); // ⭐ category 파라미터가 직접 tableName으로 사용됩니다.
-        params.put("id", questionDTO.getId());
-        params.put("question_text", questionDTO.getQuestion_text());
-        params.put("option_1", questionDTO.getOption_1());
-        params.put("option_2", questionDTO.getOption_2());
-        params.put("option_3", questionDTO.getOption_3());
-        params.put("option_4", questionDTO.getOption_4());
-        params.put("correct_answer", questionDTO.getCorrect_answer());
-        params.put("image_data", questionDTO.getImage_data());
+     // Service 계층에서 Base64 디코딩 수행
+        if (questionDTO.getImage_data_base64() != null && !questionDTO.getImage_data_base64().isEmpty()) {
+            try {
+                byte[] decodedBytes = Base64.getDecoder().decode(questionDTO.getImage_data_base64());
+                questionDTO.setImage_data(decodedBytes);
+                questionDTO.setImage_data_base64(null);
+            } catch (IllegalArgumentException e) {
+                log.error("Base64 이미지 데이터 디코딩 실패: " + e.getMessage(), e);
+                throw new IllegalArgumentException("유효하지 않은 이미지 데이터 형식입니다.", e);
+            }
+        } else {
+            questionDTO.setImage_data(null);
+        }
 
         try {
-            adminMapper.updateQuestion(params);
-            log.info(getCategoryNameFromTableName(tableName) + "(" + tableName + ") 카테고리의 문제 ID " + questionDTO.getId() + " 수정 성공.");
+            adminMapper.updateQuestion(questionDTO); // ⭐ QuestionDTO 자체를 넘기도록 변경
+            log.info(getSubjectDisplayName(subjectCode) + " 과목의 문제 ID " + questionDTO.getId() + " 수정 성공.");
         } catch (Exception e) {
             log.error("문제 수정 중 매퍼 오류 발생: " + e.getMessage(), e);
             throw new RuntimeException("데이터베이스에서 문제를 수정하는 중 오류가 발생했습니다.", e);
@@ -269,29 +263,27 @@ public class AdminServiceImpl implements AdminService {
     
     // 문제 삭제 메소드
     @Override
-    public void deleteQuestions(String category, List<Integer> questionIds) {
-        log.info("ServiceImpl: deleteQuestions 호출 - category(tableName): " + category + ", 삭제할 ID 목록: " + questionIds);
+    public void deleteQuestions(List<Integer> questionIds, String subjectCode) {
+        log.info("ServiceImpl: deleteQuestions 호출 subjectCode: " + subjectCode + ", 삭제할 ID 목록: " + questionIds);
 
         if (questionIds == null || questionIds.isEmpty()) {
             throw new IllegalArgumentException("삭제할 문제 ID가 제공되지 않았습니다.");
         }
 
-        // 카테고리(테이블 이름) 유효성 검사
-        if (!isValidCategory(category)) {
-            throw new IllegalArgumentException("유효하지 않은 테이블 이름입니다: " + category);
+     // subject 코드 유효성 검사
+        if (subjectCode == null || !isValidSubjectCode(subjectCode)) {
+            throw new IllegalArgumentException("유효하지 않은 과목 코드입니다: " + subjectCode);
         }
-        String tableName = category;
-        log.debug("삭제될 문제의 테이블: " + tableName);
-
+        
         Map<String, Object> params = new HashMap<>();
-        params.put("tableName", tableName); // ⭐ category 파라미터가 직접 tableName으로 사용됩니다.
+        params.put("subjectCode", subjectCode); // ⭐ subjectCode를 파라미터로 넘김 (tableName 대신)
         params.put("questionIds", questionIds);
 
         try {
-            int deletedCount = adminMapper.deleteQuestions(params);
-            log.info(getCategoryNameFromTableName(tableName) + "(" + tableName + ") 테이블에서 " + deletedCount + "개의 문제가 삭제되었습니다.");
+            int deletedCount = adminMapper.deleteQuestions(params); // ⭐ Map에 subjectCode 포함
+            log.info(getSubjectDisplayName(subjectCode) + " 과목에서 " + deletedCount + "개의 문제가 삭제되었습니다.");
             if (deletedCount == 0) {
-                log.warn("삭제 요청된 ID 중 해당 테이블에서 일치하는 문제가 없거나 이미 삭제되었습니다.");
+                log.warn("삭제 요청된 ID 중 해당 과목에서 일치하는 문제가 없거나 이미 삭제되었습니다.");
             }
         } catch (Exception e) {
             log.error("문제 삭제 중 매퍼 오류 발생: " + e.getMessage(), e);

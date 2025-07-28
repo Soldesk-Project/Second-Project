@@ -15,14 +15,14 @@ import org.joonzis.domain.UsersVO;
 public interface AdminMapper {
 
     //문제 등록 메소드
-	void insertQuestion(Map<String, Object> params);
+	void insertQuestion(QuestionDTO questionDTO);
     
     //문제 검색 메소드
     List<QuestionDTO> getQuestionsBySearch(Map<String, Object> params);
     int getTotalQuestionCount(Map<String, Object> params);
     
     //문제 수정 메소드
-    void updateQuestion(Map<String, Object> params);
+    void updateQuestion(QuestionDTO questionDTO);
     
     //문제 삭제 메소드
     int deleteQuestions(Map<String, Object> params);
