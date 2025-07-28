@@ -1,0 +1,78 @@
+/* 화면 전체를 덮는 어두운 배경 */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* 다른 UI보다 위로 */
+}
+
+/* 모달 박스 */
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px 32px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* 모달 내 텍스트 */
+.modal p {
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* 버튼 영역 */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* 확인 버튼 */
+.confirmBtn {
+  flex: 1;
+  background-color: #e74c3c; /* 빨간색 (경고 느낌) */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.confirmBtn:hover {
+  background-color: #c0392b;
+}
+
+/* 취소 버튼 */
+.cancelBtn {
+  flex: 1;
+  background-color: #bdc3c7; /* 회색 */
+  color: #2c3e50;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.cancelBtn:hover {
+  background-color: #95a5a6;
+}
+
+/* 페이드인 애니메이션 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

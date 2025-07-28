@@ -6,6 +6,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { WebSocketContext } from '../../util/WebSocketProvider';
 import GameChatbox from '../../components/chatbox/GameChatbox';
 import ResultModal from '../../components/modal/ResultModal';
+import LeaveModal from '../../components/modal/LeaveModal';
 
 const getRankedUsers = (users, gameMode) => {
   const sorted = [...users].sort((a, b) => {
@@ -60,6 +61,8 @@ const InPlay = () => {
   const [userProfiles, setUserProfiles] = useState({});
   const [questionStartTime, setQuestionStartTime] = useState(null);
   const [userElapsedTimes, setUserElapsedTimes] = useState([]);
+  const [countdown, setCountdown] = useState(10);
+  const [leaveModal, setLeaveModal] = useState(false);
   const myTotalElapsed = userElapsedTimes.reduce((sum, t) => sum + t, 0);
   const questionListRef = useRef([]);
   const { roomNo } = useParams();
@@ -397,6 +400,27 @@ const InPlay = () => {
     }
   };
 
+  useEffect(() => {
+    if (gameMode === 'rank') {
+      setCountdown(10);
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer); // cleanup
+    }
+  }, [gameMode]);
+
+  const openLeaveModal = () => {
+    setLeaveModal(true)
+  }
+
   // 나가기 버튼 (플레이 중 불가)
   const leaveRoom = () => {
     const socket = sockets['room'];
@@ -404,9 +428,11 @@ const InPlay = () => {
       socket.send(JSON.stringify({
         action: 'leaveRoom',
         roomNo: roomNo,
-        userNick: userNick
+        userNick: userNick,
+        gameMode: gameMode
       }));
     }
+    setLeaveModal(false);
     nav('/main/' + server);
   };
 
@@ -452,16 +478,21 @@ const InPlay = () => {
               </div>
               <div className={styles.initiatorBtn}>
                 {
-                  (play||result)?(
-                    <>
-                      <button onClick={start} disabled={true}>시작</button>
-                      <button onClick={leaveRoom} className={styles.leaveBtn}>나가기</button>
-                    </>
-                  ):(
-                    <>  
-                      <button onClick={start} disabled={!isOwner}>시작</button>
-                      <button onClick={leaveRoom} className={styles.leaveBtn}>나가기</button>
-                    </>
+                  gameMode === 'rank' ? (
+                    // 랭크 모드에서는 시작 버튼 없음
+                    <button onClick={openLeaveModal} className={styles.leaveBtn}>나가기</button>
+                  ) : (
+                    (play || result) ? (
+                      <>
+                        <button onClick={start} disabled={true}>시작</button>
+                        <button onClick={openLeaveModal} className={styles.leaveBtn}>나가기</button>
+                      </>
+                    ) : (
+                      <>
+                        <button onClick={start} disabled={!isOwner}>시작</button>
+                        <button onClick={openLeaveModal} className={styles.leaveBtn}>나가기</button>
+                      </>
+                    )
                   )
                 }
               </div>
@@ -470,17 +501,25 @@ const InPlay = () => {
               }
               <div className={styles.gamePlay}>
                 {
-                  play ? 
-                  <Test question={question} 
-                        nextId={nextId}
-                        onSelectAnswer={setSelectedAnswer} // 추가!
-                        selectedAnswer={selectedAnswer}
-                        submitted={submitted}/> : 
-                  <h2>대기중</h2>
+                  play ? (
+                    <Test 
+                      question={question} 
+                      nextId={nextId}
+                      onSelectAnswer={setSelectedAnswer}
+                      selectedAnswer={selectedAnswer}
+                      submitted={submitted}
+                    />
+                  ) : (
+                    gameMode === 'rank' ? (
+                      <h2 className={styles.countdown}>랭크 게임이 {countdown}초 후 시작됩니다...</h2>
+                    ) : (
+                      <h2>대기중</h2>
+                    )
+                  )
                 }
               </div>
               <button onClick={handleSubmit} disabled={submitted || selectedAnswer === null}>제출</button>
-              <button onClick={()=>setResult(true)}>결과창확인</button>
+              {/* <button onClick={()=>setResult(true)}>결과창확인</button> */}
             </div>
           </div>
           <div className={styles.chat_box}>
@@ -559,12 +598,24 @@ const InPlay = () => {
         </div>
       </div>
         {
+          leaveModal && (
+            <LeaveModal 
+              onConfirm={leaveRoom} 
+              onCancel={() => setLeaveModal(false)}
+              gameMode={gameMode}
+            />
+          )
+        }
+        {
           result &&
             <ResultModal users={rankedUsers}
               setResult={setResult}
               gameMode={gameMode}
               myElapsedTimes={userElapsedTimes}
-              myTotalElapsed={myTotalElapsed}/>
+              myTotalElapsed={myTotalElapsed}
+              roomNo={roomNo}
+              userNick={userNick}
+              server={server}/>
         }
       </div>
     </div>

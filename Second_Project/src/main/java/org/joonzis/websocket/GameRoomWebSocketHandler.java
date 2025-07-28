@@ -161,7 +161,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 				gameMode, json.get("is_private").asText(), json.get("limit").asInt(),
 				json.get("pwd") != null ? json.get("pwd").asText() : null);
 
-		roomStatus.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).put(roomNo, "waiting");
+		roomStatus.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).put(roomNo, "create");
 		
 		// 게임 모드 분기
 		if ("normal".equals(newRoom.getGame_mode())) {
@@ -264,33 +264,44 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     // 게임 나가기
     private void handleLeaveRoom(WebSocketSession session, JsonNode json) {
         String server = (String) session.getAttributes().get("server");
-        String userNick = (String) session.getAttributes().get("userNick");
-        if (server == null || userNick == null) return;
+        String user_nick = (String) session.getAttributes().get("userNick");
+        if (server == null || user_nick == null) return;
 
 		String roomNo = json.get("roomNo").asText();
+		String gameMode = json.get("gameMode").asText();
+		
+		String broadcastServer = "rank".equals(gameMode) ? "rank" : server;
+		
+		String status = roomStatus.getOrDefault(broadcastServer, Collections.emptyMap()).get(roomNo);
+		
+		System.out.println("status -> " + status);
+		
+		if (gameMode.equals("rank") && (status.equals("rankPlaying")) || status.equals("create")) {
+			playService.leavePanalty(user_nick);
+		}
 
 		// 방 참가자 목록에서 유저 제거
-		Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
+		Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(broadcastServer, Collections.emptyMap());
 		if (roomUserMap.containsKey(roomNo)) {
 			Set<String> users = roomUserMap.get(roomNo);
-			users.remove(userNick);
+			users.remove(user_nick);
 
-			String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
-			if (owner != null && owner.equals(userNick)) {
+			String owner = roomOwners.getOrDefault(broadcastServer, Collections.emptyMap()).get(roomNo);
+			if (owner != null && owner.equals(user_nick)) {
 				// 방장이 나가면 남은 유저 중 한 명을 새 방장으로 지정
 				if (!users.isEmpty()) {
 					String newOwner = users.iterator().next();
-					roomOwners.get(server).put(roomNo, newOwner);
+					roomOwners.get(broadcastServer).put(roomNo, newOwner);
 				} else {
 					// 방에 아무도 없으면 방장 정보 제거
-					roomOwners.get(server).remove(roomNo);
+					roomOwners.get(broadcastServer).remove(roomNo);
 				}
 			}
 
 			// 방 인원이 0명이면 방 삭제
 			if (users.isEmpty()) {
 				roomUserMap.remove(roomNo);
-				List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
+				List<GameRoomDTO> rooms = serverRooms.getOrDefault(broadcastServer, Collections.emptyList());
 				rooms.removeIf(room -> room.getGameroom_no().equals(roomNo));
 			}
 		}
@@ -298,13 +309,13 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		// ★ rank에서도 유저 제거 (랭크방 나갈 때) ★
 		Set<String> rankUsers = serverUsers.get("rank");
 		if (rankUsers != null) {
-			rankUsers.remove(userNick);
+			rankUsers.remove(user_nick);
 		}
 
 		// 방 목록, 유저 목록 전체 브로드캐스트
-		broadcastRoomList(server);
-		broadcastUserList(server);
-		broadcastRoomUserList(server, roomNo);
+		broadcastRoomList(broadcastServer);
+		broadcastUserList(broadcastServer);
+		broadcastRoomUserList(broadcastServer, roomNo);
 	}
 
 	// 방별 유저 리스트
@@ -434,7 +445,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		answerSubmittedUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).remove(roomNo);
 		int nextId = currentQuestionId.getAndIncrement();
 
-		roomStatus.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).put(roomNo, "playing");
+		roomStatus.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).put(roomNo, "rankPlaying");
 
 		Map<String, Object> payload = Map.of("type", "gameStart", "server", server, "roomNo", roomNo, "initiator",
 				initiator, "list", list, "nextId", nextId);
@@ -559,7 +570,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         String gameMode = json.get("gameMode").asText();
         JsonNode historyArray = json.get("history");
         int point = json.get("point").asInt();
-        int rankPoint = json.get("rankPoint").asInt();
+        int rank_point = json.get("rankPoint").asInt();
         int myRank = json.get("myRank").asInt();
         
         String broadcastServer = "rank".equals(gameMode) ? "rank" : server;
@@ -572,14 +583,11 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         	playService.countFirst(user_nick);
         }
         
-        if (!"rank".equals(broadcastServer)) {
-//            roomStatus.getOrDefault(broadcastServer, Collections.emptyMap()).put(roomNo, "waiting");
-        	roomStatus.computeIfAbsent(broadcastServer, k -> new ConcurrentHashMap<>()).put(roomNo, "waiting");
-        }
+        roomStatus.computeIfAbsent(broadcastServer, k -> new ConcurrentHashMap<>()).put(roomNo, "waiting");
 
         String historyUuid = UUID.randomUUID().toString();
         
-        playService.increaseRewardPoints(point, rankPoint, user_nick);
+        playService.increaseRewardPoints(point, rank_point, user_nick);
         
         List<UserQuestionHistoryDTO> historyList = new ArrayList<>();
         for (JsonNode item : historyArray) {
@@ -746,63 +754,78 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-		String server = (String) session.getAttributes().get("server");
-		String userNick = (String) session.getAttributes().get("userNick");
+	    String server = (String) session.getAttributes().get("server");
+	    String user_nick = (String) session.getAttributes().get("userNick");
 
-		if (server != null && userNick != null) {
-			// 세션 및 유저 목록에서 제거
-			serverSessions.getOrDefault(server, Collections.emptySet()).remove(session);
-			serverUsers.getOrDefault(server, Collections.emptySet()).remove(userNick);
+	    // server 값이 "1", "2", "3" 이면 "rank"로 대체
+	    if ("1".equals(server) || "2".equals(server) || "3".equals(server)) {
+	        server = "rank";
+	    }
+	    
+	    final String serverFinal = server;
 
-			// ★ rank에서도 유저 제거 ★
-			Set<String> rankUsers = serverUsers.get("rank");
-			if (rankUsers != null) {
-				rankUsers.remove(userNick);
-			}
+	    if (server != null && user_nick != null) {
+	        // 세션 및 유저 목록에서 제거
+	        serverSessions.getOrDefault(server, Collections.emptySet()).remove(session);
+	        serverUsers.getOrDefault(server, Collections.emptySet()).remove(user_nick);
 
-			Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
-			List<String> emptyRooms = new ArrayList<>();
+	        // ★ rank에서도 유저 제거 ★
+	        Set<String> rankUsers = serverUsers.get("rank");
+	        if (rankUsers != null) {
+	            rankUsers.remove(user_nick);
+	        }
 
-			for (Map.Entry<String, Set<String>> entry : roomUserMap.entrySet()) {
-				String roomNo = entry.getKey();
-				Set<String> users = entry.getValue();
-				users.remove(userNick);
+	        Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
+	        List<String> emptyRooms = new ArrayList<>();
 
-				String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
-				if (owner != null && owner.equals(userNick)) {
-					if (!users.isEmpty()) {
-						String newOwner = users.iterator().next();
-						roomOwners.get(server).put(roomNo, newOwner);
-					} else {
-						roomOwners.get(server).remove(roomNo);
-					}
-				}
-				if (users.isEmpty()) {
-					emptyRooms.add(roomNo);
-				}
-			}
+	        for (Map.Entry<String, Set<String>> entry : roomUserMap.entrySet()) {
+	            String roomNo = entry.getKey();
 
-			List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
+	            Set<String> users = entry.getValue();
+	            users.remove(user_nick);
 
-			// 각 빈 방마다 개별적으로 유예 시간 후 삭제 체크
-			for (String roomNo : emptyRooms) {
-				new Timer().schedule(new TimerTask() {
-					@Override
-					public void run() {
-						Set<String> checkUsers = roomUserMap.get(roomNo);
-						if (checkUsers == null || checkUsers.isEmpty()) {
-							roomUserMap.remove(roomNo);
-							rooms.removeIf(room -> room.getGameroom_no().equals(roomNo));
-							broadcastRoomList(server);
-							roomOwners.get(server).remove(roomNo);
-						}
-					}
-				}, 5000); // 5초 후 체크
-			}
+	            String roomState = roomStatus.getOrDefault(server, Collections.emptyMap()).get(roomNo);
 
-			broadcastUserList(server);
-			broadcastRoomList(server);
-		}
+	            if ("rankPlaying".equals(roomState) || "create".equals(roomState)) {
+	                playService.leavePanalty(user_nick);
+	            }
+	            broadcastRoomUserList(server, roomNo);
+	            String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
+	            if (owner != null && owner.equals(user_nick)) {
+	                if (!users.isEmpty()) {
+	                    String newOwner = users.iterator().next();
+	                    roomOwners.get(server).put(roomNo, newOwner);
+	                } else {
+	                    roomOwners.get(server).remove(roomNo);
+	                }
+	            }
+	            if (users.isEmpty()) {
+	                emptyRooms.add(roomNo);
+	            }
+	        }
+
+	        List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
+
+	        // 각 빈 방마다 개별적으로 유예 시간 후 삭제 체크
+	        for (String roomNo : emptyRooms) {
+	            new Timer().schedule(new TimerTask() {
+	                @Override
+	                public void run() {
+	                    Set<String> checkUsers = roomUserMap.get(roomNo);
+	                    if (checkUsers == null || checkUsers.isEmpty()) {
+	                        roomUserMap.remove(roomNo);
+	                        rooms.removeIf(room -> room.getGameroom_no().equals(roomNo));
+	                        broadcastRoomList(serverFinal);
+	                        roomOwners.get(serverFinal).remove(roomNo);
+	                    }
+	                }
+	            }, 5000); // 5초 후 체크
+	        }
+
+	        broadcastUserList(server);
+	        broadcastRoomList(server);
+	    }
 	}
+
 
 }

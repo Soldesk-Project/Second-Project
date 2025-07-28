@@ -20,6 +20,8 @@ public interface PlayMapper {
 	
 	public void countFirst(@Param("user_nick") String user_nick);
 	
+	public void leavePanalty(@Param("user_nick") String user_nick);
+	
 	public List<UserQuestionHistoryDTO> getQuestionReviewList(@Param("user_nick") String user_nick);
 	
 	public List<UserQuestionHistoryDTO> getUserQuestionHistory(@Param("submittedAt") String submittedAt);

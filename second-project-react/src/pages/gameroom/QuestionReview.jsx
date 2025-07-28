@@ -123,8 +123,8 @@ const QuestionReview = () => {
         // console.log("정답유무 : "+question._correct);
         // console.log("문제 : "+question.question_text);
         // console.log("과목 : "+question.subject);
-        console.log(question);
         
+        console.log(question);
         setExplanation("");
         setExplanationLoading(true);
         setShowAnswer(true);
