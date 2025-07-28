@@ -62,7 +62,13 @@
   border-radius: 10px;
   box-shadow: 0px 1px 3px 1px rgb(0, 0, 0, 0.3);
 }
+.playDiv{
+  display: flex;
 
+}
+.answerTable td{
+  padding: 2px;
+}
 /* 유저 정보 영역 */
 .user_info {
   width: 350px;

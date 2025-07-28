@@ -385,7 +385,7 @@ const RoomList = () => {
               <div className={styles.roomMeta}>
                 <span>{room.currentCount ?? 0} / {room.limit}명</span>
                 <span>{room.is_private === 'Y' ? '비공개' : '공개'}</span>
-                <span>{room.pwd}</span>
+                <span>{room.status === 'playing'?'게임중':"대기중"}</span>
               </div>
             </div>
           ))
