@@ -30,33 +30,26 @@ public class AdminPageController {
     
     // 문제 등록
     @PostMapping("/registerQuestion")
-    public ResponseEntity<?> registerQuestion(@RequestBody QuestionDTO questionDTO,
-                                            @RequestParam("category") String categoryParam) {
+    public ResponseEntity<?> registerQuestion(@RequestBody QuestionDTO questionDTO) {
         System.out.println("문제 등록 요청 수신: " + questionDTO);
-        System.out.println("수신된 카테고리 (테이블 결정용): " + categoryParam);
+        System.out.println("수신된 과목 (DB 저장용): " + questionDTO.getSubject());
 
         try {
-            String decodedCategory = URLDecoder.decode(categoryParam, "UTF-8");
-            
-            // 이미지 데이터 처리 (현재와 동일)
+            // 이미지 데이터 처리
             if (questionDTO.getImage_data_base64() != null && !questionDTO.getImage_data_base64().isEmpty()) {
                 byte[] decodedBytes = Base64.getDecoder().decode(questionDTO.getImage_data_base64());
                 questionDTO.setImage_data(decodedBytes);
-                questionDTO.setImage_data_base64(null); // byte[]로 변환 후 base64 필드는 비움
+                questionDTO.setImage_data_base64(null);
             } else {
                 questionDTO.setImage_data(null);
             }
             
-            // 변경된 서비스 메서드 호출 (category도 함께 전달)
-            adminService.registerQuestion(questionDTO, decodedCategory); 
+            adminService.registerQuestion(questionDTO); 
             
             return new ResponseEntity<>("문제 등록 성공!", HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return new ResponseEntity<>("잘못된 요청 데이터입니다: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("카테고리 디코딩 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("문제 등록 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -66,21 +59,15 @@ public class AdminPageController {
     // 문제 검색
     @GetMapping(value = "/searchQuestions", produces = "application/json; charset=UTF-8")
     public ResponseEntity<?> searchQuestions(
-            @RequestParam("category") String categoryParam,
+    		@RequestParam("subject") String subjectCode,
             @RequestParam(value = "query", required = false, defaultValue = "") String query,
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "limit", defaultValue = "5") int limit) {
+            @RequestParam(value = "limit", defaultValue = "10") int limit) {
         try {
-            String decodedCategory = URLDecoder.decode(categoryParam, "UTF-8");
-            String decodedQuery = URLDecoder.decode(query, "UTF-8");
-
-            Map<String, Object> result = adminService.searchQuestions(decodedCategory, decodedQuery, page, limit);
+            Map<String, Object> result = adminService.searchQuestions(subjectCode, query, page, limit);
 
             return new ResponseEntity<>(result, HttpStatus.OK);
 
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("카테고리 또는 검색어 디코딩 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             e.printStackTrace();
             Map<String, Object> errorResponse = new HashMap<>();
@@ -91,13 +78,11 @@ public class AdminPageController {
     
     // 문제 수정
     @PostMapping("/editQuestion")
-    public ResponseEntity<?> editQuestion(@RequestBody QuestionDTO questionDTO,
-                                          @RequestParam("category") String categoryParam) {
+    public ResponseEntity<?> editQuestion(@RequestBody QuestionDTO questionDTO) {
         System.out.println("문제 수정 요청 수신: " + questionDTO);
-        System.out.println("수신된 카테고리 (테이블 결정용): " + categoryParam);
+        System.out.println("수신된 과목: " + questionDTO.getSubject());
 
         try {
-            String decodedCategory = URLDecoder.decode(categoryParam, "UTF-8");
             if (questionDTO.getImage_data_base64() != null && !questionDTO.getImage_data_base64().isEmpty()) {
                 byte[] decodedBytes = Base64.getDecoder().decode(questionDTO.getImage_data_base64());
                 questionDTO.setImage_data(decodedBytes);
@@ -106,14 +91,11 @@ public class AdminPageController {
                 questionDTO.setImage_data(null);
             }
 
-            adminService.updateQuestion(questionDTO, decodedCategory);
+            adminService.updateQuestion(questionDTO);
             return new ResponseEntity<>("문제 수정 성공!", HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return new ResponseEntity<>("잘못된 요청 데이터입니다: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("카테고리 디코딩 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("문제 수정 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -123,26 +105,25 @@ public class AdminPageController {
     // 문제 삭제
     @DeleteMapping("/deleteQuestions")
     public ResponseEntity<?> deleteQuestions(
-            @RequestParam("category") String categoryParam,
+    		@RequestParam("subject") String subjectCode,
             @RequestParam("ids") String idsParam) {
-        System.out.println("문제 삭제 요청 수신 - 카테고리: " + categoryParam + ", ID 목록: " + idsParam);
+    	System.out.println("문제 삭제 요청 수신 - 과목: " + subjectCode + ", ID 목록: " + idsParam);
 
         try {
-            String decodedCategory = URLDecoder.decode(categoryParam, "UTF-8");
             List<Integer> questionIds = Arrays.stream(idsParam.split(","))
                                               .map(Integer::parseInt)
                                               .collect(Collectors.toList());
 
-            adminService.deleteQuestions(decodedCategory, questionIds);
+            adminService.deleteQuestions(questionIds, subjectCode);
 
             return new ResponseEntity<>("선택된 문제가 성공적으로 삭제되었습니다.", HttpStatus.OK);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("카테고리 디코딩 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (NumberFormatException e) {
             e.printStackTrace();
             return new ResponseEntity<>("잘못된 문제 ID 형식입니다. 숫자로 구성된 쉼표 구분 문자열이어야 합니다.", HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
+        } catch(IllegalArgumentException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("문제 삭제 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

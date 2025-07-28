@@ -4,19 +4,22 @@
 
 <mapper namespace="org.joonzis.mapper.AdminMapper">
 
-    <sql id="questionColumns">
-        id, question_text, option_1, option_2, option_3, option_4, correct_answer, image_data, created_at
-    </sql>
     
     <!-- 문제 등록 -->
-    <insert id="insertQuestion" parameterType="map">
-        INSERT INTO ${tableName} (
-            id, question_text, option_1, option_2, option_3, option_4, correct_answer,
+    <insert id="insertQuestion" parameterType="org.joonzis.domain.QuestionDTO">
+        INSERT INTO Question (
+            id,
+            subject, question_text,
+            option_1,
+            option_2,
+            option_3,
+            option_4,
+            correct_answer,
             <if test="image_data != null">image_data,</if>
             created_at
         ) VALUES (
-            ${tableName}_SEQ.NEXTVAL,
-            #{question_text},
+            QUESTION_SEQ.NEXTVAL,
+            #{subject}, #{question_text},
             #{option_1},
             #{option_2},
             #{option_3},
@@ -31,6 +34,7 @@
 	<select id="getQuestionsBySearch" resultType="org.joonzis.domain.QuestionDTO" parameterType="map">
 		SELECT
 			id,
+			subject,
 			question_text,
 			option_1,
 			option_2,
@@ -41,6 +45,7 @@
 		FROM (
 			SELECT
 				id,
+				subject,
 				question_text,
 				option_1,
 				option_2,
@@ -51,6 +56,7 @@
 				ROWNUM AS rn  FROM (
 				SELECT
 					id,
+					subject,
 					question_text,
 					option_1,
 					option_2,
@@ -58,7 +64,7 @@
 					option_4,
 					correct_answer,
 					image_data
-				FROM ${tableName}
+				FROM Question
 				ORDER BY id DESC
 			)
 		)
@@ -67,18 +73,22 @@
 
     <select id="getTotalQuestionCount" resultType="int" parameterType="map">
         SELECT COUNT(*)
-        FROM ${tableName}
+        FROM Question
         <where>
+            <if test="subjectCode != null and subjectCode != ''">
+                subject = #{subjectCode}
+            </if>
             <if test="query != null and query != ''">
-                question_text LIKE '%' || #{query} || '%'
+                and question_text LIKE '%' || #{query} || '%'
             </if>
         </where>
     </select>
     
     <!-- 문제 수정 -->
-    <update id="updateQuestion" parameterType="map">
-        UPDATE ${tableName}
+    <update id="updateQuestion" parameterType="org.joonzis.domain.QuestionDTO">
+        UPDATE Question
         SET
+        	subject = #{subject},
             question_text = #{question_text},
             option_1 = #{option_1},
             option_2 = #{option_2},
@@ -95,10 +105,14 @@
     </update>
     
     <!-- 문제 삭제 -->
-    <delete id="deleteQuestions" parameterType="map"> DELETE FROM ${tableName} WHERE id IN
+    <delete id="deleteQuestions" parameterType="map">
+    	DELETE FROM Question WHERE id IN
         <foreach collection="questionIds" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
+        <if test="subjectCode != null and subjectCode != ''">
+            AND subject = #{subjectCode}
+        </if>
     </delete>
     
     <!-- 유저 전체 조회 -->

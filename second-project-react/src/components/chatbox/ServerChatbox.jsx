@@ -269,7 +269,6 @@ const ServerChatbox = () => {
                     placeholder={isWhisperMode ? "귓속말 메시지 입력..." : "메시지 입력..."}
                     disabled={!isConnected}
                 />
-                <button id="emojiBtn" className="emojiBtn" disabled={!isConnected}>😊</button>
                 <button id="sendBtn" className="sendBtn" onClick={sendMessage} disabled={!isConnected}>전달</button>
             </div>
 

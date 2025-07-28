@@ -13,13 +13,13 @@ public interface AdminService {
     
 	//문제 관련 메소드
 	//문제 등록 메소드
-	void registerQuestion(QuestionDTO questionDTO, String category);
+	void registerQuestion(QuestionDTO questionDTO);
     //문제 검색 메소드
-	Map<String, Object> searchQuestions(String category, String query, int page, int limit);
+	Map<String, Object> searchQuestions(String subjectCode, String query, int page, int limit);
     //문제 수정 메소드
-	void updateQuestion(QuestionDTO questionDTO, String category);
+	void updateQuestion(QuestionDTO questionDTO);
 	//문제 삭제 메소드
-	void deleteQuestions(String decodedCategory, List<Integer> questionIds);
+	void deleteQuestions(List<Integer> questionIds, String subjectCode);
 
 	//유저 관련 메소드
 	//유저 조회 메소드

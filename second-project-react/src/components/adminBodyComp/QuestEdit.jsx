@@ -7,46 +7,47 @@ const QuestEdit = () => {
   const [questionText, setQuestionText] = useState('');
   const [options, setOptions] = useState(['', '', '', '']);
   const [correctAnswer, setCorrectAnswer] = useState('1');
-  const [category, setCategory] = useState('정보처리기사');
+  const [subject, setSubject] = useState('정보처리기사');
   const [base64ImageString, setBase64ImageString] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedQuestId, setSelectedQuestId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 10;
+  // 한 페이지에 보이는 문제 개수를 5개로 변경
+  const itemsPerPage = 5;
   const [startPage, setStartPage] = useState(1);
   const pagesToShow = 5;
 
   // 이전 검색어를 저장할 useRef (searchQuery가 변경되었는지 확인하기 위함)
   const lastSearchQuery = useRef('');
 
-  const categories = [
+  const subjects = [
     '정보처리기사', '정보처리산업기사', '정보처리기능사',
     '리눅스마스터1급', '리눅스마스터2급',
     '정보통신산업기사', '정보통신기사', '정보보안기사',
     '네트워크관리사1급', '네트워크관리사2급',
   ];
 
-  const categoryTableMap = {
-    '정보처리기사': 'CPE_Q',
-    '정보처리산업기사': 'CPEI_Q',
-    '정보처리기능사': 'CPET_Q',
-    '리눅스마스터1급': 'LM1_Q',
-    '리눅스마스터2급': 'LM2_Q',
-    '정보통신산업기사': 'ICTI_Q',
-    '정보통신기사': 'ICT_Q',
-    '정보보안기사': 'SEC_Q',
-    '네트워크관리사1급': 'NET1_Q',
-    '네트워크관리사2급': 'NET2_Q',
+  const subjectValueMap = {
+    '정보처리기사': 'cpe',
+    '정보처리산업기사': 'cpei',
+    '정보처리기능사': 'cpet',
+    '리눅스마스터1급': 'lm1',
+    '리눅스마스터2급': 'lm2',
+    '정보통신산업기사': 'icti',
+    '정보통신기사': 'ict',
+    '정보보안기사': 'sec',
+    '네트워크관리사1급': 'net1',
+    '네트워크관리사2급': 'net2',
   };
 
-  const handleCategoryChange = (e) => {
-    const selectedCategory = e.target.value;
-    setCategory(selectedCategory);
+  const handleSubjectChange = (e) => {
+    const selectedSubject = e.target.value;
+    setSubject(selectedSubject);
     setSearchResults([]);
     setSearchQuery('');
-    setSelectedQuestId(null);
+    setSelectedQuestId(null); // 과목 변경 시 선택된 문제 초기화
     handleReset();
     setCurrentPage(1);
     setTotalPages(1);
@@ -73,9 +74,9 @@ const QuestEdit = () => {
   };
 
   const handleSearchQuest = async (page = 1) => {
-    const tableName = categoryTableMap[category];
-    if (!tableName) {
-      alert('유효하지 않은 카테고리입니다.');
+    const dbSubjectValue = subjectValueMap[subject];
+    if (!dbSubjectValue) {
+      alert('유효하지 않은 과목입니다.');
       return;
     }
 
@@ -85,8 +86,7 @@ const QuestEdit = () => {
     lastSearchQuery.current = searchQuery;
 
     try {
-      // itemsPerPage를 서버 요청에 사용
-      const response = await fetch(`/admin/searchQuestions?category=${tableName}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`);
+      const response = await fetch(`/admin/searchQuestions?subject=${encodeURIComponent(dbSubjectValue)}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -110,22 +110,28 @@ const QuestEdit = () => {
   };
 
   const handleSelectQuest = (question) => {
-    setSelectedQuestId(question.id);
-    setQuestionText(question.question_text);
-    setOptions([
-      question.option_1,
-      question.option_2,
-      question.option_3,
-      question.option_4,
-    ]);
-    setCorrectAnswer(String(question.correct_answer));
-
-    if (question.image_data_base64) {
-      setBase64ImageString(question.image_data_base64);
-      setPreviewImage(`data:image/png;base64,${question.image_data_base64}`);
+    // 이미 선택된 문제를 다시 클릭하면 드롭다운을 닫고 초기화
+    if (selectedQuestId === question.id) {
+      setSelectedQuestId(null);
+      handleReset();
     } else {
-      setBase64ImageString('');
-      setPreviewImage(null);
+      setSelectedQuestId(question.id);
+      setQuestionText(question.question_text);
+      setOptions([
+        question.option_1,
+        question.option_2,
+        question.option_3,
+        question.option_4,
+      ]);
+      setCorrectAnswer(String(question.correct_answer));
+
+      if (question.image_data_base64) {
+        setBase64ImageString(question.image_data_base64);
+        setPreviewImage(`data:image/png;base64,${question.image_data_base64}`);
+      } else {
+        setBase64ImageString('');
+        setPreviewImage(null);
+      }
     }
   };
 
@@ -146,9 +152,15 @@ const QuestEdit = () => {
       }
     }
 
+    const dbSubjectValue = subjectValueMap[subject]; // subject state 값을 사용합니다.
+    if (!dbSubjectValue) {
+      alert('유효하지 않은 과목입니다. 다시 선택해주세요.');
+      return;
+    }
+
     const questData = {
       id: selectedQuestId,
-      subject: "임시주제",
+      subject: dbSubjectValue,
       question_text: questionText,
       option_1: options[0],
       option_2: options[1],
@@ -161,7 +173,7 @@ const QuestEdit = () => {
     console.log('수정할 문제 데이터:', questData);
 
     try {
-      const response = await fetch(`/admin/editQuestion?category=${encodeURIComponent(categoryTableMap[category])}`, {
+      const response = await fetch(`/admin/editQuestion?`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -172,10 +184,10 @@ const QuestEdit = () => {
       if (response.ok) {
         alert('문제 수정 성공!');
         handleReset();
-        setSearchResults([]);
-        setSearchQuery('');
+        // 수정 완료 후 선택된 문제 ID를 초기화하여 드롭다운 닫기
         setSelectedQuestId(null);
-        handleSearchQuest(currentPage); // 수정 후 현재 페이지를 다시 불러와 목록 업데이트
+        // 검색 결과 목록을 새로고침하여 수정된 내용 반영
+        handleSearchQuest(currentPage);
       } else {
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
@@ -207,10 +219,10 @@ const QuestEdit = () => {
       <h1>문제 수정</h1>
       <div className='category'>
         <h3>1. 카테고리 선택 및 문제 검색</h3>
-        <select name="cateSelect" value={category} onChange={handleCategoryChange}>
-          {categories.map((cat, index) => (
-            <option key={index} value={cat}>
-              {cat}
+        <select name="cateSelect" value={subject} onChange={handleSubjectChange}>
+          {subjects.map((subject, index) => (
+            <option key={index} value={subject}>
+              {subject}
             </option>
           ))}
         </select>
@@ -229,18 +241,82 @@ const QuestEdit = () => {
       </div>
 
       {searchResults.length > 0 && (
-        <div className='searchResults'> {/* 이 div에 CSS를 적용하여 스크롤 방지 */}
+        <div className='searchResults'>
           <h3>검색 결과 ({searchResults.length}개): 문제를 클릭하여 수정하세요.</h3>
           <ul>
             {searchResults.map((quest) => (
-              <li
-                key={quest.id}
-                onClick={() => handleSelectQuest(quest)}
-                className={selectedQuestId === quest.id ? 'selected-edit' : ''}
-              >
-                <span className="quest-id">[ID: {quest.id}]</span>
-                {quest.question_text.length > 80 ? quest.question_text.substring(0, 80) + '...' : quest.question_text}
-              </li>
+              <React.Fragment key={quest.id}>
+                <li
+                  onClick={() => handleSelectQuest(quest)}
+                  className={selectedQuestId === quest.id ? 'selected-edit' : ''}
+                >
+                  <span className="quest-id">[ID: {quest.id}]</span>
+                  {quest.question_text.length > 80 ? quest.question_text.substring(0, 80) + '...' : quest.question_text}
+                </li>
+                {/* 선택된 문제 수정 내용은 해당 문제 칸의 아래에 드롭다운 형태로 나오게 할 것 */}
+                {selectedQuestId === quest.id && (
+                  <div className='question-detail-form dropdown-content'>
+                    <h2>선택된 <strong>{selectedQuestId}</strong>번 문제 수정 ✏️</h2>
+                    <div className='questionText'>
+                      <h3>2. 문제 본문 입력</h3>
+                      <input
+                        type="text"
+                        value={questionText}
+                        onChange={(e) => setQuestionText(e.target.value)}
+                        placeholder="문제 본문을 입력하세요."
+                      />
+                    </div>
+                    <div className='option'>
+                      <h3>3. 선택지 입력</h3>
+                      {options.map((option, index) => (
+                        <div key={index}>
+                          <input
+                            type="text"
+                            value={option}
+                            onChange={(e) => {
+                              const newOptions = [...options];
+                              newOptions[index] = e.target.value;
+                              setOptions(newOptions);
+                            }}
+                            placeholder={`${index + 1}번 선택지를 입력하세요.`}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <div className='corAnswer'>
+                      <h3>4. 정답 입력</h3>
+                      <select name="corAnsSelect" value={correctAnswer} onChange={(e) => setCorrectAnswer(e.target.value)}>
+                        {options.map((_, index) => (
+                          <option key={index + 1} value={String(index + 1)}>{index + 1}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="photo-input-section">
+                      <h3 className="section-title">5. 이미지 업로드 (선택 사항)</h3>
+                      <div className="image-upload-wrapper">
+                        <label htmlFor="image-upload" className="image-upload-label">이미지 선택:</label>
+                        <input
+                          type="file"
+                          id="image-upload"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="image-upload-input"
+                        />
+                      </div>
+                      {previewImage && (
+                        <div className="image-preview-container">
+                          <h3 className="image-preview-title">이미지 미리보기:</h3>
+                          <img src={previewImage} alt="Image Preview" className="image-preview" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="button-group">
+                      <button onClick={handleReset} className="reset-button">현재 내용 초기화</button>
+                      <button onClick={handleQuestEditSubmit} className="submit-button">수정 완료</button>
+                    </div>
+                  </div>
+                )}
+              </React.Fragment>
             ))}
           </ul>
           {totalPages > 1 && (
@@ -278,73 +354,6 @@ const QuestEdit = () => {
             </div>
           )}
         </div>
-      )}
-
-      {selectedQuestId && (
-        <>
-          <hr />
-          <div className='question-detail-form'>
-            <h2>선택된 문제 수정 ✏️</h2>
-            <p>선택된 문제 ID: <strong>{selectedQuestId}</strong></p>
-            <div className='questionText'>
-              <h3>2. 문제 본문 입력</h3>
-              <input
-                type="text"
-                value={questionText}
-                onChange={(e) => setQuestionText(e.target.value)}
-                placeholder="문제 본문을 입력하세요."
-              />
-            </div>
-            <div className='option'>
-              <h3>3. 선택지 입력</h3>
-              {options.map((option, index) => (
-                <div key={index}>
-                  <input
-                    type="text"
-                    value={option}
-                    onChange={(e) => {
-                      const newOptions = [...options];
-                      newOptions[index] = e.target.value;
-                      setOptions(newOptions);
-                    }}
-                    placeholder={`${index + 1}번 선택지를 입력하세요.`}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className='corAnswer'>
-              <h3>4. 정답 입력</h3>
-              <select name="corAnsSelect" value={correctAnswer} onChange={(e) => setCorrectAnswer(e.target.value)}>
-                {options.map((_, index) => (
-                  <option key={index + 1} value={String(index + 1)}>{index + 1}</option>
-                ))}
-              </select>
-            </div>
-            <div className="photo-input-section">
-              <h3 className="section-title">5. 이미지 업로드 (선택 사항)</h3>
-              <div className="image-upload-wrapper">
-                <label htmlFor="image-upload" className="image-upload-label">이미지 선택:</label>
-                <input
-                  type="file"
-                  id="image-upload"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="image-upload-input"
-                />
-              </div>
-              {previewImage && (
-              <div className="image-preview-container">
-                <h3 className="image-preview-title">이미지 미리보기:</h3>
-                <img src={previewImage} alt="Image Preview" className="image-preview" />
-              </div>
-              )}
-            </div>
-            <div className="button-group">
-              <button onClick={handleReset} className="reset-button">현재 내용 초기화</button>
-              <button onClick={handleQuestEditSubmit} className="submit-button">수정 완료</button>
-            </div>
-          </div>
-        </>
       )}
     </div>
   );
