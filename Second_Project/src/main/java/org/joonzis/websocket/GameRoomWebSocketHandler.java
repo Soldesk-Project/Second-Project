@@ -161,6 +161,8 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 				gameMode, json.get("is_private").asText(), json.get("limit").asInt(),
 				json.get("pwd") != null ? json.get("pwd").asText() : null);
 
+		roomStatus.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).put(roomNo, "waiting");
+		
 		// 게임 모드 분기
 		if ("normal".equals(newRoom.getGame_mode())) {
 			// 서버별 방 목록 업데이트
@@ -571,7 +573,8 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         }
         
         if (!"rank".equals(broadcastServer)) {
-            roomStatus.getOrDefault(broadcastServer, Collections.emptyMap()).put(roomNo, "waiting");
+//            roomStatus.getOrDefault(broadcastServer, Collections.emptyMap()).put(roomNo, "waiting");
+        	roomStatus.computeIfAbsent(broadcastServer, k -> new ConcurrentHashMap<>()).put(roomNo, "waiting");
         }
 
         String historyUuid = UUID.randomUUID().toString();
@@ -617,10 +620,10 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	            roomMap.put("is_private", room.getIs_private());
 	            roomMap.put("limit", room.getLimit());
 	            roomMap.put("pwd", room.getPwd());
+	            roomMap.put("status", roomStatus.getOrDefault(server, Collections.emptyMap()).get(room.getGameroom_no()));
 
 	            Set<String> users = roomUserMap.getOrDefault(room.getGameroom_no(), Collections.emptySet());
 	            roomMap.put("currentCount", users.size());
-
 	            roomListWithCount.add(roomMap);
 	        }
 	    }
@@ -650,7 +653,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 			roomMap.put("is_private", room.getIs_private());
 			roomMap.put("limit", room.getLimit());
 			roomMap.put("pwd", room.getPwd());
-			// 현재 인원수
+			roomMap.put("status", roomStatus.getOrDefault(server, Collections.emptyMap()).get(room.getGameroom_no()));
 			Set<String> users = roomUserMap.getOrDefault(room.getGameroom_no(), Collections.emptySet());
 			roomMap.put("currentCount", users.size());
 			roomListWithCount.add(roomMap);

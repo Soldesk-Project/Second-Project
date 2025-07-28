@@ -17,6 +17,7 @@ const QuestionReview = () => {
   const [isCorrect, setIsCorrect] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [selectAnswer, setSelectAnswer] = useState(null);
+  const [reviewQuestions, setReviewQuestions] = useState([]);
   const [answer, setAnswer] = useState(null);
   const [point, setPoint] = useState(null);
   const [showAnswer, setShowAnswer] = useState(false);
@@ -94,8 +95,9 @@ const QuestionReview = () => {
     const resp=await axios.post('/api/userQuestionHistory', {submittedAt});
     // console.log('submmitedAt:', submittedAt);
     const data=resp.data
-    // console.log(data);
+    console.log(data);
     questionListRef.current = data
+    setReviewQuestions(resp.data);
     setNextId(0);
     setQuestion(data[nextId])
     setPlay(true);
@@ -198,32 +200,53 @@ const QuestionReview = () => {
                 <span>내 보유 포인트 : {point}p</span>
                 <button onClick={leaveRoom} className={styles.leaveBtn}>나가기</button>
               </div>
-              <div className={styles.gamePlay}>
-                {
-                  play ? 
-                    <>
-                      <Test question={question} 
-                            nextId={nextId}
-                            onSelectAnswer={setSelectAnswer}
-                            selectedAnswer={selectAnswer}/> 
-                      <span>내가 선택한 정답 : {selectedAnswer!==0?selectedAnswer:'선택하지 않음'}</span>
-                    </> : 
-                  <h2>대기중</h2>
-                }
-                {showAnswer && (
-                    <div className={styles.answerAndExplanation}>
-                      <p>문제의 정답: {answer}</p>
+              <div className={styles.playDiv}>
+                <div className={styles.answerTable}>
+                  {
+                    play &&
+                    <table>
+                      <tr>
+                        <td>번호</td>
+                        <td>정답</td>
+                      </tr>
+                      {
+                        reviewQuestions.map((a, idx)=>(
+                          <tr key={idx}>
+                            <td>{idx+1}</td>
+                            <td>{a._correct?'O':'X'}</td>
+                          </tr>
+                        ))
+                      }
+                    </table>
+                  }
+                </div>
+                <div className={styles.gamePlay}>
+                  {
+                    play ? 
+                      <>
+                        <Test question={question} 
+                              nextId={nextId}
+                              onSelectAnswer={setSelectAnswer}
+                              selectedAnswer={selectAnswer}/> 
+                        <span>내가 선택한 정답 : {selectedAnswer!==0?selectedAnswer:'선택하지 않음'}</span>
+                      </> : 
+                    <h2>대기중</h2>
+                  }
+                  {showAnswer && (
+                      <div className={styles.answerAndExplanation}>
+                        <p>문제의 정답: {answer}</p>
 
-                      <div className={styles.explanationBox}>
-                        <strong>AI 해설:</strong><br />
-                        {explanationLoading ? (
-                          <p>해설 생성 중...</p>
-                        ) : (
-                          <p>{explanation}</p>
-                        )}
+                        <div className={styles.explanationBox}>
+                          <strong>AI 해설:</strong><br />
+                          {explanationLoading ? (
+                            <p>해설 생성 중...</p>
+                          ) : (
+                            <p>{explanation}</p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                </div>
               </div>
             </div>
           </div>
