@@ -146,24 +146,39 @@ const Shop = () => {
                   className={styles.card} 
                   onClick={() => setSelectedItem(item)}>
                   <div className={styles.itemCss}>
-                  <img 
+                  {/* 가끔 경로가 안되는 경우가 있음 */}
+                  {/* <img 
                     src={`/images/${item.imageFileName}`} 
                     alt={item.item_name} 
-                    className={styles.itemImage} />
-                    {/* <div>
-                        {item.item_type === 'title' && titleTextMap[item.css_class_name] && (
-                            <span className={decoStyles[item.css_class_name]} style={{marginRight: '5px', fontWeight: 'bold'}}>
-                                [{titleTextMap[item.css_class_name]}]
-                            </span>
-                            )}
-                        <span
-                          className={
-                            item.item_type !== 'title' ? decoStyles[item.css_class_name] : undefined
-                          }
-                        >
-                          아이템
-                        </span>
-                    </div> */}
+                    className={styles.itemImage} /> */}
+                  {item.item_type === 'title' && (
+                  // 1) 칭호: 텍스트 매핑
+                  <span
+                    className={decoStyles[item.css_class_name]}
+                    style={{ fontWeight: 'bold', fontSize: '1.2em' }}
+                  >
+                    { titleTextMap[item.css_class_name] || item.item_name }
+                  </span>
+                )}
+
+                {item.item_type === 'fontColor' && (
+                  // 2) 글자색: 고정 텍스트 + 컬러 클래스
+                  <span
+                    className={decoStyles[item.css_class_name]}
+                    style={{ fontSize: '1.5em' }}
+                  >
+                    가나다abc
+                  </span>
+                )}
+
+                {item.item_type !== 'title' && item.item_type !== 'fontColor' && (
+                  // 3) 나머지(테두리, 배경, 말풍선, 기타): 이미지
+                  <img
+                    src={item.imgUrl}
+                    alt={item.item_name}
+                    className={styles.itemImage}
+                  />
+                )}
                   </div>
                   <div className={styles.itemName}>이름 : {item.item_name}</div>
                   <div className={styles.itemPrice}>가격 : {item.item_price ? item.item_price.toLocaleString() : '가격 미정'} p</div>
