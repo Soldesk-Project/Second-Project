@@ -112,7 +112,7 @@ public class ShopController {
             "글자색", "fontColor",
             "배경", "background",
             "말풍선", "balloon",
-            "랜덤박스", "randomBox"
+            "기타", "etc"
         );
 
         String mappedCategory = categoryMap.getOrDefault(category, "unknown");

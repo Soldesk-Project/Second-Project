@@ -171,7 +171,17 @@ const Shop = () => {
                   </span>
                 )}
 
-                {item.item_type !== 'title' && item.item_type !== 'fontColor' && (
+                {item.item_type === 'etc' && (
+                  // 3) 기타: 고정 텍스트
+                  <span
+                    className={decoStyles[item.css_class_name]}
+                    style={{ fontWeight: 'bold', fontSize: '1.2em' }}
+                  >
+                    { titleTextMap[item.css_class_name] || item.item_name }
+                  </span>
+                )}
+
+                {item.item_type !== 'title' && item.item_type !== 'fontColor' && item.item_type !== 'etc' && (
                   // 3) 나머지(테두리, 배경, 말풍선, 기타): 이미지
                   <img
                     src={item.imgUrl}

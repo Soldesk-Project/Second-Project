@@ -11,7 +11,8 @@
     	ITEM_PRICE         AS item_price,
     	ITEM_NAME          AS item_name,
     	ITEM_TYPE          AS item_type,
-    	IMAGE_FILE_NAME    AS imageFileName
+    	IMAGE_FILE_NAME    AS imageFileName,
+    	CSS_CLASS_NAME	   AS css_class_name
 		FROM ITEMS
     	WHERE ITEM_TYPE = #{category}
 	 </select>
