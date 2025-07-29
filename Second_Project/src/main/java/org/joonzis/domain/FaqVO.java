@@ -10,8 +10,9 @@ import lombok.*;
 @Builder
 public class FaqVO {
     private Long id;
-    private String subject;
-    private String message;
+    private String question;
+    private String answer;
+    private String category;
     
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime createdAt;

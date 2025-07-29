@@ -93,7 +93,7 @@ const AchRegister = () => {
         </select>
       </div>
 
-      <div className='achievement-text-section'>
+      <div className='ach-name-section'>
         <h3 className='section-title'>2. 업적 이름 입력</h3>
         <input
           type="text"
@@ -102,7 +102,9 @@ const AchRegister = () => {
           className='achievement-text-input'
           placeholder='업적 이름을 입력하세요.'
         />
-
+      </div>
+      
+      <div className="ach-content-section">
         <h3 className='section-title'>3. 업적 내용 입력</h3>
         <input
           type='number'
@@ -111,7 +113,9 @@ const AchRegister = () => {
           className="achievement-text-input"
           placeholder='업적 내용을 입력하세요'  
         />
+      </div>
 
+      <div className='ach-reward-section'>
         <h3 className='section-title'>4. 업적 보상 입력</h3>
         <input
           type='number'

@@ -75,7 +75,7 @@ public class CustomerController {
     @GetMapping("/inquiries")
     public ResponseEntity<Map<String, Object>> getInquiries(
     		@RequestParam(value = "page", defaultValue = "1") int page,
-    		@RequestParam(value = "size", defaultValue = "15") int size) {
+    		@RequestParam(value = "size", defaultValue = "10") int size) {
     	Map<String, Object> data = inquiryService.getInquiries(page, size);
     	return ResponseEntity.ok(data);
     }

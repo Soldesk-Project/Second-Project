@@ -9,8 +9,8 @@ h1 {
 .category {
   margin-bottom: 25px;
   padding: 15px;
-  background-color: #f0f8ff;
-  border: 1px solid #cceeff;
+  background-color: #0A0D17;
+  border: 1px solid #0A0D17;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -19,7 +19,7 @@ h1 {
 }
 
 .category h3 {
-  color: #2c3e50;
+  color: #fff;
   margin: 0 10px 0 0;
   font-size: 1.1em;
 }
@@ -53,15 +53,14 @@ h1 {
 /* 검색 결과 섹션 */
 .searchResults {
   margin-top: 20px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #171a23;
   padding: 15px;
-  border-radius: 8px;
-  background-color: #ffffff;
+  background-color: #171a23;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .searchResults h3 {
-  color: #34495e;
+  color: #fff;
   margin-top: 0;
   margin-bottom: 15px;
   font-size: 1.05em;
@@ -70,9 +69,9 @@ h1 {
 .searchResults ul {
   list-style: none;
   padding: 0;
-  border: 1px solid #f0f0f0;
-  border-radius: 5px;
-  background-color: #fdfdfd;
+  border: 1px solid #171a23;
+  border-radius: 0px;
+  background-color: #171a23;
 }
 
 .searchResults li {
@@ -82,7 +81,7 @@ h1 {
   display: flex;
   align-items: center;
   font-size: 0.95em;
-  color: #444;
+  color: #fff;
 }
 
 .searchResults li:last-child {
@@ -91,10 +90,15 @@ h1 {
 
 .searchResults li:hover {
   background-color: #f5f5f5;
+  color: black;
+}
+
+.searchResults li:hover span {
+  color: black;
 }
 
 .searchResults li span {
-  color: #777;
+  color: #fff;
   margin-right: 10px;
   font-size: 0.9em;
 }
@@ -106,27 +110,28 @@ h1 {
 }
 
 .pagination button {
-  margin: 0 4px;
-  padding: 8px 14px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 0.9em;
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+    padding: 8px 15px;
+    margin: 0 5px;
+    background-color: #35373d;
+    color: #ddd;
+    border: 1px solid #48494e;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
 /* 문제 상세/수정/삭제 폼 섹션 공통 스타일 */
 .question-detail-form {
   margin-top: 20px;
-  border: 1px solid #dcdcdc;
+  border: 1px solid #171a23;
   padding: 25px;
   border-radius: 8px;
-  background-color: #fdfdfd;
+  background-color: #171a23;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .question-detail-form h2 {
-  color: #2c3e50;
+  color: #fff;
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 1.3em;
@@ -141,7 +146,7 @@ h1 {
 }
 
 .question-detail-form h3 {
-  color: #34495e;
+  color: #fff;
   margin-top: 20px;
   margin-bottom: 10px;
   font-size: 1.1em;

@@ -6,18 +6,34 @@
 .ItemMenu {
   width : 300px;
   color: white;
-  background-color: grey;
+  background-color: #0A0D17;
   font-size: 1.5em;
   text-align: left;
   padding: 15px 20px;
-  border: 1px solid navy;
+  border: 1px solid #0A0D17;
 }
 
 .submenu-list{
   padding: 20px 40px;
+  color: #171a23;
 }
+
+.submenu-list li {
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.submenu-list li::before {
+  content: '•';
+  color: white;
+  position: absolute;
+  left: -20px;
+  font-size: 1.2em;
+}
+
 
 .submenu-list button{
   font-size: 1.2em;
   margin-bottom: 5px;
+  color: white;
 }

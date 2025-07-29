@@ -1,4 +1,6 @@
-/* 공통 리셋 */
+/* customer.module.css */
+
+/* --- 공통 리셋 (기존 유지) --- */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -9,38 +11,33 @@
   display: none;
 }
 
+.h3{
+    font-size: 1.2em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
 button {
-  /* 브라우저 기본 버튼 모양 제거 */
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  
-  /* 테두리/배경 초기화 */
   background: none;
   border: none;
-  
-  /* 여백 초기화 */
   padding: 0;
   margin: 0;
-  
-  /* 폰트 속성 상속 */
   font: inherit;
   color: inherit;
-  
-  /* 포커스 아웃라인 제거 (필요시) */
   outline: none;
-  
-  /* 마우스 커서 */
   cursor: pointer;
 }
 
+/* --- 상위 컨테이너 및 탭 관련 (기존 유지) --- */
 .customerServiceCenter{
   color: #fff;
   background-color: #171a23;
   min-height: calc(100vh);
 }
 
-/* 상단 헤더 */
 .topNav{
   height: 70px;
   background-color: #0A0D17;
@@ -51,19 +48,13 @@ button {
   font-weight: bold;
 }
 
-.title{
-  text-align: center;
-  font-size: 30px;
-  margin-top: 100px;
-}
-/* 탭 리스트 */
 .tabs {
   display: flex;
   gap: 6rem;
   border-bottom: 2px solid #ddd;
   padding: 0 20px;
   justify-content: center;
-  margin-top: 100px;
+  margin-top: 20px;
 }
 
 .tabs .tab {
@@ -71,6 +62,7 @@ button {
   border: none;
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
+  color: #fff; /* 탭 글자색 */
 }
 
 .tabs .tab:hover,
@@ -79,178 +71,304 @@ button {
 }
 
 .tabs .active {
-  border-bottom: 3px solid #8367C7; /* 보라색 하이라이트 */
+  border-bottom: 3px solid #8367C7;
   font-weight: bold;
 }
 
-/* 탭 패널 */
 .tabPanels {
   padding: 20px;
   padding-top : 50px;
 }
 
-.content {
+.content { /* 각 패널의 최상위 컨테이너 */
   animation: fadeIn 0.2s ease-in;
+  margin: 0 auto; /* 중앙 정렬 */
+  max-width: 1000px; /* 최대 너비 제한 (inquiryBox 대신 사용) */
+  color: #fff; /* 패널 내부 기본 글자색 */
 }
 
-.inquiryBox{
-  display: flex;              
-  flex-direction: column;     /* 세로로 쌓이는 구조라면 */
-  align-items: center;  
+/* --- 공통 리스트 헤더 (제목 줄) --- */
+.listHeader {
+    list-style: none;
+    margin: 5px 0 0 0; /* 상단 여백, 좌우 여백 제거 */
+    padding: 0; /* 패딩 제거 */
+    display: grid;
+    grid-template-columns: 80px 1fr 120px 140px; /* 번호, 제목(넓게), 닉네임/유형, 날짜 */
+    gap: 1rem;
+    align-items: center;
+    padding: 10px 0; /* 헤더 상하 패딩 */
+    border-top: 2px solid #35373d;
+    border-bottom: 1px solid #48494e;
+    font-weight: bold;
+    color: #fff; /* 헤더 글자색 */
+    text-align: center;
+}
+
+.listHeader li {
+    text-align: center; /* 기본 가운데 정렬 */
+}
+/* 각 컬럼별 정렬 및 너비는 패널별로 오버라이드하거나, 이 아래에 일반적인 정의 */
+.listHeader li:nth-child(1) { justify-self: center; } /* 번호 */
+.listHeader li:nth-child(2) { justify-self: center; } /* 제목 */
+.listHeader li:nth-child(3) { justify-self: center; } /* 닉네임/유형 */
+.listHeader li:nth-child(4) { justify-self: center; } /* 날짜 */
+
+
+/* --- 공통 리스트 본문 (ul) --- */
+.listView {
+    list-style: none;
+    margin: 30px 0; /* 상하 여백, 좌우 여백 제거 */
+    padding: 0; /* 패딩 제거 */
+}
+
+/* --- 공통 각 리스트 항목 (li) --- */
+.listItem {
+    display: grid;
+    /* grid-template-rows는 헤더와 상세 내용 두 줄을 위해 auto auto */
+    grid-template-rows: auto auto; 
+    grid-template-columns: 80px 1fr 120px 140px;
+    gap: 0; 
+    align-items: stretch;
+    border-bottom: 1px solid #48494e; /* 각 항목의 하단 경계선 */
+    color: #ddd; /* 항목 기본 글자색 */
+    
+}
+
+/* 리스트 항목의 상단 (기본 정보) 영역 */
+.listItemHeader {
+    display: contents; /* 이 div는 Grid 아이템으로 공간을 차지하지 않고, 자식들이 Grid 아이템 됨 */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    padding: 15px 0; /* 상하 패딩 */
+}
+
+/* listItemHeader의 자식 요소들 (실제 Grid 아이템) */
+.listItemNo { /* 번호 */
+    justify-self: center;
+    align-self: center;
+    font-size: 0.9em;
+    color: #888;
+}
+.listItemTitle { /* 제목 */
+    justify-self: start;
+    align-self: center;
+    text-align: left;
+    padding-left: 10px;
+    font-weight: 500;
+    color: #fff;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+}
+.listItemTitle:hover {
+    color: #8367C7; /* 호버 시 색상 변경 */
+}
+.listItemAuthor, /* 닉네임 또는 유형 */
+.listItemDate { /* 날짜 */
+    justify-self: center; /* 기본 가운데 정렬 */
+    align-self: center;
+    font-size: 0.9em;
+    color: #666;
+}
+.listItemDate { /* 날짜만 우측 정렬 */
+    justify-self: end;
+    text-align: right;
+    padding-right: 30px;
+}
+
+/* 호버 시 배경색 */
+.listItem:hover .listItemHeader {
+    background-color: rgba(131, 103, 199, 0.1);
+}
+
+/* --- 상세 내용 영역 --- */
+.detailContentArea {
+    grid-column: 1 / -1; /* 첫 번째 컬럼부터 마지막 컬럼까지 모두 차지 (전체 행) */
+    padding: 20px 30px;
+    background-color: #1f222b; /* 배경색 */
+    border-top: 1px dashed #48494e;
+    box-sizing: border-box;
+    margin-bottom: 15px; /* 다음 리스트 항목과의 간격 */
+}
+
+.detailContent {
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #ddd;
+    line-height: 1.8;
+    font-size: 1em;
+}
+
+/* --- 새 글 등록/작성 버튼 및 페이징 공통 --- */
+.listFooter { /* 기존 listBottom 재정의 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    margin: 20px 0 0 0; /* margin 조정 */
+}
+
+.primaryButton { /* 새 글 등록, 작성 완료 등에 사용될 메인 버튼 */
+    padding: 8px 15px;
+    margin: 0 5px;
+    background-color: #35373d;
+    color: #ddd;
+    border: 1px solid #48494e;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.primaryButton:hover {
+    background-color: #6a4fa8;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination button {
+    padding: 8px 15px;
+    margin: 0 5px;
+    background-color: #35373d; /* 페이징 버튼 배경색 */
+    color: #ddd; /* 페이징 버튼 글자색 */
+    border: 1px solid #48494e;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #48494e;
+}
+
+.pagination button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4; /* 비활성화 시 투명도 조절 */
+    background-color: #2b2e35; /* 비활성화 시 배경색 */
+}
+
+.pagination span {
+    margin: 0 10px;
+    font-weight: bold;
+    color: #888;
+}
+
+
+/* --- 폼 관련 스타일 (기존 유지, 필요한 부분 통합) --- */
+.inquiryBox{ /* 현재 사용 안 함 */
+  display: flex;           
+  flex-direction: column;   
+  align-items: center;   
   margin: 0 auto;
-  width: 1000px;      /* 자식들을 가로 가운데로 */
+  width: 1000px;         
 }
-
-.inquiryTitle{
-  list-style: none;
-  margin-top: 5px;
-  border-top: 2px solid #35373d;
-  border-bottom: 1px solid #48494e;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  width: 1000px;
-}
-
-.inquiryList{
-  list-style: none;
-  margin-top: 30px;
-  justify-items: center;
-}
-
-.inquiryPersonal{
-  padding: 5px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #48494e;
-  width: 1000px;
-  display: flex;
-  flex-direction: row;
-  gap: 150px;
-}
-
 .explanation{
   border-top: 1px solid #fff;
   border-bottom: 1px solid #fff;
   width: 800px;
   text-align: center;
   margin: 50px auto 0px;
+  color: #ddd;
+}
+.explanation p {
+    margin-top: 1rem;
 }
 
-.inqContainer{
-width: 800px;
-margin: 50px auto 0px;
-display: flex;
-flex-direction: column;
+.inqContainer { 
+    width: 800px;
+    margin: 50px auto 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px; /* input/textarea 사이 간격 */
+    color: #ddd;
 }
 
-textarea.textarea {
-  width: 100%;
-  height: 150px;
-  padding: 10px;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+.formGroup { /* input/label 묶음 */
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
-
-.listBottom{
-  display: flex;
-  align-items: center;  /* 수직 중앙 정렬 */
-  width: 100%;
+.formGroup label {
+    flex-basis: 100px; /* 라벨 너비 고정 */
+    text-align: right;
+    font-weight: bold;
 }
 
-.pagination{
-  margin: 0 auto;
-  gap: 10px;
-}
-/* 버튼 */
-.inqBtns{
-  display: flex;
-  flex-direction: row;
-  gap: 20px;
-  justify-content: center;
-  margin-bottom: 100px;
-}
-
-.InqBtn{
-  margin-left: 0;
-  padding: 0.5rem 1rem;
-  background: #8367C7;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
+.input[type="text"],
+.input[type="password"],
+.input[type="email"]{
+    flex-grow: 1; /* 남은 공간 채우기 */
+    padding: 10px;
+    border: 1px solid #48494e;
+    border-radius: 5px;
+    background-color: #2b2e35;
+    color: #fff;
+    font-size: 1rem;
+    width:100%;
+    margin-bottom: 25px;
 }
 
-.Button {
-  margin-left: 0;
-  padding: 0.5rem 1rem;
-  background: #8367C7;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
+textarea {
+    flex-grow: 1; /* 남은 공간 채우기 */
+    padding: 10px;
+    border: 1px solid #48494e;
+    border-radius: 5px;
+    background-color: #2b2e35;
+    color: #fff;
+    font-size: 1rem;
+    width:100%;
 }
 
-/* 간단한 페이드인 애니메이션 */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.inqueriesBox{
-  margin: 0 auto;
-}
-
-.submitBtn{
-  border-radius: 10px;
-  background-color: #8367C7;
-  color: white;
-  padding: 5px 10px;
-}
-
-.inqContainer-two{
-  background-color: rgba(10,13,23,0.3);
-  width: 700px;
-  margin: 0 auto;
-  border-radius: 10px;
-}
-
-.inqTitle{
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.inqTitle h6{
-  display: inline-block;   /* 한 줄에 위치하도록 */
-  white-space: nowrap;     /* 텍스트 줄바꿈 방지 */
-  margin: 0;
-}
-
-.inqTitle input {
-  min-width: 600px;
-  max-width: 100%;
-}
-
-.inqTextBox{
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-.inqPwBox{
-  display: flex;
-  flex-direction: row;
-}
-
-.textarea {
-  width: 100%;
+textarea.textarea { /* textarea의 최소 높이 */
   min-height: 250px;
+  resize: vertical; /* 세로 크기 조절 가능 */
 }
 
-.detailWrapper {
-  padding: 20px;
+.textsection
+ {
+    /* border: 1px solid #48494e; */
+    font-size: 0.9em;
+    margin-bottom: 15px;
 }
+
+.textarea_1,
+.textarea_2 {
+    margin-bottom: 25px;
+}
+
+.legnthConfirm {
+    font-size: 0.9em;
+    text-align: right;
+    margin-bottom: 0;
+}
+
+.fileInputGroup { /* 파일 업로드 박스 */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+    color: #ddd;
+}
+.fileInputGroup input[type="file"] {
+    display: block; /* 파일 선택 버튼이 한 줄에 표시되도록 */
+    width: 100%;
+}
+
+
+.formActions { /* 폼 하단 버튼들 */
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 40px;
+    margin-bottom: 100px;
+}
+
+/* --- 상세 보기 페이지 (detailBox) --- */
 .detailBox {
   margin: 100px auto 20px auto;
   max-width: 800px;
@@ -260,16 +378,18 @@ textarea.textarea {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
+  color: #ddd;
 }
 
-.writeData{
-  text-align: left;
+.detailWrapper {
+  padding: 20px; /* 전체 Wrapper padding */
 }
 
 .postTitle {
-  font-size: 24px;
+  font-size: 28px;
   margin-bottom: 8px;
-  width: 80%;
+  width: 100%;
+  color: #fff;
 }
 .meta {
   font-size: 14px;
@@ -278,16 +398,24 @@ textarea.textarea {
   gap: 12px;
   flex-direction: row;
   margin-top: 15px;
+  color: #bbb;
+  border-bottom: 1px solid #48494e;
+  padding-bottom: 10px;
 }
-.content {
+.detailContent { /* 상세 내용 박스 내의 실제 내용 */
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.8;
+  margin-top: 24px;
   margin-bottom: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #eee;
 }
-.backBtn {
+
+.inqBtns{
+    
+}
+.backButton { /* detailBox 내 뒤로가기 버튼 */
   padding: 8px 16px;
   background: #8367C7;
   color: #fff;
@@ -298,145 +426,88 @@ textarea.textarea {
   margin: 0 auto;
 }
 
-.textLimitBox{
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+.submitBtn{
+  padding: 8px 15px;
+  margin-right : 10px;
+  background-color: #35373d;
+  color: #ddd;
+  border: 1px solid #48494e;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.textLimitBox h6{
-  display: inline-block;   /* 한 줄에 위치하도록 */
-  white-space: nowrap;     /* 텍스트 줄바꿈 방지 */
-  margin: 0;               /* 여백 초기화 */
-}
+/* --- 반응형 디자인 (기존 미디어 쿼리 통합 및 조정) --- */
+@media (max-width: 768px) {
+    .content,
+    .listHeader,
+    .listView,
+    .listFooter,
+    .formContainer,
+    .detailBox {
+        width: 100%; /* 작은 화면에서는 전체 너비 사용 */
+        max-width: none;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .listHeader, .listItemHeader { /* 헤더와 각 항목 헤더 */
+        grid-template-columns: 1fr; /* 1개 컬럼으로 변경 */
+        padding: 10px; /* 패딩 조정 */
+        flex-direction: column; /* 세로로 쌓이도록 (만약 Flexbox를 썼다면) */
+        align-items: flex-start; /* 왼쪽 정렬 */
+    }
 
-.textLimit{
-  display: flex;
-  flex-direction: column; 
-}
+    .listItem {
+        grid-template-columns: 1fr; /* 상세 내용도 1개 컬럼 */
+    }
 
-.textLimit p{
-  font-size: 13px;
-}
+    .listHeader li, 
+    .listItemNo, 
+    .listItemTitle, 
+    .listItemAuthor, 
+    .listItemDate {
+        justify-self: start; /* 모두 왼쪽 정렬 */
+        text-align: left; /* 텍스트도 왼쪽 정렬 */
+        padding-left: 0;
+        padding-right: 0;
+        margin-bottom: 5px; /* 각 줄 간격 */
+    }
 
-.inqInfoBox{
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  margin-bottom: 25px;
-}
+    .listItemNo { order: 1; }
+    .listItemTitle { order: 2; font-size: 1.1em; }
+    .listItemAuthor { order: 3; }
+    .listItemDate { order: 4; }
 
-.inqInfoBox_1{
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-}
-
-.inqInfoBox_2{
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-}
-
-.textareaBox{
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-top: 50px;
-}
-
-.textareaBox_1{
-  display: flex;
-  flex-direction: row;
-  justify-items: center;
-  margin-top: 50px;
-}
-
-.textarea_1{
-  font-size: 15px;
-  margin-left: 88px;
-}
-
-.textareaBox_2{
-  display: flex;
-  flex-direction: row;
-  justify-items: center;
-  gap: 20px;
-  margin-top: 50px;
-}
-
-.textarea_2{
-  font-size: 15px;
-}
-
-.explanation p{
-  margin-top: 1rem;
-}
-
-.inquiryList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  /* display: grid;  <-- 이 라인 삭제 */
-}
-
-/* 헤더(Title) */
-.inquiryTitle {
-  padding: 0;
-
-  display: grid;
-  grid-template-columns:
-    4ch    /* 번호 */
-    742px    /* 제목 */
-    86px   /* 닉네임 */
-    auto;  /* 날짜 */
-  gap: 1rem;
-  align-items: center;
-  padding-right: 30px;
-}
-
-/* 각 게시글 항목(LI) */
-.inquiryPersonal {
-  display: grid;
-  grid-template-columns:
-    3ch
-    1fr
-    auto
-    auto;
-  gap: 1rem;
-  align-items: center;
-}
-
-/* 번호·날짜 우측 정렬 */
-.inquiryNo,
-.inquiryDate,
-.inquiryTitle li:nth-child(4) {
-  text-align: right;
-}
-
-/* 2) 각 셀 안에서의 정렬 */
-.inquiryNo {
-  justify-self: start;    /* 번호는 왼쪽 정렬 */
-}
-.inquiryLink {
-  justify-self: start;    /* 제목도 왼쪽 정렬 */
-  overflow: hidden;
-  text-overflow: ellipsis;/* 너무 길면 말줄임 */
-  white-space: nowrap;
-}
-.inquiryNick {
-  justify-self: center;   /* 닉네임은 가운데 정렬 */
-}
-.inquiryDate {
-  justify-self: end;      /* 날짜는 오른쪽 정렬 */
-}
-
-.listBottom{
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.inputPassword{
-  margin-left: 72px;
+    .detailContentArea {
+        padding: 15px;
+    }
+    .listFooter {
+        flex-direction: column;
+        align-items: center;
+    }
+    .primaryButton {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    .pagination {
+        width: 100%;
+        justify-content: center;
+    }
+    .formGroup {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .formGroup label {
+        flex-basis: auto;
+        width: 100%;
+        text-align: left;
+    }
+    .formGroup input, textarea {
+        width: 100%;
+    }
+    .detailBox .meta {
+        flex-direction: column;
+        gap: 5px;
+    }
 }

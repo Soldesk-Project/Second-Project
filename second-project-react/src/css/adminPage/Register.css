@@ -5,7 +5,7 @@
 .item-register-container {
   padding: 20px;
   width: 100%;
-  background-color: #f9f9f9;
+  background-color: #171a23;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -13,14 +13,14 @@
 .quest-register-title,
 .achievement-register-title,
 .item-register-title {
-  color: #333;
+  color: #fff;
   text-align: center;
   margin-bottom: 30px;
   font-size: 2em;
 }
 
 .section-title {
-  color: #555;
+  color: #ddd;
   margin-bottom: 10px;
   font-size: 1.2em;
   border-bottom: 1px solid #eee;
@@ -34,7 +34,9 @@
 .correct-answer-section,
 .photo-input-section,
 .type-section,
-.achievement-text-section,
+.ach-name-section,
+.ach-content-section,
+.ach-reward-section,
 .item-Name-section,
 .item-Price-section {
   margin-bottom: 25px;
@@ -47,9 +49,11 @@
   width: auto;
   padding: 10px;
   border: 1px solid #ddd;
+  color: #808080;
   border-radius: 4px;
   font-size: 1em;
   box-sizing: border-box;
+  background-color: #2b2e35;
 }
 
 /* 텍스트/넘버 입력 */
@@ -63,6 +67,7 @@
   border-radius: 4px;
   font-size: 1em;
   box-sizing: border-box;
+  background-color: #2b2e35;
 }
 
 /* 선택지 입력 */
@@ -77,6 +82,7 @@
   border-radius: 4px;
   font-size: 1em;
   box-sizing: border-box;
+  background-color: #2b2e35;
 }
 
 /* 이미지 업로드 */
@@ -140,6 +146,14 @@
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease;
+  /* padding: 8px 15px;
+    margin: 0 5px;
+    background-color: #35373d;
+    color: #ddd;
+    border: 1px solid #48494e;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease; */
 }
 
 .reset-button {

@@ -5,7 +5,7 @@
 }
 
 h1 {
-  color: #0056b3;
+  color: #fff;
   margin-bottom: 20px;
 }
 
@@ -22,7 +22,7 @@ hr {
 }
 
 .search-section h3 {
-  color: #007bff;
+  color: #fff;
   margin-bottom: 15px;
 }
 
@@ -36,6 +36,7 @@ hr {
 .search-controls label {
   font-weight: bold;
   margin-right: 5px; /* 레이블과 다음 요소 사이 간격 */
+  color: #fff;
 }
 
 .search-select,
@@ -91,7 +92,7 @@ hr {
 
 /* 검색 결과 테이블 */
 .search-results h3 {
-  color: #007bff;
+  color: #fff;
   margin-bottom: 15px;
 }
 

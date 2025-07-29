@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import Header from '../../layout/Header';
 import styles from '../../css/customer.module.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -68,7 +67,6 @@ const CustomerProblemSubmit = () => {
   
   return (
     <div className={styles.customerServiceCenter}>
-      <div className={styles.topNav}><Header/></div>
 
       <div className={styles.inqueriesBox}>
         <form onSubmit={handleSubmit}>
@@ -84,42 +82,43 @@ const CustomerProblemSubmit = () => {
         <div className={styles.inqContainerTwo}>
           <div className={styles.inqInfoBox}>
             <div className={styles.inqInfoBox_1}>
-              <h6>게시글 비밀번호</h6>
+              <h3 className={styles.h3}>1. 게시글 비밀번호</h3>
               <input
-              className={styles.inputPassword}
+              className={styles.input}
               type="password"
               value={postPassword}
               onChange={e => setPostPassword(e.target.value)}
+              placeholder="게시글 비밀번호를 입력하세요"
               required
             />
             </div>
             <div className={styles.inqInfoBox_2}>
-            <h6>이메일</h6>
+            <h3 className={styles.h3}>2. 이메일</h3>
             <input
+              className={styles.input}
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="문의 결과 안내받을 이메일"
+              placeholder="문의 결과 안내받을 이메일을 입력하세요"
               required
-              style={{ width: '350px' }}
             />
             </div>
           </div>
 
           <div className={styles.inqTextBox}>
             <div className={styles.inqTitle}>
-              <h6>제목 (필수)</h6>
+              <h5 className={styles.h3}>3. 제목 (필수)</h5>
               <input
+              className={styles.input}
               type="text"
               value={title}
               onChange={e => setTitle(e.target.value)}
               placeholder="제목을 입력하세요."
               required
-              style={{ width: '600px' }}
             />
             </div>
             <div className={styles.textLimitBox}>
-              <h6>문의 내용 (필수)</h6>
+              <h5 className={styles.h3}>4. 문의 내용 (필수)</h5>
               <div className={styles.textLimit}>
                 <textarea
                   value={content}
@@ -127,9 +126,9 @@ const CustomerProblemSubmit = () => {
                   placeholder="문의 내용을 입력하세요."
                   maxLength={1000}
                   required
-                  style={{ width: '600px', height: '250px' }}
+                  style={{height: '250px' }}
                 />
-                <p>{content.length}자 입력 / 최대 1000자</p>
+                <p className={styles.legnthConfirm}>{content.length}자 입력 / 최대 1000자</p>
               </div>
             </div>
           </div>
@@ -137,10 +136,13 @@ const CustomerProblemSubmit = () => {
 
         <div className={styles.textareaBox}>
           <div className={styles.textareaBox_1}>
-            <h6>첨부 파일 (선택)</h6>
+            <h5 className={styles.h3}>5. 첨부 파일 (선택)</h5>
             <div className={styles.textarea_1}>
-              <p>파일명은 - , _를 제외한 특수문자는 허용되지 않습니다.</p>
-              <p>아래 파일 형식만 첨부할 수 있습니다.</p>
+              <div className={styles.textsection}>
+                파일명은 - , _를 제외한 특수문자는 허용되지 않습니다.<br/>
+                아래 파일 형식만 첨부할 수 있습니다.<br/>
+                이미지: .jpeg, .jpg, .gif, .bmp, .png
+              </div>
               <input
                   type="file"
                   multiple
@@ -160,17 +162,18 @@ const CustomerProblemSubmit = () => {
                   <li key={idx}>{file.name}</li>
                 ))}
               </ul>
-              <p>이미지: .jpeg, .jpg, .gif, .bmp, .png</p>
 
             </div>
           </div>
 
           <div className={styles.textareaBox_2}>
-            <h6>개인정보 수집 동의(필수)</h6>
+            <h6 className={styles.h3}>6. 개인정보 수집 동의(필수)</h6>
             <div className={styles.textarea_2}>
-              <p>수집하는 개인정보 항목: 이메일 주소</p>
-              <p>작성해 주시는 개인정보는 문제 접수 및 문제 활용을 위해 3년간 보관됩니다.</p>
-              <p>이용자는 본 동의를 거부할 수 있으나, 미동의 시 문제 접수가 불가능합니다.</p>
+              <div className={styles.textsection}>
+                수집하는 개인정보 항목: 이메일 주소<br/>
+                작성해 주시는 개인정보는 문제 접수 및 문제 활용을 위해 3년간 보관됩니다.<br/>
+                이용자는 본 동의를 거부할 수 있으나, 미동의 시 문제 접수가 불가능합니다.
+              </div>
               <input
                 type="checkbox"
                 checked={consent}
