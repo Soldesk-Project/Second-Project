@@ -21,4 +21,5 @@ public class UsersVO {
 	private Date user_date;
 	private int ischatbanned;
     private Timestamp banned_timestamp;
+    private String auth;
 }

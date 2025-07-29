@@ -18,7 +18,7 @@ public class UserInfoDTO {
 	private String user_nick, user_id, user_pw, user_email;
 	private Date user_date;
 	private int ischatbanned; // 0: 정상, 1: 채팅 금지
-    private Date banned_timestamp;
+    private Date banned_timestamp;    
     
     private String imageFileName;
     private String user_profile_img;
@@ -29,4 +29,5 @@ public class UserInfoDTO {
     private Integer backgroundItemNo;
     private Integer balloonItemNo;
 
+    private String auth;
 }

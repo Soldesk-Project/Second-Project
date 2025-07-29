@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -542,7 +546,7 @@ public class LoginController {
 	@PostMapping("/signUp")
 	public void signUp(@RequestBody UsersVO users) {
 		String rawPw = users.getUser_pw();
-        String encodedPw = passwordEncoder.encode(rawPw);
+        String encodedPw = passwordEncoder.encode(rawPw);	
         users.setUser_pw(encodedPw);
         
         userservice.insertMember(users);
@@ -691,7 +695,7 @@ public class LoginController {
 	            userservice.updatePassword(user); // DB에 저장
 	        }
 	    }
-
+	    
 	    // 2. 비밀번호 불일치
 	    if (!isMatch) {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 일치하지 않습니다.");
@@ -706,7 +710,6 @@ public class LoginController {
 	    // 4. 로그인 처리
 	    userservice.updateLoginStatus(inputId, 1);
 	    String token = jwtUtil.generateToken(inputId);
-
 	    // 5. 사용자 정보 및 토큰 반환
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("token", token);
@@ -716,6 +719,7 @@ public class LoginController {
 
 	    return ResponseEntity.ok(response);
 	}
+	
 
 	@PostMapping("/logout")
 	public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {

@@ -101,4 +101,5 @@ public interface UserService {
 	// 정답률 통계 가져오기
 	public List<UserAccuracyDTO> getUserAccuracyList();
 
+	
 }

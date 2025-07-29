@@ -27,6 +27,7 @@ import NaverCallback from './pages/login/NaverCallback';
 import GoogleCallback from './pages/login/GoogleCallback';
 import QuestionReview from './pages/gameroom/QuestionReview';
 import ResetPasswordPage from './pages/login/ResetPasswordPage';
+import ErrorEvent from './pages/ErrorEvent';
 
 function App() {
   const dispatch = useDispatch();
@@ -71,6 +72,7 @@ function App() {
           <Route path="/admin" element={<AdminPage/>}/>
           <Route path="/inquiries/:id" element={<InquiryDetail />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/*" element={<ErrorEvent />} />
         </Routes>
       </Router>
     </WebSocketProvider>
