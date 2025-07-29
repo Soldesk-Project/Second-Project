@@ -9,6 +9,7 @@ import { WebSocketContext } from '../util/WebSocketProvider';
 import PasswordModal from './modal/PasswordModal';
 import FilterModal from './modal/FilterModal';
 
+
 const RoomList = () => {
   const [category, setCategory] = useState('random');
   const [gameRoomList, setGameRoomList] = useState([]);

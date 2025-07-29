@@ -607,7 +607,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     
 	private void handlefilterRoomList(WebSocketSession session, JsonNode json) {
 		System.out.println("handlefilterRoomList.....");
-		
 		String server = json.get("server").asText();
 		String category = json.get("category").asText();
         String is_private = json.get("is_private").asText();

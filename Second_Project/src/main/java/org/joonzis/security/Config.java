@@ -32,7 +32,7 @@ public class Config extends WebSecurityConfigurerAdapter {
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .authorizeRequests()
-        .antMatchers("/admin").hasRole("ADMIN") // ROLE_은 자동으로 붙으므로 "ADMIN"만
+        .antMatchers("/admin", "/admin/**").hasRole("ADMIN") // ROLE_은 자동으로 붙으므로 "ADMIN"만
         .antMatchers("/api/login").permitAll()
         .antMatchers("/**").permitAll()
         .anyRequest().authenticated()

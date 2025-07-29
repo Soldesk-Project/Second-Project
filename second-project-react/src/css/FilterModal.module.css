@@ -1,11 +1,77 @@
-.container {  
+.container {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border: 1px solid black;
+  border: 1px solid #d3e2f1;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 8px 32px 0 rgba(30, 64, 175, 0.12);
+  padding: 10px 20px;
+  min-width: 340px;
+  z-index: 1000;
 }
 
-.close {
-  margin-left: 10px;
+.container table {
+  width: 100%;
+}
+
+.container td {
+  padding: 10px 6px;
+  font-size: 1rem;
+  color: #232b44;
+}
+
+.container select {
+  width: 160px;
+  padding: 5px 10px;
+  border: 1px solid #b5cbe7;
+  border-radius: 6px;
+  background-color: #f6faff;
+  color: #234087;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.container select:focus {
+  border-color: #457eff;
+}
+
+.container button {
+  padding: 6px 18px;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px 0 rgba(69, 126, 255, 0.08);
+}
+
+.content{
+  display: flex;
+}
+
+.searchBtn{
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.search{
+  background-color: #457eff;
+}
+
+.search:hover {
+  background-color: #2b53b6;
+}
+
+.close{
+  background-color: #f44336;
+}
+
+.close:hover {
+  background-color: #d32f2f;
 }

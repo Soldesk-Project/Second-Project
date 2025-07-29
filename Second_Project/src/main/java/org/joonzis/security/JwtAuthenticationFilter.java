@@ -1,6 +1,7 @@
 package org.joonzis.security;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -14,14 +15,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import lombok.extern.log4j.Log4j;
-
-@Log4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
-
+    
     public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
 
         this.jwtUtil = jwtUtil;
@@ -34,14 +32,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     	
     	String requestURI = request.getRequestURI();	
 
-        // 여러개의 인증 예외 경로 처리
-//        String[] openEndpoints = {"/api/login", "/api/signUp", "/api/findId", "/api/findPw"};
-//        if (Arrays.stream(openEndpoints).anyMatch(requestURI::startsWith)) {
-//        	log.info("스킵1");
-//        	System.out.println("스킵2");
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
+//         여러개의 인증 예외 경로 처리
+        String[] openEndpoints = {"/api/login", "/api/signUp", "/api/findId", "/api/findPw"};
+        if (Arrays.stream(openEndpoints).anyMatch(requestURI::startsWith)) {
+        	System.out.println("로그인관련");
+            filterChain.doFilter(request, response);
+            return;
+        }
     	
 
         String authHeader = request.getHeader("Authorization");
@@ -71,9 +68,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     
                     
                     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                    System.out.println("등록된 SecurityContext authentication: " + auth);
-                    System.out.println("등록된 Authorities: " + auth.getAuthorities());
-                    
                 }
             } catch (Exception e) {
             	e.printStackTrace();

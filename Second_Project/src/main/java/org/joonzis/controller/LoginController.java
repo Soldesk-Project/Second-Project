@@ -725,10 +725,10 @@ public class LoginController {
 	    }
 
 	    // 3. 이미 로그인된 사용자 확인
-	    if (user.getIs_logged_in() == 1) {
-	        return ResponseEntity.status(HttpStatus.CONFLICT)
-	                .body("이미 로그인된 사용자입니다.");
-	    }
+//	    if (user.getIs_logged_in() == 1) {
+//	        return ResponseEntity.status(HttpStatus.CONFLICT)
+//	                .body("이미 로그인된 사용자입니다.");
+//	    }
 
 	    // 4. 로그인 처리
 	    userservice.updateLoginStatus(inputId, 1);
