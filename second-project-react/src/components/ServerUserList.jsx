@@ -55,10 +55,10 @@ const ServerUserList = () => {
     const payload = {
       action: "join",
       server,
-      userNick:      user.user_nick,       // 백엔드가 userNick 으로 읽습니다
-      userNo:        user.user_no,
-      bgItemNo:      user.backgroundItemNo,
-      titleItemNo:   user.titleItemNo,
+      userNick: user.user_nick,       // 백엔드가 userNick 으로 읽습니다
+      userNo: user.user_no,
+      boundaryItemNo: user.boundaryItemNo,
+      titleItemNo: user.titleItemNo,
       fontColorItemNo: user.fontcolorItemNo
     };
 
@@ -70,6 +70,7 @@ const ServerUserList = () => {
 
     socket.onmessage = async (event) => {
       const data = JSON.parse(event.data);
+      
       if (data.type === "userList" && data.server === server) {
         // 1) WebSocket이 준 userNo 리스트를 상세 정보로 보강
        const detailed = await Promise.all(

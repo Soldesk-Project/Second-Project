@@ -18,14 +18,12 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	
 	@Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-		System.out.println("sequrity-loadUserByUsername..");
         // DB에서 유저 + 권한 조회 (UserVO 등에 role 필드를 포함시키세요)
         UserInfoDTO user = userService.getUserById(userId);
         if (user == null) throw new UsernameNotFoundException("No user");
 
         // DB에서 꺼낸 role 필드 사용
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getAuth()));
-        System.out.println(user.getAuth());
         return new org.springframework.security.core.userdetails.User(
             user.getUser_id(),
             user.getUser_pw(),

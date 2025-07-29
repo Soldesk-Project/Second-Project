@@ -177,6 +177,7 @@ const QuestionReview = () => {
       socket.send(JSON.stringify({
         action: 'leaveRoom',
         roomNo: 'questionReview',
+        gameMode: 'normal',
         userNick: userNick
       }));
     }

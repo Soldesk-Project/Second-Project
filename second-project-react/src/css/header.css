@@ -36,7 +36,7 @@
 
 .header li span{
   display: block;
-  background-image: url('../../public/images/Submit.png');
+  background-color: blueviolet;
   width: 110px;
   text-align: center;
   padding: 23px;
@@ -44,7 +44,6 @@
   color: white;
 }
 .header li span:hover{
-  background-image: none;
   background-color: white;
   color: black;
   font-weight: bold;
@@ -117,7 +116,6 @@
 /* 활성 탭 표시 */
 .header-category li span.active {
   background-color: rgba(255, 255, 255, 0.95);
-  background-image: none;
   color: #222;
   font-weight: bold;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);

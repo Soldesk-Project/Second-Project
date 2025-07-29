@@ -249,6 +249,8 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     	String userNick = json.get("userNick").asText();
     	String roomNo = "questionReview";
     	
+    	roomStatus.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).put(roomNo, "review");
+    	
     	roomUsers.computeIfAbsent(server, k -> new ConcurrentHashMap<>())
         .computeIfAbsent(roomNo, k -> ConcurrentHashMap.newKeySet())
         .add(userNick);
@@ -269,14 +271,14 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
 		String roomNo = json.get("roomNo").asText();
 		String gameMode = json.get("gameMode").asText();
-		
+
 		String broadcastServer = "rank".equals(gameMode) ? "rank" : server;
 		
 		String status = roomStatus.getOrDefault(broadcastServer, Collections.emptyMap()).get(roomNo);
 		
 		System.out.println("status -> " + status);
 		
-		if (gameMode.equals("rank") && (status.equals("rankPlaying")) || status.equals("create")) {
+		if (gameMode.equals("rank") && (status.equals("rankPlaying") || status.equals("create"))) {
 			playService.leavePanalty(user_nick);
 		}
 
@@ -345,7 +347,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
                 profile.put("imageFileName", dto.getImageFileName());
                 profile.put("titleItemNo", dto.getTitleItemNo());
                 profile.put("backgroundItemNo", dto.getBackgroundItemNo());
-
+                profile.put("fontColorItemNo", dto.getFontcolorItemNo());
+                profile.put("backgroundItemNo", dto.getBackgroundItemNo());
+                
                 profiles.put(nick, profile);
             }
         }
@@ -694,6 +698,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	            profile.put("imageFileName", dto.getImageFileName());
 	            profile.put("titleItemNo", dto.getTitleItemNo());
 	            profile.put("backgroundItemNo", dto.getBackgroundItemNo());
+	            profile.put("fontColorItemNo", dto.getFontcolorItemNo());
 	            profiles.put(nick, profile);
 	        }
 	    }

@@ -8,8 +8,8 @@
 .createBtn {
   padding: 8px 40px;
   border: none;
-  background-image: url('../../public/images/Submit.png');
-  border-radius: 50px;
+  background-color: blueviolet;
+  border-radius: 8px;
   color: white;
   cursor: pointer;
   flex: 0 0 auto;

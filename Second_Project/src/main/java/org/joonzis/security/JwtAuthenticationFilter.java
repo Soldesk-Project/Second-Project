@@ -48,10 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
             String role = jwtUtil.getUserRoleFromToken(token);
-            System.out.println("Token role from token: " + role);
             
-           
-            System.out.println("token -> " + token);
             try {
                 if (!jwtUtil.validateToken(token)) {
                     filterChain.doFilter(request, response); // 유효하지 않은 토큰
@@ -61,11 +58,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    System.out.println("UserDetails from DB: " + userDetails);
-                    System.out.println("UserDetails authorities: " + userDetails.getAuthorities());
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    
                     
                     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
                 }

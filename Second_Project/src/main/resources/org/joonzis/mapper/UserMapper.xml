@@ -11,7 +11,10 @@
 	    
 	    <result column="IMAGE_FILE_NAME"  property="imageFileName"/>
 	    <result column="USER_PROFILE_IMG" property="user_profile_img"/>
-	    <result column="boundary_item_no" property="boundaryItemNo"/>
+	    <result column="BOUNDARY_ITEM_NO" property="boundaryItemNo"/>
+	    <result column="TITLE_ITEM_NO" property="titleItemNo"/>
+	    <result column="FONTCOLOR_ITEM_NO" property="fontcolorItemNo"/>
+	    <result column="BACKGROUND_ITEM_NO" property="backgroundItemNo"/>
 	</resultMap>
 
 	 <!-- Top 10 유저 랭킹 목록 -->
@@ -23,10 +26,10 @@
 			    U.USER_NO AS user_no,
 			    U.USER_RANK AS user_rank,
 			    U.USER_NICK AS user_nick,
-			    COALESCE(D.BOUNDARY_ITEM_NO, 0) AS boundaryItemNo,
-			    COALESCE(D.TITLE_ITEM_NO, 0) AS titleItemNo,
-			    COALESCE(D.FONTCOLOR_ITEM_NO, 0) AS fontcolorItemNo,
-			    COALESCE(D.BACKGROUND_ITEM_NO, 0) AS backgroundItemNo,
+			    COALESCE(D.BOUNDARY_ITEM_NO, 0) AS BOUNDARY_ITEM_NO,
+			    COALESCE(D.TITLE_ITEM_NO, 0) AS TITLE_ITEM_NO,
+			    COALESCE(D.FONTCOLOR_ITEM_NO, 0) AS FONTCOLOR_ITEM_NO,
+			    COALESCE(D.BACKGROUND_ITEM_NO, 0) AS BACKGROUND_ITEM_NO,
 			    COALESCE(D.BALLOON_ITEM_NO, 0) AS balloonItemNo
 			  FROM USERS U
 			  LEFT JOIN USER_DECO D ON U.USER_NO = D.USER_NO

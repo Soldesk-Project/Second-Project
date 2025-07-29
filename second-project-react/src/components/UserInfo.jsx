@@ -137,6 +137,7 @@ const UserInfo = () => {
                 
                 // 2) 최신 유저 정보 다시 가져오기
                 const res = await axios.get(`/user/${user.user_no}`);
+                
                 // console.log('🔔 GET /user/4 리턴 data=', res.data);
                 dispatch(setUser({
                 user_no:               res.data.user_no,
@@ -167,7 +168,7 @@ const UserInfo = () => {
             console.error('아이템 전송 중 에러:', error);
         }
     }
-  
+
     // WebSocket 메시지 핸들링
         useEffect(() => {
             if (!socket) return;

@@ -1,13 +1,16 @@
 import React, { useEffect, useState, useContext, useRef, useCallback, useMemo } from 'react';
 import Test from '../../components/Test';
 import styles from '../../css/Inplay.module.css';
+import decoStyles from '../../css/Decorations.module.css';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { WebSocketContext } from '../../util/WebSocketProvider';
 import GameChatbox from '../../components/chatbox/GameChatbox';
 import ResultModal from '../../components/modal/ResultModal';
 import LeaveModal from '../../components/modal/LeaveModal';
+import axios from 'axios';
 
+// 순위 계산 및 포인트 지급
 const getRankedUsers = (users, gameMode) => {
   const sorted = [...users].sort((a, b) => {
     // 1. 점수 높은 순
@@ -63,6 +66,7 @@ const InPlay = () => {
   const [userElapsedTimes, setUserElapsedTimes] = useState([]);
   const [countdown, setCountdown] = useState(10);
   const [leaveModal, setLeaveModal] = useState(false);
+  const [shopItems, setShopItems] = useState([]);
   const myTotalElapsed = userElapsedTimes.reduce((sum, t) => sum + t, 0);
   const questionListRef = useRef([]);
   const { roomNo } = useParams();
@@ -86,6 +90,32 @@ const InPlay = () => {
   // 사용자별 최근 채팅 메시지를 저장할 상태
   const [userRecentChats, setUserRecentChats] = useState({});
 
+  // 상점 아이템 목록 가져오기(유저 프로필 아이템 랜더링)
+  const itemMap = React.useMemo(() => {
+    return shopItems.reduce((m, it) => {
+      m[it.item_no] = it;
+      return m;
+    }, {});
+  }, [shopItems]);
+
+	 // 🆕 useEffect: 샵 전체 아이템 한 번만 불러오기
+  useEffect(() => {
+    const cats = ['테두리','칭호','글자색','배경','말풍선'];
+    Promise.all(cats.map(cat =>
+      axios.get(`/api/shop/items?category=${encodeURIComponent(cat)}`)
+    ))
+    .then(results => {
+      const all = results.flatMap(r =>
+        r.data.map(it => ({
+          ...it,
+          imgUrl: it.imageFileName ? `/images/${it.imageFileName}` : ''
+        }))
+      );
+      setShopItems(all);
+    })
+    .catch(err => console.error('샵 아이템 로드 실패', err));
+  }, []);
+  
   // 제출 버튼 클릭 시 수정 불가
   // [제출 버튼]
   const handleSubmit = () => {
@@ -185,13 +215,16 @@ const InPlay = () => {
         }));
         
         setUsers(formattedUsers);
+        
+       if (data.profiles) {
+          setUserProfiles(prev => ({
+            ...prev,
+            ...data.profiles
+          }));
+        }
 
         console.log(data.profiles);
         
-
-        if (data.profiles) {
-          setUserProfiles(data.profiles); // ✅ 전체를 그대로 덮어쓰기
-        }
       }
 
       if (
@@ -199,7 +232,6 @@ const InPlay = () => {
         data.roomNo === roomNo &&
         (gameMode === 'rank' ? data.server === 'rank' : data.server === server)
       ) {
-        console.log(data.list);
         
         if (Array.isArray(data.list) && data.list.length > 0) {
           setNextId(0);
@@ -343,8 +375,7 @@ const InPlay = () => {
         const myPoint = myInfo.point ?? 0;
         const rankPoint = myInfo.rankPoint ?? 0;
         const myRank = myInfo.rank ?? 0;
-        
-        console.log(userAnswerHistory);
+
         socket.send(JSON.stringify({
           action: 'rewardPointsAndSaveUserHistory',
           server,
@@ -463,7 +494,7 @@ const InPlay = () => {
       default: return category || "알 수 없음";
     }
   };
-
+  
   return (
     <div className={styles.container}>
       <div className={styles.body}>
@@ -537,7 +568,22 @@ const InPlay = () => {
             const profile = userProfiles[user?.userNick];
 
             return user ? (
-              <div key={user.userNo} className={styles.user_card}>
+              <div
+                key={user.userNo}
+                className={styles.user_card}
+                style={(() => {
+                  if (!profile || !itemMap) return {};
+                  const bg = itemMap[profile.backgroundItemNo];
+                  if (!bg || !bg.imgUrl) return {};
+                  return {
+                    borderStyle: 'solid',
+                    borderWidth: '10px',
+                    borderImageSource: `url(${bg.imgUrl})`,
+                    borderImageSlice: 10,
+                    borderImageRepeat: 'stretch',
+                  };
+                })()}
+              >
                 {/* 방장/유저 뱃지 */}
                 <div className={styles.role_badge}>
                   {user.isOwner ? '방장' : '유저'}
@@ -562,13 +608,26 @@ const InPlay = () => {
 
                   <div className={styles.user_info}>
                     <div className={styles.userTopInfo}>
-                      <span className={styles.nick}>{user.userNick}</span>
-                      {profile && (
-                        <>
-                          <span className={styles.rank}>랭크: {profile.user_rank}</span>
-                          <span className={styles.title}>칭호: {profile.titleItemNo ?? '-'}</span>
-                        </>
-                      )}
+                      {/* 여기서 fc 선언 후 사용 */}
+                      {(() => {
+                        const fontcolor = profile && itemMap ? itemMap[profile.fontColorItemNo] : null;
+                        
+                        return (
+                          <span className={`${styles.nick} ${fontcolor ? decoStyles[fontcolor.css_class_name] : ''}`}>
+                            {user.userNick}
+                          </span>
+                        );
+                      })()}
+
+                      {profile && (() => {
+                        const title = itemMap ? itemMap[profile.titleItemNo] : null;
+                        return (
+                          <>
+                            <span className={styles.rank}>랭크: {profile.user_rank}</span>
+                            <span className={styles.title}>칭호: {title?.item_name ?? '-'}</span>
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>

@@ -10,7 +10,6 @@ import org.joonzis.domain.UserAccuracyDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserRewardVO;
-import org.joonzis.domain.UsersVO;
 import org.joonzis.service.UserService;
 import org.joonzis.websocket.ServerUserWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
