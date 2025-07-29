@@ -60,7 +60,7 @@ h1 {
 }
 
 .searchResults h3 {
-  color: #fff;
+  color: #ddd;
   margin-top: 0;
   margin-bottom: 15px;
   font-size: 1.05em;
@@ -81,7 +81,7 @@ h1 {
   display: flex;
   align-items: center;
   font-size: 0.95em;
-  color: #fff;
+  color: #ddd;
 }
 
 .searchResults li:last-child {
@@ -98,7 +98,7 @@ h1 {
 }
 
 .searchResults li span {
-  color: #fff;
+  color: #ddd;
   margin-right: 10px;
   font-size: 0.9em;
 }
@@ -131,7 +131,7 @@ h1 {
 }
 
 .question-detail-form h2 {
-  color: #fff;
+  color: #ddd;
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 1.3em;
@@ -146,7 +146,7 @@ h1 {
 }
 
 .question-detail-form h3 {
-  color: #fff;
+  color: #ddd;
   margin-top: 20px;
   margin-bottom: 10px;
   font-size: 1.1em;
@@ -159,6 +159,8 @@ h1 {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  background-color: #2b2e35;
+  color: #ddd;
   font-size: 1em;
   margin-bottom: 10px;
 }
@@ -175,7 +177,7 @@ h1 {
 }
 
 .image-upload-label {
-  background-color: #007bff;
+  background-color: #35373d;  
   color: white;
   padding: 8px 15px;
   border-radius: 4px;
@@ -184,7 +186,7 @@ h1 {
 }
 
 .image-upload-label:hover {
-  background-color: #0056b3;
+  background-color: #5a6268;
 }
 
 .image-upload-input {

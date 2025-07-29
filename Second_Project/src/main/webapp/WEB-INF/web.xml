@@ -58,7 +58,7 @@
 	
 	
  	<!-- 스프링 시큐리티 필터 -->
-<!-- 	<filter>
+	<filter>
   		 <filter-name>springSecurityFilterChain</filter-name>
    		<filter-class>org.springframework.web.filter.DelegatingFilterProxy
    		</filter-class>
@@ -71,7 +71,6 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
 			/WEB-INF/spring/root-context.xml
-			/WEB-INF/spring/security-context.xml
 		</param-value>
-	</context-param> -->
+	</context-param>
 </web-app>

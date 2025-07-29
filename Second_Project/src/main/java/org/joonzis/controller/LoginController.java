@@ -6,8 +6,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +23,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -72,6 +71,9 @@ public class LoginController {
     
     @Autowired
     UserService userservice;
+    
+    @Autowired
+    UserDetailsService userDetailsService;
     
     @Autowired
     JwtUtil jwtUtil;
@@ -126,8 +128,14 @@ public class LoginController {
 	        }
 
 	        userservice.updateLoginStatus(user.getUser_id(), 1);
+	        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUser_id());
+		    
+		    String role = userDetails.getAuthorities().stream()
+		    	    .findFirst()
+		    	    .map(GrantedAuthority::getAuthority)
+		    	    .orElse("ROLE_USER");  // 권한 없으면 기본값
 
-	        String jwtToken = jwtUtil.generateToken(user.getUser_id());
+	        String jwtToken = jwtUtil.generateToken(user.getUser_id(), role);
 
 	        Map<String, Object> response = new HashMap<>();
 	        response.put("token", jwtToken);
@@ -323,8 +331,16 @@ public class LoginController {
 	        }
 
 	        userservice.updateLoginStatus(user.getUser_id(), 1);
+	        
+	        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUser_id());
+		    
+		    String role = userDetails.getAuthorities().stream()
+		    	    .findFirst()
+		    	    .map(GrantedAuthority::getAuthority)
+		    	    .orElse("ROLE_USER");  // 권한 없으면 기본값
+	        
 
-	        String jwtToken = jwtUtil.generateToken(user.getUser_id());
+	        String jwtToken = jwtUtil.generateToken(user.getUser_id(), role);
 
 	        Map<String, Object> response = new HashMap<>();
 	        response.put("token", jwtToken);
@@ -435,8 +451,15 @@ public class LoginController {
 	        }
 
 	        userservice.updateLoginStatus(user.getUser_id(), 1);
+	        
+	        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUser_id());
+		    
+		    String role = userDetails.getAuthorities().stream()
+		    	    .findFirst()
+		    	    .map(GrantedAuthority::getAuthority)
+		    	    .orElse("ROLE_USER");  // 권한 없으면 기본값
 
-	        String jwtToken = jwtUtil.generateToken(user.getUser_id());
+	        String jwtToken = jwtUtil.generateToken(user.getUser_id(), role);
 
 	        Map<String, Object> response = new HashMap<>();
 	        response.put("token", jwtToken);
@@ -709,7 +732,16 @@ public class LoginController {
 
 	    // 4. 로그인 처리
 	    userservice.updateLoginStatus(inputId, 1);
-	    String token = jwtUtil.generateToken(inputId);
+	    UserDetails userDetails = userDetailsService.loadUserByUsername(inputId);
+	    
+	    String role = userDetails.getAuthorities().stream()
+	    	    .findFirst()
+	    	    .map(GrantedAuthority::getAuthority)
+	    	    .orElse("ROLE_USER");  // 권한 없으면 기본값
+	    
+	    System.out.println("role -> "  + role);
+	    
+	    String token = jwtUtil.generateToken(inputId, role);
 	    // 5. 사용자 정보 및 토큰 반환
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("token", token);

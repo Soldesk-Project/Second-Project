@@ -10,8 +10,6 @@ import QuestEdit from '../components/adminBodyComp/QuestEdit';
 import QuestDelete from '../components/adminBodyComp/QuestDelete';
 import QuestRegiCallManage from '../components/adminBodyComp/QuestRegiCallManage';
 import QuestErrRepoManage from '../components/adminBodyComp/QuestErrRepoManage';
-import UserInfoView from '../components/adminBodyComp/UserInfoView';
-import LoginRecordView from '../components/adminBodyComp/LoginRecordView';
 import UserRestrict from '../components/adminBodyComp/UserRestrict';
 import AchAdminSidebar from '../components/AdminSidebar/AchAdminSidebar';
 import AchRegister from '../components/adminBodyComp/AchRegister';
@@ -63,14 +61,10 @@ const AdminPage = () => {
   //activeUserMenu 값에 따라 렌더링할 컴포넌트를 결정하는 함수
   const renderUserContent = () => {
     switch (activeUserMenu){
-      case 'infoView':
-        return <UserInfoView/>;
-      case 'loginRecordView':
-        return <LoginRecordView/>;
       case 'userRestrict':
         return <UserRestrict/>;
       default:
-        return <UserInfoView/>;
+        return <UserRestrict/>;
     }
   };
 
@@ -98,7 +92,7 @@ const AdminPage = () => {
       <div className={Headerstyles.top_nav}><Header /></div>
       <div className={styles.top_nav}>
         <button className="QuestAdminBtn" onClick={setPageQuestAdmin}>문제/제보관리</button>
-        <button className="UserAdminBtn" onClick={setpageUserAdmin}>유저/권한관리</button>
+        <button className="UserAdminBtn" onClick={setpageUserAdmin}>유저권한관리</button>
         <button className="AchAdminBtn" onClick={setPageAchAdmin}>업적/상점관리</button>
         <span>관리자 {userNick} 님</span>
       </div>

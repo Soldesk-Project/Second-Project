@@ -607,7 +607,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
     
 	private void handlefilterRoomList(WebSocketSession session, JsonNode json) {
 		System.out.println("handlefilterRoomList.....");
-<<<<<<< Updated upstream
 		
 		String server = json.get("server").asText();
 		String category = json.get("category").asText();
@@ -642,8 +641,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 					objectMapper.writeValueAsString(Map.of("type", "filterRoomList", "rooms", roomListWithCount))));
 		} catch (Exception e) {
 		}
-=======
->>>>>>> Stashed changes
 	}
 
 	private void broadcastUserList(String server) {
