@@ -1,18 +1,31 @@
 .roomListHeader {
   display: flex;
-  /* justify-content: flex-end; */
+  justify-content: center;
   margin-bottom: 10px;
-  gap: 10px;
+  gap: 20px;
 }
 
 .createBtn {
-  padding: 8px 16px;
+  padding: 8px 40px;
   border: none;
   background-image: url('../../public/images/Submit.png');
   border-radius: 50px;
   color: white;
   cursor: pointer;
   flex: 0 0 auto;
+  font-size: 20px;
+}
+
+.createBtn:hover{
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #222;
+  font-weight: bold;
+  transform: translateY(-3px); /* 살짝 위로 뜨는 효과 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.createBtn:hover::after{
+  width: 60%;
 }
 
 .roomListSearch{

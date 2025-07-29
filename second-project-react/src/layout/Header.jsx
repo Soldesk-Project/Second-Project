@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../css/header.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { clearUser, clearServer } from '../store/userSlice';
@@ -12,6 +12,8 @@ const LOGOUT_REDIRECT_URI = 'http://localhost:3000';
 const Header = () => {
   const server = useSelector(state => state.user.server);
   const user = useSelector(state => state.user.user);
+  const [activeTab, setActiveTab] = useState('');
+  const location = useLocation();
   const nav = useNavigate();
   const dispatch = useDispatch();
 
@@ -20,6 +22,17 @@ const Header = () => {
       window.Kakao.init(KAKAO_JS_KEY);
     }
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const page = params.get('page');
+
+    if (page === 'itemBook') setActiveTab('도감');
+    else if (page === 'achievements') setActiveTab('업적');
+    else if (location.pathname.includes('/shop')) setActiveTab('상점');
+    else if (location.pathname.includes('/inquiries')) setActiveTab('고객센터');
+    else setActiveTab('문제풀이');
+  }, [location]);
 
   const isKakaoUser = () => user.user_id.startsWith('kakao_');
   const isNaverUser = () => user.user_id.startsWith('naver_');
@@ -153,22 +166,21 @@ const Header = () => {
   return (
     <div className='header'>
       <div className='header-box-left'>
+        <div className='logo-container'>
+          <img
+            src="/images/logo.png"
+            alt="로고"
+            onClick={clickToGoMain}
+            className='logo-img header-logo'
+          />
+        </div>
+        
         <ul className='header-category'>
-          <li>
-            <div>
-              <img
-                src="/images/logo.png"
-                alt="로고"
-                onClick={clickToGoMain}
-                className='logo-img header-logo'
-              />
-            </div>
-          </li>
-          <li><span onClick={clickToGoMain}>문제풀이</span></li>
-          <li><span data-name="itemBook" onClick={clickToGo}>도감</span></li>
-          <li><span data-name="achievements" onClick={clickToGo}>업적</span></li>
-          <li><span data-name="shop" onClick={clickToGo}>상점</span></li>
-          <li><span data-name="inquiries" onClick={clickToGo}>고객센터</span></li>
+          <li><span className={activeTab === '문제풀이' ? 'active' : ''} onClick={() => {setActiveTab('문제풀이'); clickToGoMain();}}>문제풀이</span></li>
+          <li><span data-name="itemBook" className={activeTab === '도감' ? 'active' : ''} onClick={(e) => {setActiveTab('도감'); clickToGo(e)}}>도감</span></li>
+          <li><span data-name="achievements" className={activeTab === '업적' ? 'active' : ''} onClick={(e) => {setActiveTab('업적'); clickToGo(e)}}>업적</span></li>
+          <li><span data-name="shop" className={activeTab === '상점' ? 'active' : ''} onClick={(e) => {setActiveTab('상점'); clickToGo(e)}}>상점</span></li>
+          <li><span data-name="inquiries" className={activeTab === '고객센터' ? 'active' : ''} onClick={(e) => {setActiveTab('고객센터'); clickToGo(e)}}>고객센터</span></li>
         </ul>
       </div>
       <div className='header-box-right'>

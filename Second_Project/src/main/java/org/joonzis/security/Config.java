@@ -1,6 +1,5 @@
 package org.joonzis.security;
 
-import org.joonzis.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +34,7 @@ public class Config extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .antMatchers("/admin").hasRole("ADMIN") // ROLE_은 자동으로 붙으므로 "ADMIN"만
         .antMatchers("/api/login").permitAll()
+        .antMatchers("/**").permitAll()
         .anyRequest().authenticated()
         .and()
         .formLogin().disable() // React에서는 자체 로그인 폼을 사용
@@ -54,12 +54,7 @@ public class Config extends WebSecurityConfigurerAdapter {
 	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 	    source.registerCorsConfiguration("/**", configuration);
 	    return source;
-	}
-	
-	@Bean
-	public UserDetailsService userDetailsService() {
-	    return new UserDetailsServiceImpl();
-	}
+	}	
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {

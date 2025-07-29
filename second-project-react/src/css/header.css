@@ -10,18 +10,33 @@
   justify-content: space-between;
 }
 
-.header-category{
-  list-style-type: none;
-  overflow: hidden;
-  width: 100%;
-  height: 70px;
+.logo-container {
+  flex: 0 0 auto; /* 로고는 왼쪽에 고정 */
+}
+
+.header-box-left {
   display: flex;
   align-items: center;
-  margin-bottom: 0px;
+  justify-content: space-between; /* 로고 왼쪽, 메뉴 중앙 */
+}
+
+.header-category {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%); /* 메뉴를 화면 중앙으로 이동 */
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-category li {
+  margin: 0 10px; /* 메뉴 간격 조정 */
 }
 
 .header li span{
   display: block;
+  background-image: url('../../public/images/Submit.png');
   width: 110px;
   text-align: center;
   padding: 23px;
@@ -29,6 +44,7 @@
   color: white;
 }
 .header li span:hover{
+  background-image: none;
   background-color: white;
   color: black;
   font-weight: bold;
@@ -49,4 +65,75 @@
   align-items: center;
   justify-content: flex-end;
   gap: 0.5rem;
+}
+
+.header-category li span {
+  display: block;
+  width: 150px;
+  text-align: center;
+  padding: 15px 20px;
+  text-decoration: none;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+/* hover 시 부드러운 컬러 전환 및 강조 효과 */
+.header-category li span:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #222;
+  font-weight: bold;
+  transform: translateY(-3px); /* 살짝 위로 뜨는 효과 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 클릭(active) 시 살짝 눌리는 효과 */
+.header-category li span:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 밑줄 애니메이션 효과 */
+.header-category li span::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 3px;
+  background: #ffcc00; /* 포인트 색상 (원하는 색으로 변경 가능) */
+  transition: width 0.3s ease;
+}
+
+.header-category li span:hover::after {
+  width: 60%;
+}
+
+/* 활성 탭 표시 */
+.header-category li span.active {
+  background-color: rgba(255, 255, 255, 0.95);
+  background-image: none;
+  color: #222;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  position: relative;
+}
+
+/* 활성 탭 밑줄 강조 */
+.header-category li span.active::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 3px;
+  background: #ffcc00;
+  border-radius: 2px;
 }

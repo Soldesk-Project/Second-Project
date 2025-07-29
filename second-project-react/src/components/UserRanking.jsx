@@ -135,7 +135,6 @@ const UserRanking = () => {
     return (
         <div className={styles.container}>
             <div className={styles.header}>
-                <button className={styles.itemButton} onClick={() => setIsModalOpen(true)}>아이템</button>
                 유저 랭킹
             </div>
 

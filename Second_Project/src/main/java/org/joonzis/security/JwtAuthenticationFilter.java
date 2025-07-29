@@ -1,7 +1,6 @@
 package org.joonzis.security;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -24,8 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
-    	System.out.println(1);
-    	log.info(1);
+
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
     }
@@ -33,7 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
-        String requestURI = request.getRequestURI();	
+    	
+    	String requestURI = request.getRequestURI();	
 
         // 여러개의 인증 예외 경로 처리
 //        String[] openEndpoints = {"/api/login", "/api/signUp", "/api/findId", "/api/findPw"};
@@ -43,6 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //            filterChain.doFilter(request, response);
 //            return;
 //        }
+    	
 
         String authHeader = request.getHeader("Authorization");
         String token = null;
@@ -50,20 +50,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
+            String role = jwtUtil.getUserRoleFromToken(token);
+            System.out.println("Token role from token: " + role);
+            
+           
+            System.out.println("token -> " + token);
             try {
                 if (!jwtUtil.validateToken(token)) {
                     filterChain.doFilter(request, response); // 유효하지 않은 토큰
                     return;
                 }
                 username = jwtUtil.getUserIdFromToken(token);
+
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    System.out.println("UserDetails from DB: " + userDetails);
+                    System.out.println("UserDetails authorities: " + userDetails.getAuthorities());
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     
+                    
                     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                    System.out.println(auth.getAuthorities()); // 콘솔에서 리스트 직접 확인
-                    log.info(auth.getAuthorities());
+                    System.out.println("등록된 SecurityContext authentication: " + auth);
+                    System.out.println("등록된 Authorities: " + auth.getAuthorities());
                     
                 }
             } catch (Exception e) {

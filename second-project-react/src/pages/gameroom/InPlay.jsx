@@ -603,6 +603,7 @@ const InPlay = () => {
               onConfirm={leaveRoom} 
               onCancel={() => setLeaveModal(false)}
               gameMode={gameMode}
+              play={play}
             />
           )
         }
