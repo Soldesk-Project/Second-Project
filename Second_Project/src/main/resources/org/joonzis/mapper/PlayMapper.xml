@@ -55,6 +55,13 @@
     	WHERE USER_NICK = #{user_nick}
     </update>
     
+    <update id="leavePanalty">
+    	UPDATE USERS
+    	SET
+    		USER_RANK = USER_RANK - 20
+    	WHERE USER_NICK = #{user_nick}
+    </update>
+    
     <insert id="insertHistory" parameterType="org.joonzis.domain.UserQuestionHistoryDTO">
 	    INSERT INTO USER_QUESTION_HISTORY VALUES (
 	      user_q_seq.NEXTVAL,

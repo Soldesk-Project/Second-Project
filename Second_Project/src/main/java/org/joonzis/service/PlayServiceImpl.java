@@ -36,7 +36,13 @@ public class PlayServiceImpl implements PlayService {
 		
 	@Override
 	public void increaseRewardPoints(int point, int rank_point, String user_nick) {
-		playMapper.increaseRewardPoints(point, rank_point, user_nick);
+		try {
+			System.out.println("increaseRewardPoints 실행됨");
+			playMapper.increaseRewardPoints(point, rank_point, user_nick);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -49,6 +55,11 @@ public class PlayServiceImpl implements PlayService {
 	@Override
 	public void countFirst(String user_nick) {
 		playMapper.countFirst(user_nick);
+	}
+	
+	@Override
+	public void leavePanalty(String user_nick) {
+		playMapper.leavePanalty(user_nick);
 	}
 
 	@Override

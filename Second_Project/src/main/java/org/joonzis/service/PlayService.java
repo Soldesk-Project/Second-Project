@@ -16,6 +16,8 @@ public interface PlayService {
 	
 	public void countFirst(String user_nick);
 	
+	public void leavePanalty(String user_nick);
+	
 	public List<UserQuestionHistoryDTO> getQuestionReviewList(String user_nick);
 	
 	public List<UserQuestionHistoryDTO> getUserQuestionHistory(String submittedAt);
