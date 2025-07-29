@@ -9,7 +9,7 @@ import titleTextMap from '../js/Decorations';
 import PreviewModal from '../components/modal/PreviewModal';
 
 const Shop = () => {
-  const allTabs = ['테두리', '칭호', '글자색', '배경', '말풍선', '랜덤박스'];
+  const allTabs = ['테두리', '칭호', '글자색', '배경', '말풍선', '기타'];
   const [activeTab, setActiveTab] = useState(allTabs[0]);
   const [items, setItems]   = useState([]);
   const [ownedItems, setOwnedItems] = useState([]);

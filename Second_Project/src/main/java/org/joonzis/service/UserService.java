@@ -21,12 +21,14 @@ public interface UserService {
 	
 	// 모든 아이템 목록
 	public List<ItemVO> getItemList();
+	
 	// 인벤토리 - 카테고리별 아이템 목록
 	public List<ItemVO> getInventoryCategory(Map<String, Object> paramMap);
+	
 	// 보유 아이템 목록
 	public List<ItemVO> getInventory(int user_no);
 	
-	// userNo로 유저 정보+css 찾기	
+	// userNo로 유저 정보 + deco 찾기	
 	public UserInfoDTO getUserInfoByUserNo(int userNo);
 	
 	// 유저 장식 업데이트	
