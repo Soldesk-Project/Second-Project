@@ -258,7 +258,7 @@ const QuestEdit = () => {
                   <div className='question-detail-form dropdown-content'>
                     <h2>선택된 <strong>{selectedQuestId}</strong>번 문제 수정 ✏️</h2>
                     <div className='questionText'>
-                      <h3>2. 문제 본문 입력</h3>
+                      <h3>1. 문제 본문 입력</h3>
                       <input
                         type="text"
                         value={questionText}
@@ -267,7 +267,7 @@ const QuestEdit = () => {
                       />
                     </div>
                     <div className='option'>
-                      <h3>3. 선택지 입력</h3>
+                      <h3>2. 선택지 입력</h3>
                       {options.map((option, index) => (
                         <div key={index}>
                           <input
@@ -284,7 +284,7 @@ const QuestEdit = () => {
                       ))}
                     </div>
                     <div className='corAnswer'>
-                      <h3>4. 정답 입력</h3>
+                      <h3>3. 정답 입력</h3>
                       <select name="corAnsSelect" value={correctAnswer} onChange={(e) => setCorrectAnswer(e.target.value)}>
                         {options.map((_, index) => (
                           <option key={index + 1} value={String(index + 1)}>{index + 1}</option>
@@ -292,7 +292,7 @@ const QuestEdit = () => {
                       </select>
                     </div>
                     <div className="photo-input-section">
-                      <h3 className="section-title">5. 이미지 업로드 (선택 사항)</h3>
+                      <h3 className="section-title">4. 이미지 업로드 (선택 사항)</h3>
                       <div className="image-upload-wrapper">
                         <label htmlFor="image-upload" className="image-upload-label">이미지 선택:</label>
                         <input

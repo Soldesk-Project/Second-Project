@@ -1,24 +1,25 @@
 @import './Admin.css';
 
 .category button {
-  background-color: #007bff; 
+  background-color: #35373d; 
 }
 
 .category button:hover {
-  background-color: #0056b3;
+  background-color: #5a6268;
 }
 
 .searchResults li {
-  background-color: #171a23; 
+  background-color: #2b2e35; 
+  color: #ddd;
 }
 
 .searchResults li.selected-edit {
-  background-color: #e0f7fa; 
+  background-color: #2b2e35; 
   font-weight: bold;
 }
 
 .pagination button.active {
-  background-color: #007bff;
+  background-color: #5a6268;
   color: white;
 }
 
@@ -28,7 +29,7 @@
 
 /* 수정 폼 내 버튼 스타일 */
 .button-group button.reset-button {
-  background-color: #6c757d;
+  background-color: #35373d;
 }
 
 .button-group button.reset-button:hover {
@@ -36,11 +37,11 @@
 }
 
 .button-group button.submit-button {
-  background-color: #28a745;
+  background-color: #35373d;
 }
 
 .button-group button.submit-button:hover {
-  background-color: #218838;
+  background-color: #5a6268;
 }
 
 /* 본문, 선택지 등 입력 필드의 disabled 상태 스타일 */

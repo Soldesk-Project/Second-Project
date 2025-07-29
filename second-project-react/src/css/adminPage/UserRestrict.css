@@ -53,7 +53,7 @@ hr {
 
 .search-button {
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: #35373d;
   color: white;
   border: none;
   border-radius: 4px;
@@ -63,7 +63,7 @@ hr {
 }
 
 .search-button:hover:not(:disabled) {
-  background-color: #0056b3;
+  background-color: #5a6268;
 }
 
 .search-button:disabled {
@@ -101,28 +101,29 @@ hr {
   border-collapse: collapse;
   text-align: left;
   margin-top: 20px;
-  border: 1px solid #ddd; /* 전체 테이블 테두리 */
 }
 
 .user-table th,
 .user-table td {
   padding: 10px;
-  border: 1px solid #ddd; /* 셀 테두리 */
   vertical-align: middle; /* 텍스트 수직 정렬 */
+  color: #ddd;
 }
 
 .user-table th {
-  background-color: #f2f2f2;
-  font-weight: bold;
-  white-space: nowrap; /* 줄 바꿈 방지 */
+  background-color: #171a23;
+  white-space: nowrap;
+  color: #ddd;
+  text-align: center;
+  border-bottom: 1px solid #eee;
 }
 
 .user-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
+  background-color: #171a23;
 }
 
 .user-table tbody tr:hover {
-  background-color: #f1f1f1;
+  background-color: #171a23;
 }
 
 .user-no-col {
@@ -154,7 +155,7 @@ hr {
 
 .apply-ban-button {
   padding: 10px 20px;
-  background-color: #dc3545; /* 붉은색 계열 */
+  background-color: #35373d;
   color: white;
   border: none;
   border-radius: 4px;

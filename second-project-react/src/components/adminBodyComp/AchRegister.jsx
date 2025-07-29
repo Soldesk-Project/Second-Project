@@ -14,6 +14,12 @@ const AchRegister = () => {
     '게임 1등',
   ];
 
+  const tableType = {
+    '티어': 'tier',
+    '게임 플레이': 'gamePlay',
+    '게임 1등': 'game1st',
+  };
+
   const handleTypeChange = (e) => {
     setAchType(e.target.value);
   }
@@ -42,7 +48,7 @@ const AchRegister = () => {
       ach_title: achTitle,
       ach_content: parseInt(achContent, 10),
       ach_reward: parseInt(achReward, 10),
-      ach_type: achType,
+      ach_type: tableType[achType],
     };
 
     try {

@@ -22,6 +22,12 @@ const AchieveDelete = () => {
     '게임 1등',
   ];
 
+  const tableType = {
+    '티어': 'tier',
+    '게임 플레이': 'gamePlay',
+    '게임 1등': 'game1st',
+  };
+
   const handleTypeChange = (e) => {
     setAchType(e.target.value);
     setSearchResults([]);
@@ -35,7 +41,7 @@ const AchieveDelete = () => {
   }
 
   const handleSearchAch = async (page = 1) => {
-    const typeValue = achType;
+    const typeValue = tableType[achType];
 
     if (searchQuery !== lastSearchQuery.current || page === 1){
       setStartPage(1);
@@ -96,7 +102,7 @@ const AchieveDelete = () => {
       return;
     }
 
-    const typeValue = achType;
+    const typeValue = tableType[achType];
 
     try {
       const response = await fetch(`/admin/deleteAchievements?type=${encodeURIComponent(typeValue)}&titles=${Array.from(selectedAchsToDelete).join(',')}`, {

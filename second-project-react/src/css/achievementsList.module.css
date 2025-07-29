@@ -43,12 +43,11 @@ th, td {
 
 /* === 색상 스타일 === */
 thead th {
-  background-color: #f9f9f9bd;
-  font-weight: bold;
+  background-color: #171a23;
 }
 
 tbody td {
-  background-color: #f9f9f9;
+  background-color: #171a23;
 }
 
 /* === 버튼 공통 === */

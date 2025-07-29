@@ -46,7 +46,7 @@
 .correct-answer-select,
 .achtype-select,
 .itemType-select {
-  width: auto;
+  width: 157px;
   padding: 10px;
   border: 1px solid #ddd;
   color: #808080;
@@ -54,6 +54,10 @@
   font-size: 1em;
   box-sizing: border-box;
   background-color: #2b2e35;
+}
+
+.correct-answer-select{
+  text-align: center;
 }
 
 /* 텍스트/넘버 입력 */
@@ -64,6 +68,7 @@
   width: 100%; /* 부모 div의 100%를 차지하도록 수정 */
   padding: 10px;
   border: 1px solid #ddd;
+  color: #fff;
   border-radius: 4px;
   font-size: 1em;
   box-sizing: border-box;
@@ -93,7 +98,7 @@
 }
 
 .image-upload-label {
-  background-color: #007bff;
+  background-color: #35373d;
   color: white;
   padding: 8px 15px;
   border-radius: 4px;
@@ -102,7 +107,7 @@
 }
 
 .image-upload-label:hover {
-  background-color: #0056b3;
+  background-color: #5a6268;
 }
 
 .image-upload-input {
@@ -115,12 +120,12 @@
   border: 1px dashed #ccc;
   padding: 15px;
   border-radius: 8px;
-  background-color: #fafafa;
+  background-color: #5a6268;
 }
 
 .image-preview-title {
   margin-top: 0;
-  color: #666;
+  color: #ddd;
   font-size: 1em;
 }
 

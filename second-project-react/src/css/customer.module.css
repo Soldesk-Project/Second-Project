@@ -127,10 +127,10 @@ button {
     /* grid-template-rows는 헤더와 상세 내용 두 줄을 위해 auto auto */
     grid-template-rows: auto auto; 
     grid-template-columns: 80px 1fr 120px 140px;
-    gap: 0; 
+    gap: 1rem; 
     align-items: stretch;
     border-bottom: 1px solid #48494e; /* 각 항목의 하단 경계선 */
-    color: #ddd; /* 항목 기본 글자색 */
+    color: #fff; /* 항목 기본 글자색 */
     
 }
 
@@ -147,7 +147,6 @@ button {
     justify-self: center;
     align-self: center;
     font-size: 0.9em;
-    color: #888;
 }
 .listItemTitle { /* 제목 */
     justify-self: start;
@@ -155,7 +154,6 @@ button {
     text-align: left;
     padding-left: 10px;
     font-weight: 500;
-    color: #fff;
     text-decoration: none;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -163,14 +161,13 @@ button {
     transition: color 0.2s ease;
 }
 .listItemTitle:hover {
-    color: #8367C7; /* 호버 시 색상 변경 */
+    color: #35373d; /* 호버 시 색상 변경 */
 }
 .listItemAuthor, /* 닉네임 또는 유형 */
 .listItemDate { /* 날짜 */
     justify-self: center; /* 기본 가운데 정렬 */
     align-self: center;
     font-size: 0.9em;
-    color: #666;
 }
 .listItemDate { /* 날짜만 우측 정렬 */
     justify-self: end;
