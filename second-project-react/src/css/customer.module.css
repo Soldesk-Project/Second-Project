@@ -413,7 +413,8 @@ textarea.textarea { /* textarea의 최소 높이 */
 }
 
 .inqBtns{
-    
+    display: flex;
+    justify-content: center;
 }
 .backButton { /* detailBox 내 뒤로가기 버튼 */
   padding: 8px 16px;
