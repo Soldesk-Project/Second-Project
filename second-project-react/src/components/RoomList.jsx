@@ -312,10 +312,7 @@ const RoomList = () => {
         filterModal && (
           <FilterModal
             setFilterModal={setFilterModal}
-<<<<<<< Updated upstream
             server={server}
-=======
->>>>>>> Stashed changes
           />
         )
       }
