@@ -28,6 +28,7 @@ import GoogleCallback from './pages/login/GoogleCallback';
 import QuestionReview from './pages/gameroom/QuestionReview';
 import ResetPasswordPage from './pages/login/ResetPasswordPage';
 import ErrorEvent from './pages/ErrorEvent';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   const dispatch = useDispatch();
@@ -69,7 +70,7 @@ function App() {
           <Route path="/inquiries" element={<CustomerServiceCenter />} />
           <Route path="/inquiry" element={<CustomerCenterNew />} />
           <Route path="/problemsubmit" element={<CustomerProblemSubmit />} />
-          <Route path="/admin" element={<AdminPage/>}/>
+          <Route path="/admin" element={<ProtectedRoute requiredRole="ROLE_ADMIN"><AdminPage/></ProtectedRoute>}/>
           <Route path="/inquiries/:id" element={<InquiryDetail />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/*" element={<ErrorEvent />} />
