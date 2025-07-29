@@ -8,6 +8,21 @@ import { useSelector } from 'react-redux';
 import { WebSocketContext } from '../util/WebSocketProvider';
 import PasswordModal from './modal/PasswordModal';
 import FilterModal from './modal/FilterModal';
+<<<<<<< Updated upstream
+=======
+
+const getUserIdFromToken = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.userId || payload.sub || payload.username;
+  } catch (e) {
+    console.error(":x: JWT 파싱 오류:", e);
+    return null;
+  }
+};
+>>>>>>> Stashed changes
 
 const RoomList = () => {
   const [category, setCategory] = useState('random');
@@ -297,7 +312,10 @@ const RoomList = () => {
         filterModal && (
           <FilterModal
             setFilterModal={setFilterModal}
+<<<<<<< Updated upstream
             server={server}
+=======
+>>>>>>> Stashed changes
           />
         )
       }

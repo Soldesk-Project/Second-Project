@@ -78,8 +78,10 @@ const QuestionReview = () => {
     
     if (!userId) return;
     try {
-      const res = await axios.get(`/api/user/point?user_id=${userId}`);
-      setPoint(res.data);
+      const resp = await axios.get(`/api/user/point?user_id=${userId}`);
+      console.log(resp.data);
+      
+      setPoint(resp.data);
     } catch (error) {
       console.error('포인트 불러오기 실패:', error);
     }

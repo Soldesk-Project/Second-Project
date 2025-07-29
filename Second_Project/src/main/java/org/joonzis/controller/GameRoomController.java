@@ -84,6 +84,7 @@ public class GameRoomController {
     	userservice.userPointMinus(paramMap);
 	}
 	
+<<<<<<< Updated upstream
 	@PostMapping(value = "/groq-explanation", produces = "application/json; charset=UTF-8")
 	@ResponseBody
 	public String getGroqExplanation(@RequestBody Map<String, Object> body) {
@@ -151,4 +152,6 @@ public class GameRoomController {
         Map message = (Map) choices.get(0).get("message");
         return (String) message.get("content");
     }
+=======
+>>>>>>> Stashed changes
 }
