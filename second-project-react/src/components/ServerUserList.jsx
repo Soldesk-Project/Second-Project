@@ -30,7 +30,7 @@ const ServerUserList = () => {
 
 	 // 🆕 useEffect: 샵 전체 아이템 한 번만 불러오기
   useEffect(() => {
-    const cats = ['테두리','칭호','글자색','배경','말풍선'];
+    const cats = ['테두리','칭호','글자색','명함','말풍선'];
     Promise.all(cats.map(cat =>
       axios.get(`/api/shop/items?category=${encodeURIComponent(cat)}`)
     ))

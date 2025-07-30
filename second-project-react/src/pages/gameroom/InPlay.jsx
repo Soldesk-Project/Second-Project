@@ -100,7 +100,7 @@ const InPlay = () => {
 
 	 // 🆕 useEffect: 샵 전체 아이템 한 번만 불러오기
   useEffect(() => {
-    const cats = ['테두리','칭호','글자색','배경','말풍선'];
+    const cats = ['테두리','칭호','글자색','명함','말풍선'];
     Promise.all(cats.map(cat =>
       axios.get(`/api/shop/items?category=${encodeURIComponent(cat)}`)
     ))
@@ -167,7 +167,7 @@ const InPlay = () => {
         });
         // 타이머가 실행된 후에는 ref에서도 해당 타이머 ID 제거
         delete messageTimeoutRef.current[chatMessage.mSender]; 
-      }, 5000); // 마지막 메시지 출력 후 5초 뒤에 사라짐
+      }, 10000000); // 마지막 메시지 출력 후 5초 뒤에 사라짐
 
       // 4. 새로 설정된 타이머 ID를 useRef에 저장
       messageTimeoutRef.current[chatMessage.mSender] = timerId;
@@ -309,23 +309,7 @@ const InPlay = () => {
           ])
           
         }
-        // console.log("-----------------");
-        // console.log("userNick : "+data.userNick);
-        // console.log("questionId : "+questionListRef.current[data.questionIdx].id);
-        // console.log("subject : "+questionListRef.current[data.questionIdx].subject);
-        // console.log("answer : "+data.answer);
-        // console.log("correctAnswer : "+data.correctAnswer);
-        // console.log("isCorrect : "+data.isCorrect);
-        // console.log("question : "+data.questionIdx);
-        // console.log("question : "+questionListRef.current[data.questionIdx].question_text);
-        // console.log("question : "+questionListRef.current[data.questionIdx].correct_answer);
       }
-
-      // if (data.type === 'joinDenied') {
-      //   alert(data.reason);
-      // }
-
-
     };
 
     socket.onclose = () => {
@@ -348,7 +332,7 @@ const InPlay = () => {
         setTime(prev => {
           // 1 이하에서 멈추게
           if (prev <= 1) {
-            clearInterval(timer); // 이거는 혹시 모를 race condition용. (불필요할 수도)
+            clearInterval(timer);
             return 0;
           }
           return prev - 1;
@@ -371,7 +355,6 @@ const InPlay = () => {
       const socket = sockets['room'];
       if (socket && socket.readyState === 1) {
         const myInfo = rankedUsers.find(u => u.userNick === userNick);
-        // console.log(myInfo);
         const myPoint = myInfo.point ?? 0;
         const rankPoint = myInfo.rankPoint ?? 0;
         const myRank = myInfo.rank ?? 0;
@@ -399,13 +382,13 @@ const InPlay = () => {
     const socket = sockets['room'];
     if (socket && socket.readyState === 1) {
       socket.send(JSON.stringify({
-        action: 'submitAnswer',  // or 'checkAnswer' 등 서버에 맞춰서!
+        action: 'submitAnswer',
         server,
         roomNo,
         userNick,
-        answer, // 내가 선택한 답 번호만 보냄!
-        questionIndex: nextId, // 현재 문제 번호
-        spentTime: spentTimeSec, // 소요시간 서버에 전달
+        answer, 
+        questionIndex: nextId,
+        spentTime: spentTimeSec,
         game_mode: gameMode
       }));
     } else {
@@ -481,16 +464,6 @@ const InPlay = () => {
       case "sec": return "정보보안기사";
       case "net1": return "네트워크관리사 1급";
       case "net2": return "네트워크관리사 2급";
-      // case "정보처리기사": return "cpe";
-      // case "정보처리산업기사": return "cpei";
-      // case "정보처리기능사": return "cpet";
-      // case "리눅스마스터 1급": return "lm1";
-      // case "리눅스마스터 2급": return "lm2";
-      // case "정보통신산업기사": return "icti";
-      // case "정보통신기사": return "ict";
-      // case "정보보안기사": return "sec";
-      // case "네트워크관리사 1급": return "net1";
-      // case "네트워크관리사 2급": return "net2";
       default: return category || "알 수 없음";
     }
   };
@@ -641,11 +614,19 @@ const InPlay = () => {
                 </div>
 
                 {/* 채팅 말풍선 */}
-                {userRecentChats[user.userNick] && (
-                  <div className={styles.chatBubble}>
-                    {userRecentChats[user.userNick].message}
+                {userRecentChats[user.userNick] && (() => {
+                const balloon = itemMap ? itemMap[profile.balloonItemNo] : null;
+                return (
+                  <div className={styles.chatBubbleWrapper}>
+                    {balloon && (
+                      <img src={`/images/${balloon.imageFileName}`} alt="Chat Balloon"/>
+                    )}
+                    <span className={styles.chatMessage}>
+                      {userRecentChats[user.userNick].message}
+                    </span>
                   </div>
-                )}
+                );
+              })()}
               </div>
             ): (
               // 빈 자리 슬롯

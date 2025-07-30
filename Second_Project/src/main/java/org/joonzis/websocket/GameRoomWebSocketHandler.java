@@ -699,6 +699,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	            profile.put("titleItemNo", dto.getTitleItemNo());
 	            profile.put("backgroundItemNo", dto.getBackgroundItemNo());
 	            profile.put("fontColorItemNo", dto.getFontcolorItemNo());
+	            profile.put("balloonItemNo", dto.getBalloonItemNo());
 	            profiles.put(nick, profile);
 	        }
 	    }
@@ -761,8 +762,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	    String server = (String) session.getAttributes().get("server");
 	    String user_nick = (String) session.getAttributes().get("userNick");
 
-	    // server 값이 "1", "2", "3" 이면 "rank"로 대체
-	    if ("1".equals(server) || "2".equals(server) || "3".equals(server)) {
+	    if (!("1".equals(server) || "2".equals(server) || "3".equals(server))) {
 	        server = "rank";
 	    }
 	    

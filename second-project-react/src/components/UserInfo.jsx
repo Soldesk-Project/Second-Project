@@ -21,9 +21,27 @@ const UserInfo = () => {
     const [editMyInfo, setEditMyInfo] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [point, setPoint] = useState(0);
     const dispatch = useDispatch();
 
     const { user } = useSelector((state) => state.user);
+    
+    const userId = user?.user_id;
+    const userNick = user?.user_nick;
+
+    useEffect(() => {
+        fetchGetPoint();
+      }, [userNick]);
+
+    const fetchGetPoint = async () => {
+    if (!userId) return;
+    try {
+        const res = await axios.get(`/api/user/point?user_id=${userId}`);
+        setPoint(res.data);
+    } catch (error) {
+        console.error('포인트 불러오기 실패:', error);
+    }
+    }
 
     useEffect(() => {
       if (!user?.user_no) return;
@@ -182,19 +200,22 @@ const UserInfo = () => {
     useEffect(() => {
         if (!user.user_no) return;
         axios
-        .get(`/user/accuracy`)
+        .get(`/user/accuracy/${user.user_nick}`)
         .then(res => setStats(res.data))
         
         .catch(err => console.error(err));
     }, [user.user_no]);    
-    console.log(stats);
         
     // 2) 퍼센트 계산
     // --- 퍼센트 계산 (통계가 로딩되지 않았으면 0으로)
     const answerPercent = stats?.[0]?.accuracyPct || 0;
         
     const handleNicknameChange = (newNick) => {
-        axios.patch(`/user/${user.user_no}/nickname`, { user_nick: newNick })
+        if(point < 5000){
+            alert("포인트 부족")
+            return;
+        }
+        axios.patch(`/user/${user.user_no}/nickname`, { user_nick: newNick, user_id: userId })
             .then(res => {
                 const updatedUser = {
                     ...user,
@@ -229,7 +250,7 @@ const UserInfo = () => {
         }
     }, [user.user_id, user.user_email, loading]);
 
-    console.log(items);
+    console.log(profileSrc);
     
 
   return (
@@ -323,7 +344,7 @@ const UserInfo = () => {
             </>
         }
 
-        <NickModal isOpen={isNickModalOpen} onClose={() => setIsNickModalOpen(false)}  onSubmit={handleNicknameChange}/>
+        <NickModal isOpen={isNickModalOpen} onClose={() => setIsNickModalOpen(false)}  onSubmit={handleNicknameChange} point={point}/>
 
       <InventoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div role="tablist" className={styles.subTabContainer}>

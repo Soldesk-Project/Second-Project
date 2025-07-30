@@ -159,34 +159,27 @@
 
 
 /* 화면 우측 말풍선*/
-.chatBubble {
-    position: absolute;
-    top: calc(100% + 5px);
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #e0f7fa;
-    border: 1px solid #b2ebf2;
-    border-radius: 10px;
-    padding: 5px 10px;
-    font-size: 0.8em;
-    color: #333;
-    min-width: 80px;
-    max-width: 150px;
-    word-wrap: break-word;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 10;
+.chatBubbleWrapper {
+  position: relative;
+  display: inline-block;
 }
 
-/* 말풍선 꼬리 */
-.chatBubble::after {
-    content: '';
-    position: absolute;
-    bottom: 100%; /* ★ 변경: 말풍선 위쪽으로 (꼬리가 위를 향하도록) */
-    left: 50%; /* 가운데 정렬을 위해 50% 이동 */
-    transform: translateX(-50%); /* 가운데 정렬 */
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent transparent #e0f7fa transparent; /* ★ 변경: 꼬리 색상 및 방향 */
+.chatBalloonImage {
+  width: 200px;
+  height: auto;
+  display: block;
+}
+
+.chatMessage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #000;
+  font-size: 0.9rem;
+  text-align: center;
+  white-space: pre-wrap;
+  width: 70%;
 }
 
 @keyframes fadeOut {

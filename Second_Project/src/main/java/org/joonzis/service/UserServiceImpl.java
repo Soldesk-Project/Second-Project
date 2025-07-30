@@ -259,7 +259,7 @@ public class UserServiceImpl implements UserService{
 		mapper.updateLoginStatus(userId, status);
 	}
 
-	public List<UserAccuracyDTO> getUserAccuracyList() {
-	    return mapper.getUserAccuracyList();
+	public List<UserAccuracyDTO> getUserAccuracyList(String user_nick) {
+	    return mapper.getUserAccuracyList(user_nick);
 	  }
 }

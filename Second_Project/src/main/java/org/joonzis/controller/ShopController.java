@@ -110,7 +110,7 @@ public class ShopController {
             "테두리", "boundary",
             "칭호", "title",
             "글자색", "fontColor",
-            "배경", "background",
+            "명함", "background",
             "말풍선", "balloon",
             "기타", "etc"
         );

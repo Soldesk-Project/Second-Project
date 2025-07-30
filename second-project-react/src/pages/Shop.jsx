@@ -9,13 +9,14 @@ import titleTextMap from '../js/Decorations';
 import PreviewModal from '../components/modal/PreviewModal';
 
 const Shop = () => {
-  const allTabs = ['테두리', '칭호', '글자색', '배경', '말풍선', '기타'];
+  const allTabs = ['테두리', '칭호', '글자색', '명함', '말풍선'];
   const [activeTab, setActiveTab] = useState(allTabs[0]);
   const [items, setItems]   = useState([]);
   const [ownedItems, setOwnedItems] = useState([]);
   const [point, setPoint]   = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [profileSrc, setProfileSrc] = useState('/images/profile_default.png');
 
   const user   = useSelector(state => state.user.user);
   const userId = user?.user_id;
@@ -47,12 +48,20 @@ const Shop = () => {
   useEffect(() => {
     fetchGetItems();
   }, [user.user_no]);
+
+  useEffect(() => {
+          if (!user?.user_profile_img) return;
+          const raw = user.user_profile_img;
+          const src = raw.startsWith('/images/')
+              ? raw
+              : `/images/${raw}`;
+          setProfileSrc(src);
+          }, [user.user_profile_img]);
   
   useEffect(() => {
     // 아이템 탭
     axios.get(`/api/shop/items?category=${encodeURIComponent(activeTab)}`)
       .then(res => {
-        console.log(res.data)
         const withImg = res.data.map(item => {
           const filename = item.imageFileName;
           return {
@@ -73,13 +82,15 @@ const Shop = () => {
           params.append("item_price", item.item_price);
           params.append("css_class_name", item.css_class_name);
 
-            const { data, status } = await axios.post('/api/shop/buyItemInventory', params);
-            if (status === 200) {
-              fetchGetPoint();
-              fetchGetItems();
-            } else {
-                throw new Error('아이템 구매 실패');
-            }
+          console.log(params.item_name);
+          
+          const { data, status } = await axios.post('/api/shop/buyItemInventory', params);
+          if (status === 200) {
+            fetchGetPoint();
+            fetchGetItems();
+          } else {
+              throw new Error('아이템 구매 실패');
+          }
         } catch (error) {
             console.error('아이템 구매 로드 실패:', error);
         }
@@ -175,7 +186,7 @@ const Shop = () => {
                   // 3) 기타: 고정 텍스트
                   <span
                     className={decoStyles[item.css_class_name]}
-                    style={{ fontWeight: 'bold', fontSize: '1.2em' }}
+                    style={{ fontWeight: 'bold', fontSize: '1.2em', color: 'black' }}
                   >
                     { titleTextMap[item.css_class_name] || item.item_name }
                   </span>
@@ -202,7 +213,7 @@ const Shop = () => {
       </div>
 
       {showModal && <ChargeModal onClose={() => setShowModal(false)} />}
-      {selectedItem && (<PreviewModal action={'Shop'} user={user} item={selectedItem} onClose={() => setSelectedItem(null)} on_click={() => buyItem(selectedItem)} />)}
+      {selectedItem && (<PreviewModal action={'Shop'} user={user} profileSrc={profileSrc} item={selectedItem} onClose={() => setSelectedItem(null)} on_click={() => buyItem(selectedItem)} />)}
     </div>
   );
 };
