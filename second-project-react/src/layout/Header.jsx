@@ -17,6 +17,9 @@ const Header = () => {
   const nav = useNavigate();
   const dispatch = useDispatch();
 
+  console.log(user.auth);
+
+
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
       window.Kakao.init(KAKAO_JS_KEY);
@@ -181,6 +184,10 @@ const Header = () => {
           <li><span data-name="achievements" className={activeTab === '업적' ? 'active' : ''} onClick={(e) => {setActiveTab('업적'); clickToGo(e)}}>업적</span></li>
           <li><span data-name="shop" className={activeTab === '상점' ? 'active' : ''} onClick={(e) => {setActiveTab('상점'); clickToGo(e)}}>상점</span></li>
           <li><span data-name="inquiries" className={activeTab === '고객센터' ? 'active' : ''} onClick={(e) => {setActiveTab('고객센터'); clickToGo(e)}}>고객센터</span></li>
+          {
+            user.auth==='ROLE_ADMIN' &&
+            <li><span data-name="admin" className={activeTab === '관리자 페이지' ? 'active' : ''} onClick={(e) => {setActiveTab('관리자 페이지'); clickToGo(e)}}>관리자 페이지</span></li>
+          }
         </ul>
       </div>
       <div className='header-box-right'>

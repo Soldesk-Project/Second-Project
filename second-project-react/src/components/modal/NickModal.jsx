@@ -52,7 +52,7 @@ const NickModal = ({ isOpen, onClose, onSubmit }) => {
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={styles.container} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <h3 style={{color:'black', textAlign:'center'}}>닉네임 변경</h3>
         <input
@@ -65,9 +65,9 @@ const NickModal = ({ isOpen, onClose, onSubmit }) => {
         />
         {nickname && isDuplicateNick === true && (<p style={{ color: 'red' }}>이미 사용 중인 닉네임입니다.</p>)}
         {nickname && isDuplicateNick === false && (<p style={{ color: 'green' }}>사용 가능한 닉네임입니다.</p>)}
-        <div className={styles.buttons}>
-          <button onClick={handleSubmit}>변경</button>
-          <button onClick={onClose}>취소</button>
+        <div className={styles.buttonWrapper}>
+          <button className={styles.closeBtn} onClick={onClose}>취소</button>
+          <button className={styles.changeBtn} onClick={handleSubmit}>변경</button>
         </div>
       </div>
     </div>

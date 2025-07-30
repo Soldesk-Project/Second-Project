@@ -1,4 +1,4 @@
-.roomListHeader {
+  .roomListHeader {
   display: flex;
   justify-content: center;
   margin-bottom: 10px;
@@ -14,6 +14,13 @@
   cursor: pointer;
   flex: 0 0 auto;
   font-size: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: 
+    background-color 0.2s,
+    color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .createBtn:hover{
@@ -22,6 +29,10 @@
   font-weight: bold;
   transform: translateY(-3px); /* 살짝 위로 뜨는 효과 */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.createBtn:focus {
+  outline: none;
 }
 
 .createBtn:hover::after{

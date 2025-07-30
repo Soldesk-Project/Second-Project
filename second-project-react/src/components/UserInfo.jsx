@@ -18,6 +18,7 @@ const UserInfo = () => {
     const [isNickModalOpen, setIsNickModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState(TABS[0]);
     const [items, setItems]   = useState([]);
+    const [editMyInfo, setEditMyInfo] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
@@ -72,16 +73,7 @@ const UserInfo = () => {
         });
     };
     
-    const openButtonStyle = {
-        padding: '8px 16px',
-        backgroundColor: '#8367C7',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        fontWeight: 'bold',
-        marginTop: '20px'
-    };
+      
 
     useEffect(() => {
         if (!user.user_no) return;
@@ -309,17 +301,27 @@ const UserInfo = () => {
             <div className={styles.label}>{answerPercent}% 정답률</div>
             </div>
         </div>
-        <div className={styles.invenBtnWrapper}>
-            <div className={styles.invenBtn}>
-                <button style={openButtonStyle} onClick={() => setIsModalOpen(true)}>Inventory</button>
-            </div>
-            <div className={styles.invenBtn}>
-                <button style={openButtonStyle} onClick={() => setIsNickModalOpen(true)}>닉네임 변경</button>
-            </div>
+        <div className={styles.editMyInfoBtnWrapper}>
+            {
+                editMyInfo?
+                <button className={styles.editMyInfoBtn} onClick={() => setEditMyInfo(false)}>돌아가기</button>
+                :
+                <button className={styles.editMyInfoBtn} onClick={() => setEditMyInfo(true)}>내 정보 수정</button>
+            }
         </div>
-        <div className={styles.invenBtn}>
-            <button style={openButtonStyle} onClick={handleChangePw} disabled={loading}>{loading ? '요청 중...' : '비밀번호 변경'}</button>
-        </div>
+        {
+            editMyInfo?
+            <>
+                <div className={styles.invenBtnWrapper}>
+                    <button className={styles.invenBtn} onClick={() => setIsModalOpen(true)}>Inventory</button>
+                    <button className={styles.invenBtn} onClick={() => setIsNickModalOpen(true)}>닉네임 변경</button>
+                    <button className={styles.invenBtn} onClick={handleChangePw} disabled={loading}>{loading ? '요청 중...' : '비밀번호 변경'}</button>
+                </div>
+            </>:
+            <>
+                {/* 여기에 공간 채우기 */}
+            </>
+        }
 
         <NickModal isOpen={isNickModalOpen} onClose={() => setIsNickModalOpen(false)}  onSubmit={handleNicknameChange}/>
 

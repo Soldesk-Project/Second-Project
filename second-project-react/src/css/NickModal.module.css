@@ -1,4 +1,4 @@
-.overlay {
+.container {
   position: fixed;
   top: 0;
   left: 0;
@@ -20,17 +20,46 @@
 
 .nickModalInput {
   width: 100%;
-  padding: 8px;
-  margin: 12px 0;
+  padding: 5px 10px;
+  border: 1px solid #b5cbe7;
+  border-radius: 6px;
+  background-color: #f6faff;
+  color: #234087;
+  font-size: 1.2rem;
+  outline: none;
+  transition: border-color 0.2s;
 }
 
-.buttons {
+.buttonWrapper {
   display: flex;
   justify-content: space-between;
   margin: 10px 50px;
 }
+.buttonWrapper button{
+  padding: 6px 18px;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px 0 rgba(69, 126, 255, 0.08);
 
-.buttons button {
-    border: 1px solid black;
-    color: black;
+}
+.changeBtn{
+  background-color: #457eff;
+}
+
+.changeBtn:hover {
+  background-color: #2b53b6;
+}
+
+.closeBtn{
+  background-color: #f44336;
+}
+
+.closeBtn:hover {
+  background-color: #d32f2f;
 }
