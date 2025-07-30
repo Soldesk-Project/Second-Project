@@ -30,8 +30,9 @@ h1 {
   padding: 10px 12px;
   border: 1px solid #aaddff;
   border-radius: 5px;
+  background-color: #35373d;
   font-size: 1em;
-  color: #333;
+  color: #ddd;
 }
 
 .category input[type="text"] {

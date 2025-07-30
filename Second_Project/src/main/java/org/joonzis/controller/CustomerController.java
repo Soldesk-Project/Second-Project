@@ -96,20 +96,22 @@ public class CustomerController {
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<Map<String,String>> createInquiry(
-            @RequestParam("userNick") String UserNick,  // <-- wrong name/case
+            @RequestParam(value = "userId", required = false) String UserId,
             @RequestParam("subject") String subject,
             @RequestParam("message") String message,
             @RequestParam("postPassword") int    postPassword,
             @RequestParam("email") String email,
+            @RequestParam("category") String category,
             @RequestParam(value = "files", required = false) List<MultipartFile> files
     ) throws IOException {
         // VO에 담기
         InquiryVO vo = new InquiryVO();
-        vo.setUserNick(UserNick);
+        vo.setUserId(UserId);
         vo.setSubject(subject);
         vo.setMessage(message);
         vo.setPostPassword(postPassword);
         vo.setEmail(email);
+        vo.setCategory(category);
 
         // Service 호출 (파일 처리까지)
         inquiryService.createInquiry(vo, files);

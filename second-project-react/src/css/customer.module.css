@@ -280,7 +280,6 @@ button {
     margin: 50px auto 0px;
     display: flex;
     flex-direction: column;
-    gap: 25px; /* input/textarea 사이 간격 */
     color: #ddd;
 }
 
@@ -298,7 +297,8 @@ button {
 
 .input[type="text"],
 .input[type="password"],
-.input[type="email"]{
+.input[type="email"],
+.input {
     flex-grow: 1; /* 남은 공간 채우기 */
     padding: 10px;
     border: 1px solid #48494e;
@@ -347,15 +347,18 @@ textarea.textarea { /* textarea의 최소 높이 */
 .fileInputGroup { /* 파일 업로드 박스 */
     display: flex;
     flex-direction: column;
-    gap: 10px;
     margin-top: 20px;
     color: #ddd;
+    margin-bottom: 25px;
 }
 .fileInputGroup input[type="file"] {
     display: block; /* 파일 선택 버튼이 한 줄에 표시되도록 */
     width: 100%;
 }
 
+.fileInputGroup .submitBtn {
+  width: fit-content;
+}
 
 .formActions { /* 폼 하단 버튼들 */
     display: flex;
@@ -435,6 +438,13 @@ textarea.textarea { /* textarea의 최소 높이 */
   transition: background-color 0.2s ease;
 }
 
+.submitBtn:hover {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+}
+
+
+
 /* --- 반응형 디자인 (기존 미디어 쿼리 통합 및 조정) --- */
 @media (max-width: 768px) {
     .content,
@@ -508,4 +518,27 @@ textarea.textarea { /* textarea의 최소 높이 */
         flex-direction: column;
         gap: 5px;
     }
+}
+
+.image_preview_container {
+    margin-top: 20px;
+    text-align: center;
+    border: 1px dashed #ccc;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #2b2e35;
+}
+
+.image_preview_title {
+    margin-top: 0;
+    color: #ddd;
+    font-size: 1em;
+}
+
+.image_preview {
+    max-width: 300px;
+    max-height: 300px;
+    border: 1px solid #eee;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
 }

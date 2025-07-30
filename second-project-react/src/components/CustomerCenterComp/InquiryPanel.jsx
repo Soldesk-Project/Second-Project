@@ -74,6 +74,25 @@ const InquiryPanel = () => {
                         <br />
                       </React.Fragment>
                     ))}
+                    {item.files && item.files.length > 0 && (
+                      <div className={styles.attachmentArea}>
+                        <h4>첨부파일:</h4>
+                        <ul className={styles.attachmentList}>
+                          {item.files.map((file, fileIndex) => (
+                            <li key={fileIndex}>
+                              <a 
+                                href={file.filepath} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className={styles.attachmentLink}
+                              >
+                                {file.filename}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

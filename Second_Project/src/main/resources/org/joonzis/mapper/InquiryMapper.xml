@@ -4,51 +4,53 @@
          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.joonzis.mapper.InquiryMapper">
-  <!-- 페이징 조회 -->
-  <select id="selectInquiries" resultType="org.joonzis.domain.InquiryVO">
-    SELECT * FROM (
-      SELECT ROWNUM rn, t.* FROM (
-        SELECT id,
-               user_nick AS userNick,
-               subject,
-               message,
-               created_at AS createdAt
-          FROM inquiry
-         ORDER BY created_at DESC
-      ) t
-      WHERE ROWNUM &lt;= #{offset} + #{limit}
-    )
-    WHERE rn &gt; #{offset}
-  </select>
+	<!-- 페이징 조회 -->
+	<select id="selectInquiries" resultType="org.joonzis.domain.InquiryVO">
+	<![CDATA[
+	SELECT * FROM (
+		SELECT ROWNUM rn, t.* FROM (
+			SELECT i.id,
+				u.user_nick AS userNick, i.subject,
+				i.message,
+				i.created_at AS createdAt
+			FROM inquiry i
+			JOIN users u ON i.user_id = u.user_id ORDER BY i.created_at DESC
+		) t
+		WHERE ROWNUM <= #{offset} + #{limit}
+	)
+	WHERE rn > #{offset}
+	]]>
+	</select>
 
-  <!-- 전체 카운트 -->
-  <select id="countInquiries" resultType="int">
-    SELECT COUNT(*) FROM inquiry
-  </select>
+	<!-- 전체 카운트 -->
+	<select id="countInquiries" resultType="int">
+		SELECT COUNT(*) FROM inquiry
+	</select>
 
-  <!-- 등록 -->
-  <insert id="insertInquiry" parameterType="org.joonzis.domain.InquiryVO">
-    INSERT INTO inquiry (
-      id, user_nick, subject, message, created_at, post_password, email
-    ) VALUES (
-      seq_inquiry.nextval,
-      #{userNick},
-      #{subject},
-      #{message},
-      SYSDATE,
-      #{postPassword},
-      #{email}
-    )
-  </insert>
+	<insert id="insertInquiry" parameterType="org.joonzis.domain.InquiryVO">
+	<selectKey keyProperty="id" resultType="long" order="BEFORE">
+		SELECT seq_inquiry.NEXTVAL FROM dual
+	</selectKey>
+	INSERT INTO inquiry (
+		id, subject, message, created_at, post_password, email, user_id, category
+	) VALUES (
+		#{id}, #{subject},
+		#{message},
+		SYSDATE,
+		#{postPassword},
+		#{email},
+		#{userId},
+		#{category}
+	)
+	</insert>
   
-  <!-- 상세 조회 -->
-  <select id="selectById" parameterType="long" resultType="org.joonzis.domain.InquiryVO">
-    SELECT id,
-           user_nick AS userNick,
-           subject,
-           message,
-           created_at AS createdAt
-      FROM inquiry
-     WHERE id = #{id}
-  </select>
+	<!-- 상세 조회 -->
+	<select id="selectById" parameterType="long" resultType="org.joonzis.domain.InquiryVO">
+    SELECT i.id,
+           u.user_nick AS userNick, i.subject,
+           i.message,
+           i.created_at AS createdAt
+      FROM inquiry i
+      JOIN users u ON i.user_id = u.user_id WHERE i.id = #{id}
+	</select>
 </mapper>

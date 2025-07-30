@@ -16,7 +16,6 @@ import Achievements from './pages/Achievements';
 import ItemBook from './pages/ItemBook';
 import InPlay from './pages/gameroom/InPlay';
 import CustomerServiceCenter from './pages/customer/CustomerServiceCenter';
-import CustomerCenterNew from './pages/customer/CustomerCenterNew';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { WebSocketProvider } from './util/WebSocketProvider';
@@ -69,8 +68,7 @@ function App() {
           <Route path="/gameRoom/:roomNo" element={<InPlay />} />
           <Route path="/questionReview" element={<QuestionReview />} />
           <Route path="/inquiries" element={<CustomerServiceCenter />} />
-          <Route path="/inquiry" element={<CustomerCenterNew />} />
-          <Route path="/problemsubmit" element={<CustomerProblemSubmit />} />
+          <Route path="/inquiry" element={<CustomerProblemSubmit />} />
           <Route path="/admin" element={<ProtectedRoute requiredRole="ROLE_ADMIN"><AdminPage/></ProtectedRoute>}/>
           <Route path="/inquiries/:id" element={<InquiryDetail />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
