@@ -170,37 +170,37 @@ const UserInfo = () => {
     }
 
     // WebSocket 메시지 핸들링
-        useEffect(() => {
-            if (!socket) return;
-    
-            const handleMessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (data.type === 'styleUpdated') {
-                    dispatch(triggerRefreshRanking()); 
-                    dispatch(fetchUserInfo(user.user_no)); }
-            };
-    
-            socket.addEventListener('message', handleMessage);
-    
-            return () => { socket.removeEventListener('message', handleMessage); };
-        }, [socket]);
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleMessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'styleUpdated') {
+                dispatch(triggerRefreshRanking()); 
+                dispatch(fetchUserInfo(user.user_no)); }
+        };
+
+        socket.addEventListener('message', handleMessage);
+
+        return () => { socket.removeEventListener('message', handleMessage); };
+    }, [socket]);
 
     // 2) 사용자 통계 가져오기
-        const [stats, setStats] = useState(null);
-        useEffect(() => {
-            if (!user.user_no) return;
-            axios
-            .get(`/user/accuracy`)
-            .then(res => setStats(res.data))
-            .catch(err => console.error(err));
-        }, [user.user_no]);    
-
+    const [stats, setStats] = useState(null);
+    useEffect(() => {
+        if (!user.user_no) return;
+        axios
+        .get(`/user/accuracy`)
+        .then(res => setStats(res.data))
+        
+        .catch(err => console.error(err));
+    }, [user.user_no]);    
+    console.log(stats);
+        
     // 2) 퍼센트 계산
     // --- 퍼센트 계산 (통계가 로딩되지 않았으면 0으로)
-        const answerPercent = stats && stats.totalCount > 0
-            ? Math.floor((stats.correctCount / stats.totalCount) * 100)
-            : 0;
-
+    const answerPercent = stats?.[0]?.accuracyPct || 0;
+        
     const handleNicknameChange = (newNick) => {
         axios.patch(`/user/${user.user_no}/nickname`, { user_nick: newNick })
             .then(res => {
@@ -236,6 +236,9 @@ const UserInfo = () => {
             setLoading(false);
         }
     }, [user.user_id, user.user_email, loading]);
+
+    console.log(items);
+    
 
   return (
     <div>
@@ -297,14 +300,13 @@ const UserInfo = () => {
             )}
 
             <div className={styles.bar_set}>
-                {/* 정답률 바 */}
-                <div className={styles.progressLine}>
-                    <div
-                    className={styles.progressFill}
-                    style={{ width: `${answerPercent}%` }}
-                    />
-                </div>
-                <div className={styles.label}>{answerPercent}% 정답률</div>
+            <div className={styles.progressLine}>
+                <div
+                className={styles.progressFill}
+                style={{ width: `${answerPercent}%` }}
+                />
+            </div>
+            <div className={styles.label}>{answerPercent}% 정답률</div>
             </div>
         </div>
         <div className={styles.invenBtnWrapper}>
@@ -349,7 +351,7 @@ const UserInfo = () => {
                     <div key={item.item_no} className={styles.card} onClick={() => setSelectedItem(item)}>
                         <div className={styles.itemCss}>
                         {/* title 타입은 텍스트 데코, 그 외엔 이미지 */}
-                        {item.item_type === 'title' ? (
+                        {(item.item_type === 'fontColor' || item.item_type === 'title') ? (
                         <span className={decoStyles[item.css_class_name]}>
                             [{titleTextMap[item.css_class_name]}]
                         </span>

@@ -55,6 +55,10 @@
   align-items: center;
 }
 
+.itemImage{
+  width: 90%;
+}
+
 .tabItem {
   background: wheat;
   border: 1px solid black;
@@ -120,7 +124,7 @@
 .label {
   font-size: 0.875rem;
   text-align: center;
-  color: #333;
+  color: white;
 }
 
 .invenBtnWrapper{

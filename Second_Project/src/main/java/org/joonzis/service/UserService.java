@@ -8,7 +8,6 @@ import javax.mail.MessagingException;
 import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserAccuracyDTO;
-import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.UserDecoUpdateDTO;
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UserRewardVO;

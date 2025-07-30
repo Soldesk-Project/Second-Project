@@ -50,7 +50,8 @@
 	      i.ITEM_PRICE       AS item_price,
 	      i.ITEM_NAME        AS item_name,
 	      i.ITEM_TYPE        AS item_type,
-	      i.IMAGE_FILE_NAME  AS imageFileName
+	      i.IMAGE_FILE_NAME  AS imageFileName,
+	      i.CSS_CLASS_NAME AS css_class_name
 	    FROM INVENTORY inv
 	    JOIN ITEMS     i
 	      ON inv.ITEM_NAME = i.ITEM_NAME
@@ -281,17 +282,17 @@
 	
 	<!-- 전 체 유저 정답률 -->
 	<select id="getUserAccuracyList" resultType="org.joonzis.domain.UserAccuracyDTO">
-		SELECT
-		  USER_NICK                 AS userNick,
-		  COUNT(*)                  AS totalCount,
-		  SUM(DECODE(IS_CORRECT,'Y',1,0)) AS correctCount,
-		  ROUND(
-		    SUM(DECODE(IS_CORRECT,'Y',1,0))
-		    / COUNT(*) * 100
-		  , 2)                       AS accuracyPct
-		FROM USER_QUESTION_HISTORY
-		GROUP BY USER_NICK
-		ORDER BY accuracyPct DESC
+	    SELECT
+	        USER_NICK AS userNick,
+	        COUNT(*) AS totalCount,
+	        SUM(TO_NUMBER(IS_CORRECT)) AS correctCount,
+	        ROUND(
+	            SUM(TO_NUMBER(IS_CORRECT)) / COUNT(*) * 100,
+	            2
+	        ) AS accuracyPct
+	    FROM USER_QUESTION_HISTORY
+	    GROUP BY USER_NICK
+	    ORDER BY accuracyPct DESC
 	</select>
 	
 </mapper>

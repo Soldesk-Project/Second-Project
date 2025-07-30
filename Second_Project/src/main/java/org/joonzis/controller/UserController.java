@@ -168,6 +168,7 @@ public class UserController {
     public ResponseEntity<List<UserAccuracyDTO>> getUserAccuracyList() {
         try {
             List<UserAccuracyDTO> list = service.getUserAccuracyList();
+            System.out.println("정답률 -> " + list);
             return ResponseEntity.ok(list);
         } catch (Exception e) {
             // 내부 예외 로깅

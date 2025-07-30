@@ -86,15 +86,6 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
               </td>
             </tr>
             <tr>
-              <td>모드</td>
-              <td>
-                <select value={mode} onChange={(e) => setMode(e.target.value)}>
-                  <option value="normal">일반</option>
-                  {/* <option value="rank">랭크</option> */}
-                </select>
-              </td>
-            </tr>
-            <tr>
               <td>공개 여부</td>
               <td>
                 <select onChange={handlePrivacyChange}>
@@ -108,7 +99,7 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
               <td>
                 <select value={limit} onChange={(e) => setLimit(Number(e.target.value))}>
                   {/* {[2, 4, 6, 8, 10].map(num => ( */}
-                  {[4].map(num => (
+                  {[2, 3, 4].map(num => (
                     <option key={num} value={num}>{num}명</option>
                   ))}
                 </select>
