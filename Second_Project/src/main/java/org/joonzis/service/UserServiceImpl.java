@@ -129,6 +129,7 @@ public class UserServiceImpl implements UserService{
 	public String findPwByIdAndEmail(UsersVO vo) {
 		return mapper.findPwByIdAndEmail(vo);
 	}
+	// 이메일로 임시 비밀번호 발송
 	public void sendTempPassword(String toEmail, String tempPassword) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -141,10 +142,12 @@ public class UserServiceImpl implements UserService{
 
         mailSender.send(message);
     }
+	// 비밀번호 찾기 - 유저 정보 찾기
 	@Override
 	public UserInfoDTO findUserByIdAndEmail(String id, String email) {
 	    return mapper.findUserByIdAndEmail(id, email);
 	}
+	// 비밀번호 변경
 	@Override
 	public void updatePassword(UserInfoDTO user) {
 		mapper.updatePassword(user);
@@ -171,25 +174,29 @@ public class UserServiceImpl implements UserService{
         return mapper.getUsersByUserNo(userNo);
     }
 	
+	// 비밀번호 변경 - 임시 토큰 생성
 	@Override
 	public void saveResetToken(String userId, String token) {
 	    LocalDateTime expiry = LocalDateTime.now().plusMinutes(30); // 30분 후 만료
 	    mapper.insertResetToken(userId, token, expiry);
 	}
+	// 비밀번호 변경 - 토큰으로 유저 정보 찾기
 	@Override
 	public UserInfoDTO findUserByToken(String token) {
 	    return mapper.findUserByToken(token);
 	}
+	// 토큰 유효기간 비교
 	@Override
 	public boolean tokenExpired(String token) {
 	    LocalDateTime expiry = mapper.getExpiryByToken(token);
 	    return expiry == null || expiry.isBefore(LocalDateTime.now());
 	}
+	// 비밀번호 변경 성공 후 토큰 삭제
 	@Override
 	public void deleteResetToken(String token) {
 	    mapper.deleteToken(token);
 	}
-	
+	// 이메일로 비밀번호 변경 링크 전송
 	@Override
 	public void sendResetLinkEmail(String toEmail, String resetLink) throws MessagingException {
 		MimeMessage message = mailSender.createMimeMessage();

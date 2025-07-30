@@ -8,6 +8,7 @@ export default function FindId() {
   const [emailDomain, setEmailDomain] = useState('');
   const [findId, setFindId] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [copied, setCopied] = useState(false);
   const navigate = useNavigate();
 
   const handleFindId = async() => {
@@ -60,6 +61,17 @@ export default function FindId() {
     }
   };
 
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(findId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // 2초 후 메시지 숨김
+    } catch (err) {
+      console.error('클립보드 복사 실패:', err);
+      alert('복사에 실패했습니다. 브라우저 권한을 확인해주세요.');
+    }
+  };
+
   return (
     <div className="login-background login-container">
       <img
@@ -94,10 +106,11 @@ export default function FindId() {
             <div
               style={{
                 width: '10%',
-                height: '31px',
+                height: '50px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                color: 'white',
               }}
             >
               @
@@ -116,7 +129,30 @@ export default function FindId() {
               <option value="hanmail.net" />
             </datalist>
           </div>
-          {findId && (<div style={{ color: 'white', marginBottom: '20px' }}>ID : {findId}</div>)}
+          {/* {findId && (<div style={{ color: 'white', marginBottom: '20px' }}>ID : {findId}</div>)} */}
+          {findId && (
+            <div style={{ color: 'white', marginBottom: '20px' }}>
+              ID : <strong>{findId}</strong>
+              <button
+                onClick={copyToClipboard}
+                style={{
+                  marginLeft: '10px',
+                  padding: '4px 10px',
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  backgroundImage: `url('/images/Submit.png')`,
+                  borderRadius: '4px'
+                }}
+              >
+                복사
+              </button>
+              {copied && (
+                <span style={{ marginLeft: '10px', color: 'lightgreen' }}>
+                  복사되었습니다!
+                </span>
+              )}
+            </div>
+          )}
           {errorMessage && (<div style={{ color: 'lightcoral', marginBottom: '20px' }}>{errorMessage}</div>)}
           <div className='signUpBtn'
                         style={{

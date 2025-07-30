@@ -62,11 +62,18 @@ const ServerUserList = () => {
       fontColorItemNo: user.fontcolorItemNo
     };
 
+    const sendPayload = () => socket.send(JSON.stringify(payload));
+
     if (socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify(payload));
+      sendPayload();
     } else {
-      socket.onopen = () => socket.send(JSON.stringify(payload));
+      socket.addEventListener('open', sendPayload, { once: true });
     }
+    // if (socket.readyState === WebSocket.OPEN) {
+    //   socket.send(JSON.stringify(payload));
+    // } else {
+    //   socket.onopen = () => socket.send(JSON.stringify(payload));
+    // }
 
     socket.onmessage = async (event) => {
       const data = JSON.parse(event.data);

@@ -60,7 +60,9 @@ public interface UserService {
 	// 비밀번호 찾기
 	public String findPwByIdAndEmail(UsersVO vo);
 	public UserInfoDTO findUserByIdAndEmail(String id, String email);
+	// 비밀번호 변경
 	public void updatePassword(UserInfoDTO user);
+	// 이메일로 임시 비밀번호 발송
 	public void sendTempPassword(String toEmail, String tempPassword) throws MessagingException;
 	
 	//유저프로필이미지선택
@@ -72,11 +74,15 @@ public interface UserService {
 	// 유저 닉네임 변경
 	public void updateNickname(Long user_no, String user_nick);
 	
+	// 비밀번호 변경 - 임시 토큰 생성
 	public void saveResetToken(String userId, String token);
+	// 비밀번호 변경 - 토큰으로 유저 정보 찾기
 	public UserInfoDTO findUserByToken(String token);
+	// 토큰 유효기간 비교
 	public boolean tokenExpired(String token);
+	// 비밀번호 변경 성공 후 토큰 삭제
 	public void deleteResetToken(String token);
-	
+	// 이메일로 비밀번호 변경 링크 전송
 	public void sendResetLinkEmail(String toEmail, String resetLink) throws MessagingException;
 	
 	// 회원가입

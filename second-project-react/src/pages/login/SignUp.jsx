@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { debounce } from 'lodash';
 import { useNavigate } from 'react-router-dom';
 import '../../css/signUp.css';
@@ -6,6 +6,12 @@ import axios from 'axios';
 
 const SignUp = () => {
     const navigate = useNavigate();
+    const [pwConfirm, setPwConfirm] = useState('');
+
+    const nickRef = useRef(null);
+    const idRef = useRef(null);
+    const pwConfirmRef = useRef(null);
+    const emailIdRef = useRef(null);
 
     const [users, setUsers] = useState({
         user_nick : '',
@@ -40,6 +46,11 @@ const SignUp = () => {
             return;
         }
 
+        if (name === 'pwConfirm') {
+            setPwConfirm(value);
+            return;
+        }
+
         setUsers({
             ...users,
             [name] : value
@@ -64,6 +75,7 @@ const SignUp = () => {
         });
         setEmailId('');
         setEmailDomain('');
+        setPwConfirm('');
     }
 
     const registerUser = async () => {
@@ -80,6 +92,7 @@ const SignUp = () => {
         }
         if (isDuplicateId === true) {
             alert("이미 사용 중인 아이디입니다.");
+            idRef.current.focus();
             return;
         }
         if (user_nick !== lastCheckedNickname) {
@@ -88,6 +101,12 @@ const SignUp = () => {
         }
         if (isDuplicateNick === true) {
             alert("이미 사용 중인 닉네임입니다.");
+            nickRef.current.focus();
+            return;
+        }
+        if (user_pw !== pwConfirm) {
+            alert("비밀번호가 일치하지 않습니다.");
+            pwConfirmRef.current.focus();
             return;
         }
         if (user_email !== lastCheckedEmail) {
@@ -96,6 +115,7 @@ const SignUp = () => {
         }
         if (isDuplicateEmail === true) {
             alert("이미 사용 중인 이메일입니다.");
+            emailIdRef.current.focus();
             return;
         }
 
@@ -204,6 +224,7 @@ const SignUp = () => {
                         name='user_nick'
                         placeholder="닉네임을 입력하세요."
                         value={users.user_nick}
+                        ref={nickRef}
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
                     />
@@ -214,6 +235,7 @@ const SignUp = () => {
                         name='user_id'
                         placeholder="아이디 입력 (영문, 숫자 조합 4~20자)"
                         value={users.user_id}
+                        ref={idRef}
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
                     />
@@ -227,6 +249,20 @@ const SignUp = () => {
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
                     />
+                    <input
+                        type="password"
+                        name='pwConfirm'
+                        placeholder="비밀번호 확인."
+                        value={pwConfirm}
+                        ref={pwConfirmRef}
+                        onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
+                    />
+                    {users.user_pw && pwConfirm && (
+                    <p style={{ color: users.user_pw === pwConfirm ? 'green' : 'red' }}>
+                        {users.user_pw === pwConfirm ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.'}
+                    </p>
+                    )}
                     <div style={{
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -237,16 +273,18 @@ const SignUp = () => {
                             type="text"
                             placeholder="이메일을 입력하세요."
                             value={emailId}
+                            ref={emailIdRef}
                             onChange={handleEmailChange}
                             onKeyDown={handleKeyDown}
                             style={{width:'45%'}}
                         />
                         <div style={{
                             width: '10%',
-                            height: '31px',
+                            height: '50px',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center'
+                            justifyContent: 'center',
+                            color: 'white',
                         }}>@</div>
                         <input
                             list="email-domains"

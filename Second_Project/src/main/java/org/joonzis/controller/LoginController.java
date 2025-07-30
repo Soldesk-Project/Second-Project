@@ -645,7 +645,7 @@ public class LoginController {
 	    userservice.deleteResetToken(token); // 보안 위해 삭제
 
 	    Map<String, String> response = new HashMap<>();
-	    response.put("message", "비밀번호가 변경되었습니다.");
+	    response.put("message", "비밀번호가 변경되었습니다. 5초 후 페이지를 종료합니다...");
 	    return ResponseEntity.ok(response);
 	}
 

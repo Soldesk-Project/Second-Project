@@ -15,14 +15,10 @@ public class AchievementServiceImpl implements AchievementService{
 	
 	// 업적 리스트
 	@Override
-	public List<AchievementDTO> getAchievementList(int user_no) {
-		return mapper.getAchievementList(user_no);
-	}
+	public List<AchievementDTO> getAchievementList(int user_no) { return mapper.getAchievementList(user_no); }
 	
 	// 유저업적 저장
 	@Override
-	public int addUserAchievement(AchievementDTO dto) {
-		return mapper.addUserAchievement(dto);
-	}
+	public int addUserAchievement(AchievementDTO dto) { return mapper.addUserAchievement(dto); }
 
 }

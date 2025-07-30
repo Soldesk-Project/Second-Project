@@ -57,12 +57,15 @@ public interface UserMapper {
 	public String findIdByEmail(String user_email);
 	// 비밀번호 찾기
 	public String findPwByIdAndEmail(UsersVO vo);
+	// 비밀번호 업데이트
 	public void updatePassword(UserInfoDTO user);
+	// 비밀번호 변경 - 유저 확인
 	public UserInfoDTO findUserByIdAndEmail(@Param("user_id") String user_id, @Param("user_email") String user_email);
 	
 	// 유저 닉네임 변경
 	public void updateNickname(@Param("user_no") Long user_no, @Param("user_nick") String user_nick);
 	
+	// 프로필 이미지 업데이트
 	int updateProfileImage(@Param("userNo") int userNo,
             @Param("imageUrl") String imageUrl);
 	
@@ -74,11 +77,15 @@ public interface UserMapper {
 	
 	
 	
+	// 비밀번호 변경 - 임시 토큰 생성
 	public void insertResetToken(@Param("userId") String userId,
             @Param("token") String token,
             @Param("expiryDate") LocalDateTime expiryDate);
+	// 비밀번호 변경 - 토큰으로 유저 정보 찾기
 	public UserInfoDTO findUserByToken(String token);
+	// 토큰 유효기간 비교
 	public LocalDateTime getExpiryByToken(String token);
+	// 비밀번호 변경 성공 후 토큰 삭제
 	public void deleteToken(String token);
 	
 	// 회원가입

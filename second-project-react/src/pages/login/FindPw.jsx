@@ -8,6 +8,7 @@ const FindPw = () => {
   const [emailId, setEmailId] = useState('');
   const [emailDomain, setEmailDomain] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
  
   const fullEmail = `${emailId}@${emailDomain}`;
@@ -29,6 +30,7 @@ const FindPw = () => {
   const handleFindPw = useCallback(async () => {
     if (!validateInputs()) return;
 
+    setLoading(true);
     try {
       const { data } = await axios.post('/api/findPw/checkIdAndEmail', {
         user_id: id,
@@ -45,6 +47,8 @@ const FindPw = () => {
     } catch (error) {
       console.error('PW 찾기 실패:', error);
       setErrorMessage('서버 오류로 PW를 찾을 수 없습니다.');
+    } finally {
+        setLoading(false);
     }
   }, [id, emailId, emailDomain]);
  
@@ -154,7 +158,7 @@ const FindPw = () => {
                         width: '100%',
                         marginBottom: '1rem 0',
                     }}>
-            <button style={buttonStyle} onClick={handleFindPw}>Find Result</button>
+            <button style={buttonStyle} onClick={handleFindPw} disabled={loading}>{loading ? '요청 중...' : 'Find Result'}</button>
             <button style={buttonStyle} onClick={resetInputs}>Reset</button>
             <button style={buttonStyle} onClick={() => navigate('/')}>Home</button>
           </div>
