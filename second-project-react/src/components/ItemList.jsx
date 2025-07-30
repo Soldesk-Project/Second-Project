@@ -6,17 +6,18 @@ import { useSelector } from 'react-redux';
 import titleTextMap from '../js/Decorations';
 
 const ITEM_TYPES = [
-  { key: 'boundary', label: 'BOUNDARY ITEM' },
-  { key: 'title', label: 'TITLE ITEM' },
-  { key: 'fontColor', label: 'FONTCOLOR ITEM' },
-  { key: 'background', label: 'BACKGROUND ITEM' },
+  { key: 'boundary', label: '프로필 테두리' },
+  { key: 'title', label: '칭호' },
+  { key: 'fontColor', label: '글자색' },
+  { key: 'background', label: '명함' },
+  { key: 'unique', label: '유니크 아이템' },
 ];
 
 const REWARDS = {
-  boundary: { css_class_name: 'rainbow_bd', item_name: 'rainbow_boundary'},
+  // boundary: { css_class_name: 'rainbow_bd', item_name: 'rainbow_boundary'},
   title: { css_class_name: 'collector_title', item_name: '콜렉터'},
   fontColor: { css_class_name: 'rainbow_fontColor', item_name: 'rainbow_fontColor'},
-  background: { css_class_name: 'rainbow_bg', item_name: 'rainbow_background'},
+  // background: { css_class_name: 'rainbow_bg', item_name: 'rainbow_background'},
 };
 
 const ItemList = () => {
@@ -48,7 +49,7 @@ const ItemList = () => {
         .then(res => setOwnedItems(res.data))
         .catch(err => console.error('유저 아이템 불러오기 실패:', err));
     }
-  }, [user.user_no]);
+  }, [user.user_no, rewardReceived]);
 
   // 전체 아이템 가져오기
   useEffect(() => {
@@ -139,9 +140,9 @@ const ItemList = () => {
   
   // 리워드 핸들러
   const handleRewardClick = (typeKey) => {
-    const reward = REWARDS[typeKey];
-     if (!reward) return;
     
+    const reward = REWARDS[typeKey];
+    if (!reward) return;
     // API 호출 등 비동기 처리도 가능
     axios.post('/user/reward', { item_type: typeKey, user_no: user.user_no, css_class_name: reward.css_class_name, item_name: reward.item_name })
     .then(() => {
@@ -169,7 +170,7 @@ const ItemList = () => {
     const canReward = ownedCount === totalCount && totalCount > 0 && !isRewarded;
 
     return (
-      <div key={typeKey}>
+      <div key={typeKey} className={styles.category}>
         <div
           className={styles.title}
           onClick={() =>
@@ -182,11 +183,11 @@ const ItemList = () => {
           <div>{label}</div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <span>{ownedCount} / {totalCount} ({percent}%)</span>
-            {ownedCount === totalCount && totalCount > 0 && (
+            {ownedCount === totalCount && totalCount > 0 && ( (typeKey!== 'unique') &&
               <button
                 disabled={!canReward}
                 className={`${styles.rewardButton} ${!canReward ? styles.rewardButtonDisabled : ''}`}
-                onClick={() => handleRewardClick(typeKey)}
+                onClick={(e) => {e.stopPropagation(); handleRewardClick(typeKey)}}
               >
                 {isRewarded ? '보상 받기 완료' : '보상 받기'}
               </button>
