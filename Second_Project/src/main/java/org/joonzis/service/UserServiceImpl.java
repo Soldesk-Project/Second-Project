@@ -95,11 +95,13 @@ public class UserServiceImpl implements UserService{
 	// 리워드 상태 업데이트
 	@Override
 	public boolean rewardUpdate(UserRewardVO UserRewardVO) {
+		System.out.println("rewardUpdate 호출...");
 		return mapper.rewardUpdate(UserRewardVO);
 	}
 	// 리워드 보상 획득
 	@Override
 	public boolean addReward(UserDecoUpdateDTO UserDecoUpdateDTO) {
+		System.out.println("addReward 호출...");
 		return mapper.addReward(UserDecoUpdateDTO);
 	}
 	

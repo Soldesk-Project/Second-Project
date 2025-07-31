@@ -30,7 +30,6 @@ const PasswordModal = ({setPassword, setPasswordMadal, selectedRoom, enterRoom})
     <div className={styles.PasswordModalContainer}>
       <div className={styles.modalTitle}>
         <span>입장하려면 해당 방의 비밀번호를 입력하세요</span> &nbsp;
-        <button onClick={close}>X</button>
       </div>
       <div className={styles.modalContent}>
         <input type="password"
@@ -38,7 +37,10 @@ const PasswordModal = ({setPassword, setPasswordMadal, selectedRoom, enterRoom})
                onChange={(e)=>setRoomPassword(e.target.value)}
                placeholder='숫자 4자리 입력'
                />
-        <button onClick={checkPassword}>확인</button>
+      </div>
+      <div className={styles.buttonWrapper}>
+        <button className={styles.close} onClick={close}>취소</button>
+        <button className={styles.checkPassword} onClick={checkPassword}>확인</button>
       </div>
     </div>
   );

@@ -151,7 +151,7 @@
 			TITLE = #{title},
 			FONTCOLOR = #{fontColor},
 			BACKGROUND = #{background}
-		WHERE USER_NO = #{user_no}
+		WHERE USER_NO = #{user_no}	
 	</update>
 	<!-- 리워드 보상 획득 -->
 	<insert id="addReward" parameterType="org.joonzis.domain.UserDecoUpdateDTO">

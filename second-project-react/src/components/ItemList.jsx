@@ -57,7 +57,6 @@ const ItemList = () => {
       .then(res => {
         const withImg = res.data.map(item => {
           const fileName = item.imageFileName;
-          console.log(fileName);
           
           return {
             ...item,

@@ -18,8 +18,14 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
   };
 
   const handleCreateRoom = async () => {
-    const regex = /^\d{4}$/;
+    const regexPassword = /^\d{4}$/;
+    const regexTitle= /^[가-힣A-Za-z0-9]{1,20}$/;
 
+
+    if (!regexTitle.test(title)) {
+      alert("제목은 20글자 이하, 특수문자를 제외하고 입력 가능합니다");
+      return;
+    }
     if (!isWsOpen) {  // 연결 상태 확인
       alert("웹소켓 연결 대기 중...");
       return;
@@ -28,7 +34,7 @@ const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
       alert('비공개 방은 비밀번호를 입력해주세요.');
       return;
     }
-    if (isPrivate && !regex.test(password)) {
+    if (isPrivate && !regexPassword.test(password)) {
       alert('비밀번호는 숫자 4자리만 입력 가능합니다.')
       return;
     }

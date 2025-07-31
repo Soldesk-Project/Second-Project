@@ -297,7 +297,7 @@ const progressPercent = nextTier
         }
         } catch (error) {
          alert('비밀번호 변경 링크 요청 중 오류가 발생했습니다.');
-        } finally {
+        } finally { 
             setLoading(false);
         }
     }, [user.user_id, user.user_email, loading]);

@@ -106,7 +106,6 @@ public class UserController {
 	// 리워드 보상 획득
 	@PostMapping(value = "/reward", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> addReward(@RequestBody UserDecoUpdateDTO UserDecoUpdateDTO) {
-		System.out.println(service.addReward(UserDecoUpdateDTO));
 		boolean success = service.addReward(UserDecoUpdateDTO);
 	    if (success) {
 	        return ResponseEntity.ok("업데이트 성공");
