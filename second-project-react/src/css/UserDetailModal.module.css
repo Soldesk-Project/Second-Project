@@ -16,9 +16,13 @@
   background-color: white;
   padding: 24px;
   border-radius: 10px;
-  max-width: 420px;
+  max-width: 470px;
   width: 90%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.modalContent h2 {
+  margin-bottom: 40px;
 }
 
 .userInfo_Box_1{

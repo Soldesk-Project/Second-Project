@@ -9,6 +9,7 @@ import TestModal from './modal/TestModal';
 import { WebSocketContext } from '../util/WebSocketProvider';
 import { setIsTop10 } from '../store/rankingSlice';
 import titleTextMap from '../js/Decorations';
+import UserDetailModal from './modal/UserDetailModal';
 
 const UserRanking = () => {
   const [userRankingList, setUserRankingList] = useState([]);
@@ -16,6 +17,8 @@ const UserRanking = () => {
   const [itemList, setItemList]             = useState([]);
   const [loading, setLoading]               = useState(true);
   const [isModalOpen, setIsModalOpen]       = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showUserDetailModal, setShowUserDetailModal] = useState(false);
 
   const dispatch       = useDispatch();
   const { user }       = useSelector(state => state.user);
@@ -190,6 +193,24 @@ if (loading) return <div>로딩 중...</div>;
                 key={user_no}
                 className={styles.user}
                 style={bgStyle}
+                onClick={async () => {
+                  try {
+                    const { data } = await axios.get(`/user/${user_no}`);
+                    setSelectedUser({
+                      userNo: data.user_no,
+                      userNick: data.user_nick,
+                      backgroundItemNo: data.backgroundItemNo,
+                      titleItemNo: data.titleItemNo,
+                      fontColorItemNo: data.fontcolorItemNo,
+                      userProfileImg: data.user_profile_img,
+                      imageFileName: data.imageFileName,
+                      user_rank: data.user_rank
+                    });
+                    setShowUserDetailModal(true);
+                  } catch (err) {
+                    console.error('유저 상세 정보 로드 실패:', err);
+                  }
+                }}
               >
                 <div>
                   {titleCls && titleTextMap[titleCls] && (
@@ -239,6 +260,16 @@ if (loading) return <div>로딩 중...</div>;
           ))}
         </TestModal>
       </div>
+      {showUserDetailModal && selectedUser && (
+        <UserDetailModal
+          user={selectedUser}
+          shopItems={[...itemList, ...shopBgItems]}
+          onClose={() => {
+            setSelectedUser(null);
+            setShowUserDetailModal(false);
+          }}
+        />
+      )}
     </div>
   );
 };
