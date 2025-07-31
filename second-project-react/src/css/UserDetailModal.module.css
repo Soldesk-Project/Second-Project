@@ -1,0 +1,92 @@
+.modalOverlay {
+  color: black;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: white;
+  padding: 24px;
+  border-radius: 10px;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.userInfo_Box_1{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  /* justify-content: center; */
+  gap: 30px;
+}
+
+.profileWrapper {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  /* 필요하면 margin, display 속성도 추가 */
+}
+
+.profileImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;    /* 사진이 잘리거나 찌그러지지 않게 */
+  border-radius: 50%;   /* 원형 프로필이면 */
+}
+
+.frameOverlay {
+  position: absolute;      /* .profileWrapper 기준 */
+  left: 50%;                 /* 왼쪽 꼭지점에 딱 붙이고 */
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100%;             /* 부모 너비에 맞춤 */
+  height: auto;
+  pointer-events: none;    /* 클릭 이벤트는 뒷단 img 에 전달 */
+  z-index: 1;              /* 프로필(img) 보다 위에 보이도록 */
+  object-fit: contain;     /* 이미지 비율 유지하면서 꽉 채우기 */
+  object-position: bottom center;
+}
+
+.userInfo_Name{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.userInfo_Name p {
+    margin-bottom: 0.5rem;
+}
+
+.bar_set {
+  width: 150px;          /* 프로필 크기에 맞춰 조정 */
+  margin: 16px auto;     /* 중앙 정렬 */
+}
+
+.progressLine {
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 8px;
+  margin-bottom: 4px;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #4caf50;  /* 원하는 색으로 바꿔도 됩니다 */
+  transition: width 0.3s ease;
+}
+
+.label {
+  font-size: 0.875rem;
+  text-align: center;
+  color: black;
+}

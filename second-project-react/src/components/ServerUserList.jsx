@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
+import UserDetailModal from "./modal/UserDetailModal";
 import styles from "../css/ServerUserList.module.css";
 import decoStyles from '../css/Decorations.module.css';
 import { useSelector } from "react-redux";
@@ -10,6 +11,9 @@ const ServerUserList = () => {
   const [users, setUsers] = useState([]); // 현재 서버에 접속한 유저 목록
   const [shopItems, setShopItems] = useState([]);
   const { user, server } = useSelector((state) => state.user);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
   const sockets = useContext(WebSocketContext);
   const socketRef = useRef(null);
   
@@ -18,7 +22,9 @@ const ServerUserList = () => {
     user_no,
     backgroundItemNo,
     titleItemNo,
-    fontcolorItemNo
+    fontcolorItemNo,
+    user_profile_img,
+    imageFileName
   } = user;
   
   const itemMap = React.useMemo(() => {
@@ -59,7 +65,8 @@ const ServerUserList = () => {
       userNo: user.user_no,
       boundaryItemNo: user.boundaryItemNo,
       titleItemNo: user.titleItemNo,
-      fontColorItemNo: user.fontcolorItemNo
+      fontColorItemNo: user.fontcolorItemNo,
+      userProfileImg: user.user_profile_img,
     };
 
     const sendPayload = () => socket.send(JSON.stringify(payload));
@@ -83,12 +90,16 @@ const ServerUserList = () => {
        const detailed = await Promise.all(
          data.users.map(async u => {
            const { data: full } = await axios.get(`/user/${u.userNo}`);
+           
+           
            return {
              userNo:            full.user_no,
              userNick:          full.user_nick,
              backgroundItemNo:  full.backgroundItemNo,
              titleItemNo:       full.titleItemNo,
-             fontColorItemNo:   full.fontcolorItemNo
+             fontColorItemNo:   full.fontcolorItemNo,
+             userProfileImg:    full.user_profile_img,
+             imageFileName:     full.imageFileName
            };
          })
        );
@@ -117,6 +128,8 @@ const ServerUserList = () => {
     user?.boundaryItemNo,
     user?.titleItemNo,
     user?.fontcolorItemNo,
+    user_profile_img,
+    imageFileName,
     sockets
   ]);
 
@@ -148,6 +161,10 @@ const ServerUserList = () => {
                 key={`user-${u.userNo}`}
                 className={styles.user}
                 style={bgStyle}        // ★ 배경 이미지
+                onClick={() => {
+                  setSelectedUser(u);
+                  setShowModal(true);
+                }}
               >
                 <div>
                   {/* 칭호 */}
@@ -176,6 +193,16 @@ const ServerUserList = () => {
           <p>현재 접속 유저가 없습니다.</p>
         )}
       </div>
+
+      {showModal && (
+        <UserDetailModal
+          user={selectedUser}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedUser(null);
+          }}
+        />
+      )}
     </div>
   );
 };

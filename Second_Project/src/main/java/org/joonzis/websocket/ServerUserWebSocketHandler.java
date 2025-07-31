@@ -45,6 +45,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         String server = data.get("server");
         String userNick = data.get("userNick");
         String userNo = data.get("userNo");
+        String userProfileImg = data.get("userProfileImg");
         Integer bgItemNo = parseInteger(data.get("bgItemNo"));
         Integer blItemNo = parseInteger(data.get("blItemNo"));
         Integer bdItemNo = parseInteger(data.get("bdItemNo"));
@@ -53,7 +54,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         if ("join".equals(action) && server != null && userNick != null) {
             removeSessionFromAllServers(session);
             serverSessions.putIfAbsent(server, new ConcurrentHashMap<>());
-            serverSessions.get(server).put(session, new UserInfo(userNick, userNo, bgItemNo, blItemNo, bdItemNo, titleItemNo, fontColorItemNo));
+            serverSessions.get(server).put(session, new UserInfo(userNick, userNo, userProfileImg, bgItemNo, blItemNo, bdItemNo, titleItemNo, fontColorItemNo));
 //            log.info("[WebSocket] 세션 추가됨. 서버: " + server + ", 세션ID: " + session.getId()
 //            + ", 현재 접속 유저 수: " + serverSessions.get(server).size());
             // 3) 해당 서버에 접속한 유저 목록 전송
@@ -204,6 +205,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             Map<String, String> userMap = new HashMap<>();
             userMap.put("userNick", userInfo.getUserNick());
             userMap.put("userNo", userInfo.getUserNo());
+            userMap.put("userProfileImg", userInfo.getUserProfileImg());
             userMap.put("bgItemNo", String.valueOf(userInfo.getBgItemNo()));
             userMap.put("blItemNo", String.valueOf(userInfo.getBlItemNo()));
             userMap.put("bdItemNo", String.valueOf(userInfo.getBdItemNo()));

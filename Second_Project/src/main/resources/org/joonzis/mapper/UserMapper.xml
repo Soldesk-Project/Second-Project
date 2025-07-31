@@ -9,6 +9,7 @@
 	    <result column="user_rank" property="user_rank"/>
 	    <result column="user_nick" property="user_nick"/>
 	    
+	    <result column="USER_PROFILE_IMG" property="user_profile_img"/>
 	    <result column="IMAGE_FILE_NAME"  property="imageFileName"/>
 	    <result column="USER_PROFILE_IMG" property="user_profile_img"/>
 	    <result column="BOUNDARY_ITEM_NO" property="boundaryItemNo"/>
