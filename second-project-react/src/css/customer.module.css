@@ -310,6 +310,22 @@ button {
     margin-bottom: 25px;
 }
 
+.optionInput{
+    flex-grow: 1; /* 남은 공간 채우기 */
+    padding: 10px;
+    border: 1px solid #48494e;
+    border-radius: 5px;
+    background-color: #2b2e35;
+    color: #fff;
+    font-size: 1rem;
+    width:100%;
+    margin-bottom: 10px;
+}
+
+.optionGroup{
+    margin-bottom: 25px;
+}
+
 textarea {
     flex-grow: 1; /* 남은 공간 채우기 */
     padding: 10px;
@@ -541,4 +557,8 @@ textarea.textarea { /* textarea의 최소 높이 */
     border: 1px solid #eee;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
     border-radius: 4px;
+}
+
+.hiddenInput{
+    display: none;
 }

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styles from '../../css/customer.module.css';
+import { useSelector } from 'react-redux';
 
 const QuestRequestPanel = () => {
-    const [email, setEmail] = useState('');
     const [consent, setConsent] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [previewImage, setPreviewImage] = useState(null);
@@ -39,6 +39,9 @@ const QuestRequestPanel = () => {
       '네트워크관리사1급': 'net1',
       '네트워크관리사2급': 'net2',
     };
+
+    const user = useSelector(state => state.user);
+    const userNo = user?.user?.user_no;
   
     const handleSubjectChange = (e) => {
       setSubject(e.target.value);
@@ -97,7 +100,7 @@ const QuestRequestPanel = () => {
       }
   
       const questData = {
-        email: email,
+        user_no: userNo,
         subject: dbSubjectValue,
         question_text: questionText,
         option_1: options[0],
@@ -109,7 +112,7 @@ const QuestRequestPanel = () => {
       };
   
       try {
-        const response = await fetch(`/customer/questRequest?`, {
+        const response = await fetch(`api/customer/questRequest`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -136,7 +139,6 @@ const QuestRequestPanel = () => {
   
     const handleReset = () => {
       setConsent('');
-      setEmail('');
       setSelectedImage(null);
       setPreviewImage(null);
       setQuestionText('');
@@ -148,34 +150,32 @@ const QuestRequestPanel = () => {
   
     return (
       <div className={styles.inqueriesBox}>
-        <h1 className="quest-register-title">문제 등록 요청</h1>
-        
-        <div className='category-section'>
-          <h3 className="section-title">1. 카테고리 선택</h3>
-          <select name="cateSelect" value={subject} onChange={handleSubjectChange} className="category-select">
+        <div className={styles.title}>
+          <h1>문제 등록 요청</h1>
+        </div>
+        <div className={styles.inqContainer}>
+          {/* 1. 카테고리 선택 */}
+          <h3 className={styles.h3}>1. 카테고리 선택</h3>
+          <select name="cateSelect" value={subject} onChange={handleSubjectChange} className={styles.input}>
             {subjects.map((subject, index) => (
               <option key={index} value={subject}>
                 {subject}
               </option>
             ))}
           </select>
-        </div>
-        
-        <div className='question-text-section'>
-          <h3 className="section-title">2. 문제 본문 입력</h3>
+          {/* 2. 문제 본문 입력*/}
+          <h3 className={styles.h3}>2. 문제 본문 입력</h3>
           <input
             type="text"
             value={questionText}
             onChange={(e) => setQuestionText(e.target.value)}
-            className="question-text-input"
+            className={styles.input}
             placeholder="문제 본문을 입력하세요."
           />
-        </div>
-        
-        <div className='option-section'>
-          <h3 className="section-title">3. 선택지 입력</h3>
-          {options.map((option, index) => (
-            <div key={index} className="option-item">
+          {/* 3. 선택지 입력 */}
+          <h3 className={styles.h3}>3. 선택지 입력</h3>
+          <div className={styles.optionGroup}>
+            {options.map((option, index) => (
               <input
                 type="text"
                 value={option}
@@ -184,42 +184,54 @@ const QuestRequestPanel = () => {
                   newOptions[index] = e.target.value;
                   setOptions(newOptions);
                 }}
-                className="option-input"
+                className={styles.optionInput}
                 placeholder={`${index + 1}번 선택지를 입력하세요.`}
               />
-            </div>
-          ))}
-        </div>
-        
-        <div className='correct-answer-section'>
-          <h3 className="section-title">4. 정답 입력</h3>
-          <select name="corAnsSelect" value={correctAnswer} onChange={(e) => setCorrectAnswer(e.target.value)} className="correct-answer-select">
+            ))}
+          </div>
+          {/* 4. 정답 입력 */}
+          <h3 className={styles.h3}>4. 정답 입력</h3>
+          <select name="corAnsSelect" value={correctAnswer} onChange={(e) => setCorrectAnswer(e.target.value)} className={styles.input}>
             {options.map((_, index) => (
               <option key={index + 1} value={String(index + 1)}>{index + 1}</option>
             ))}
           </select>
-        </div>
-        
-        <div className="photo-input-section">
-          <h3 className="section-title">5. 이미지 업로드 (선택 사항)</h3>
-          <div className="image-upload-wrapper">
-            <label htmlFor="image-upload" className="image-upload-label">이미지 선택:</label>
-            <input
-              type="file"
-              id="image-upload"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="image-upload-input"
-            />
-          </div>
-          {previewImage && (
-            <div className="image-preview-container">
-              <h3 className="image-preview-title">이미지 미리보기:</h3>
-              <img src={previewImage} alt="Image Preview" className="image-preview" />
+          {/* 5. 이미지 업로드 */}
+          <div className={styles.fileInputGroup}>
+            <h3 className={styles.h3}>5. 이미지 업로드 (선택 사항)</h3>
+            <div className="image-upload-wrapper">
+              <label htmlFor="image-upload" className="image-upload-label">이미지 선택:</label>
+              <input
+                type="file"
+                id="image-upload"
+                accept="image/*"
+                onChange={handleImageChange}
+                style={{display: 'none'}}
+              />
             </div>
-          )}
+            {previewImage && (
+              <div className={styles.image_preview_container}>
+                <h3 className={styles.image_preview_title}>이미지 미리보기:</h3>
+                <img src={previewImage} alt="Image Preview" className={styles.image_preview}/>
+              </div>
+            )}
+          </div>
+          {/* 6. 개인정보 수집 동의 (필수) */}
+          <h3 className={styles.h3}>7. 개인정보 수집 동의 (필수)</h3>
+            <div className={styles.textsection}>
+              수집하는 개인정보 항목: 이메일 주소<br/>
+              작성해 주시는 개인정보는 문제 접수 및 문제 활용을 위해 3년간 보관됩니다.<br/>
+              이용자는 본 동의를 거부할 수 있으나, 미동의 시 문제 접수가 불가능합니다.
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={e => setConsent(e.target.checked)}
+              />&nbsp;<span>동의합니다.</span>
+            </div>
         </div>
-        
+
         <div className="button-group">
           <button onClick={handleReset} className="reset-button">초기화</button>
           <button onClick={handleQuestRegisterSubmit} className="submit-button">제출</button>

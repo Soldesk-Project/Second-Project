@@ -7,9 +7,11 @@ import java.util.Map;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.joonzis.domain.InquiryVO;
+import org.joonzis.domain.QuestRequestVO;
 import org.joonzis.service.FaqService;
 import org.joonzis.service.InquiryService;
 import org.joonzis.service.NoticeService;
+import org.joonzis.service.QuestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,7 +39,9 @@ public class CustomerController {
     @Autowired
     private FaqService faqService;
 
-	
+	@Autowired
+	private QuestService questService;
+    
     @Autowired
     private InquiryService inquiryService;
 
@@ -60,12 +64,25 @@ public class CustomerController {
         return ResponseEntity.ok(data);
     }
     
-    // 3) 문제 제출
+    // 3) 문제 등록 요청 페이지
     @GetMapping("/problems")
     public int getProblems(
     		@RequestParam(value="page", defaultValue="1") int page,
     		@RequestParam(value="size", defaultValue="15") int size) {
     	return 0;
+    }
+    
+    // 3-1) 문제 등록 요청 전달
+    @PostMapping(path = "/questRequest", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> questRequest(@RequestBody QuestRequestVO questRequestVO) {
+        log.info("문제 등록 요청 데이터: " + questRequestVO);
+        try {
+            questService.registerQuest(questRequestVO); // 서비스 계층 호출
+            return new ResponseEntity<>("문제 등록 요청 성공", HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("문제 등록 요청 실패: " + e.getMessage());
+            return new ResponseEntity<>("문제 등록 요청 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     
     // 4)1:1 문의
@@ -87,7 +104,7 @@ public class CustomerController {
     	return ResponseEntity.ok(vo);
     }
     
-    //  1:1 문의 게시글 비밀번호 확인
+    // 4-2) 1:1 문의 게시글 비밀번호 확인
     @PostMapping("/inquiries/{id}/check-password")
     public ResponseEntity<Map<String, Boolean>> checkInquiryPassword(
             @PathVariable Long id, // URL 경로에서 게시글 ID 추출
@@ -105,7 +122,7 @@ public class CustomerController {
         return ResponseEntity.ok(Map.of("isValid", isValid));
     }
 
-    // 4-2) 1:1문의 게시글 등록 페이지
+    // 4-3) 1:1문의 게시글 등록 페이지
     @PostMapping(
       path = "/inquiry",
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE
