@@ -15,8 +15,8 @@ const ITEM_TYPES = [
 
 const REWARDS = {
   // boundary: { css_class_name: 'rainbow_bd', item_name: 'rainbow_boundary'},
-  title: { css_class_name: 'collector_title', item_name: '콜렉터'},
-  fontColor: { css_class_name: 'rainbow_fontColor', item_name: 'rainbow_fontColor'},
+  title: { css_class_name: 'collector_title', item_name: '콜렉터', item_type: 'unique'},
+  fontColor: { css_class_name: 'rainbow_fontColor', item_name: '무지개 글자', item_type: 'unique'},
   // background: { css_class_name: 'rainbow_bg', item_name: 'rainbow_background'},
 };
 
@@ -54,7 +54,11 @@ const ItemList = () => {
   // 전체 아이템 가져오기
   useEffect(() => {
     axios.get('/user/item')
-      .then(res => setItems(res.data))
+      .then(res => {
+        console.log(res.data);
+       setItems(res.data) 
+      }
+    )
       .catch(() => setItems([]));
   }, []);
 
@@ -138,13 +142,16 @@ const ItemList = () => {
     };
   }, [visibleSections, createWheelHandler]);
   
+  
   // 리워드 핸들러
   const handleRewardClick = (typeKey) => {
     
     const reward = REWARDS[typeKey];
+    console.log(reward.item_type);
+    
     if (!reward) return;
     // API 호출 등 비동기 처리도 가능
-    axios.post('/user/reward', { item_type: typeKey, user_no: user.user_no, css_class_name: reward.css_class_name, item_name: reward.item_name })
+    axios.post('/user/reward', { item_type: reward.item_type, user_no: user.user_no, css_class_name: reward.css_class_name, item_name: reward.item_name })
     .then(() => {
       const updated = {
         ...rewardReceived,

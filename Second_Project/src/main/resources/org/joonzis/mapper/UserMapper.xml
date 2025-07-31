@@ -46,7 +46,7 @@
 	</select>
 	<!-- 인벤토리 - 카테고리별 아이템 목록 -->
 	<select id="getInventoryCategory" parameterType="map" resultType="org.joonzis.domain.ItemVO">
-	    SELECT 
+	    SELECT DISTINCT
 	      i.ITEM_NO          AS item_no,
 	      i.ITEM_PRICE       AS item_price,
 	      i.ITEM_NAME        AS item_name,
@@ -86,6 +86,12 @@
 	        </when>
 	        <when test="item_type == 'balloon'">
 	          BALLOON_ITEM_NO   = #{item_no, jdbcType=INTEGER}
+	        </when>
+	        <when test="item_no == 103">
+	          FONTCOLOR_ITEM_NO = #{item_no, jdbcType=INTEGER}
+	        </when>
+	        <when test="item_no == 110">
+	          TITLE_ITEM_NO = #{item_no, jdbcType=INTEGER}
 	        </when>
 	      </choose>
 	    </set>

@@ -112,6 +112,7 @@ public class ShopController {
             "글자색", "fontColor",
             "명함", "background",
             "말풍선", "balloon",
+            "유니크", "unique",
             "기타", "etc"
         );
 
