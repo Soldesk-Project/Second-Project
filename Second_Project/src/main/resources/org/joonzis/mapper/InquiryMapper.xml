@@ -49,8 +49,15 @@
     SELECT i.id,
            u.user_nick AS userNick, i.subject,
            i.message,
-           i.created_at AS createdAt
+           i.created_at AS createdAt,
+           i.post_password AS postPassword, i.user_id As userId, i.category
       FROM inquiry i
       JOIN users u ON i.user_id = u.user_id WHERE i.id = #{id}
 	</select>
+	
+	<select id="checkPassword" resultType="int">
+		SELECT COUNT(*)
+		FROM inquiry
+        WHERE id = #{id} AND post_password = #{postPassword}
+    </select>
 </mapper>

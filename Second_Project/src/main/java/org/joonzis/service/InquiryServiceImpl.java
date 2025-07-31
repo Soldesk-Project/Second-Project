@@ -97,4 +97,9 @@ public class InquiryServiceImpl implements InquiryService {
             }
         }
     }
+
+	@Override
+	public boolean checkPassword(Long id, int postPassword) {
+		return inquiryMapper.checkPassword(id, postPassword) == 1;
+	}
 }
