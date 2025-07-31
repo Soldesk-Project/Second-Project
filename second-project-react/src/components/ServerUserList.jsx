@@ -105,9 +105,9 @@ const ServerUserList = () => {
        );
         
         // 2) 본인 맨 앞으로
-        detailed.sort((a,b) => 
-          a.user_no === user.user_no ? -1 :
-          b.user_no === user.user_no ?  1 : 0
+        detailed.sort((a, b) =>
+          Number(a.userNo) === Number(user.user_no) ? -1 :
+          Number(b.userNo) === Number(user.user_no) ? 1 : 0
         );
         setUsers(detailed);
       }
