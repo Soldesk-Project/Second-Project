@@ -197,6 +197,7 @@ const ServerUserList = () => {
       {showModal && (
         <UserDetailModal
           user={selectedUser}
+          shopItems={shopItems}
           onClose={() => {
             setShowModal(false);
             setSelectedUser(null);

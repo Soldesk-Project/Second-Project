@@ -5,21 +5,32 @@ import titleTextMap from '../../js/Decorations';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 
-const UserDetailModal = ({ user, onClose }) => {
+const UserDetailModal = ({ user, onClose, shopItems }) => {
     const [profileSrc, setProfileSrc] = useState('/images/profile_default.png');
     const { isTop10 } = useSelector((state) => state.ranking);
     const [stats, setStats] = useState(null);
+    
+    // 상점 아이템 목록 가져오기(유저 프로필 아이템 랜더링)
+    const itemMap = React.useMemo(() => {
+        return shopItems.reduce((m, it) => {
+            m[it.item_no] = it;
+            return m;
+        }, {});
+    }, [shopItems]);
+
+    const fontcolor = itemMap[user.fontColorItemNo]?.css_class_name;
+
     useEffect(() => {
-        if (!user.user_no) return;
+        if (!user.userNo) return;
         axios
-        .get(`/user/accuracy/${user.user_nick}`)
+        .get(`/user/accuracy/${user.userNick}`)
         .then(res => setStats(res.data))
         
         .catch(err => console.error(err));
     }, [user.user_no]);
+
     const answerPercent = stats?.[0]?.accuracyPct || 0;
-    // console.log(user);
-    
+
     useEffect(() => {
         if (!user?.userProfileImg) return;
         const raw = user.userProfileImg;
@@ -59,7 +70,7 @@ const UserDetailModal = ({ user, onClose }) => {
             </div>
 
             <div className={styles.userInfo_Name}>
-                <p>{user.userNick}</p>
+                <p className={decoStyles[fontcolor]}>{user.userNick}</p>
                 <p>{renderTier()}</p>
                 <div className={styles.bar_set}>
                     <div className={styles.progressLine}>

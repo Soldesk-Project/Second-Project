@@ -41,6 +41,13 @@ const PreviewModal = ({
     case 'balloon':
       previewStyle.balloon_class_name = item.css_class_name;
       break;
+    case 'unique':
+      if (item.css_class_name.includes('fontColor')) {
+        previewStyle.fontcolor_class_name = item.css_class_name; // 무지개 글자 같은 색상
+      } else if (item.css_class_name.includes('title')) {
+        previewStyle.title_class_name = item.css_class_name; // 콜렉터 같은 칭호
+      }
+      break;
     default:
       break;
   }
@@ -84,7 +91,7 @@ const PreviewModal = ({
         )}
 
         {/* 텍스트 미리보기 */}
-        {(item.item_type === 'fontColor' || item.item_type === 'title') && (
+        {(item.item_type === 'fontColor' || item.item_type === 'title' || item.item_type === 'unique') && (
           <div className={styles.textPreview}>
             {(() => {
               const layers = [
@@ -95,17 +102,14 @@ const PreviewModal = ({
 
               const textElement = (
                 <span className={decoStyles[previewStyle.fontcolor_class_name]}>
-                  {/* 타이틀 있을 경우 출력 */}
+                  {/* title 출력 */}
                   {titleTextMap[previewStyle.title_class_name] && (
-                    <span
-                      className={decoStyles[previewStyle.title_class_name]}
-                      style={{ marginRight: '5px' }}
-                    >
+                    <span className={decoStyles[previewStyle.title_class_name]} style={{ marginRight: '5px' }}>
                       [{titleTextMap[previewStyle.title_class_name]}]
                     </span>
                   )}
-                  {/* 닉네임은 fontColor일 때만 출력 */}
-                  {item.item_type === 'fontColor' && user.user_nick}
+                  {/* 닉네임 출력 */}
+                  {user.user_nick}
                 </span>
               );
 
@@ -118,6 +122,7 @@ const PreviewModal = ({
             })()}
           </div>
         )}
+
 
         {/* 버튼 영역 */}
         <div className={styles.buttons}>

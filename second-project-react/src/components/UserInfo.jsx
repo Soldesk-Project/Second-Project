@@ -83,6 +83,16 @@ const UserInfo = () => {
     const [profileSrc, setProfileSrc] = useState('/images/profile_default.png');
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
+    // 페이지 로드 시, 백엔드에서 유저 정보(프로필 포함) 가져오기
+    useEffect(() => {
+        if (!user?.user_profile_img) return;
+        const raw = user.user_profile_img;
+        const src = raw.startsWith('/images/')
+            ? raw
+            : `/images/${raw}`;
+        setProfileSrc(src);
+        }, [user.user_profile_img]);
+
     // --- 2) 프로필 변경 요청
     const PROFILE_OPTIONS = [
         '/images/profile_1.png',
@@ -107,6 +117,9 @@ const UserInfo = () => {
             alert('서버 저장 중 오류가 발생했습니다.');
         });
     };
+
+    console.log(profileSrc);
+    
       
     useEffect(() => {
         if (!user.user_no) return;
@@ -266,6 +279,9 @@ const UserInfo = () => {
     }, [user.user_id, user.user_email, loading]);
 
     const fontcolor = itemMap[user.fontcolorItemNo]?.css_class_name;
+
+    console.log(items);
+    
 
   return (
     <div>

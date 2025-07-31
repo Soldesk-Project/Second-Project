@@ -28,10 +28,29 @@
 /* title */
 .admin_title { color: #00FFC6; font-weight: bold;}
 .tester_title { color: 	#FFD700; font-weight: bold;}
-.vip_title { color: #FF69B4; font-weight: bold;}
-
+.vip_title {
+  font-weight: 600;
+  font-size: 1.1em;
+  color: #1E90FF; /* 딥블루 */
+  text-shadow: 1px 1px 2px rgba(30, 144, 255, 0.5);
+  user-select: none;
+}
 .itemImage{
   width: 130px;
   height: 130px;
 }
-.collector_title { color: rgb(250, 250, 185); font-weight: bold;}
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+
+.collector_title {
+  font-weight: bold;
+  font-size: 1.1em;
+  background: linear-gradient(90deg, #ffd700 25%, #fff 50%, #ffd700 75%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 2.5s linear infinite;
+  user-select: none;
+}
