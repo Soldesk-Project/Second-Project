@@ -25,8 +25,6 @@ const ServerChatbox = () => {
     const stompClientInstanceRef = useRef(null);
     const [messages, setMessages] = useState([]);
     const [messageInput, setMessageInput] = useState('');
-    const [isWhisperMode, setIsWhisperMode] = useState(false);
-    const [whisperTarget, setWhisperTarget] = useState('');
     const chatLogRef = useRef(null);
     const hasSentAddUserRef = useRef(false);
     const [isConnected, setIsConnected] = useState(false); // 웹소켓 연결 상태를 추적하는 state
@@ -79,12 +77,6 @@ const ServerChatbox = () => {
                     console.error("🚫 ServerChatbox: 메시지 파싱 오류:", e, "원본 메시지:", message.body);
                 }
                 
-            });
-
-            // 귓속말 채팅방 구독
-            client.subscribe(`/user/${userNo}/queue/messages`, message => {
-                const receivedMessage = JSON.parse(message.body);
-                setMessages(prevMessages => [...prevMessages, receivedMessage]);
             });
 
             // 'addUser' 메시지 전송
@@ -151,21 +143,6 @@ const ServerChatbox = () => {
                 mTimestamp: Date.now()
             };
 
-            if (isWhisperMode && whisperTarget.trim()) {
-                messageToSend.mType = 'WHISPER_CHAT';
-                messageToSend.mReceiver = whisperTarget;
-
-                stompClientInstanceRef.current.send("/app/whisperChat.sendMessage", {}, JSON.stringify(messageToSend));
-                // 귓속말은 자신에게도 바로 표시되도록 추가
-                setMessages(prevMessages => [...prevMessages, {
-                    ...messageToSend,
-                    mReceiver: whisperTarget
-                }]);
-            } else {
-                messageToSend.mType = 'SERVER_CHAT';
-                stompClientInstanceRef.current.send("/app/serverChat.sendMessage", {}, JSON.stringify(messageToSend));
-            }
-            setMessageInput('');
         } else {
             if (!stompClientInstanceRef.current) {
                 console.warn("메시지 전송 실패 (ServerChatbox): STOMP Client 인스턴스가 없습니다.");
@@ -186,15 +163,6 @@ const ServerChatbox = () => {
         }
     };
 
-    // 귓속말 모드 토글 함수
-    const toggleWhisperMode = () => {
-        setIsWhisperMode(prev => !prev);
-        if (!isWhisperMode) {
-            setWhisperTarget('');
-        }
-        console.log(`귓속말 모드 토글됨 (ServerChatbox): ${!isWhisperMode ? '활성화' : '비활성화'}`);
-    };
-
     //신고처리
     const openReportModal = () => {
         console.log("신고버튼 클릭");
@@ -213,25 +181,6 @@ const ServerChatbox = () => {
 
     return (
         <div className="chatbox-container">
-            <div className="chatbox-header">
-                <div>
-                    <button onClick={() => setIsWhisperMode(false)}
-                            className={!isWhisperMode ? 'active-mode-btn' : ''}>전체</button>
-                    <button onClick={() => setIsWhisperMode(true)}
-                            className={isWhisperMode ? 'active-mode-btn' : ''}>귓속말</button>
-
-                    {/* {isWhisperMode && (
-                        <input
-                            type="text"
-                            placeholder="귓속말 대상 (닉네임)"
-                            value={whisperTarget}
-                            onChange={(e) => setWhisperTarget(e.target.value)}
-                            className="whisper-target-input"
-                        />
-                    )} */}
-                </div>
-            </div>
-
             <div className="chatbox-log" ref={chatLogRef}>
                 {messages.map((msg, index) => (
                     <div key={index} className={`chat-message ${msg.mSender === userNick ? 'my-message' : ''} ${msg.mType === 'WHISPER_CHAT' ? 'whisper' : ''} ${msg.mType === 'SERVER_JOIN' || msg.mType === 'SERVER_LEAVE' ? 'system-message' : ''}`}>
@@ -266,7 +215,7 @@ const ServerChatbox = () => {
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder={isWhisperMode ? "귓속말 메시지 입력..." : "메시지 입력..."}
+                    placeholder="메시지 입력..."
                     disabled={!isConnected}
                 />
                 <button id="sendBtn" className="sendBtn" onClick={sendMessage} disabled={!isConnected}>전달</button>
