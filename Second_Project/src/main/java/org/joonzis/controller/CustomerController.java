@@ -10,7 +10,6 @@ import org.joonzis.domain.InquiryVO;
 import org.joonzis.service.FaqService;
 import org.joonzis.service.InquiryService;
 import org.joonzis.service.NoticeService;
-import org.joonzis.service.ProblemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,8 +37,6 @@ public class CustomerController {
     @Autowired
     private FaqService faqService;
 
-    @Autowired
-    private ProblemService problemService;
 	
     @Autowired
     private InquiryService inquiryService;
@@ -64,11 +62,10 @@ public class CustomerController {
     
     // 3) 문제 제출
     @GetMapping("/problems")
-    public ResponseEntity<Map<String,Object>> getProblems(
+    public int getProblems(
     		@RequestParam(value="page", defaultValue="1") int page,
     		@RequestParam(value="size", defaultValue="15") int size) {
-    	Map<String,Object> data = problemService.getProblems(page, size);
-    	return ResponseEntity.ok(data);
+    	return 0;
     }
     
     // 4)1:1 문의
@@ -88,6 +85,24 @@ public class CustomerController {
     		return ResponseEntity.notFound().build();
     	}
     	return ResponseEntity.ok(vo);
+    }
+    
+    //  1:1 문의 게시글 비밀번호 확인
+    @PostMapping("/inquiries/{id}/check-password")
+    public ResponseEntity<Map<String, Boolean>> checkInquiryPassword(
+            @PathVariable Long id, // URL 경로에서 게시글 ID 추출
+            @RequestBody Map<String, Integer> payload) { // 요청 본문(JSON)에서 비밀번호를 추출 (예: {"postPassword": 1234})
+        
+        Integer postPassword = payload.get("postPassword");
+        if (postPassword == null) {
+            // 요청 본문에 비밀번호가 없을 경우 400 Bad Request 반환
+            return ResponseEntity.badRequest().body(Map.of("isValid", false)); 
+        }
+
+        // 서비스 계층의 비밀번호 확인 메서드 호출
+        boolean isValid = inquiryService.checkPassword(id, postPassword);
+        // 확인 결과 (true/false)를 JSON 형태로 반환
+        return ResponseEntity.ok(Map.of("isValid", isValid));
     }
 
     // 4-2) 1:1문의 게시글 등록 페이지

@@ -20,4 +20,5 @@ public interface InquiryMapper {
     
     /** 상세 조회 */
     InquiryVO selectById(@Param("id") Long id);
+    int checkPassword(@Param("id") Long id, @Param("postPassword") int postPassword);
 }

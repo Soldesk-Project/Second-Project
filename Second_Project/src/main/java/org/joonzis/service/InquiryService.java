@@ -16,4 +16,7 @@ public interface InquiryService {
     
     /** 문의글 상세페이지*/
     InquiryVO findById(Long id);
+    
+    /**게시글 ID와 비밀번호를 확인*/
+    boolean checkPassword(Long id, int postPassword);
 }

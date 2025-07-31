@@ -9,7 +9,10 @@ const InquiryPanel = () => {
   const [inquiries, setInquiries] = useState([]);
   const [page, setPage] = useState(1);
   const [totalInquiries, setTotalInquiries] = useState(0);
-  const [openInquiryId, setOpenInquiryId] = useState(null); 
+  const [openInquiryId, setOpenInquiryId] = useState(null);
+   const [passwordInput, setPasswordInput] = useState('');
+  const [passwordValidatedInquiries, setPasswordValidatedInquiries] = useState({}); 
+  const [passwordError, setPasswordError] = useState(null);
   
   const navigate = useNavigate();
 
@@ -30,7 +33,51 @@ const InquiryPanel = () => {
   }, [page]);
 
   const toggleDetails = (id) => {
-    setOpenInquiryId(openInquiryId === id ? null : id);
+    // 이미 열려있는 게시글을 다시 클릭하면 닫기
+    if (openInquiryId === id) {
+      setOpenInquiryId(null);
+      setPasswordInput('');
+      setPasswordError(null);
+    } else {
+      // 새로운 게시글을 열 경우
+      setOpenInquiryId(id);
+      setPasswordInput('');
+      setPasswordError(null);
+    }
+  };
+
+  const handlePasswordChange = (e) => {
+    setPasswordInput(e.target.value);
+  };
+
+  const handlePasswordSubmit = async (id) => {
+    setPasswordError(null); // 이전 오류 메시지 초기화
+
+    // 입력된 비밀번호가 숫자인지 확인 (백엔드 `int` 타입 매핑에 맞춰)
+    const passwordAsNumber = parseInt(passwordInput, 10);
+    if (isNaN(passwordAsNumber)) {
+        setPasswordError('비밀번호는 숫자여야 합니다.');
+        return;
+    }
+
+    try {
+      const res = await axios.post(`/api/customer/inquiries/${id}/check-password`, { 
+        postPassword: passwordAsNumber // 숫자로 변환하여 전송
+      });
+      
+      if (res.data.isValid) {
+        // 비밀번호 일치: 해당 문의 ID를 '검증됨' 상태로 설정
+        setPasswordValidatedInquiries(prev => ({ ...prev, [id]: true }));
+        setPasswordInput(''); // 입력창 비우기
+      } else {
+        // 비밀번호 불일치: 오류 메시지 표시
+        setPasswordError('비밀번호가 일치하지 않습니다.');
+      }
+    } catch (error) {
+      console.error("비밀번호 확인 실패:", error);
+      // 서버 응답 오류 등에 대한 일반적인 오류 메시지
+      setPasswordError('비밀번호 확인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
   };
 
   const getTotalPages = () => {
@@ -67,6 +114,30 @@ const InquiryPanel = () => {
               
               {openInquiryId === item.id && (
                 <div className={styles.detailContentArea}>
+                  {!passwordValidatedInquiries[item.id] ? (
+                    <div className={styles.passwordInputArea}>
+                      <p className={styles.passwordPrompt}>이 게시글은 비밀글입니다. 비밀번호를 입력해주세요.</p>
+                      <input 
+                        type="password" 
+                        value={passwordInput} 
+                        onChange={handlePasswordChange} 
+                        className={styles.passwordInputField}
+                        placeholder="비밀번호"
+                        onKeyPress={(e) => { // 엔터 키로 제출
+                          if (e.key === 'Enter') {
+                            handlePasswordSubmit(item.id);
+                          }
+                        }}
+                      />
+                      <button 
+                        onClick={() => handlePasswordSubmit(item.id)}
+                        className={styles.passwordSubmitButton}
+                      >
+                        확인
+                      </button>
+                      {passwordError && <p className={styles.passwordError}>{passwordError}</p>}
+                    </div>
+                  ) : (
                   <div className={styles.detailContent}>
                     {item.message && item.message.split('\n').map((line, index) => (
                       <React.Fragment key={index}>
@@ -94,6 +165,7 @@ const InquiryPanel = () => {
                       </div>
                     )}
                   </div>
+                  )}
                 </div>
               )}
             </li>

@@ -8,13 +8,13 @@ import { useLocation } from 'react-router-dom';
 // src/components/CustomerCenterComp/ 로 이동해야 하므로, '../components/CustomerCenterComp/' 경로를 사용합니다.
 import NoticePanel from '../../components/CustomerCenterComp/NoticePanel';
 import FaqPanel from '../../components/CustomerCenterComp/FaqPanel';
-import ProblemSubmit from '../customer/CustomerProblemSubmit';
 import InquiryPanel from '../../components/CustomerCenterComp/InquiryPanel';
+import QuestRequestPanel from '../../components/CustomerCenterComp/QuestRequestPanel';
 
 const CustomerServiceCenter = () => {
   const location = useLocation();
   
-  const tabs = ['공지사항', 'FAQ', '문제 제출', '1:1 문의'];
+  const tabs = ['공지사항', 'FAQ', '문제 등록 요청', '1:1 문의'];
   const initialTab = location.state?.initialTab || tabs[0];
   
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -43,7 +43,7 @@ const CustomerServiceCenter = () => {
       <div className={styles.tabPanels}>
         {activeTab === '공지사항' && <NoticePanel />}
         {activeTab === 'FAQ' && <FaqPanel />}
-        {activeTab === '문제 제출' && <ProblemSubmit />}
+        {activeTab === '문제 등록 요청' && <QuestRequestPanel />}
         {activeTab === '1:1 문의' && <InquiryPanel />}
       </div>
     </div>
