@@ -79,6 +79,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
                 for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
                     UserInfo info = entry.getValue();
                     if (userNo.equals(info.getUserNo())) {
+                    	info.setUserProfileImg(updatedUser.getImageFileName());
                     	info.setBdItemNo(updatedUser.getBoundaryItemNo());
                     	info.setTitleItemNo(updatedUser.getTitleItemNo());
                     	info.setFontColorItemNo(updatedUser.getFontcolorItemNo());
@@ -164,6 +165,7 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
         for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
             UserInfo info = entry.getValue();
             if (userNo.equals(String.valueOf(info.getUserNo()))) {
+            	info.setUserProfileImg(updatedUser.getImageFileName());
             	info.setBdItemNo(updatedUser.getBoundaryItemNo());
             	info.setTitleItemNo(updatedUser.getTitleItemNo());
             	info.setFontColorItemNo(updatedUser.getFontcolorItemNo());

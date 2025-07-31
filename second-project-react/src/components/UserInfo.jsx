@@ -111,6 +111,15 @@ const UserInfo = () => {
             setProfileSrc(src);
             dispatch({ type: 'user/setProfileImage', payload: src });
             setIsProfileModalOpen(false);
+
+            if (socket && socket.readyState === 1) {
+                socket.send(JSON.stringify({
+                    action: 'updateStyle', // 기존과 동일한 액션
+                    userNo: user.user_no
+                }));
+            } else {
+                console.warn('WebSocket이 아직 연결되지 않음');
+            }
         })
         .catch(err => {
             console.error('프로필 변경 실패', err);
