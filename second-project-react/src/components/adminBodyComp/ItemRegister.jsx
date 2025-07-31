@@ -8,6 +8,7 @@ const ItemRegister = () => {
   const [itemName, setItemName] = useState('');
   const [itemPrice, setItemPrice] = useState('');
   const [type, setType] = useState('테두리'); // 기본값 '테두리'
+  const token = localStorage.getItem('token');
 
   const types = [
     '테두리',
@@ -81,10 +82,9 @@ const ItemRegister = () => {
     try {
       const response = await fetch(`/admin/registerItem?type=${encodeURIComponent(tableName)}`, {
         method: 'POST',
-        // **!!! 여기 headers 블록을 완전히 제거해야 합니다 !!!**
-        // headers: { 
-        //   'Content-Type': 'application/json',
-        // },
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+        },
         body: formData,
       });
 

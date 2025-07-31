@@ -13,6 +13,7 @@ const QuestDelete = () => {
   const [selectedQuestionsToDelete, setSelectedQuestionsToDelete] = useState(new Set());
   const [startPage, setStartPage] = useState(1);
   const pagesToShow = 5;
+  const token = localStorage.getItem('token');
 
   const lastSearchQuery = useRef('');
 
@@ -61,7 +62,13 @@ const QuestDelete = () => {
     lastSearchQuery.current = searchQuery;
 
     try {
-      const response = await fetch(`/admin/searchQuestions?subject=${encodeURIComponent(dbSubjectValue)}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`);
+      const response = await fetch(`/admin/searchQuestions?subject=${encodeURIComponent(dbSubjectValue)}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -127,6 +134,10 @@ const QuestDelete = () => {
         `/admin/deleteQuestions?subject=${encodeURIComponent(dbSubjectValue)}&ids=${encodeURIComponent(idsString)}`,
         {
           method: 'DELETE',
+          headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }
         }
       );
 

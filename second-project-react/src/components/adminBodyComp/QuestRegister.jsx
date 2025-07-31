@@ -9,6 +9,7 @@ const QuestRegister = () => {
   const [correctAnswer, setCorrectAnswer] = useState('1');
   const [subject, setSubject] = useState('정보처리기사');
   const [base64ImageString, setBase64ImageString] = useState('');
+  const token = localStorage.getItem('token');
 
   // 사용자에게 보여줄 과목 목록
   const subjects = [
@@ -106,6 +107,7 @@ const QuestRegister = () => {
       const response = await fetch(`/admin/registerQuestion?`, {
         method: 'POST',
         headers: {
+          "Authorization": `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(questData),

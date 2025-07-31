@@ -13,6 +13,7 @@ const ItemDelete = () => {
   const [selectedItemsToDelete, setSelectedItemsToDelete] = useState(new Set());
   const [startPage, setStartPage] = useState(1);
   const pagesToShow = 5;
+  const token = localStorage.getItem('token');
 
   const lastSearchQuery = useRef('');
 
@@ -61,7 +62,13 @@ const ItemDelete = () => {
     lastSearchQuery.current = searchQuery;
 
     try {
-      const response = await fetch(`/admin/searchItems?type=${tableName}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`);
+      const response = await fetch(`/admin/searchItems?type=${tableName}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -126,6 +133,10 @@ const ItemDelete = () => {
     try {
       const response = await fetch(`/admin/deleteItems?type=${encodeURIComponent(tableName)}&itemNos=${Array.from(selectedItemsToDelete).join(',')}`, {
         method: 'DELETE',
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }
       });
 
       if (response.ok) {

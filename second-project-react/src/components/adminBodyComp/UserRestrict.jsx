@@ -38,9 +38,15 @@ const UserRestrict = () => {
       // ischatbanned 컬럼도 백엔드에서 함께 가져오도록 API 수정 필요
       const apiUrl = `/admin/users/search?searchType=${encodedSearchType}&searchValue=${encodedSearchValue}`;
         
-      console.log("Fetching from:", apiUrl);
-
-      const response = await fetch(apiUrl);
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }
+      });
 
       if (!response.ok) {
         const errorText = await response.text();

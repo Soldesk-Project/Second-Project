@@ -157,15 +157,30 @@ const UserInfo = () => {
       .catch(() => setItems([]));
     }, [activeTab, user.user_no]);
 
-    const renderTier = () => {
+    // 티어에 따라 클래스명 반환 함수
+    const getTierClass = () => {
         const rank = user.user_rank;
-        if (rank > 800 && isTop10) return '챌린저';
-        if (rank > 800) return '다이아몬드';
-        if (rank > 400) return '플래티넘';
-        if (rank > 200) return '골드';
-        if (rank > 100) return '실버';
-        return '브론즈';
+        if (rank > 800 && isTop10) return styles.challenger;
+        if (rank > 800) return styles.diamond;
+        if (rank > 400) return styles.platinum;
+        if (rank > 200) return styles.gold;
+        if (rank > 100) return styles.silver;
+        return styles.bronze;
     };
+    // 다음 티어 기준 점수 계산
+    const getNextTierScore = () => {
+        if (user.user_rank > 800 && isTop10) return null; // 챌린저면 없음
+        if (user.user_rank > 800) return 900; // 다이아 -> 챌린저
+        if (user.user_rank > 400) return 800; // 플래 -> 다이아
+        if (user.user_rank > 200) return 400; // 골드 -> 플래
+        if (user.user_rank > 100) return 200; // 실버 -> 골드
+        return 100; // 브론즈 -> 실버
+    };
+
+const nextTier = getNextTierScore();
+const progressPercent = nextTier 
+  ? Math.min((user.user_rank / nextTier) * 100, 100)
+  : 100;
 
     const clickItem = async (item) => {
         // console.log('🔔 clickItem 호출됨', item);
@@ -318,7 +333,6 @@ const UserInfo = () => {
 
             <div className={styles.userInfo_Name}>
                 <p className={decoStyles[fontcolor]}>{user.user_nick}</p>
-                <p>{renderTier()}</p>
             </div>
          </div>
 
@@ -379,7 +393,22 @@ const UserInfo = () => {
                 </div>
             </>:
             <>
-                {/* 여기에 공간 채우기 */}
+            <div className={styles.tierArea}>
+                <div className={`${styles.tierBadge} ${getTierClass()}`}></div>
+            </div>
+            {/* ✅ 티어 점수 바 추가 */}
+            <div className={styles.rankBarWrapper}>
+            <div className={styles.rankBar}>
+                <div 
+                className={styles.rankFill} 
+                style={{ width: `${progressPercent}%` }}
+                />
+            </div>
+            <div className={styles.rankLabel}>
+                {user.user_rank} RP 
+                {nextTier && ` / 다음 티어까지 ${nextTier - user.user_rank}점`}
+            </div>
+            </div>
             </>
         }
 

@@ -15,6 +15,7 @@ const ItemEdit = () => {
     const itemsPerPage = 10;
     const [startPage, setStartPage] = useState(1);
     const pagesToShow = 5;
+    const token = localStorage.getItem('token');
   
     // 이전 검색어를 저장할 useRef (searchQuery가 변경되었는지 확인하기 위함)
     const lastSearchQuery = useRef('');
@@ -79,7 +80,13 @@ const ItemEdit = () => {
   
       try {
         // itemsPerPage를 서버 요청에 사용
-        const response = await fetch(`/admin/searchItems?type=${tableName}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`);
+        const response = await fetch(`/admin/searchItems?type=${tableName}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          }
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -161,6 +168,9 @@ const ItemEdit = () => {
       try {
         const response = await fetch(`/admin/editItem`, {
           method: 'POST',
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
           body: formData,
         });
   

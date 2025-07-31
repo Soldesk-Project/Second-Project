@@ -793,6 +793,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	            if ("rankPlaying".equals(roomState) || "create".equals(roomState)) {
 	                playService.leavePanalty(user_nick);
 	            }
+	            
 	            broadcastRoomUserList(server, roomNo);
 	            String owner = roomOwners.getOrDefault(server, Collections.emptyMap()).get(roomNo);
 	            if (owner != null && owner.equals(user_nick)) {

@@ -6,6 +6,7 @@ const AchRegister = () => {
   const [achContent, setAchContent] = useState('');
   const [achReward, setAchReward] = useState('');
   const [achType, setAchType] = useState('티어');
+  const token = localStorage.getItem('token');
 
   //타입 선택 관련
   const achTypes = [
@@ -55,6 +56,7 @@ const AchRegister = () => {
       const response = await fetch(`/admin/registerAchievement?`, {
         method: 'POST',
         headers: {
+          "Authorization": `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(achData),

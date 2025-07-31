@@ -1,16 +1,5 @@
 package org.joonzis.controller;
 
-import org.joonzis.domain.AchievementDTO;
-import org.joonzis.domain.ItemVO;
-import org.joonzis.domain.QuestionDTO;
-import org.joonzis.domain.UsersVO;
-import org.joonzis.service.AdminService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Arrays;
@@ -19,7 +8,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.sql.Timestamp;
+
+import org.joonzis.domain.AchievementDTO;
+import org.joonzis.domain.ItemVO;
+import org.joonzis.domain.QuestionDTO;
+import org.joonzis.domain.UsersVO;
+import org.joonzis.service.AdminService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/admin")
@@ -258,7 +265,7 @@ public class AdminPageController {
     }
     
     // 업적 등록
-    @PostMapping("/registerItem")
+    @PostMapping(value = "/registerItem", produces = "application/json; charset=UTF-8")
     public ResponseEntity<?> registerItem(@RequestParam("type") String type,
             @RequestParam("item_name") String itemName,
             @RequestParam("item_price") int itemPrice,

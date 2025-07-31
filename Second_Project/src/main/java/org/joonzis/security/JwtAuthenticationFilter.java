@@ -60,8 +60,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    
+                   
                     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                    System.out.println("현재 인증 권한: " + auth.getAuthorities());
                 }
             } catch (Exception e) {
             	e.printStackTrace();

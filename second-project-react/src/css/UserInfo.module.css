@@ -317,3 +317,51 @@
 .invenBtn:focus {
   outline: none;
 }
+
+.tierArea {
+  display: flex;
+  justify-content: center; /* ✅ 수평 중앙 정렬 */
+  align-items: center;     /* ✅ 수직 중앙 정렬 (부모 높이 필요 시 적용) */
+  margin-top: 20px;        /* 위쪽 간격 */
+}
+
+.tierBadge {
+  width: 360px;    /* ✅ 크기 키움 (원하는 값으로 조절 가능) */
+  height: 160px;
+  background-size: 240%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.bronze { background-image: url('https://raw.communitydragon.org/14.20/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-bronze.png'); }
+.silver { background-image: url('https://raw.communitydragon.org/14.20/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-silver.png'); }
+.gold { background-image: url('https://raw.communitydragon.org/14.20/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-gold.png'); }
+.platinum { background-image: url('https://raw.communitydragon.org/14.20/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-platinum.png'); }
+.diamond { background-image: url('https://raw.communitydragon.org/14.20/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-diamond.png'); }
+.challenger { background-image: url('https://raw.communitydragon.org/14.20/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-challenger.png'); }
+
+.rankBarWrapper {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.rankBar {
+  width: 300px;
+  height: 12px;
+  background: #444;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.rankFill {
+  height: 100%;
+  background: linear-gradient(90deg, #f6d365, #fda085); /* 예쁜 색상 */
+  transition: width 0.4s ease;
+}
+
+.rankLabel {
+  margin-top: 5px;
+  font-size: 14px;
+  color: #fff;
+}

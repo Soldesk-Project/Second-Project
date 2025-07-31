@@ -12,6 +12,7 @@ const AchieveDelete = () => {
   const [selectedAchsToDelete, setSelectedAchsToDelete] = useState(new Set());
   const [startPage, setStartPage] = useState(1);
   const pagesToShow = 5;
+  const token = localStorage.getItem('token');
 
   const lastSearchQuery = useRef('');
 
@@ -49,7 +50,13 @@ const AchieveDelete = () => {
     lastSearchQuery.current = searchQuery;
 
     try {
-      const response = await fetch(`/admin/searchAchievements?type=${encodeURIComponent(typeValue)}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`);
+      const response = await fetch(`/admin/searchAchievements?type=${encodeURIComponent(typeValue)}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }
+      });
       if (!response.ok){
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -107,6 +114,10 @@ const AchieveDelete = () => {
     try {
       const response = await fetch(`/admin/deleteAchievements?type=${encodeURIComponent(typeValue)}&titles=${Array.from(selectedAchsToDelete).join(',')}`, {
         method: 'DELETE',
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }
       });
 
       if (response.ok) {
