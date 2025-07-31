@@ -58,7 +58,7 @@ const UserRanking = () => {
 
   // 2.1) 샵 전체 배경 아이템 불러오기 & imgUrl 세팅
   useEffect(() => {
-    axios.get('/api/shop/items?category=배경')
+    axios.get('/api/shop/items?category=명함')
       .then(({ data }) => {
         const bgWithUrl = data.map(it => ({
           ...it,

@@ -17,9 +17,6 @@ const Header = () => {
   const nav = useNavigate();
   const dispatch = useDispatch();
 
-  console.log(user.auth);
-
-
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
       window.Kakao.init(KAKAO_JS_KEY);

@@ -1,0 +1,117 @@
+/* 모달 전체 배경 (dimmed layer) */
+.overlay {
+  position: fixed;
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* 모달 본체 */
+.modal {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  min-width: 300px;
+  text-align: center;
+}
+
+/* 프로필/이미지 영역 공통 */
+.previewImg {
+  position: relative;
+  margin: 0 auto 20px;
+  overflow: visible;
+}
+
+/* boundary 타입 프로필 컨테이너 */
+.boundary {
+  width: 180px;
+  height: 180px;
+}
+
+/* boundary 프로필 이미지 */
+.profileImg {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* boundary 테두리 이미지 */
+.boundaryImg {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 101%;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* background 이미지 */
+.background {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* balloon 이미지 */
+.balloon {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+}
+
+/* 텍스트 미리보기 */
+.textPreview {
+  padding: 20px;
+  display: inline-block;
+}
+
+/* 버튼 컨테이너 (버튼들을 감싸는 div) */
+.buttons {
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* 공통 버튼 스타일 */
+.button {
+  padding: 6px 18px;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px 0 rgba(69, 126, 255, 0.08);
+  margin-right: 10px;
+}
+
+/* 구매/장착 버튼 */
+.buyButton,
+.equipButton {
+  background-color: #457eff;
+}
+
+/* 닫기 버튼 */
+.closeButton {
+  background-color: #f44336;
+}
+
+/* hover 효과 */
+.buyButton:hover,
+.equipButton:hover {
+  background-color: #3666cc;
+}
+
+.closeButton:hover {
+  background-color: #d7372d;
+}

@@ -71,20 +71,23 @@ public class UserController {
 	// 인벤토리 아이템 리스트
 	@GetMapping("/inventory/category")
 	public List<ItemVO> getInventoryCategory(@RequestParam("category") String category, @RequestParam("user_no") int user_no) {
+		
+		System.out.println("카테고리 -> " + category);
 
         Map<String, String> categoryMap = Map.of(
             "테두리", "boundary",
             "칭호", "title",
             "글자색", "fontColor",
-            "배경", "background",
+            "명함", "background",
             "말풍선", "balloon",
-            "랜덤박스", "randomBox"
+            "유니크", "unique"
         );
 
         String mappedCategory = categoryMap.getOrDefault(category, "unknown");
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("category", mappedCategory);
         paramMap.put("user_no", user_no);
+        System.out.println(service.getInventoryCategory(paramMap));
 	    return service.getInventoryCategory(paramMap);
 	}
 	
@@ -103,6 +106,7 @@ public class UserController {
 	// 리워드 보상 획득
 	@PostMapping(value = "/reward", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> addReward(@RequestBody UserDecoUpdateDTO UserDecoUpdateDTO) {
+		System.out.println(service.addReward(UserDecoUpdateDTO));
 		boolean success = service.addReward(UserDecoUpdateDTO);
 	    if (success) {
 	        return ResponseEntity.ok("업데이트 성공");
@@ -127,8 +131,13 @@ public class UserController {
     public ResponseEntity<?> updateNickname(@PathVariable("user_no") Long user_no,
                                             @RequestBody Map<String, String> body) {
         String user_nick = body.get("user_nick");
+        String user_id = body.get("user_id");
+        
         if (user_nick == null || user_nick.trim().isEmpty()) {
             return ResponseEntity.badRequest().body("닉네임이 비어 있습니다.");
+        }
+        if ((int) service.getUserPoint(user_id) < 5000) {
+        	return ResponseEntity.badRequest().body("포인트 부족");
         }
         try {
             service.updateNickname(user_no, user_nick);
@@ -164,11 +173,10 @@ public class UserController {
     }
     
     /** 정답률 통계 */
-    @GetMapping(value = "/accuracy", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserAccuracyDTO>> getUserAccuracyList() {
+    @GetMapping(value = "/accuracy/{user_nick}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserAccuracyDTO>> getUserAccuracyList(@PathVariable("user_nick") String user_nick) {
         try {
-            List<UserAccuracyDTO> list = service.getUserAccuracyList();
-            System.out.println("정답률 -> " + list);
+            List<UserAccuracyDTO> list = service.getUserAccuracyList(user_nick);
             return ResponseEntity.ok(list);
         } catch (Exception e) {
             // 내부 예외 로깅

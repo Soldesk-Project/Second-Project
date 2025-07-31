@@ -73,7 +73,7 @@ public interface UserMapper {
 	public UsersVO getUsersByUserNo(@Param("userNo") int userNo);
 	
 	//정답률 통계 가져오기
-	public List<UserAccuracyDTO> getUserAccuracyList();
+	public List<UserAccuracyDTO> getUserAccuracyList(@Param("user_nick") String user_nick);
 	
 	
 	

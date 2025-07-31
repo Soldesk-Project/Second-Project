@@ -11,7 +11,7 @@ import { triggerRefreshRanking } from '../store/rankingSlice';
 import NickModal from './modal/NickModal';
 import { setUser, fetchUserInfo } from '../store/userSlice';
 
-const TABS = ['테두리', '칭호', '글자색', '배경', '말풍선'];
+const TABS = ['테두리', '칭호', '글자색', '명함', '말풍선', '유니크'];
 
 const UserInfo = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,9 +21,54 @@ const UserInfo = () => {
     const [editMyInfo, setEditMyInfo] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [point, setPoint] = useState(0);
+    const [shopItems,setShopItems] = useState([]);
     const dispatch = useDispatch();
 
     const { user } = useSelector((state) => state.user);
+    
+    const userId = user?.user_id;
+    const userNick = user?.user_nick;
+
+    // 상점 아이템 목록 가져오기(유저 프로필 아이템 랜더링)
+    const itemMap = React.useMemo(() => {
+        return shopItems.reduce((m, it) => {
+        m[it.item_no] = it;
+        return m;
+        }, {});
+    }, [shopItems]);
+
+    // 🆕 useEffect: 샵 전체 아이템 한 번만 불러오기
+    useEffect(() => {
+        const cats = ['테두리','칭호','글자색','명함','말풍선', '유니크'];
+        Promise.all(cats.map(cat =>
+        axios.get(`/api/shop/items?category=${encodeURIComponent(cat)}`)
+        ))
+        .then(results => {
+        const all = results.flatMap(r =>
+            r.data.map(it => ({
+            ...it,
+            imgUrl: it.imageFileName ? `/images/${it.imageFileName}` : ''
+            }))
+        );
+        setShopItems(all);
+        })
+        .catch(err => console.error('샵 아이템 로드 실패', err));
+    }, []);
+
+    useEffect(() => {
+        fetchGetPoint();
+      }, [userNick]);
+
+    const fetchGetPoint = async () => {
+    if (!userId) return;
+    try {
+        const res = await axios.get(`/api/user/point?user_id=${userId}`);
+        setPoint(res.data);
+    } catch (error) {
+        console.error('포인트 불러오기 실패:', error);
+    }
+    }
 
     useEffect(() => {
       if (!user?.user_no) return;
@@ -37,16 +82,6 @@ const UserInfo = () => {
     // --- 1) 프로필 상태
     const [profileSrc, setProfileSrc] = useState('/images/profile_default.png');
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-
-    // 페이지 로드 시, 백엔드에서 유저 정보(프로필 포함) 가져오기
-    useEffect(() => {
-        if (!user?.user_profile_img) return;
-        const raw = user.user_profile_img;
-        const src = raw.startsWith('/images/')
-            ? raw
-            : `/images/${raw}`;
-        setProfileSrc(src);
-        }, [user.user_profile_img]);
 
     // --- 2) 프로필 변경 요청
     const PROFILE_OPTIONS = [
@@ -72,9 +107,7 @@ const UserInfo = () => {
             alert('서버 저장 중 오류가 발생했습니다.');
         });
     };
-    
       
-
     useEffect(() => {
         if (!user.user_no) return;
             axios
@@ -82,7 +115,7 @@ const UserInfo = () => {
         params: { category: activeTab, user_no: user.user_no }
       })
       .then(({ data }) => {
-        // console.log('Inventory raw data:', data);
+
         const withImg = data.map(item => {
         // 1) camelCase 프로퍼티부터 시도
         const raw =
@@ -101,7 +134,7 @@ const UserInfo = () => {
       })
       .catch(() => setItems([]));
     }, [activeTab, user.user_no]);
-    
+
     const renderTier = () => {
         const rank = user.user_rank;
         if (rank > 800 && isTop10) return '챌린저';
@@ -182,19 +215,22 @@ const UserInfo = () => {
     useEffect(() => {
         if (!user.user_no) return;
         axios
-        .get(`/user/accuracy`)
+        .get(`/user/accuracy/${user.user_nick}`)
         .then(res => setStats(res.data))
         
         .catch(err => console.error(err));
     }, [user.user_no]);    
-    console.log(stats);
         
     // 2) 퍼센트 계산
     // --- 퍼센트 계산 (통계가 로딩되지 않았으면 0으로)
     const answerPercent = stats?.[0]?.accuracyPct || 0;
         
     const handleNicknameChange = (newNick) => {
-        axios.patch(`/user/${user.user_no}/nickname`, { user_nick: newNick })
+        if(point < 5000){
+            alert("포인트 부족")
+            return;
+        }
+        axios.patch(`/user/${user.user_no}/nickname`, { user_nick: newNick, user_id: userId })
             .then(res => {
                 const updatedUser = {
                     ...user,
@@ -229,8 +265,7 @@ const UserInfo = () => {
         }
     }, [user.user_id, user.user_email, loading]);
 
-    console.log(items);
-    
+    const fontcolor = itemMap[user.fontcolorItemNo]?.css_class_name;
 
   return (
     <div>
@@ -257,10 +292,10 @@ const UserInfo = () => {
                 </div>
 
             <div className={styles.userInfo_Name}>
-                <p>{user.user_nick}</p>
+                <p className={decoStyles[fontcolor]}>{user.user_nick}</p>
                 <p>{renderTier()}</p>
             </div>
-            </div>
+         </div>
 
             {/* 프로필 선택 모달 */}
             {isProfileModalOpen && (
@@ -323,7 +358,7 @@ const UserInfo = () => {
             </>
         }
 
-        <NickModal isOpen={isNickModalOpen} onClose={() => setIsNickModalOpen(false)}  onSubmit={handleNicknameChange}/>
+        <NickModal isOpen={isNickModalOpen} onClose={() => setIsNickModalOpen(false)}  onSubmit={handleNicknameChange} point={point}/>
 
       <InventoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div role="tablist" className={styles.subTabContainer}>
@@ -353,7 +388,7 @@ const UserInfo = () => {
                     <div key={item.item_no} className={styles.card} onClick={() => setSelectedItem(item)}>
                         <div className={styles.itemCss}>
                         {/* title 타입은 텍스트 데코, 그 외엔 이미지 */}
-                        {(item.item_type === 'fontColor' || item.item_type === 'title') ? (
+                        {(item.item_type === 'fontColor' || item.item_type === 'title' || item.item_type === 'unique') ? (
                         <span className={decoStyles[item.css_class_name]}>
                             [{titleTextMap[item.css_class_name]}]
                         </span>

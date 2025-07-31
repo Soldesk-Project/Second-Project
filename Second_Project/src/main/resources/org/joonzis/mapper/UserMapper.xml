@@ -15,6 +15,7 @@
 	    <result column="TITLE_ITEM_NO" property="titleItemNo"/>
 	    <result column="FONTCOLOR_ITEM_NO" property="fontcolorItemNo"/>
 	    <result column="BACKGROUND_ITEM_NO" property="backgroundItemNo"/>
+	    <result column="BALLOON_ITEM_NO" property="balloonItemNo"/>
 	</resultMap>
 
 	 <!-- Top 10 유저 랭킹 목록 -->
@@ -41,11 +42,18 @@
 	
 	<!-- 모든 아이템 목록 -->
 	<select id="getItemList" resultType="org.joonzis.domain.ItemVO">
-		SELECT * FROM ITEMS
+		SELECT 
+			ITEM_NO            AS item_no,
+	    	ITEM_NAME          AS item_name,
+	    	ITEM_PRICE         AS item_price,
+	    	ITEM_TYPE          AS item_type,
+	    	IMAGE_FILE_NAME    AS imageFileName,
+	    	CSS_CLASS_NAME	   AS css_class_name
+		FROM ITEMS
 	</select>
 	<!-- 인벤토리 - 카테고리별 아이템 목록 -->
 	<select id="getInventoryCategory" parameterType="map" resultType="org.joonzis.domain.ItemVO">
-	    SELECT 
+	    SELECT DISTINCT
 	      i.ITEM_NO          AS item_no,
 	      i.ITEM_PRICE       AS item_price,
 	      i.ITEM_NAME        AS item_name,
@@ -85,6 +93,12 @@
 	        </when>
 	        <when test="item_type == 'balloon'">
 	          BALLOON_ITEM_NO   = #{item_no, jdbcType=INTEGER}
+	        </when>
+	        <when test="item_no == 103">
+	          FONTCOLOR_ITEM_NO = #{item_no, jdbcType=INTEGER}
+	        </when>
+	        <when test="item_no == 110">
+	          TITLE_ITEM_NO = #{item_no, jdbcType=INTEGER}
 	        </when>
 	      </choose>
 	    </set>
@@ -181,7 +195,8 @@
 	<!-- 유저 닉네임 변경 -->
 	<update id="updateNickname">
 	    UPDATE USERS
-	    SET USER_NICK = #{user_nick}
+	    SET USER_NICK = #{user_nick},
+	    	USER_POINT = USER_POINT - 5000
 	    WHERE USER_NO = #{user_no}
 	</update>
 	
@@ -291,6 +306,7 @@
 	            2
 	        ) AS accuracyPct
 	    FROM USER_QUESTION_HISTORY
+	    WHERE USER_NICK = #{user_nick}
 	    GROUP BY USER_NICK
 	    ORDER BY accuracyPct DESC
 	</select>

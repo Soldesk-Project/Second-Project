@@ -104,7 +104,7 @@ public interface UserService {
 	public void updateLoginStatus(String userId, int status);
 
 	// 정답률 통계 가져오기
-	public List<UserAccuracyDTO> getUserAccuracyList();
+	public List<UserAccuracyDTO> getUserAccuracyList(String user_nick);
 
 	
 }
