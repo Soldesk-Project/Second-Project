@@ -64,6 +64,7 @@ const Shop = () => {
       .then(res => {
         const withImg = res.data.map(item => {
           const filename = item.imageFileName;
+          
           return {
           ...item,
           imgUrl: `/images/${filename}`
@@ -158,7 +159,7 @@ const Shop = () => {
                   onClick={() => setSelectedItem(item)}>
                   <div className={styles.itemCss}>
                   {/* 가끔 경로가 안되는 경우가 있음 */}
-                  {/* <img 
+                  {/* <img  
                     src={`/images/${item.imageFileName}`} 
                     alt={item.item_name} 
                     className={styles.itemImage} /> */}

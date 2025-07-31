@@ -42,7 +42,14 @@
 	
 	<!-- 모든 아이템 목록 -->
 	<select id="getItemList" resultType="org.joonzis.domain.ItemVO">
-		SELECT * FROM ITEMS
+		SELECT 
+			ITEM_NO            AS item_no,
+	    	ITEM_NAME          AS item_name,
+	    	ITEM_PRICE         AS item_price,
+	    	ITEM_TYPE          AS item_type,
+	    	IMAGE_FILE_NAME    AS imageFileName,
+	    	CSS_CLASS_NAME	   AS css_class_name
+		FROM ITEMS
 	</select>
 	<!-- 인벤토리 - 카테고리별 아이템 목록 -->
 	<select id="getInventoryCategory" parameterType="map" resultType="org.joonzis.domain.ItemVO">

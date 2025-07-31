@@ -55,10 +55,16 @@ const ItemList = () => {
   useEffect(() => {
     axios.get('/user/item')
       .then(res => {
-        console.log(res.data);
-       setItems(res.data) 
-      }
-    )
+        const withImg = res.data.map(item => {
+          const fileName = item.imageFileName;
+          console.log(fileName);
+          
+          return {
+            ...item,
+            imgUrl: `/images/${fileName}`
+          }});
+          setItems(withImg);
+        })
       .catch(() => setItems([]));
   }, []);
 
@@ -169,6 +175,18 @@ const ItemList = () => {
       .catch(console.error);
   };
 
+  const nameChange=(name)=>{
+    switch (name) {
+      case "pinkProfileBorder": return "핑크 테두리";
+      case "lineProfileBorder": return "줄무늬 테두리";
+      case "defaultProfileBorder": return "기본 테두리";
+      case "dogProfileBorder.png": return "강아지 테두리";
+      case "leafProfileBorder": return "잎 테두리";
+      case "catProfileBorder": return "고양이 테두리";
+      default: return name;
+    }
+  }
+
   // UI 렌더링 함수
   const renderItemSection = (typeKey, label) => {
     const { filtered, ownedCount, totalCount, percent } = getItemStats(typeKey);
@@ -224,12 +242,24 @@ const ItemList = () => {
                           [{titleTextMap[item.css_class_name]}]
                         </span>
                       )}
-                      <span className={item.item_type !== 'title' ? decoStyles[item.css_class_name] : undefined}>
-                        아이템
-                      </span>
+                      {
+                        typeKey==='boundary'||typeKey==='background'?
+                        <img src={item.imgUrl} alt={item.item_name} className={styles.itemImage}/>
+                        :
+                        (
+                          item.item_no===110?
+                            <span className={item.item_type !== 'title' ? decoStyles[item.css_class_name] : undefined}>
+                              콜렉터
+                            </span>
+                          :
+                            <span className={item.item_type !== 'title' ? decoStyles[item.css_class_name] : undefined}>
+                              아이템
+                            </span>
+                        )
+                      }
                     </div>
                   </div>
-                  <div className={styles.itemName}>이름 : {item.item_name}</div>
+                  <div className={styles.itemName}>{nameChange(item.item_name)}</div>
                 </div>
               ))
             ) : (
