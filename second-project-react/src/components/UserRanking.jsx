@@ -150,7 +150,7 @@ const UserRanking = () => {
     }, {});
   }, [shopBgItems]);
 
-if (loading) return <div>로딩 중...</div>;
+if (loading) return <div style={{textAlign:'center', fontSize:'30px', paddingTop:'200px'}}>로딩 중...</div>;
 
   // 9) 렌더링
   return (

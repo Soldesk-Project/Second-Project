@@ -127,7 +127,7 @@ export default function FindId() {
             </div>
             <input
               list="email-domains"
-              placeholder="직접 입력"
+              placeholder="선택 또는 입력"
               value={emailDomain}
               onChange={(e) => setEmailDomain(e.target.value)}
               onKeyDown={handleKeyDown}
