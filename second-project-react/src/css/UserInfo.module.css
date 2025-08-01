@@ -106,20 +106,17 @@
 }
 
 .userInfo_Box{
-  margin-top: 40px;
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
   text-align: center;
-  gap: 30px;
-
 }
 
 .userInfo_Box_1{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 30px;
 }
 
 .userInfo_Name{
@@ -130,28 +127,30 @@
 }
 
 .bar_set {
-  width: 150px;          /* 프로필 크기에 맞춰 조정 */
-  margin: 16px auto;     /* 중앙 정렬 */
+  text-align: center;
+    margin-top: 15px;     /* 중앙 정렬 */
 }
 
+
 .progressLine {
-  background-color: #e0e0e0;
-  border-radius: 8px;
+  width: 300px;
+  height: 12px;
+  background: #444;
+  border-radius: 6px;
   overflow: hidden;
-  height: 8px;
-  margin-bottom: 4px;
+  margin: 0 auto;
 }
 
 .progressFill {
   height: 100%;
-  background-color: #4caf50;  /* 원하는 색으로 바꿔도 됩니다 */
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, #7ee43d, #3ac1a9);
+  transition: width 0.4s ease;
 }
 
 .label {
-  font-size: 0.875rem;
-  text-align: center;
-  color: white;
+  margin-top: 5px;
+  font-size: 14px;
+  color: #fff;
 }
 
 .profileWrapper {
@@ -254,7 +253,7 @@
 .editMyInfoBtnWrapper{
   display: flex;
   justify-content: center;
-
+  margin-top: 10px;
 }
 .editMyInfoBtn{
   width: 300px;
@@ -342,7 +341,7 @@
 
 .rankBarWrapper {
   text-align: center;
-  margin-top: 15px;
+  margin-top: 5px;
 }
 
 .rankBar {

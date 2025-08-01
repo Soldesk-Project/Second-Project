@@ -20,18 +20,53 @@
 /* 상단 바 */
 .top_nav {
   height: 50px;
-  background-color: #0A0D17;
+  background-image: url('../../../public/images/violet2.png');
   color: #fff;
   display: flex;
   align-items: center;
   font-weight: bold;
   padding: 0 20px;
-  gap: 6rem;
-
 }
 
-.top_nav span {
-  margin-left: auto;
+/* 버튼 컨테이너 (버튼 그룹) */
+.nav_buttons {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  gap: 6rem;
+}
+
+/* 개별 버튼 */
+.top_nav_button {
+  background: transparent;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: white;
+  transition: 0.2s ease;
+}
+
+.top_nav_button:hover {
+  background: white;
+  border-radius: 6px;
+  color: black;
+}
+
+/* 선택된(Active) 탭 */
+.activeTab {
+  border-bottom: 3px solid #8367C7;
+  font-weight: bold;
+}
+
+/* 선택된(Active) 탭 */
+.activeTab {
+  border-bottom: 3px solid #8367C7; /* 보라색 하이라이트 */
+  font-weight: bold;
+}
+
+.admin_info {
+  margin-left: auto; /* ✅ 오른쪽 끝으로 이동 */
 }
 
 /* 메인 영역: 좌측 사이드바 + 본페이지 */
@@ -40,10 +75,11 @@
   flex: 1;
   overflow: hidden;
   padding: 20px 20px;
-  gap: 50px;
+  /* gap: 50px; */
   color: black;
   width: 100%;
-  background-color: #171a23;
+  /* background-color: #171a23; */
+  background-image: url('../../../public/images/violet2.png');
   background-repeat: no-repeat;
   background-size: 100% auto;
   background-position: center top;
@@ -55,8 +91,8 @@
   display: flex;
   flex-direction: column;
   width: 300px;
-  padding-right: 20px;
-  background-color: #171a23;
+  /* padding-right: 20px; */
+  /* background-color: #171a23; */
 }
 
 /* 상단 컨텐츠: 유저정보 + 중앙 */
@@ -67,7 +103,7 @@
   flex-direction: column;
   gap: 20px;
   padding-bottom: 20px;
-  background-color: #171a23;
+  /* background-color: #171a23; */
   overflow-y: auto;
   max-height: calc(100vh - 50px - 50px - 40px);
   margin: 0 auto;

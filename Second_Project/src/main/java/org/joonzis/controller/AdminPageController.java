@@ -150,6 +150,7 @@ public class AdminPageController {
             @RequestParam(name = "searchValue", required = false, defaultValue = "") String searchValue) {
 
         List<UsersVO> users = adminService.searchUsers(searchType, searchValue);
+        System.out.println(users);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 

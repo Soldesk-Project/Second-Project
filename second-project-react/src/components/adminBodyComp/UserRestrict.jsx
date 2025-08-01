@@ -151,6 +151,9 @@ const UserRestrict = () => {
     }
   };
 
+  console.log(users);
+  
+
 
   // 선택된 searchType에 따라 placeholder 텍스트를 반환하는 헬퍼 함수
   const getPlaceholderText = () => {
@@ -227,6 +230,7 @@ const UserRestrict = () => {
                 <th>포인트</th>
                 <th>랭크</th>
                 <th>채팅금지 여부</th>
+                <th>권한</th>
                 <th>선택</th> {/* 체크박스 열 */}
               </tr>
             </thead>
@@ -256,6 +260,7 @@ const UserRestrict = () => {
                       </span>
                     )}
                   </td>
+                  <td>{user.auth}</td>
                   <td className="checkbox-col">
                     <input
                       type="checkbox"

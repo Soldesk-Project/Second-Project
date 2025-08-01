@@ -26,6 +26,7 @@ const AdminPage = () => {
   const [activeQuestMenu, setActiveQuestMenu] = useState('default');
   const [activeUserMenu, setActiveUserMenu] = useState('default');
   const [activeAchMenu, setActiveAchMenu] = useState('default');
+  const [activeTab, setActiveTab] = useState('quest');
 
   const setPageQuestAdmin = () => {
     setActiveSidebar('quest');
@@ -90,12 +91,20 @@ const AdminPage = () => {
     <div className={styles.container}>
       {/* 상단 바 (로고 + 메뉴 + 검색) */}
       <div className={Headerstyles.top_nav}><Header /></div>
-      <div className={styles.top_nav}>
-        <button className="QuestAdminBtn" onClick={setPageQuestAdmin}>문제/제보관리</button>
-        <button className="UserAdminBtn" onClick={setpageUserAdmin}>유저권한관리</button>
-        <button className="AchAdminBtn" onClick={setPageAchAdmin}>업적/상점관리</button>
-        <span>관리자 {userNick} 님</span>
-      </div>
+        <div className={styles.top_nav}>
+          <div className={styles.nav_buttons}>
+            <button className={`${styles.top_nav_button} ${activeTab === 'quest' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('quest'); setPageQuestAdmin(); }}>
+              문제/제보관리
+            </button>
+            <button className={`${styles.top_nav_button} ${activeTab === 'user' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('user'); setpageUserAdmin(); }}>
+              유저권한관리
+            </button>
+            <button className={`${styles.top_nav_button} ${activeTab === 'ach' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('ach'); setPageAchAdmin(); }}>
+              업적/상점관리
+            </button>
+          </div>
+          <span className={styles.admin_info}>관리자 {userNick} 님</span>
+        </div>
       {/*메인 바디 */}
       <div className={styles.body}>
         {/*좌측 바*/}

@@ -1,5 +1,5 @@
 .user-restrict-container {
-  padding: 20px;
+  /* padding: 20px; */
   font-family: Arial, sans-serif;
   color: #333;
 }
@@ -110,6 +110,10 @@ hr {
   padding: 10px;
   vertical-align: middle; /* 텍스트 수직 정렬 */
   color: #ddd;
+}
+
+.user-table td{
+  font-size: 14px;
 }
 
 .user-table th {

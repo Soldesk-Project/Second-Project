@@ -117,13 +117,13 @@
     
     <!-- 유저 전체 조회 -->
     <select id="selectAllUsers" resultType="org.joonzis.domain.UsersVO">
-        SELECT USER_NO, USER_ID, USER_NICK, USER_EMAIL, USER_DATE, USER_POINT, USER_RANK, USER_PLAY_COUNT, USER_1ST_COUNT, USER_PW, ISCHATBANNED, BANNED_TIMESTAMP
+        SELECT USER_NO, USER_ID, USER_NICK, USER_EMAIL, USER_DATE, USER_POINT, USER_RANK, USER_PLAY_COUNT, USER_1ST_COUNT, USER_PW, ISCHATBANNED, BANNED_TIMESTAMP, AUTH
         FROM USERS
     </select>
     
     <!-- 유저 검색 -->
     <select id="searchUsers" resultType="org.joonzis.domain.UsersVO" parameterType="map">
-        SELECT USER_NO, USER_ID, USER_NICK, USER_EMAIL, USER_DATE, USER_POINT, USER_RANK, USER_PLAY_COUNT, USER_1ST_COUNT, USER_PW, ISCHATBANNED, BANNED_TIMESTAMP
+        SELECT USER_NO, USER_ID, USER_NICK, USER_EMAIL, USER_DATE, USER_POINT, USER_RANK, USER_PLAY_COUNT, USER_1ST_COUNT, USER_PW, ISCHATBANNED, BANNED_TIMESTAMP, AUTH
         FROM USERS
         <where>
             <if test="searchType != null and searchValue != null and searchValue != ''">

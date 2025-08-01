@@ -23,6 +23,7 @@ const UserInfo = () => {
     const [loading, setLoading] = useState(false);
     const [point, setPoint] = useState(0);
     const [shopItems,setShopItems] = useState([]);
+    const [challengerMinScore, setChallengerMinScore] = useState(0);
     const dispatch = useDispatch();
 
     const { user } = useSelector((state) => state.user);
@@ -56,8 +57,22 @@ const UserInfo = () => {
         .catch(err => console.error('샵 아이템 로드 실패', err));
     }, []);
 
+    const fetchUserRanking = async () => {
+        try {
+        const { data, status } = await axios.get('/user/ranking');
+        if (status === 200) {
+            setChallengerMinScore(data[9].user_rank);
+            
+            setLoading(false);
+        }
+        } catch (error) {
+        console.error('유저 랭킹 로드 실패:', error);
+        }
+    };
+
     useEffect(() => {
         fetchGetPoint();
+        fetchUserRanking();
       }, [userNick]);
 
     const fetchGetPoint = async () => {
@@ -127,9 +142,6 @@ const UserInfo = () => {
         });
     };
 
-    console.log(profileSrc);
-    
-      
     useEffect(() => {
         if (!user.user_no) return;
             axios
@@ -169,18 +181,37 @@ const UserInfo = () => {
     };
     // 다음 티어 기준 점수 계산
     const getNextTierScore = () => {
-        if (user.user_rank > 800 && isTop10) return null; // 챌린저면 없음
-        if (user.user_rank > 800) return 900; // 다이아 -> 챌린저
+        if (user.user_rank > 800) {
+            if (isTop10) return null; // 챌린저면 다음 티어 없음
+            return challengerMinScore; // 챌린저 10등 점수와 비교
+        }
         if (user.user_rank > 400) return 800; // 플래 -> 다이아
         if (user.user_rank > 200) return 400; // 골드 -> 플래
         if (user.user_rank > 100) return 200; // 실버 -> 골드
         return 100; // 브론즈 -> 실버
     };
 
-const nextTier = getNextTierScore();
-const progressPercent = nextTier 
-  ? Math.min((user.user_rank / nextTier) * 100, 100)
-  : 100;
+    const nextTier = getNextTierScore();
+
+    // 진행률 계산
+    const progressPercent = (() => {
+        if (!nextTier) return 100; // 챌린저면 100%
+        
+        if (user.user_rank > 800) {
+            // 다이아 → 챌린저 진행률 (챌린저 10위 점수 기준)
+            const gap = nextTier - 800; // 800점에서 시작
+            return Math.min(((user.user_rank - 800) / gap) * 100, 100);
+        } else {
+            // 일반 티어 진행률
+            const prevTierBase =
+                user.user_rank > 400 ? 400 :
+                user.user_rank > 200 ? 200 :
+                user.user_rank > 100 ? 100 : 0;
+
+            const gap = nextTier - prevTierBase;
+            return Math.min(((user.user_rank - prevTierBase) / gap) * 100, 100);
+        }
+    })
 
     const clickItem = async (item) => {
         // console.log('🔔 clickItem 호출됨', item);
@@ -303,10 +334,6 @@ const progressPercent = nextTier
     }, [user.user_id, user.user_email, loading]);
 
     const fontcolor = itemMap[user.fontcolorItemNo]?.css_class_name;
-
-    console.log(items);
-    
-
   return (
     <div>
         <div className={styles.userInfo_Box}>

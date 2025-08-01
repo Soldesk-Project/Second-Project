@@ -188,8 +188,8 @@ const Header = () => {
         </ul>
       </div>
       <div className='header-box-right'>
-        <img onClick={serverOut} className='header-enter' src="/images/door-open.png" alt="서버이동" />
-        <img onClick={logOut} className='header-signout' src="/images/signout.png" alt="나가기" />
+        <img onClick={serverOut} className='header-enter' src="/images/SelectChannel.png" alt="서버이동" />
+        <img onClick={logOut} className='header-signout' src="/images/Logout.png" alt="나가기" />
       </div>
     </div>
   );

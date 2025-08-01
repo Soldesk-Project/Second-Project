@@ -160,12 +160,20 @@
 
 /* 화면 우측 말풍선*/
 .chatBubbleWrapper {
-  position: relative;
-  display: inline-block;
+  position: absolute; /* 유저카드나 프로필 기준 */
+  top: -109px;         /* 프로필 위로 위치 */
+  left: -4%;
+  transform: translateX(-50%);
 }
 
-.chatBalloonImage {
-  width: 200px;
+.chatBubble {
+  position: relative; /* 내부 텍스트 정렬 기준 */
+  display: inline-block;
+  transform: scale(0.4); /* 말풍선 전체 축소 */
+}
+
+.chatBubble img {
+  width: 350px;
   height: auto;
   display: block;
 }
@@ -175,11 +183,12 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #000;
-  font-size: 0.9rem;
+  font-size: 2rem;        /* 기존 0.75rem → 1rem 으로 키움 */
   text-align: center;
   white-space: pre-wrap;
-  width: 70%;
+  width: 75%;
+  font-weight: 600;       /* 글자 두껍게 하면 가독성 ↑ */
+  color: #000;            /* 필요하면 색상도 조절 */
 }
 
 @keyframes fadeOut {
@@ -343,7 +352,7 @@ button:disabled {
 
 /* 게임 참여 유저 카드 스타일 (1열 세로 최대 4명) */
 .user_card {
-  position: relative;
+  position: relative; 
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

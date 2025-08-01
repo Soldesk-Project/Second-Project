@@ -72,8 +72,6 @@ public class UserController {
 	@GetMapping("/inventory/category")
 	public List<ItemVO> getInventoryCategory(@RequestParam("category") String category, @RequestParam("user_no") int user_no) {
 		
-		System.out.println("카테고리 -> " + category);
-
         Map<String, String> categoryMap = Map.of(
             "테두리", "boundary",
             "칭호", "title",
