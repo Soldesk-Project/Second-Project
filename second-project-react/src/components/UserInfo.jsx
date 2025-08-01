@@ -335,7 +335,7 @@ const UserInfo = () => {
 
     const fontcolor = itemMap[user.fontcolorItemNo]?.css_class_name;
   return (
-    <div className={styles.userInfoContainer}>
+    <div>
         <div className={styles.userInfo_Box}>
             <div className={styles.userInfo_Box_1}>
                 <div className={styles.profileWrapper}>
@@ -420,22 +420,22 @@ const UserInfo = () => {
                 </div>
             </>:
             <>
-                <div className={styles.tierArea}>
-                    <div className={`${styles.tierBadge} ${getTierClass()}`}></div>
-                    {/* ✅ 티어 점수 바 추가 */}
-                    <div className={styles.rankBarWrapper}>
-                        <div className={styles.rankBar}>
-                            <div 
-                            className={styles.rankFill} 
-                            style={{ width: `${progressPercent}%` }}
-                            />
-                        </div>
-                        <div className={styles.rankLabel}>
-                            {user.user_rank} RP 
-                            {nextTier && ` / 다음 티어까지 ${nextTier - user.user_rank}점`}
-                        </div>
-                    </div>
-                </div>
+            <div className={styles.tierArea}>
+                <div className={`${styles.tierBadge} ${getTierClass()}`}></div>
+            </div>
+            {/* ✅ 티어 점수 바 추가 */}
+            <div className={styles.rankBarWrapper}>
+            <div className={styles.rankBar}>
+                <div 
+                className={styles.rankFill} 
+                style={{ width: `${progressPercent}%` }}
+                />
+            </div>
+            <div className={styles.rankLabel}>
+                {user.user_rank} RP 
+                {nextTier && ` / 다음 티어까지 ${nextTier - user.user_rank}점`}
+            </div>
+            </div>
             </>
         }
 

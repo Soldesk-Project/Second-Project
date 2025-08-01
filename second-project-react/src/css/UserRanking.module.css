@@ -1,28 +1,32 @@
 .container {
-    text-align: center;
-    margin: 10px;
-    height: calc(100% - 20px); /* 상하 마진(10px + 10px) 제외 */
-    display: flex;
-    flex-direction: column;
+  text-align: center;
+  margin: 10px;
+  height: calc(100% - 20px);
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
-    font-size: 25px;
-    padding-bottom: 10px;
-    flex-shrink: 0; /* 헤더가 높이를 유지하도록 */
+  font-size: 25px;
+  padding-bottom: 10px;
+  flex-shrink: 0;
 }
 
 .userList {
-    flex-grow: 1; /* 남은 높이를 모두 차지 */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* user 요소들 사이를 균등 분배 */
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .user {
-    height: 30px; /* 각 user 요소의 고정 높이 (필요 시 조정) */
-    line-height: 28px; /* 텍스트 세로 중앙 정렬 */
-    box-sizing: border-box;
+  height: 30px;
+  line-height: 28px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
 
 .itemGroup {
@@ -31,7 +35,54 @@
 }
 
 .itemButton {
-    border: 1px solid black;
-    background-color: black;
-    margin-right: 20px;
+  border: 1px solid black;
+  background-color: black;
+  margin-right: 20px;
+}
+
+.tierBadge {
+  width: 65px;
+  height: 33px;
+  background-size: 240%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.bronze {
+  background-image: url('https://raw.communitydragon.org/14.20/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-bronze.png');
+}
+.silver {
+  background-image: url('https://raw.communitydragon.org/14.20/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-silver.png');
+}
+.gold {
+  background-image: url('https://raw.communitydragon.org/14.20/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-gold.png');
+}
+.platinum {
+  background-image: url('https://raw.communitydragon.org/14.20/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-platinum.png');
+}
+.diamond {
+  background-image: url('https://raw.communitydragon.org/14.20/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-diamond.png');
+}
+.challenger {
+  background-image: url('https://raw.communitydragon.org/14.20/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-challenger.png');
+}
+
+.userInfoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.left,
+.right {
+  width: 65px; /* 티어 배지 크기와 동일 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.center {
+  flex: 1;
+  text-align: center;
 }

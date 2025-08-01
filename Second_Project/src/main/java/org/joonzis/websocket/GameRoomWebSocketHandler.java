@@ -156,12 +156,18 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 				: (String) session.getAttributes().get("server");
 
 		String gameMode = json.get("game_mode").asText();
+		
+		System.out.println("게임모드 -> " + gameMode);
 
 		GameRoomDTO newRoom = new GameRoomDTO(roomNo, json.get("title").asText(), json.get("category").asText(),
 				gameMode, json.get("is_private").asText(), json.get("limit").asInt(),
 				json.get("pwd") != null ? json.get("pwd").asText() : null);
-
-		roomStatus.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).put(roomNo, "create");
+		
+		if ("normal".equals(gameMode)) {
+			roomStatus.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).put(roomNo, "nomalCreate");
+		} else {
+			roomStatus.computeIfAbsent(server, k -> new ConcurrentHashMap<>()).put(roomNo, "rankCreate");
+		}
 		
 		// 게임 모드 분기
 		if ("normal".equals(newRoom.getGame_mode())) {
@@ -278,7 +284,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		
 		System.out.println("status -> " + status);
 		
-		if (gameMode.equals("rank") && (status.equals("rankPlaying") || status.equals("create"))) {
+		if (gameMode.equals("rank") && (status.equals("rankPlaying") || status.equals("rankCreate"))) {
 			playService.leavePanalty(user_nick);
 		}
 
@@ -789,8 +795,10 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 	            users.remove(user_nick);
 
 	            String roomState = roomStatus.getOrDefault(server, Collections.emptyMap()).get(roomNo);
+	            
+	            System.out.println("상태 -> " + roomState);
 
-	            if ("rankPlaying".equals(roomState) || "create".equals(roomState)) {
+	            if ("rankPlaying".equals(roomState) || "rankCreate".equals(roomState)) {
 	                playService.leavePanalty(user_nick);
 	            }
 	            

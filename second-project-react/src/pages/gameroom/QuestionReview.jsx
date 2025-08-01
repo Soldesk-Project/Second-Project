@@ -111,6 +111,7 @@ const QuestionReview = () => {
     setNextId(prev=>prev-1);
   }
   const nextQuestion=()=>{
+      setSelectAnswer(null);
       setNextId(prev=>prev+1);
   }
   
@@ -194,8 +195,12 @@ const QuestionReview = () => {
                 <h1>문제 다시 풀어 보기</h1>
               </div>
               <div className={styles.initiatorBtn}>
-                <button onClick={prevQuestion} >이전 문제</button>
-                <button onClick={nextQuestion} >다음 문제</button>
+                {
+                  <>
+                    <button onClick={prevQuestion} disabled={nextId === 0 || !play}>이전 문제</button>
+                    <button onClick={nextQuestion} disabled={nextId === 19 || !play}>다음 문제</button>
+                  </>
+                }
                 <button onClick={getAnswer} >포인트로 정답 확인하기</button>
                 {
                   play?(<p className={styles.isCorrect}>내가 {isCorrect?'맞춘':'틀린'} 문제 입니다</p>):null

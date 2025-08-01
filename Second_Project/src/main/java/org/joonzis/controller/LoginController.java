@@ -691,11 +691,17 @@ public class LoginController {
 	    // 사용자가 입력한 ID와 PW
 	    String inputId = dto.getUser_id();
 	    String inputPw = dto.getUser_pw();
+	    
+	    System.out.println("id -> " + inputId);
+	    System.out.println("password -> " + inputPw);
 
 	    // DB에서 사용자 정보 조회 (비밀번호 포함)
 	    UserInfoDTO user = userservice.getUserById(inputId);
+	    
+	    System.out.println("사용자 -> " + user);
 
 	    if (user == null) {
+	    	System.out.println("사용자 없음");
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("존재하지 않는 사용자입니다.");
 	    }
 
@@ -738,8 +744,6 @@ public class LoginController {
 	    	    .findFirst()
 	    	    .map(GrantedAuthority::getAuthority)
 	    	    .orElse("ROLE_USER");  // 권한 없으면 기본값
-	    
-	    System.out.println("role -> "  + role);
 	    
 	    String token = jwtUtil.generateToken(inputId, role);
 	    // 5. 사용자 정보 및 토큰 반환
