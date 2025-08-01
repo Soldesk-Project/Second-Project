@@ -18,6 +18,8 @@ const QuestRegiCallManage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [callsPerPage, setCallsPerPage] = useState(10); // 페이지당 표시 개수
 
+    const token = localStorage.getItem('token');
+
     // 데이터 로드 함수 (API 호출)
     const fetchCalls = useCallback(async () => {
         setLoading(true);
@@ -32,7 +34,13 @@ const QuestRegiCallManage = () => {
             }).toString();
 
             // 백엔드 엔드포인트에 맞게 URL 수정
-            const response = await fetch(`/admin/questRequests?${queryParams}`);
+            const response = await fetch(`/admin/questRequests?${queryParams}`, {
+                method: 'GET',
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                }
+            });
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`데이터 로드 실패: ${response.status} ${errorText}`);
@@ -95,6 +103,7 @@ const QuestRegiCallManage = () => {
                     const response = await fetch(`/admin/questRequests/${callId}`, { // API 엔드포인트 수정
                         method: 'PUT',
                         headers: {
+                            "Authorization": `Bearer ${token}`,
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({ ...callToUpdate, status: newStatus }),
@@ -127,7 +136,13 @@ const QuestRegiCallManage = () => {
         setLoading(true); // 상세 정보 로딩 중 표시
         try {
             // 백엔드 엔드포인트에 맞게 URL 수정
-            const response = await fetch(`/admin/questRequests/${callId}`);
+            const response = await fetch(`/admin/questRequests/${callId}`, {
+                method: 'GET',
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`상세 정보 로드 실패: ${response.status} ${errorText}`);
@@ -152,6 +167,7 @@ const QuestRegiCallManage = () => {
             const response = await fetch(`/admin/questRequests/${selectedCall.id}`, {
                 method: 'PUT', // PUT 또는 PATCH (부분 수정 시)
                 headers: {
+                    "Authorization": `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(selectedCall), // 수정된 selectedCall 객체 전송
