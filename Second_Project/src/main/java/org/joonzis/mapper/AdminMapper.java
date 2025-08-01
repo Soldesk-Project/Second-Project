@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.ItemVO;
+import org.joonzis.domain.QuestRequestVO;
 import org.joonzis.domain.QuestionDTO;
 import org.joonzis.domain.UsersVO;
 
@@ -58,5 +59,13 @@ public interface AdminMapper {
 	
 	//아이템 삭제 메소드
 	void deleteItems(Map<String, Object> params);
+
+	List<QuestRequestVO> selectQuestRequests(Map<String, Object> params);
+
+	int getQuestRequestTotalCount(Map<String, Object> params);
+
+	QuestRequestVO selectQuestRequestById(long id);
+
+	void updateQuestRequest(QuestRequestVO questRequestVO);
 
 }
