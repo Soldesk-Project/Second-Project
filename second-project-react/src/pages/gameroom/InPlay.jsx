@@ -73,8 +73,8 @@ const InPlay = () => {
   const { roomNo } = useParams();
   const nav = useNavigate();
   const { user, server } = useSelector((state) => state.user);
-  const userNick = user.user_nick;
-  const userNo = user.user_no;
+  const userNick = user?.user_nick;
+  const userNo = user?.user_no;
   const location = useLocation();
   const category = location.state?.category || 'random';
   // 랭크 진입 경로 일 때도 항상 gameMode를 제대로 받게 한다
