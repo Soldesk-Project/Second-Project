@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import styles from '../../css/adminPage/QuestErrRepoManage.css';
+import styles from '../../css/adminPage/QuestRegiCallManage.css';
 
 const QuestRegiCallManage = () => {
     // 예시 데이터 대신 실제 데이터를 담을 상태

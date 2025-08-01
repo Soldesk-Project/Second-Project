@@ -3,9 +3,6 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.joonzis.mapper.AdminMapper">
-
-    
-    <!-- 문제 등록 -->
     <insert id="insertQuestion" parameterType="org.joonzis.domain.QuestionDTO">
         INSERT INTO Question (
             id,
@@ -29,9 +26,8 @@
             SYSTIMESTAMP
         )
     </insert>
-    
-    <!-- 문제 검색 -->
-	<select id="getQuestionsBySearch" resultType="org.joonzis.domain.QuestionDTO" parameterType="map">
+
+    <select id="getQuestionsBySearch" resultType="org.joonzis.domain.QuestionDTO" parameterType="map">
 		SELECT
 			id,
 			subject,
@@ -53,7 +49,7 @@
 				option_4,
 				correct_answer,
 				image_data,
-				ROWNUM AS rn  FROM (
+				ROWNUM AS rn FROM (
 				SELECT
 					id,
 					subject,
@@ -83,8 +79,7 @@
             </if>
         </where>
     </select>
-    
-    <!-- 문제 수정 -->
+
     <update id="updateQuestion" parameterType="org.joonzis.domain.QuestionDTO">
         UPDATE Question
         SET
@@ -103,8 +98,7 @@
         WHERE
             id = #{id}
     </update>
-    
-    <!-- 문제 삭제 -->
+
     <delete id="deleteQuestions" parameterType="map">
     	DELETE FROM Question WHERE id IN
         <foreach collection="questionIds" item="id" open="(" separator="," close=")">
@@ -114,14 +108,12 @@
             AND subject = #{subjectCode}
         </if>
     </delete>
-    
-    <!-- 유저 전체 조회 -->
+
     <select id="selectAllUsers" resultType="org.joonzis.domain.UsersVO">
         SELECT USER_NO, USER_ID, USER_NICK, USER_EMAIL, USER_DATE, USER_POINT, USER_RANK, USER_PLAY_COUNT, USER_1ST_COUNT, USER_PW, ISCHATBANNED, BANNED_TIMESTAMP, AUTH
         FROM USERS
     </select>
-    
-    <!-- 유저 검색 -->
+
     <select id="searchUsers" resultType="org.joonzis.domain.UsersVO" parameterType="map">
         SELECT USER_NO, USER_ID, USER_NICK, USER_EMAIL, USER_DATE, USER_POINT, USER_RANK, USER_PLAY_COUNT, USER_1ST_COUNT, USER_PW, ISCHATBANNED, BANNED_TIMESTAMP, AUTH
         FROM USERS
@@ -145,8 +137,7 @@
         </where>
         ORDER BY USER_NO DESC
     </select>
-    
-    <!-- 유저 챗밴 현황 조회 -->
+
     <select id="getUsersChatBanStatus" resultType="org.joonzis.domain.UsersVO" parameterType="map">
         SELECT user_no, ISCHATBANNED, user_nick
         FROM users
@@ -155,8 +146,7 @@
             #{userNo}
         </foreach>
     </select>
-    
-    <!-- 유저 챗밴 적용 -->
+
     <update id="updateChatBanStatus" parameterType="map">
         UPDATE users
         SET
@@ -168,8 +158,7 @@
         </foreach>
         AND ISCHATBANNED = 0
     </update>
-    
-    <!-- 유저 챗밴 해제 -->
+
     <update id="unbanChatUsers">
         UPDATE USERS
         SET
@@ -180,9 +169,8 @@
             AND BANNED_TIMESTAMP IS NOT NULL
             AND BANNED_TIMESTAMP <![CDATA[ <= ]]> (SYSTIMESTAMP - INTERVAL '72' HOUR)
     </update>
-    
-    
-    <!-- 업적 등록 -->
+
+
     <insert id="insertAchievement">
         INSERT INTO ACHIEVEMENTS (ach_title, ach_content, ach_reward, ach_type)
         VALUES (
@@ -192,8 +180,7 @@
             #{ach_type, jdbcType=VARCHAR}
         )
     </insert>
-    
-    <!-- 업적 검색 -->
+
     <select id="searchAchievements" resultType="org.joonzis.domain.AchievementDTO">
     	SELECT ach_title, ach_content, ach_reward, ach_type
     	FROM (
@@ -215,7 +202,7 @@
     	)
     	WHERE rn > #{offset, jdbcType=NUMERIC}
 	</select>
-    
+
     <select id="getTotalAchievementCount" resultType="int">
         SELECT COUNT(*)
         FROM ACHIEVEMENTS
@@ -228,8 +215,7 @@
             </if>
         </where>
     </select>
-    
-    <!-- 업적 삭제 -->
+
     <delete id="deleteAchievementsByTitles">
         DELETE FROM ACHIEVEMENTS
         <where>
@@ -244,8 +230,7 @@
             </if>
         </where>
     </delete>
-    
-    <!-- 아이템 등록 -->
+
     <insert id="insertItem" parameterType="org.joonzis.domain.ItemVO" useGeneratedKeys="true" keyProperty="item_no">
     	<selectKey keyProperty="item_no" resultType="int" order="BEFORE">
             SELECT SEQ_ITEMS.NEXTVAL FROM DUAL
@@ -264,8 +249,7 @@
             #{item_type}
         )
     </insert>
-    
-    <!-- 아이템 검색 -->
+
     <select id="searchItems" resultType="org.joonzis.domain.ItemVO" parameterType="map">
     SELECT item_no, item_name, item_price, item_type, image_file_name
     FROM (
@@ -294,9 +278,8 @@
         <if test="query != null and query != ''">
             AND item_name LIKE '%' || #{query} || '%' </if>
     </select>
-	
-	<!-- 아이템 수정 -->
-    <update id="updateItem" parameterType="org.joonzis.domain.ItemVO">
+
+	<update id="updateItem" parameterType="org.joonzis.domain.ItemVO">
         UPDATE items
         SET
             item_name = #{item_name},
@@ -304,79 +287,97 @@
             image_file_name = #{imageFileName}
         WHERE item_no = #{item_no} AND item_type = #{item_type}
     </update>
-    
-    <!-- 아이템 삭제 -->
+
     <delete id="deleteItems" parameterType="map">
         DELETE FROM items WHERE item_type = #{itemType} AND item_no IN
         <foreach collection="itemNos" item="itemNo" open="(" separator="," close=")">
             #{itemNo}
         </foreach>
     </delete>
-    
-    <select id="selectQuestRequests" resultType="org.joonzis.domain.QuestRequestVO">
+
+    <select id="selectQuestRequests" resultType="org.joonzis.domain.QuestRequestVO" parameterType="map">
+    SELECT
+        id, user_no, user_id, subject, question_text, option_1, option_2, option_3, option_4, correct_answer, image_data, status, created_at
+    FROM (
         SELECT
-            qr.QUESTION_REQUEST_ID AS id,
-            qr.USER_NO AS user_no,
-            u.USER_ID AS user_id,
-            qr.SUBJECT AS subject,
-            qr.QUESTION_TEXT AS question_text,
-            qr.OPTION_1 AS option_1,
-            qr.OPTION_2 AS option_2,
-            qr.OPTION_3 AS option_3,
-            qr.OPTION_4 AS option_4,
-            qr.CORRECT_ANSWER AS correct_answer,
-            qr.IMAGE_PATH AS image_path,
-            qr.STATUS AS status,
-            qr.CREATED_AT AS created_at
-        FROM QUESTION_REQUEST qr
-        LEFT JOIN USERS u ON qr.USER_NO = u.USER_NO
-        <where>
-            <if test="searchTerm != null and !searchTerm.isEmpty()">
-                AND (qr.QUESTION_TEXT LIKE '%' || #{searchTerm} || '%' OR u.USER_ID LIKE '%' || #{searchTerm} || '%')
-            </if>
-            <if test="filterStatus != null and !filterStatus.isEmpty()">
-                AND qr.STATUS = #{filterStatus}
-            </if>
-        </where>
-        ORDER BY qr.CREATED_AT DESC
-        OFFSET #{offset} ROWS
-        FETCH NEXT #{limit} ROWS ONLY
-    </select>
+            t2.id,
+            t2.user_no,
+            t2.user_id,
+            t2.subject,
+            t2.question_text,
+            t2.option_1,
+            t2.option_2,
+            t2.option_3,
+            t2.option_4,
+            t2.correct_answer,
+            t2.image_data,
+            t2.status,
+            t2.created_at,
+            ROWNUM AS rn
+        FROM (
+            SELECT
+                qr.ID AS id,
+                qr.USER_NO AS user_no,
+                u.USER_ID AS user_id,
+                qr.SUBJECT AS subject,
+                qr.QUESTION_TEXT AS question_text,
+                qr.OPTION_1 AS option_1,
+                qr.OPTION_2 AS option_2,
+                qr.OPTION_3 AS option_3,
+                qr.OPTION_4 AS option_4,
+                qr.CORRECT_ANSWER AS correct_answer,
+                qr.IMAGE_DATA AS image_data,
+                qr.STATUS AS status,
+                qr.REQUEST_CREATED_AT AS created_at
+            FROM QUESTION_REQUEST qr
+            LEFT JOIN USERS u ON qr.USER_NO = u.USER_NO
+            <where>
+                <if test="searchTerm != null and !searchTerm.isEmpty()">
+                    AND (qr.QUESTION_TEXT LIKE '%' || #{searchTerm} || '%' OR u.USER_ID LIKE '%' || #{searchTerm} || '%')
+                </if>
+                <if test="filterStatus != null and !filterStatus.isEmpty()">
+                    AND qr.STATUS = #{filterStatus}
+                </if>
+            </where>
+            ORDER BY qr.REQUEST_CREATED_AT DESC
+        ) t2
+        WHERE ROWNUM &lt;= (#{offset} + #{limit})
+    )
+    WHERE rn > #{offset}
+	</select>
 
     <select id="getQuestRequestTotalCount" resultType="int">
         SELECT COUNT(*)
         FROM QUESTION_REQUEST qr
         LEFT JOIN USERS u ON qr.USER_NO = u.USER_NO
-        <where>
-            <if test="searchTerm != null and !searchTerm.isEmpty()">
-                AND (qr.QUESTION_TEXT LIKE '%' || #{searchTerm} || '%' OR u.USER_ID LIKE '%' || #{searchTerm} || '%')
-            </if>
-            <if test="filterStatus != null and !filterStatus.isEmpty()">
-                AND qr.STATUS = #{filterStatus}
-            </if>
-        </where>
+        WHERE 1=1
+        <if test="searchTerm != null and !searchTerm.isEmpty()">
+            AND (qr.QUESTION_TEXT LIKE '%' || #{searchTerm} || '%' OR u.USER_ID LIKE '%' || #{searchTerm} || '%')
+        </if>
+        <if test="filterStatus != null and !filterStatus.isEmpty()">
+            AND qr.STATUS = #{filterStatus}
+        </if>
     </select>
 
     <select id="selectQuestRequestById" resultType="org.joonzis.domain.QuestRequestVO">
-        SELECT
-            qr.QUESTION_REQUEST_ID AS id,
-            qr.USER_NO AS user_no,
-            u.USER_ID AS user_id,
-            qr.SUBJECT AS subject,
-            qr.QUESTION_TEXT AS question_text,
-            qr.OPTION_1 AS option_1,
-            qr.OPTION_2 AS option_2,
-            qr.OPTION_3 AS option_3,
-            qr.OPTION_4 AS option_4,
-            qr.CORRECT_ANSWER AS correct_answer,
-            qr.IMAGE_PATH AS image_path,
-            qr.IMAGE_DATA AS image_data,
-            qr.STATUS AS status,
-            qr.CREATED_AT AS created_at
-        FROM QUESTION_REQUEST qr
-        LEFT JOIN USERS u ON qr.USER_NO = u.USER_NO
-        WHERE qr.QUESTION_REQUEST_ID = #{id}
-    </select>
+    SELECT
+        qr.ID AS id,
+        qr.USER_NO AS user_no,
+        u.USER_ID AS user_id,
+        qr.SUBJECT AS subject,
+        qr.QUESTION_TEXT AS question_text,
+        qr.OPTION_1 AS option_1,
+        qr.OPTION_2 AS option_2,
+        qr.OPTION_3 AS option_3,
+        qr.OPTION_4 AS option_4,
+        qr.CORRECT_ANSWER AS correct_answer,
+        qr.IMAGE_DATA AS image_data,
+        qr.STATUS AS status,
+        qr.REQUEST_CREATED_AT AS created_at
+    FROM QUESTION_REQUEST qr
+    LEFT JOIN USERS u ON qr.USER_NO = u.USER_NO
+    WHERE qr.ID = #{id}
+	</select>
 
     <update id="updateQuestRequest">
         UPDATE QUESTION_REQUEST
@@ -390,11 +391,11 @@
             CORRECT_ANSWER = #{correct_answer},
             STATUS = #{status},
             <if test="image_data != null">
-                IMAGE_DATA = #{image_data, jdbcType=BLOB},
+                IMAGE_DATA = #{image_data, jdbcType=BLOB}
             </if>
             <if test="image_data == null and image_data_base64 != null and image_data_base64.isEmpty()">
-                IMAGE_DATA = NULL,
+                IMAGE_DATA = NULL
             </if>
-            WHERE QUESTION_REQUEST_ID = #{id}
+        WHERE ID = #{id}
     </update>
 </mapper>
