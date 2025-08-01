@@ -67,6 +67,7 @@ const InPlay = () => {
   const [countdown, setCountdown] = useState(10);
   const [leaveModal, setLeaveModal] = useState(false);
   const [shopItems, setShopItems] = useState([]);
+  const [date, setDate] = useState(()=> new Date())
   const myTotalElapsed = userElapsedTimes.reduce((sum, t) => sum + t, 0);
   const questionListRef = useRef([]);
   const { roomNo } = useParams();
@@ -450,6 +451,17 @@ const InPlay = () => {
     nav('/main/' + server);
   };
 
+   useEffect(()=>{
+    const timeId = setInterval(()=>setDate(new Date()),1000)
+    console.log('setInteval')
+
+    return() =>{
+      clearInterval(timeId)
+      console.log('clearInterval')
+
+    }
+  },[])
+
   // 카테고리 변환
   const setKoreanToCategory = (category) => {
     switch (category) {
@@ -638,6 +650,10 @@ const InPlay = () => {
             );
           })}
         </div>
+        <div className={styles.nowTime}>
+          <span>현재 시간</span>
+          <span>{date.toLocaleTimeString()}</span>
+        </div> 
       </div>
         {
           leaveModal && (

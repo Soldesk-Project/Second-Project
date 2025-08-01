@@ -202,8 +202,10 @@ const Shop = () => {
                   />
                 )}
                   </div>
-                  <div className={styles.itemName}>이름 : {item.item_name}</div>
-                  <div className={styles.itemPrice}>가격 : {item.item_price ? item.item_price.toLocaleString() : '가격 미정'} p</div>
+                  <div className={styles.cardFooter}>
+                    <div className={styles.itemName}>이름 : {item.item_name}</div>
+                    <div className={styles.itemPrice}>가격 : {item.item_price ? item.item_price.toLocaleString() : '가격 미정'}</div>
+                  </div>
                 </div>
               ))
             ) : (
