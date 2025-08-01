@@ -156,7 +156,7 @@
 	<!-- 리워드 보상 획득 -->
 	<insert id="addReward" parameterType="org.joonzis.domain.UserDecoUpdateDTO">
 		INSERT INTO INVENTORY (USER_NO, CSS_CLASS_NAME, ITEM_NAME, ITEM_TYPE)
-		VALUES (#{user_no}, #{css_class_name}, #{item_name}, #{item_type})
+		VALUES (#{user_no}, #{css_class_name, jdbcType=VARCHAR}, #{item_name}, #{item_type})
 	</insert>
 	
 	<!-- 회원가입 - 닉네임 중복 확인 -->

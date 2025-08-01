@@ -185,13 +185,22 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -60%);
   font-size: 2rem;        /* 기존 0.75rem → 1rem 으로 키움 */
   text-align: center;
   white-space: pre-wrap;
   width: 75%;
+  max-height: 40%;
   font-weight: 600;       /* 글자 두껍게 하면 가독성 ↑ */
   color: #000;            /* 필요하면 색상도 조절 */
+  
+  display: -webkit-box;     /* 줄임 및 라인수 제한 위한 flexbox 대체 */
+  -webkit-line-clamp: 2;   /* 최대 2줄까지만 보이게 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  justify-content: center;
+  align-items: center;
 }
 
 @keyframes fadeOut {

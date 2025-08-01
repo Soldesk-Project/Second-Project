@@ -14,10 +14,10 @@ const ITEM_TYPES = [
 ];
 
 const REWARDS = {
-  // boundary: { css_class_name: 'rainbow_bd', item_name: 'rainbow_boundary'},
+  boundary: { css_class_name: null, item_name: '무지개 테두리', item_type: 'unique'},
   title: { css_class_name: 'collector_title', item_name: '콜렉터', item_type: 'unique'},
   fontColor: { css_class_name: 'rainbow_fontColor', item_name: '무지개 글자', item_type: 'unique'},
-  // background: { css_class_name: 'rainbow_bg', item_name: 'rainbow_background'},
+  background: { css_class_name: null, item_name: '사이버 명함', item_type: 'unique'},
 };
 
 const ItemList = () => {
@@ -242,7 +242,7 @@ const ItemList = () => {
                         </span>
                       )}
                       {
-                        typeKey==='boundary'||typeKey==='background'?
+                        typeKey==='boundary'||typeKey==='background'||(item.item_type==='unique' && item.item_no===118) ||(item.item_type==='unique' && item.item_no===119)?
                         <img src={item.imgUrl} alt={item.item_name} className={styles.itemImage}/>
                         :
                         (
