@@ -32,7 +32,7 @@ const Shop = () => {
   }
 
   const fetchGetItems = async () => {
-    if (!user.user_no) return;
+    if (!user?.user_no) return;
     try {
       const res = await axios.get(`/user/getItems?user_no=${user.user_no}`);
       setOwnedItems(res.data);
@@ -47,7 +47,7 @@ const Shop = () => {
 
   useEffect(() => {
     fetchGetItems();
-  }, [user.user_no]);
+  }, [user?.user_no]);
 
   useEffect(() => {
           if (!user?.user_profile_img) return;
@@ -56,7 +56,7 @@ const Shop = () => {
               ? raw
               : `/images/${raw}`;
           setProfileSrc(src);
-          }, [user.user_profile_img]);
+          }, [user?.user_profile_img]);
   
   useEffect(() => {
     // 아이템 탭
@@ -202,8 +202,10 @@ const Shop = () => {
                   />
                 )}
                   </div>
-                  <div className={styles.itemName}>이름 : {item.item_name}</div>
-                  <div className={styles.itemPrice}>가격 : {item.item_price ? item.item_price.toLocaleString() : '가격 미정'} p</div>
+                  <div className={styles.cardFooter}>
+                    <div className={styles.itemName}>이름 : {item.item_name}</div>
+                    <div className={styles.itemPrice}>가격 : {item.item_price ? item.item_price.toLocaleString() : '가격 미정'}</div>
+                  </div>
                 </div>
               ))
             ) : (

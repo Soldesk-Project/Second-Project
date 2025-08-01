@@ -91,15 +91,14 @@ const FindPw = () => {
       <div className="findPw-box">
         <div className='findPw_submit'>
           <h1>CotePlay에 어서오세요.</h1>
-          <br />
           <div className="login-options">
             <div className='login-option_1'>
-              <button name="signUp" onClick={handleNavigation}>Sign Up</button>
+              <button name="signUp" onClick={handleNavigation}>회원가입</button>
             </div>
             <div className='login-option_2'>
-              <button name="findId" onClick={handleNavigation}>Find id</button>
+              <button name="findId" onClick={handleNavigation}>아이디 찾기</button>
               <p>/</p>
-              <button name="findPw" onClick={handleNavigation}>Find password</button>
+              <button name="findPw" onClick={handleNavigation}>비밀번호 찾기</button>
             </div>
           </div>
 
@@ -113,10 +112,10 @@ const FindPw = () => {
             />
           </div>
 
-          <div className='email_box'>
+          <div className='email_box' style={{marginBottom:'0px'}}>
             <input
               type="text"
-              placeholder="이메일 아이디"
+              placeholder="이메일 입력"
               value={emailId}
               onChange={(e) => setEmailId(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -158,9 +157,9 @@ const FindPw = () => {
                         width: '100%',
                         marginBottom: '1rem 0',
                     }}>
-            <button style={buttonStyle} onClick={handleFindPw} disabled={loading}>{loading ? '요청 중...' : 'Find Result'}</button>
-            <button style={buttonStyle} onClick={resetInputs}>Reset</button>
-            <button style={buttonStyle} onClick={() => navigate('/')}>Home</button>
+            <button style={buttonStyle} onClick={handleFindPw} disabled={loading}>{loading ? '요청 중...' : '찾기'}</button>
+            <button style={buttonStyle} onClick={resetInputs}>다시 입력</button>
+            <button style={buttonStyle} onClick={() => navigate('/')}>홈</button>
           </div>
         </div>
 

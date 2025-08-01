@@ -14,6 +14,7 @@
 .findId_submit{
   align-content: center;
   margin-left: 50px;
+  margin-bottom: 70px;
 }
 
 .findId-box input {
@@ -35,7 +36,7 @@
   display: flex;
   flex-direction: row;
   width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: 0px;
 }
 
 .domain_box{

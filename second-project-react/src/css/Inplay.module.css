@@ -42,6 +42,9 @@
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   box-shadow: 0px 1px 3px 1px rgb(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 15px;
 }
 
 /* 유저 랭킹 */
@@ -200,11 +203,11 @@
 /* Inplay css 추후 수정 --------------------------------------------- */
 .game_join_userList {
   display: flex;
+  /* height: 100%; */
+  gap: 20px;
+  padding: 20px 0;
   flex-direction: column;
-  justify-content: space-between;
-  height: 901px; /* 이미 px로 고정이면 그대로, 아니면 vh로 추천 */
-  gap: 16px;
-  padding: 16px 0;
+  min-height: 971px;
 }
 .solving {
   display: flex;
@@ -367,7 +370,7 @@ button:disabled {
 
   /* ★ 추가 */
   flex: 1 1 0;           /* <- 4칸 균등 분배의 핵심! */
-  min-height: 0;         /* (부모의 높이 초과 방지) */
+  min-height: 220;         /* (부모의 높이 초과 방지) */
   margin: 0 8px;         /* 양 옆 여백, 원하면 조절 */
   /* margin-bottom 대신 부모에서 gap 사용 */
   transition: background 0.15s;
@@ -448,3 +451,24 @@ button:disabled {
   50% { transform: scale(1.1); opacity: 0.7; }
   100% { transform: scale(1); opacity: 1; }
 }
+.nowTime{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 5px 0;
+  font-size: 1.2rem;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  color: #39ffe6;
+  text-shadow:
+    0 0 5px #00fff7,
+    0 0 10px #05eaff,
+    0 0 20px #56fffb;
+  border-radius: 12px;
+  background: rgba(0, 20, 50, 0.25);
+  box-shadow: 0 0 12px 2px #00d8ff33;
+  font-weight: bold;
+  margin: 10px auto 0;
+  width: 90%;
+  letter-spacing: 1px;
+}
+

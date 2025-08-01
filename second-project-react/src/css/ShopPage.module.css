@@ -113,7 +113,7 @@
 }
 
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0,0,0,0.3);
 }
 
@@ -127,7 +127,7 @@
 }
 
 .itemImage {
-  max-width: 90%;
+  max-width: 50%;
   max-height: 90%;
 }
 
@@ -136,27 +136,65 @@
 }
 
 
-.itemName {
-  flex: 2;
+.cardFooter {
   width: 100%;
+  background: linear-gradient(90deg, #f0f1f7 0%, #e7e0fc 100%);
+  border-top: 1.5px solid #e7e7ee;
+  box-shadow: 0 6px 16px -6px #bcb7e633 inset;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  font-weight: bold;
-  font-size: 0.95rem;
-  color: #333;
-  border-top: 1px solid #eee;
+  gap: 4px;
+  position: relative;
+  padding: 5px 0;
+  transition: box-shadow .18s, background .22s;
+}
+.card:hover .cardFooter {
+  background: linear-gradient(90deg, #ece9f7 0%, #d8cfff 100%);
+  box-shadow: 0 2px 26px 0 #ceccfaf7;
 }
 
+/* 세련된 부드러운 서체, 컬러 */
+.itemName {
+  font-family: 'Noto Sans KR', 'Roboto', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #392a56;
+  background: #fff9fc;
+  width: 95%;
+  border-radius: 7px 7px 0 0;
+  padding: 7px 0 4px 12px;
+  letter-spacing: 0.01em;
+  margin: 0;
+  border-bottom: 1px solid #e5d8f5;
+  text-align: left;
+  box-shadow: 0 2px 8px #e8e1fa12 inset;
+}
 
+/* 가격은 골드/실버 명도 타이포+커스텀 p 강조 */
 .itemPrice {
-  flex: 1;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 0.85rem;
-  color: #777;
+  font-family: 'Noto Sans KR', 'Roboto', sans-serif;
+  font-size: 1.01rem;
+  color: #866ee7;
+  font-weight: 600;
+  background: #f8f7fb;
+  width: 95%;
+  border-radius: 7px 7px 0 0;
+  padding: 7px 0 4px 12px;
+  box-shadow: 0 1px 8px #e7d7f533 inset;
+  margin: 0;
+  text-align: left;
+  position: relative;
+  letter-spacing: .02em;
+}
+.itemPrice::after {
+  content: " p";
+  color: #b89c40;
+  font-size: 1.08em;
+  font-weight: bold;
+  padding-left: 2px;
+  letter-spacing: 0;
+  opacity: 0.85;
 }
 
 /* 메인 영역 */

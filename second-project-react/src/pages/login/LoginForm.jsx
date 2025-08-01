@@ -43,29 +43,32 @@ const LoginForm = () => {
       navigate('/server');
     }
   }, [user, navigate]);
-  
-  const handleLogin = async () => {
+
+  const handleLogin = async (e) => {
+    if (e) e.preventDefault(); // ✅ form 제출 시 기본 동작 방지
+
     if (!id || !pw) {
       alert('ID와 비밀번호를 입력해주세요.');
       return;
     }
 
     try {
-      // ✅ 기존 토큰 제거
       localStorage.removeItem('token');
 
       const res = await axios.post('/api/login', { user_id: id, user_pw: pw });
 
       localStorage.setItem('token', res.data.token);
-      console.log(res.data.user);
-      
       dispatch(setUser(res.data.user));
       navigate('/server');
     } catch (err) {
-      if (err.response.status === 409) {
+      if (!err.response) {
+        alert("네트워크 오류가 발생했습니다.");
+      } else if (err.response.status === 409) {
         alert('이미 로그인된 사용자입니다.');
+      } else if (err.response.status === 401) {
+        alert('아이디 또는 비밀번호가 잘못되었습니다.');
       } else {
-        alert('로그인 실패');
+        alert('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
       }
     }
   };
@@ -74,30 +77,16 @@ const LoginForm = () => {
     window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}&response_type=code`;
   }
 
-  const handleButtonOption = (e) => {
-    const { name } = e.target;
-    switch (name) {
-      case 'signUp':
-        navigate('/signUp');
-        break;
-      case 'findId':
-        navigate('/findId');
-        break;
-      case 'findPw':
-        navigate('/findPw');
-        break;
-      case 'login':
-        navigate('/');
-        break;
-      default:
-        break;
-    }
+  const pageRoutes = {
+    signUp: '/signUp',
+    findId: '/findId',
+    findPw: '/findPw',
+    login: '/',
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleLogin();
-    }
+  const handleButtonOption = (e) => {
+    const route = pageRoutes[e.target.name];
+    if (route) navigate(route);
   };
 
   return (
@@ -110,32 +99,32 @@ const LoginForm = () => {
           <h6>it 자격증 시험 및 코딩 공부를 쉽게 할 수 있도록 도와주는 교육게임사이트입니다. </h6>
           <div className="login-options">
             <div className='login-option_1'>
-              <button name="signUp" onClick={handleButtonOption}>Sing Up</button>
+              <button name="signUp" onClick={handleButtonOption}>회원가입</button>
             </div>
             <div className='login-option_2'>
-              <button name="findId" onClick={handleButtonOption}>Find id</button>
+              <button name="findId" onClick={handleButtonOption}>아이디 찾기</button>
               <p>/</p>
-              <button name="findPw" onClick={handleButtonOption}>Find password</button>
+              <button name="findPw" onClick={handleButtonOption}>비밀번호 찾기</button>
             </div>
           </div>
-          <input
-            type="text"
-            placeholder="id"
-            value={id}
-            onChange={(e) => setId(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-          <input
-            type="password"
-            placeholder="password"
-            value={pw}
-            onChange={(e) => setPw(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-          <button onClick={handleLogin} className='loginButton'>login</button>
-          <button onClick={handleKakaoLogin} className='kakao-login'>kakao login</button>
-          <button onClick={handleNaverLogin} className='naver-login'>naver login</button>
-          <button onClick={handleGoogleLogin} className='google-login'>google login</button>
+          <form onSubmit={handleLogin}>
+            <input
+              type="text"
+              placeholder="아이디"
+              value={id}
+              onChange={(e) => setId(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="비밀번호"
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+            />
+            <button type="submit" className='loginButton'>로그인</button>
+          </form>
+          <button onClick={handleKakaoLogin} className='kakao-login'>카카오 로그인</button>
+          <button onClick={handleNaverLogin} className='naver-login'>네이버 로그인</button>
+          <button onClick={handleGoogleLogin} className='google-login'>구글 로그인</button>
         </div>
         <div className='login-image'>
           <img 

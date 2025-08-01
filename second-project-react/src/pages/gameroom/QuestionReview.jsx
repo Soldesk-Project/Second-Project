@@ -253,13 +253,6 @@ const QuestionReview = () => {
               </div>
             </div>
           </div>
-          <div className={styles.chat_box}>
-            {/* {userNick && userNo != null && roomNo ? (
-              <GameChatbox gameroomNo={roomNo} userNick={userNick} userNo={userNo} onNewMessage={handleNewChatMessage}/>
-            ) : (
-              <p>채팅을 로드할 수 없습니다. 사용자 정보 또는 게임방 번호를 확인 중...</p>
-            )} */}
-          </div>
         </div>
         <div className={styles.body_right}>
           {

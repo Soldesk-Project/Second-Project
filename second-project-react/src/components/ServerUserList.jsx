@@ -13,6 +13,7 @@ const ServerUserList = () => {
   const { user, server } = useSelector((state) => state.user);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const sockets = useContext(WebSocketContext);
   const socketRef = useRef(null);
@@ -110,6 +111,7 @@ const ServerUserList = () => {
           Number(b.userNo) === Number(user.user_no) ? 1 : 0
         );
         setUsers(detailed);
+        setIsLoading(false);
       }
       
     };
@@ -139,14 +141,14 @@ const ServerUserList = () => {
         {`${server}서버 - 유저 목록`}
       </div>
       <div className={styles.userList}>
-        {users.length > 0 ? (
+        {isLoading ? (
+          <p>로딩중...</p>
+        ) : users.length > 0 ? (
           users.map(u => {
-            // 4) 각 유저의 아이템 객체 가져오기
             const bg = itemMap[u.backgroundItemNo];
             const tt = itemMap[u.titleItemNo];
             const fc = itemMap[u.fontColorItemNo];
 
-            // 5) 배경 스타일 세팅
             const bgStyle = bg?.imgUrl
               ? {
                   backgroundImage: `url(${bg.imgUrl})`,
@@ -160,14 +162,13 @@ const ServerUserList = () => {
               <div
                 key={`user-${u.userNo}`}
                 className={styles.user}
-                style={bgStyle}        // ★ 배경 이미지
+                style={bgStyle}
                 onClick={() => {
                   setSelectedUser(u);
                   setShowModal(true);
                 }}
               >
                 <div>
-                  {/* 칭호 */}
                   {tt && titleTextMap[tt.css_class_name] && (
                     <span
                       className={decoStyles[tt.css_class_name]}
@@ -176,12 +177,8 @@ const ServerUserList = () => {
                       [{titleTextMap[tt.css_class_name]}]
                     </span>
                   )}
-
-                  {/* 닉네임(글자색) */}
                   <span
-                    className={
-                      fc ? decoStyles[fc.css_class_name] : undefined
-                    }
+                    className={fc ? decoStyles[fc.css_class_name] : undefined}
                   >
                     {u.userNick}
                   </span>
