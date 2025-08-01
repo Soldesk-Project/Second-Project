@@ -79,6 +79,10 @@ const SignUp = () => {
     }
 
     const registerUser = async () => {
+        if (users.user_id !== lastCheckedId || users.user_nick !== lastCheckedNickname || users.user_email !== lastCheckedEmail) {
+            alert('입력값 변경 후 중복 확인 중입니다. 잠시만 기다려주세요.');
+            return;
+        }
         const { user_nick, user_id, user_pw, user_email } = users;
 
         if (!user_nick || !user_id || !user_pw || !user_email) {
@@ -127,7 +131,7 @@ const SignUp = () => {
 
         try {
             const resp = await axios.post('/api/signUp', users);
-            if (resp.status === 200) {
+            if (resp.status >= 200 && resp.status < 300) {
                 alert('회원가입 성공');
                 navigate('/');
             } else {
@@ -314,9 +318,9 @@ const SignUp = () => {
                         width: '100%',
                         marginBottom: '1rem 0',
                     }}>
-                        <button style={buttonStyle} onClick={registerUser}>Sign Up</button>
-                        <button style={buttonStyle} onClick={resetInputs}>Reset</button>
-                        <button style={buttonStyle} onClick={moveToLogin}>Home</button>
+                        <button style={buttonStyle} onClick={registerUser}>회원가입</button>
+                        <button style={buttonStyle} onClick={resetInputs}>다시 입력</button>
+                        <button style={buttonStyle} onClick={moveToLogin}>홈</button>
                     </div>
                     </div>
                     <div className='login-image'>

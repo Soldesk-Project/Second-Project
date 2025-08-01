@@ -34,7 +34,9 @@ export default function FindId() {
     }
     } catch (err) {
       console.error("ID 찾기 실패:", err);
-      if (err.response?.status === 404) {
+      if (err.response.status === 400) {
+        setErrorMessage('잘못된 요청입니다. 이메일 형식을 확인해주세요.');
+      } else if (err.response.status === 404) {
         setErrorMessage('입력한 이메일로 가입된 계정이 없습니다.');
       } else {
         setErrorMessage('서버 오류로 ID를 찾을 수 없습니다.');
@@ -93,16 +95,16 @@ export default function FindId() {
           <h1>CotePlay에 어서오세요.</h1>
           <div className="login-options">
             <div className='login-option_1'>
-              <button name="signUp" onClick={handleButtonOption}>Sign Up</button>
+              <button name="signUp" onClick={handleButtonOption}>회원가입</button>
             </div>
             <div className='login-option_2'>
-              <button name="findId" onClick={handleButtonOption}>Find id</button>
+              <button name="findId" onClick={handleButtonOption}>아이디 찾기</button>
               <p>/</p>
-              <button name="findPw" onClick={handleButtonOption}>Find password</button>
+              <button name="findPw" onClick={handleButtonOption}>비밀번호 찾기</button>
             </div>
           </div>
 
-          <div className="email_box">
+          <div className="email_box" style={{marginBottom:'0px'}}>
             <input
               type="text"
               placeholder="이메일 입력"
@@ -169,9 +171,9 @@ export default function FindId() {
                         width: '100%',
                         marginBottom: '1rem 0',
                     }}>
-            <button style={buttonStyle} onClick={handleFindId}>Find Result</button>
-            <button style={buttonStyle} onClick={resetInputs}>Reset</button>
-            <button style={buttonStyle} onClick={moveToLogin}>Home</button>
+            <button style={buttonStyle} onClick={handleFindId}>찾기</button>
+            <button style={buttonStyle} onClick={resetInputs}>다시 입력</button>
+            <button style={buttonStyle} onClick={moveToLogin}>홈</button>
           </div>
         </div>
         <div className="login-image">
