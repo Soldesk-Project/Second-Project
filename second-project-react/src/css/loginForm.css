@@ -35,14 +35,11 @@ body {
   flex-direction: row;
   justify-content: center;
 }
+
 .login_submit{
   align-content: center;
   width: 426px;
   margin-left: 50px;
-}
-.login-option_2{
-  display: flex;
-  flex-direction: row;
 }
 
 .login-box input {
@@ -59,17 +56,95 @@ body {
 .login-box button{
   border: none;
 }
-
 .loginButton {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #394866;
+  color: white;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  background-image: url('../../public/images/Submit.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.loginButton:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.kakao-login {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #FEE500;
+  color: #3c1e1e;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.kakao-login:hover {
+  background-color: #ffeb3b;
+  transform: scale(1.02);
+}
+
+.naver-login {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #03C75A;
+  color: white;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.naver-login:hover {
+  background-color: #02b354;
+  transform: scale(1.02);
+}
+
+.google-login {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: white;
+  color: #555555;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.google-login:hover {
+  background-color: #f5f5f5;
+  transform: scale(1.02);
+}
+/* .loginButton {
   padding: 0.5rem;
   background-color: #394866;
   color: white;
   border-radius: 4px;
   cursor: pointer;
   margin-bottom: 1rem;
-}
+} */
 
-.kakao-login {
+/* .kakao-login {
   width: 100%;
   padding: 0.5rem;
   background-color: rgb(254, 229, 0);
@@ -77,9 +152,9 @@ body {
   border-radius: 4px;
   cursor: pointer;
   margin-bottom: 1rem;
-}
+} */
 
-.naver-login {
+/* .naver-login {
   width: 100%;
   padding: 0.5rem;
   background-color: #03c75a;
@@ -87,9 +162,9 @@ body {
   border-radius: 4px;
   cursor: pointer;
   margin-bottom: 1rem;
-}
+} */
 
-.google-login {
+/* .google-login {
   width: 100%;
   padding: 0.5rem;
   background-color: white;
@@ -97,11 +172,26 @@ body {
   border-radius: 4px;
   cursor: pointer;
   margin-bottom: 1rem;
-}
+} */
 
 .login-options {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;  /* 가운데 정렬 */
+  align-items: center;
+  gap: 30px;  /* 옵션 사이 간격 */
+  margin-top: 20px;
+}
+
+.login-option_1,
+.login-option_2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;  /* 내부 버튼 간격 */
+}
+
+.login-option_2 p {
+  margin: 0;
+  color: white;
 }
 
 .login-options button {
@@ -177,5 +267,5 @@ body {
 .login_submit h6{
   color: white;
   margin-top: 20px;
-  margin-bottom: 30px;
+  /* margin-bottom: 30px; */
 }

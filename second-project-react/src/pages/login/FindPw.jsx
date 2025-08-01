@@ -91,7 +91,6 @@ const FindPw = () => {
       <div className="findPw-box">
         <div className='findPw_submit'>
           <h1>CotePlay에 어서오세요.</h1>
-          <br />
           <div className="login-options">
             <div className='login-option_1'>
               <button name="signUp" onClick={handleNavigation}>Sign Up</button>
@@ -116,7 +115,7 @@ const FindPw = () => {
           <div className='email_box'>
             <input
               type="text"
-              placeholder="이메일 아이디"
+              placeholder="이메일 입력"
               value={emailId}
               onChange={(e) => setEmailId(e.target.value)}
               onKeyDown={handleKeyDown}

@@ -212,6 +212,13 @@ const SignUp = () => {
         }
     };
 
+    const renderValidationMessage = (value, duplicateState, label) => {
+    if (!value) return null;
+    if (duplicateState === true) return <p style={{ color: 'red' }}>이미 사용 중인 {label}입니다.</p>;
+    if (duplicateState === false) return <p style={{ color: 'green' }}>사용 가능한 {label}입니다.</p>;
+    return null;
+    };
+
     return (
         <div className="login-background login-container">
                 <img src='/images/logo.png' alt='로고이미지' onClick={moveToLogin}/>
@@ -228,8 +235,7 @@ const SignUp = () => {
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
                     />
-                    {users.user_nick && isDuplicateNick === true && (<p style={{ color: 'red' }}>이미 사용 중인 닉네임입니다.</p>)}
-                    {users.user_nick && isDuplicateNick === false && (<p style={{ color: 'green' }}>사용 가능한 닉네임입니다.</p>)}
+                    {renderValidationMessage(users.user_nick, isDuplicateNick, '닉네임')}
                     <input
                         type="text"
                         name='user_id'
@@ -239,8 +245,7 @@ const SignUp = () => {
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
                     />
-                    {users.user_id.length >= 4 && isDuplicateId === true && (<p style={{ color: 'red' }}>이미 사용 중인 아이디입니다.</p>)}
-                    {users.user_id.length >= 4 && isDuplicateId === false && (<p style={{ color: 'green' }}>사용 가능한 아이디입니다.</p>)}
+                    {renderValidationMessage(users.user_id, isDuplicateId, '아이디')}
                     <input
                         type="password"
                         name='user_pw'
@@ -271,7 +276,7 @@ const SignUp = () => {
                     }}>
                         <input
                             type="text"
-                            placeholder="이메일을 입력하세요."
+                            placeholder="이메일 입력"
                             value={emailId}
                             ref={emailIdRef}
                             onChange={handleEmailChange}
@@ -300,8 +305,7 @@ const SignUp = () => {
                             <option value="hanmail.net" />
                         </datalist>
                     </div>
-                    {users.user_email && isDuplicateEmail === true && (<p style={{ color: 'red' }}>이미 사용 중인 이메일입니다.</p>)}
-                    {users.user_email && isDuplicateEmail === false && (<p style={{ color: 'green' }}>사용 가능한 이메일입니다.</p>)}
+                    {renderValidationMessage(users.user_email, isDuplicateEmail, '이메일')}
 
                     <div className='signUpBtn'
                         style={{
@@ -310,7 +314,7 @@ const SignUp = () => {
                         width: '100%',
                         marginBottom: '1rem 0',
                     }}>
-                        <button style={buttonStyle} onClick={registerUser}>Sing Up</button>
+                        <button style={buttonStyle} onClick={registerUser}>Sign Up</button>
                         <button style={buttonStyle} onClick={resetInputs}>Reset</button>
                         <button style={buttonStyle} onClick={moveToLogin}>Home</button>
                     </div>

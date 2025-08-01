@@ -12,6 +12,10 @@ export default function FindId() {
   const navigate = useNavigate();
 
   const handleFindId = async() => {
+    if (!emailId.trim() || !emailDomain.trim()) {
+      alert("이메일 ID와 도메인을 모두 입력해주세요.");
+      return;
+    }
     const full = `${emailId}@${emailDomain}`;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(full)) {
@@ -20,7 +24,7 @@ export default function FindId() {
     }
     try {
     const res = await axios.get(`/api/findId/checkEmail?user_email=${full}`);
-    if (res.data && res.data !== '') {
+    if (res.status === 200 && res.data) {
       setFindId(res.data);
       setErrorMessage('');
       resetInputs();
@@ -28,10 +32,14 @@ export default function FindId() {
       setFindId('');
       setErrorMessage('입력한 이메일로 가입된 계정이 없습니다.');
     }
-  } catch (err) {
-    console.error("ID 찾기 실패:", err);
-    setErrorMessage('서버 오류로 ID를 찾을 수 없습니다.');
-  }
+    } catch (err) {
+      console.error("ID 찾기 실패:", err);
+      if (err.response?.status === 404) {
+        setErrorMessage('입력한 이메일로 가입된 계정이 없습니다.');
+      } else {
+        setErrorMessage('서버 오류로 ID를 찾을 수 없습니다.');
+      }
+    }
   };
 
   const resetInputs = () => {
@@ -84,12 +92,12 @@ export default function FindId() {
         <div className="findId_submit">
           <h1>CotePlay에 어서오세요.</h1>
           <div className="login-options">
-            <div className="login-option_1">
+            <div className='login-option_1'>
               <button name="signUp" onClick={handleButtonOption}>Sign Up</button>
             </div>
-            <div className="login-option_2">
+            <div className='login-option_2'>
               <button name="findId" onClick={handleButtonOption}>Find id</button>
-              <span>/</span>
+              <p>/</p>
               <button name="findPw" onClick={handleButtonOption}>Find password</button>
             </div>
           </div>
@@ -97,7 +105,7 @@ export default function FindId() {
           <div className="email_box">
             <input
               type="text"
-              placeholder="이메일을 입력하세요."
+              placeholder="이메일 입력"
               value={emailId}
               onChange={(e) => setEmailId(e.target.value)}
               onKeyDown={handleKeyDown}

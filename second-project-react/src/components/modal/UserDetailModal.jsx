@@ -32,6 +32,18 @@ const UserDetailModal = ({ user, onClose, shopItems }) => {
     const answerPercent = stats?.[0]?.accuracyPct || 0;
 
     useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [onClose]);
+    
+    useEffect(() => {
         if (!user?.userProfileImg) return;
         const raw = user.userProfileImg;
         const src = raw.startsWith('/images/')
