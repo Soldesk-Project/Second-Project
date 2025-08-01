@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.ItemVO;
+import org.joonzis.domain.QuestRequestVO;
 import org.joonzis.domain.QuestionDTO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.service.AdminService;
@@ -19,7 +20,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -133,6 +136,66 @@ public class AdminPageController {
         }catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("문제 삭제 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+ // --- 문제 등록 요청 관리 API ---
+
+    // 1. 문제 등록 요청 목록 조회 (페이징, 검색, 필터링 포함)
+    @GetMapping(value = "/questRequests", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> getQuestRequests(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "limit", defaultValue = "10") int limit, // 프론트엔드에서 'limit'으로 보냄
+            @RequestParam(value = "searchTerm", required = false, defaultValue = "") String searchTerm,
+            @RequestParam(value = "filterStatus", required = false, defaultValue = "") String filterStatus) {
+        try {
+            // URL 디코딩 (선택 사항: 스프링이 자동으로 디코딩해주지만, 명시적으로 처리할 경우)
+            String decodedSearchTerm = URLDecoder.decode(searchTerm, "UTF-8");
+            String decodedFilterStatus = URLDecoder.decode(filterStatus, "UTF-8");
+
+            Map<String, Object> result = adminService.getQuestRequests(page, limit, decodedSearchTerm, decodedFilterStatus);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("검색어 또는 상태 디코딩 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("문제 등록 요청 목록 로드 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // 2. 단일 문제 등록 요청 상세 조회
+    @GetMapping(value = "/questRequests/{id}", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> getQuestRequestById(@PathVariable("id") int id) {
+        try {
+            QuestRequestVO questRequest = adminService.getQuestRequestById(id);
+            if (questRequest != null) {
+                return new ResponseEntity<>(questRequest, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("해당 ID의 문제 등록 요청을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("문제 등록 요청 상세 정보 로드 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // 3. 문제 등록 요청 수정 (상태 변경 및 내용 수정)
+    @PutMapping(value = "/questRequests/{id}", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> updateQuestRequest(
+            @PathVariable("id") int id,
+            @RequestBody QuestRequestVO questRequestVO) {
+        try {
+            // PathVariable의 ID와 RequestBody의 ID가 다를 경우를 대비한 검증 (선택 사항)
+            if (id != questRequestVO.getId()) {
+                return new ResponseEntity<>("요청 ID와 본문 ID가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
+            }
+
+            adminService.updateQuestRequest(questRequestVO);
+            return new ResponseEntity<>("문제 등록 요청이 성공적으로 업데이트되었습니다.", HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("문제 등록 요청 업데이트 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     

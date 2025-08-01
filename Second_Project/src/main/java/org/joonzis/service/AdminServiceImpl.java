@@ -15,6 +15,7 @@ import java.util.Collections;
 
 import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.ItemVO;
+import org.joonzis.domain.QuestRequestVO;
 import org.joonzis.domain.QuestionDTO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.mapper.AdminMapper;
@@ -619,4 +620,44 @@ public class AdminServiceImpl implements AdminService {
 
 	        adminMapper.deleteItems(params);
 	}
+
+	@Override
+	public Map<String, Object> getQuestRequests(int page, int limit, String searchTerm,
+			String filterStatus) {
+		Map<String, Object> params = new HashMap<>();
+        params.put("offset", (page - 1) * limit);
+        params.put("limit", limit);
+        params.put("searchTerm", searchTerm);
+        params.put("filterStatus", filterStatus);
+
+        List<QuestRequestVO> requests = adminMapper.selectQuestRequests(params);
+        int totalCount = adminMapper.getQuestRequestTotalCount(params); // 검색/필터링 조건에 맞는 총 개수
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("requests", requests);
+        result.put("totalCount", totalCount);
+        return result;
+    }
+
+	@Override
+	public QuestRequestVO getQuestRequestById(long id) {
+		QuestRequestVO request = adminMapper.selectQuestRequestById(id);
+        if (request != null && request.getImage_data() != null) {
+            // BLOB 데이터를 Base64 문자열로 인코딩하여 VO에 설정
+            String base64Image = Base64.getEncoder().encodeToString(request.getImage_data());
+            request.setImage_data_base64(base64Image);
+        }
+        return request;
+    }
+
+	@Override
+	public void updateQuestRequest(QuestRequestVO questRequestVO) {
+		if (questRequestVO.getImage_data_base64() != null && !questRequestVO.getImage_data_base64().isEmpty()) {
+            byte[] decodedBytes = Base64.getDecoder().decode(questRequestVO.getImage_data_base64());
+            questRequestVO.setImage_data(decodedBytes);
+        } else if (questRequestVO.getImage_data_base64() != null && questRequestVO.getImage_data_base64().isEmpty()) {
+            questRequestVO.setImage_data(null);
+        }
+        adminMapper.updateQuestRequest(questRequestVO);
+    }
 }

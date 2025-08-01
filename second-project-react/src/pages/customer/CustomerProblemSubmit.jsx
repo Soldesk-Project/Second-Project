@@ -9,7 +9,7 @@ const CustomerProblemSubmit = () => {
   const [postPassword, setPostPassword] = useState('');
   const [email, setEmail] = useState('');
   const [consent, setConsent] = useState(false);
-  const [probCate, setProbCate] = useState('');
+  const [probCate, setProbCate] = useState('결제 관련');
   const [probSub, setProbSub] = useState('');
   const [probMessage, setProbMessage] = useState('');
   const [selectedImageFiles, setSelectedImageFiles] = useState([]);
@@ -117,7 +117,7 @@ const CustomerProblemSubmit = () => {
 
     try {
       const response = await axios.post(
-        'http://localhost:9099/api/customer/inquiry',
+        '/api/customer/inquiry',
         formData,
         {
           headers: {
@@ -152,17 +152,8 @@ const CustomerProblemSubmit = () => {
     <div className={styles.customerServiceCenter}>
       <div className={styles.inqueriesBox}>
         <form onSubmit={handleProbSubmit}>
-          <div className={styles.title}>
-            <h1 style={{ color: 'white' }}>문의 접수</h1>
-          </div>
-          <div className={styles.explanation}>
-            <p>접수하신 문의가 등록되었는지의 유무는 유저의 이메일로 안내해드리고 있습니다.</p>
-            <p>보내주신 문의는 서비스 개선을 위해 소중히 활용하고 있습니다.</p>
-          </div>
-
-          <div className={styles.inqContainer}>
-            {/* 1. 게시글 비밀번호*/}
-            <h3 className={styles.h3}>1. 게시글 비밀번호</h3>
+          <fieldset>
+            <legend>1. 게시글 비밀번호</legend>
             <input
               className={styles.input}
               type="password"
@@ -171,8 +162,10 @@ const CustomerProblemSubmit = () => {
               placeholder="게시글 비밀번호를 입력하세요"
               required
             />
-            {/* 2. 이메일*/}
-            <h3 className={styles.h3}>2. 이메일</h3>
+          </fieldset>
+
+          <fieldset>
+            <legend>2. 이메일</legend>
             <input
               className={styles.input}
               type="email"
@@ -181,92 +174,103 @@ const CustomerProblemSubmit = () => {
               placeholder="문의 결과 안내받을 이메일을 입력하세요"
               required
             />
-            {/* 3. 카테고리 선택*/}
-            <h3 className={styles.h3}>3. 카테고리 선택</h3>
+          </fieldset>
+
+          <fieldset>
+            <legend>3. 카테고리 선택</legend>
             <select
               name="cateSelect"
               value={probCate}
               onChange={handleCateChange}
               className={styles.input}
             >
-              {/* 첫 번째 옵션 추가 */}
-              {categories.map((cate, index) => (
-                <option key={index} value={cate}>
+              {categories.map((cate, idx) => (
+                <option key={idx} value={cate}>
                   {cate}
                 </option>
               ))}
             </select>
-            {/* 4. 문의 제목 입력*/}
-            <h3 className={styles.h3}>4. 문의 제목 입력</h3>
+          </fieldset>
+
+          <fieldset>
+            <legend>4. 문의 제목 입력</legend>
             <input
               className={styles.input}
               type="text"
               value={probSub}
-              onChange={(e) => setProbSub(e.target.value)}
+              onChange={e => setProbSub(e.target.value)}
               placeholder="문의 제목을 입력하세요."
               required
             />
-            {/* 5. 문의 본문 입력*/}
-            <h3 className={styles.h3}>5. 문의 본문 입력</h3>
+          </fieldset>
+
+          <fieldset>
+            <legend>5. 문의 본문 입력</legend>
             <textarea
               value={probMessage}
-              onChange={(e) => setProbMessage(e.target.value)}
+              onChange={e => setProbMessage(e.target.value)}
               className={styles.textarea}
               placeholder="문의 본문을 입력하세요."
               required
             />
-            <p className={styles.legnthConfirm}>{probMessage.length}자 입력 / 최대 1000자</p>
-            {/* 6. 첨부 파일 */}
-            <div className={styles.fileInputGroup}>
-              <h3 className={styles.h3}>6. 첨부 파일 (선택)</h3>
-              <div className={styles.textsection}>
-                파일명은 - , _를 제외한 특수문자는 허용되지 않습니다.<br/>
-                아래 이미지 파일 형식만 첨부할 수 있습니다.<br/>
-                이미지: .jpeg, .jpg, .gif, .bmp, .png
-              </div>
-              <input
-                type="file"
-                multiple
-                accept=".jpeg,.jpg,.gif,.bmp,.png"
-                style={{ display: 'none' }}
-                ref={fileInputRef}
-                onChange={handleFileChange}
-              />
-              <button type="button" className={styles.submitBtn} onClick={triggerFileInput}>파일 첨부</button>
-              {/* 첨부된 파일명 목록 */}
-              {selectedImageFiles.length > 0 && (
-                <ul style={{ color: 'white', listStyle: 'none', padding: '10px 0 0 0' }}>
-                  {selectedImageFiles.map((file, idx) => (
-                    <li key={idx} style={{ marginBottom: '5px' }}>
-                      {file.name}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {/* 이미지 미리보기 출력 */}
-              {previewImages.length > 0 && (
-                <div className={styles.image_preview_container}>
-                  <h3 className={styles.image_preview_title}>이미지 미리보기:</h3>
-                  <div>
-                    {previewImages.map((url, idx) => (
-                      <div key={idx} className={styles.image_thumbnail_wrapper}>
-                        <img
-                          src={url}
-                          alt={`Preview ${idx + 1}`}
-                          className={styles.image_preview}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+            <p className={styles.legnthConfirm}>
+              {probMessage.length}자 입력 / 최대 1000자
+            </p>
+          </fieldset>
+
+          <fieldset className={styles.fileInputGroup}>
+            <legend>6. 첨부 파일 (선택)</legend>
+            <div className={styles.textsection}>
+              파일명은 - , _를 제외한 특수문자는 허용되지 않습니다.
+              <br />
+              아래 이미지 파일 형식만 첨부할 수 있습니다.
+              <br />
+              이미지: .jpeg, .jpg, .gif, .bmp, .png
             </div>
 
-            {/* 7. 개인정보 수집 동의 (필수) */}
-            <h3 className={styles.h3}>7. 개인정보 수집 동의 (필수)</h3>
+            <input
+              type="file"
+              multiple
+              accept=".jpeg,.jpg,.gif,.bmp,.png"
+              style={{ display: 'none' }}
+              ref={fileInputRef}
+              onChange={handleFileChange}
+            />
+            <button type="button" className={styles.submitBtn} onClick={triggerFileInput}>
+              파일 첨부
+            </button>
+
+            {selectedImageFiles.length > 0 && (
+              <ul style={{ color: 'white', listStyle: 'none', padding: '10px 0 0 0' }}>
+                {selectedImageFiles.map((file, idx) => (
+                  <li key={idx} style={{ marginBottom: '5px' }}>
+                    {file.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {previewImages.length > 0 && (
+              <div className={styles.image_preview_container}>
+                <h3 className={styles.image_preview_title}>이미지 미리보기:</h3>
+                <div>
+                  {previewImages.map((url, idx) => (
+                    <div key={idx} className={styles.image_thumbnail_wrapper}>
+                      <img src={url} alt={`Preview ${idx + 1}`} className={styles.image_preview} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </fieldset>
+
+          <fieldset>
+            <legend>7. 개인정보 수집 동의 (필수)</legend>
             <div className={styles.textsection}>
-              수집하는 개인정보 항목: 이메일 주소<br/>
-              작성해 주시는 개인정보는 문제 접수 및 문제 활용을 위해 3년간 보관됩니다.<br/>
+              수집하는 개인정보 항목: 이메일 주소
+              <br />
+              작성해 주시는 개인정보는 문제 접수 및 문제 활용을 위해 3년간 보관됩니다.
+              <br />
               이용자는 본 동의를 거부할 수 있으나, 미동의 시 문제 접수가 불가능합니다.
             </div>
             <div>
@@ -274,19 +278,19 @@ const CustomerProblemSubmit = () => {
                 type="checkbox"
                 checked={consent}
                 onChange={e => setConsent(e.target.checked)}
-              />&nbsp;<span>동의합니다.</span>
+              />
+              &nbsp;<span>동의합니다.</span>
             </div>
-          </div>
+          </fieldset>
 
-          {/* 버튼 */}
-          <div className={styles.inqBtns}>
-            <button type="submit" className={styles.submitBtn}>등록</button>
+          <div className={styles.inqBtns}>  
+            <button type="submit" className={styles.submitButton}>
+              등록
+            </button>
             <button
               type="button"
-              className={styles.submitBtn}
-              onClick={() => navigate('/inquiries', {
-                state: { initialTab: '문제 제출' }
-              })}
+              className={styles.submitButton}
+              onClick={() => navigate('/inquiries', { state: { initialTab: '문제 제출' } })}
             >
               돌아가기
             </button>

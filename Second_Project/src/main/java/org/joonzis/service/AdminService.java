@@ -2,6 +2,7 @@ package org.joonzis.service;
 
 import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.ItemVO;
+import org.joonzis.domain.QuestRequestVO;
 import org.joonzis.domain.QuestionDTO;
 import org.joonzis.domain.UsersVO;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +22,14 @@ public interface AdminService {
 	//문제 삭제 메소드
 	void deleteQuestions(List<Integer> questionIds, String subjectCode);
 
+	//문제 등록 요청 관련 메소드
+	//문제 등록 요청 조회 메소드
+	Map<String, Object> getQuestRequests(int page, int limit, String searchTerm, String filterStatus);
+	//문제 등록 요청 검색 메소드
+	QuestRequestVO getQuestRequestById(long id);
+	//문제 등록 요청 수정 메소드
+	void updateQuestRequest(QuestRequestVO questRequestVO);
+	
 	//유저 관련 메소드
 	//유저 조회 메소드
 	List<UsersVO> getAllUsers();
@@ -48,5 +57,8 @@ public interface AdminService {
 	void updateItem(int itemNo, String type, String itemName, int itemPrice, MultipartFile itemImage, String originalImageFileName);
 	//아이템 삭제 메소드
 	void deleteItems(String itemType, List<Integer> itemNos);
+	
+	
+	
 	
 }

@@ -112,7 +112,7 @@ const QuestRequestPanel = () => {
       };
   
       try {
-        const response = await fetch(`api/customer/questRequest`, {
+        const response = await fetch(`/api/customer/questRequest`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -149,94 +149,101 @@ const QuestRequestPanel = () => {
     };
   
     return (
-      <div className={styles.inqueriesBox}>
-        <div className={styles.title}>
-          <h1>문제 등록 요청</h1>
-        </div>
+      <form className={styles.inqueriesBox} onSubmit={handleQuestRegisterSubmit}>
         <div className={styles.inqContainer}>
           {/* 1. 카테고리 선택 */}
-          <h3 className={styles.h3}>1. 카테고리 선택</h3>
-          <select name="cateSelect" value={subject} onChange={handleSubjectChange} className={styles.input}>
-            {subjects.map((subject, index) => (
-              <option key={index} value={subject}>
-                {subject}
-              </option>
-            ))}
-          </select>
-          {/* 2. 문제 본문 입력*/}
-          <h3 className={styles.h3}>2. 문제 본문 입력</h3>
-          <input
-            type="text"
-            value={questionText}
-            onChange={(e) => setQuestionText(e.target.value)}
-            className={styles.input}
-            placeholder="문제 본문을 입력하세요."
-          />
+          <fieldset>
+            <legend>1. 카테고리 선택</legend>
+            <select name="cateSelect" value={subject} onChange={handleSubjectChange} className={styles.input}>
+              {subjects.map((subject, index) => (
+                <option key={index} value={subject}>{subject}</option>
+              ))}
+            </select>
+          </fieldset>
+
+          {/* 2. 문제 본문 입력 */}
+          <fieldset>
+            <legend>2. 문제 본문 입력</legend>
+            <input
+              type="text"
+              value={questionText}
+              onChange={(e) => setQuestionText(e.target.value)}
+              className={styles.input}
+              placeholder="문제 본문을 입력하세요."
+            />
+          </fieldset>
+
           {/* 3. 선택지 입력 */}
-          <h3 className={styles.h3}>3. 선택지 입력</h3>
-          <div className={styles.optionGroup}>
-            {options.map((option, index) => (
-              <input
-                type="text"
-                value={option}
-                onChange={(e) => {
-                  const newOptions = [...options];
-                  newOptions[index] = e.target.value;
-                  setOptions(newOptions);
-                }}
-                className={styles.optionInput}
-                placeholder={`${index + 1}번 선택지를 입력하세요.`}
-              />
-            ))}
-          </div>
-          {/* 4. 정답 입력 */}
-          <h3 className={styles.h3}>4. 정답 입력</h3>
-          <select name="corAnsSelect" value={correctAnswer} onChange={(e) => setCorrectAnswer(e.target.value)} className={styles.input}>
-            {options.map((_, index) => (
-              <option key={index + 1} value={String(index + 1)}>{index + 1}</option>
-            ))}
-          </select>
-          {/* 5. 이미지 업로드 */}
-          <div className={styles.fileInputGroup}>
-            <h3 className={styles.h3}>5. 이미지 업로드 (선택 사항)</h3>
-            <div className="image-upload-wrapper">
-              <label htmlFor="image-upload" className="image-upload-label">이미지 선택:</label>
-              <input
-                type="file"
-                id="image-upload"
-                accept="image/*"
-                onChange={handleImageChange}
-                style={{display: 'none'}}
-              />
+          <fieldset>
+            <legend>3. 선택지 입력</legend>
+            <div className={styles.optionGroup}>
+              {options.map((option, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  value={option}
+                  onChange={(e) => {
+                    const newOptions = [...options];
+                    newOptions[index] = e.target.value;
+                    setOptions(newOptions);
+                  }}
+                  className={styles.optionInput}
+                  placeholder={`${index + 1}번 선택지를 입력하세요.`}
+                />
+              ))}
             </div>
+          </fieldset>
+
+          {/* 4. 정답 입력 */}
+          <fieldset>
+            <legend>4. 정답 입력</legend>
+            <select value={correctAnswer} onChange={(e) => setCorrectAnswer(e.target.value)} className={styles.input}>
+              {options.map((_, index) => (
+                <option key={index} value={String(index + 1)}>{index + 1}</option>
+              ))}
+            </select>
+          </fieldset>
+
+          {/* 5. 이미지 업로드 */}
+          <fieldset>
+            <legend>5. 이미지 업로드 (선택 사항)</legend>
+            <label htmlFor="image-upload" className={styles.uploadLabel}>이미지 선택:</label>
+            <input
+              type="file"
+              id="image-upload"
+              accept="image/*"
+              onChange={handleImageChange}
+              style={{display: 'none'}}
+            />
             {previewImage && (
               <div className={styles.image_preview_container}>
-                <h3 className={styles.image_preview_title}>이미지 미리보기:</h3>
+                <h4 className={styles.image_preview_title}>이미지 미리보기</h4>
                 <img src={previewImage} alt="Image Preview" className={styles.image_preview}/>
               </div>
             )}
-          </div>
-          {/* 6. 개인정보 수집 동의 (필수) */}
-          <h3 className={styles.h3}>7. 개인정보 수집 동의 (필수)</h3>
+          </fieldset>
+
+          {/* 6. 개인정보 수집 동의 */}
+          <fieldset>
+            <legend>6. 개인정보 수집 동의 (필수)</legend>
             <div className={styles.textsection}>
               수집하는 개인정보 항목: 이메일 주소<br/>
               작성해 주시는 개인정보는 문제 접수 및 문제 활용을 위해 3년간 보관됩니다.<br/>
               이용자는 본 동의를 거부할 수 있으나, 미동의 시 문제 접수가 불가능합니다.
             </div>
-            <div>
-              <input
-                type="checkbox"
-                checked={consent}
-                onChange={e => setConsent(e.target.checked)}
-              />&nbsp;<span>동의합니다.</span>
-            </div>
+            <label>
+              <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+              &nbsp;동의합니다.
+            </label>
+          </fieldset>
         </div>
 
-        <div className="button-group">
-          <button onClick={handleReset} className="reset-button">초기화</button>
-          <button onClick={handleQuestRegisterSubmit} className="submit-button">제출</button>
+        {/* 버튼 그룹 */}
+        <div className={styles.buttonGroup}>
+          <button type="reset" className={styles.resetButton} onClick={handleReset}>초기화</button>
+          <button type="submit" className={styles.submitButton}>제출</button>
         </div>
-      </div>
+      </form>
     );
   };
 

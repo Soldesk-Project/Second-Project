@@ -312,4 +312,89 @@
             #{itemNo}
         </foreach>
     </delete>
+    
+    <select id="selectQuestRequests" resultType="org.joonzis.domain.QuestRequestVO">
+        SELECT
+            qr.QUESTION_REQUEST_ID AS id,
+            qr.USER_NO AS user_no,
+            u.USER_ID AS user_id,
+            qr.SUBJECT AS subject,
+            qr.QUESTION_TEXT AS question_text,
+            qr.OPTION_1 AS option_1,
+            qr.OPTION_2 AS option_2,
+            qr.OPTION_3 AS option_3,
+            qr.OPTION_4 AS option_4,
+            qr.CORRECT_ANSWER AS correct_answer,
+            qr.IMAGE_PATH AS image_path,
+            qr.STATUS AS status,
+            qr.CREATED_AT AS created_at
+        FROM QUESTION_REQUEST qr
+        LEFT JOIN USERS u ON qr.USER_NO = u.USER_NO
+        <where>
+            <if test="searchTerm != null and !searchTerm.isEmpty()">
+                AND (qr.QUESTION_TEXT LIKE '%' || #{searchTerm} || '%' OR u.USER_ID LIKE '%' || #{searchTerm} || '%')
+            </if>
+            <if test="filterStatus != null and !filterStatus.isEmpty()">
+                AND qr.STATUS = #{filterStatus}
+            </if>
+        </where>
+        ORDER BY qr.CREATED_AT DESC
+        OFFSET #{offset} ROWS
+        FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
+    <select id="getQuestRequestTotalCount" resultType="int">
+        SELECT COUNT(*)
+        FROM QUESTION_REQUEST qr
+        LEFT JOIN USERS u ON qr.USER_NO = u.USER_NO
+        <where>
+            <if test="searchTerm != null and !searchTerm.isEmpty()">
+                AND (qr.QUESTION_TEXT LIKE '%' || #{searchTerm} || '%' OR u.USER_ID LIKE '%' || #{searchTerm} || '%')
+            </if>
+            <if test="filterStatus != null and !filterStatus.isEmpty()">
+                AND qr.STATUS = #{filterStatus}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectQuestRequestById" resultType="org.joonzis.domain.QuestRequestVO">
+        SELECT
+            qr.QUESTION_REQUEST_ID AS id,
+            qr.USER_NO AS user_no,
+            u.USER_ID AS user_id,
+            qr.SUBJECT AS subject,
+            qr.QUESTION_TEXT AS question_text,
+            qr.OPTION_1 AS option_1,
+            qr.OPTION_2 AS option_2,
+            qr.OPTION_3 AS option_3,
+            qr.OPTION_4 AS option_4,
+            qr.CORRECT_ANSWER AS correct_answer,
+            qr.IMAGE_PATH AS image_path,
+            qr.IMAGE_DATA AS image_data,
+            qr.STATUS AS status,
+            qr.CREATED_AT AS created_at
+        FROM QUESTION_REQUEST qr
+        LEFT JOIN USERS u ON qr.USER_NO = u.USER_NO
+        WHERE qr.QUESTION_REQUEST_ID = #{id}
+    </select>
+
+    <update id="updateQuestRequest">
+        UPDATE QUESTION_REQUEST
+        SET
+            SUBJECT = #{subject},
+            QUESTION_TEXT = #{question_text},
+            OPTION_1 = #{option_1},
+            OPTION_2 = #{option_2},
+            OPTION_3 = #{option_3},
+            OPTION_4 = #{option_4},
+            CORRECT_ANSWER = #{correct_answer},
+            STATUS = #{status},
+            <if test="image_data != null">
+                IMAGE_DATA = #{image_data, jdbcType=BLOB},
+            </if>
+            <if test="image_data == null and image_data_base64 != null and image_data_base64.isEmpty()">
+                IMAGE_DATA = NULL,
+            </if>
+            WHERE QUESTION_REQUEST_ID = #{id}
+    </update>
 </mapper>

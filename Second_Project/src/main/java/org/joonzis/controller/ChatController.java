@@ -84,15 +84,6 @@ public class ChatController {
         simpMessagingTemplate.convertAndSend("/serverChat/public", chatRoomDTO);
         System.out.println("DEBUG: serverChat/public 토픽으로 메시지 발행 시도 완료.");
     }
-    
-    // 귓속말 메시지 전송 (개인 채팅)
-    @MessageMapping("/whisperChat.sendMessage")
-    public void sendWhisperMessage(@Payload ChatRoomDTO chatRoomDTO) {
-        // 귓속말은 파일에 저장하지 않는다고 가정. 필요시 별도 큐 사용
-        // simpMessagingTemplate.convertAndSendToUser(chatRoomDTO.getMReceiver(), "/queue/private", chatRoomDTO);
-        simpMessagingTemplate.convertAndSendToUser(chatRoomDTO.getMReceiver(), "/private", chatRoomDTO);
-        simpMessagingTemplate.convertAndSendToUser(chatRoomDTO.getMSender(), "/private", chatRoomDTO);
-    }
 
  // 게임 채팅방 메시지 전송
     @MessageMapping("/gameChat.sendMessage/{gameroomNo}")

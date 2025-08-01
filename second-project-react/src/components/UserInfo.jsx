@@ -211,7 +211,7 @@ const UserInfo = () => {
             const gap = nextTier - prevTierBase;
             return Math.min(((user.user_rank - prevTierBase) / gap) * 100, 100);
         }
-    })
+    })();  
 
     const clickItem = async (item) => {
         // console.log('🔔 clickItem 호출됨', item);
