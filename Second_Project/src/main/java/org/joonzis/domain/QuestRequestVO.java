@@ -18,7 +18,7 @@ public class QuestRequestVO {
     private String option_3;
     private String option_4;
     private int correct_answer;
-    private Date created_at;
+    private Date request_created_at;
     private String status;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

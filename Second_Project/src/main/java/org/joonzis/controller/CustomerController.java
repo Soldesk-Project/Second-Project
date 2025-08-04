@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.joonzis.domain.InquiryVO;
 import org.joonzis.domain.QuestRequestVO;
 import org.joonzis.service.FaqService;
+import org.joonzis.service.FileUploadService;
 import org.joonzis.service.InquiryService;
 import org.joonzis.service.NoticeService;
 import org.joonzis.service.QuestService;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,6 +47,8 @@ public class CustomerController {
     @Autowired
     private InquiryService inquiryService;
 
+    @Autowired
+    private FileUploadService fileUploadService;
     
     // 1) 공지사항
     @GetMapping("/notices")
@@ -73,17 +77,90 @@ public class CustomerController {
     }
     
     // 3-1) 문제 등록 요청 전달
-    @PostMapping(path = "/questRequest", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> questRequest(@RequestBody QuestRequestVO questRequestVO) {
-        log.info("문제 등록 요청 데이터: " + questRequestVO);
+    @PostMapping(path = "/questRequestWithImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> questRequestWithImage(
+            @RequestParam("user_no") Long userNo,
+            @RequestParam("subject") String subject,
+            @RequestParam("question_text") String questionText,
+            @RequestParam("option_1") String option1,
+            @RequestParam("option_2") String option2,
+            @RequestParam("option_3") String option3,
+            @RequestParam("option_4") String option4,
+            @RequestParam("correct_answer") int correctAnswer,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile
+        ) {
         try {
-            questService.registerQuest(questRequestVO); // 서비스 계층 호출
-            return new ResponseEntity<>("문제 등록 요청 성공", HttpStatus.OK);
+            byte[] imageBytes = null;
+            if (imageFile != null && !imageFile.isEmpty()) {
+                imageBytes = imageFile.getBytes();
+                // 선택적: 파일 저장
+                fileUploadService.saveFile(imageFile);
+            }
+
+            questService.registerQuest(subject, questionText, option1, option2, option3,
+                                      option4, correctAnswer, imageBytes, userNo);
+
+            return ResponseEntity.ok("문제 등록 성공");
         } catch (Exception e) {
-            log.error("문제 등록 요청 실패: " + e.getMessage());
-            return new ResponseEntity<>("문제 등록 요청 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("등록 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("등록 실패: " + e.getMessage());
         }
     }
+//    @PostMapping(path = "/questRequest", consumes = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<String> questRequest(@RequestBody QuestRequestVO questRequestVO) {
+//        log.info("문제 등록 요청 데이터: " + questRequestVO);
+//        try {
+//            questService.registerQuest(questRequestVO); // 서비스 계층 호출
+//            return new ResponseEntity<>("문제 등록 요청 성공", HttpStatus.OK);
+//        } catch (Exception e) {
+//            log.error("문제 등록 요청 실패: " + e.getMessage());
+//            return new ResponseEntity<>("문제 등록 요청 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+//    @PostMapping(path = "/questRequestWithImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ResponseEntity<String> questRequestWithImage(
+//    	    @RequestParam("user_no") Long userNo,
+//    	    @RequestParam("subject") String subject,
+//    	    @RequestParam("question_text") String questionText,
+//    	    @RequestParam("option_1") String option1,
+//    	    @RequestParam("option_2") String option2,
+//    	    @RequestParam("option_3") String option3,
+//    	    @RequestParam("option_4") String option4,
+//    	    @RequestParam("correct_answer") int correctAnswer,
+//    	    @RequestParam(value = "image", required = false) MultipartFile imageFile
+//    	)  {
+//        try {
+//        	System.out.println("imageFile 확인 : " + imageFile);
+//            QuestRequestVO quest = new QuestRequestVO();
+//            quest.setUser_no(userNo);
+//            quest.setSubject(subject);
+//            quest.setQuestion_text(questionText);
+//            quest.setOption_1(option1);
+//            quest.setOption_2(option2);
+//            quest.setOption_3(option3);
+//            quest.setOption_4(option4);
+//            quest.setCorrect_answer(correctAnswer);
+//            // 이미지가 존재하면 BLOB 및 파일 저장 수행
+//            if (imageFile != null && !imageFile.isEmpty()) {
+//                byte[] imageBytes = imageFile.getBytes();
+//                System.out.println("imageBytes 확인 : " + imageBytes);
+//                quest.setImage_data(imageBytes); // ✅ BLOB 저장용
+//                // 선택적: 물리 파일 저장
+//                fileUploadService.saveFile(imageFile); // DB에 경로 저장도 가능
+//            }
+//            System.out.println("이미지 크기: " + (quest.getImage_data() != null ? quest.getImage_data().length : "null"));
+//            questService.registerQuest(quest);
+//
+//            return ResponseEntity.ok("문제 등록 성공");
+//
+//        } catch (Exception e) {
+//            log.error("등록 실패", e);
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                                 .body("등록 실패: " + e.getMessage());
+//        }
+//    }
+    
     
     // 4)1:1 문의
     @GetMapping("/inquiries")

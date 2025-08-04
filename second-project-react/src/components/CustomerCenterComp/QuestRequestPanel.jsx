@@ -67,73 +67,111 @@ const QuestRequestPanel = () => {
     };
   
     // 전체 문제 등록 제출 핸들러
-    const handleQuestRegisterSubmit = async () => {
-      // 필수 입력 필드 검증
-      if (!consent) {
-      return alert('개인정보 수집 동의가 필요합니다.');
-      }
-      if (!subject.trim()) {
-        alert('카테고리를 선택해주세요.');
-        return;
-      }
-      if (!questionText.trim()) {
-        alert('문제 본문을 입력해주세요.');
-        return;
-      }
-      for (let i = 0; i < options.length; i++) {
-        if (!options[i].trim()) {
-          alert(`${i + 1}번 선택지를 입력해주세요.`);
-          return;
-        }
-      }
-      if (!correctAnswer.trim()) {
-        alert('정답을 선택해주세요.');
-        return;
-      }
+    // const handleQuestRegisterSubmit = async () => {
+    //   // 필수 입력 필드 검증
+    //   if (!consent) {
+    //   return alert('개인정보 수집 동의가 필요합니다.');
+    //   }
+    //   if (!subject.trim()) {
+    //     alert('카테고리를 선택해주세요.');
+    //     return;
+    //   }
+    //   if (!questionText.trim()) {
+    //     alert('문제 본문을 입력해주세요.');
+    //     return;
+    //   }
+    //   for (let i = 0; i < options.length; i++) {
+    //     if (!options[i].trim()) {
+    //       alert(`${i + 1}번 선택지를 입력해주세요.`);
+    //       return;
+    //     }
+    //   }
+    //   if (!correctAnswer.trim()) {
+    //     alert('정답을 선택해주세요.');
+    //     return;
+    //   }
   
-      // `subjectValueMap`을 사용하여 실제 DB에 저장될 값을 가져옴
-      const dbSubjectValue = subjectValueMap[subject];
-      console.log('클라이언트에서 서버로 보낼 subject 값:', dbSubjectValue);
-      if (!dbSubjectValue) {
-        alert('유효하지 않은 과목입니다.');
-        return;
+    //   // `subjectValueMap`을 사용하여 실제 DB에 저장될 값을 가져옴
+    //   const dbSubjectValue = subjectValueMap[subject];
+    //   console.log('클라이언트에서 서버로 보낼 subject 값:', dbSubjectValue);
+    //   if (!dbSubjectValue) {
+    //     alert('유효하지 않은 과목입니다.');
+    //     return;
+    //   }
+  
+    //   const questData = {
+    //     user_no: userNo,
+    //     subject: dbSubjectValue,
+    //     question_text: questionText,
+    //     option_1: options[0],
+    //     option_2: options[1],
+    //     option_3: options[2],
+    //     option_4: options[3],
+    //     correct_answer: parseInt(correctAnswer),
+    //     image_data_base64: base64ImageString,
+    //   };
+  
+    //   try {
+    //     const response = await fetch(`/api/customer/questRequest`, {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify(questData),
+    //     });
+  
+    //     if (response.ok) {
+    //       alert('문제 등록 요청 성공!');
+    //       handleReset(); // 성공 시 폼 초기화
+    //     } else {
+    //       const contentType = response.headers.get("content-type");
+    //       if (contentType && contentType.includes("application/json")) {
+    //         const errorData = await response.json();
+    //         console.error('문제 등록 요청 실패 상세:', errorData);
+    //         alert('문제 등록 요청 실패: ' + (errorData.message || '알 수 없는 오류'));
+    //       }
+    //     }
+    //   } catch (error) {
+    //     console.error('문제 등록 요청 오류:', error);
+    //     alert('문제 등록 요청 중 오류가 발생했습니다.');
+    //   }
+    // };
+    const handleQuestRegisterSubmit = async (e) => {
+      e.preventDefault(); // ❗ form 제출 방지
+
+      if (!consent) return alert('개인정보 수집 동의가 필요합니다.');
+
+      const formData = new FormData();
+
+      formData.append('user_no', userNo);
+      formData.append('subject', subjectValueMap[subject]);
+      formData.append('question_text', questionText);
+      formData.append('option_1', options[0]);
+      formData.append('option_2', options[1]);
+      formData.append('option_3', options[2]);
+      formData.append('option_4', options[3]);
+      formData.append('correct_answer', correctAnswer);
+
+      if (selectedImage) {
+        formData.append('image', selectedImage); // ⬅️ 파일 직접 추가
       }
-  
-      const questData = {
-        user_no: userNo,
-        subject: dbSubjectValue,
-        question_text: questionText,
-        option_1: options[0],
-        option_2: options[1],
-        option_3: options[2],
-        option_4: options[3],
-        correct_answer: parseInt(correctAnswer),
-        image_data_base64: base64ImageString,
-      };
-  
+      
       try {
-        const response = await fetch(`/api/customer/questRequest`, {
+        console.log("보내기전 확인 : " , formData);
+        const response = await fetch('/api/customer/questRequestWithImage', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(questData),
+          body: formData, // ✅ Content-Type 자동 설정됨
         });
-  
+
         if (response.ok) {
-          alert('문제 등록 요청 성공!');
-          handleReset(); // 성공 시 폼 초기화
+          alert('문제 등록 성공!');
+          handleReset();
         } else {
-          const contentType = response.headers.get("content-type");
-          if (contentType && contentType.includes("application/json")) {
-            const errorData = await response.json();
-            console.error('문제 등록 요청 실패 상세:', errorData);
-            alert('문제 등록 요청 실패: ' + (errorData.message || '알 수 없는 오류'));
-          }
+          const err = await response.text();
+          alert('등록 실패: ' + err);
         }
       } catch (error) {
-        console.error('문제 등록 요청 오류:', error);
-        alert('문제 등록 요청 중 오류가 발생했습니다.');
+        alert('에러 발생: ' + error.message);
       }
     };
   
@@ -213,7 +251,7 @@ const QuestRequestPanel = () => {
               id="image-upload"
               accept="image/*"
               onChange={handleImageChange}
-              style={{display: 'none'}}
+              style={{marginLeft:'10px'}}
             />
             {previewImage && (
               <div className={styles.image_preview_container}>
