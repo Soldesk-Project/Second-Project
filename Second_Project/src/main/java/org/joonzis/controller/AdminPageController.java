@@ -10,7 +10,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.joonzis.domain.AchievementDTO;
+import org.joonzis.domain.FaqVO;
 import org.joonzis.domain.ItemVO;
+import org.joonzis.domain.NoticeVO;
 import org.joonzis.domain.QuestRequestVO;
 import org.joonzis.domain.QuestionDTO;
 import org.joonzis.domain.UsersVO;
@@ -452,4 +454,95 @@ public class AdminPageController {
             return new ResponseEntity<>("아이템 삭제 중 오류가 발생했습니다: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
+    // 공지사항 등록
+    @PostMapping(value = "/registerNotice", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> registerNotice(@RequestBody NoticeVO notice) {
+        try {
+            adminService.registerNotice(notice.getSubject(), notice.getMessage());
+            return new ResponseEntity<>("공지사항 등록 성공!", HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "공지사항 등록 중 오류가 발생했습니다: " + e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    // 공지사항 수정
+    @PostMapping(value = "/editNotice", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> editNotice(@RequestBody NoticeVO notice) {
+    	try {
+    		adminService.editNotice(notice.getId(), notice.getSubject(), notice.getMessage());
+    		return new ResponseEntity<>("공지사항 수정 성공!", HttpStatus.OK);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		Map<String, String> errorResponse = new HashMap<>();
+    		errorResponse.put("message", "공지사항 수정 중 오류가 발생했습니다: " + e.getMessage());
+    		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    }
+    // 공지사항 삭제
+    @PostMapping(value = "/deleteNotice", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> deleteNotice(@RequestBody NoticeVO notice) {
+    	try {
+    		adminService.deleteNotice(notice.getId());
+    		return new ResponseEntity<>("공지사항 삭제 성공!", HttpStatus.OK);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		Map<String, String> errorResponse = new HashMap<>();
+    		errorResponse.put("message", "공지사항 삭제 중 오류가 발생했습니다: " + e.getMessage());
+    		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    }
+
+    
+    // FAQ 등록
+    @PostMapping(value = "/registerFaq", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> registerFaq(@RequestBody FaqVO faq) {
+    	try {
+    		adminService.registerFaq(faq.getQuestion(), faq.getAnswer(), faq.getCategory());
+    		return new ResponseEntity<>("FAQ 등록 성공!", HttpStatus.OK);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		Map<String, String> errorResponse = new HashMap<>();
+    		errorResponse.put("message", "FAQ 등록 중 오류가 발생했습니다: " + e.getMessage());
+    		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    }
+    // FAQ 수정
+    @PostMapping(value = "/editFaq", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> editFaq(@RequestBody FaqVO faq) {
+    	try {
+    		adminService.editFaq(faq.getId(), faq.getQuestion(), faq.getAnswer(), faq.getCategory());
+    		return new ResponseEntity<>("FAQ 수정 성공!", HttpStatus.OK);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		Map<String, String> errorResponse = new HashMap<>();
+    		errorResponse.put("message", "FAQ 수정 중 오류가 발생했습니다: " + e.getMessage());
+    		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    }
+    // FAQ 삭제
+    @PostMapping(value = "/deleteFaq", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> deleteFaq(@RequestBody FaqVO faq) {
+    	try {
+    		adminService.deleteFaq(faq.getId());
+    		return new ResponseEntity<>("FAQ 삭제 성공!", HttpStatus.OK);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		Map<String, String> errorResponse = new HashMap<>();
+    		errorResponse.put("message", "FAQ 삭제 중 오류가 발생했습니다: " + e.getMessage());
+    		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

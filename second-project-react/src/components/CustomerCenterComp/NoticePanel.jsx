@@ -1,30 +1,53 @@
 import React, { useEffect, useState } from 'react'; 
 import axios from 'axios';
 import styles from '../../css/customer.module.css'; 
+import NoticeModal from '../modal/NoticeModal';
+import { useSelector } from 'react-redux';
 
-const PAGE_SIZE = 5; 
+const PAGE_SIZE = 10; 
 
 const NoticePanel = () => {
   const [notices, setNotices] = useState([]);
   const [page, setPage] = useState(1);
   const [totalNotices, setTotalNotices] = useState(0);
   const [openNoticeId, setOpenNoticeId] = useState(null); 
+  const [noticeModal, setNoticeModal] = useState(false); 
+  const [modalStatus, setModalStatus] = useState(''); 
+  const [noticeItem, setNoticeItem] = useState(null); 
+  const [refreshFlag, setRefreshFlag] = useState(false);
+  const user = useSelector(state => state.user.user);
 
   useEffect(() => {
     const fetchNotices = async () => {
       try {
         const res = await axios.get(`/api/customer/notices?page=${page}&size=${PAGE_SIZE}`);
-        console.log("Notices data received:", res.data);
         setNotices(res.data.items);
         setTotalNotices(res.data.totalCount);
       } catch (error) {
-        console.error("공지사항 데이터를 가져오는 데 실패했습니다.", error);
         setNotices([]);
         setTotalNotices(0);
       }
     };
     fetchNotices();
-  }, [page]);
+    setOpenNoticeId(null);
+  }, [page, refreshFlag]);
+
+  const reloadNotices = () => {
+    setRefreshFlag(prev => !prev);
+  };
+
+  // 공지사항 작성 모달
+  const handleOpenNoticeModal=(item)=>{
+    if (item && typeof item === "object") {
+      setModalStatus('edit');
+      setNoticeItem(item);
+    } else {
+      setModalStatus('register');
+      setNoticeItem(null);
+    }
+    setNoticeModal(true);
+
+  }
 
   const toggleDetails = (id) => {
     setOpenNoticeId(openNoticeId === id ? null : id);
@@ -35,89 +58,96 @@ const NoticePanel = () => {
   };
 
   return (
-    // section 시작
-    <section className={styles.content}>
-      {/* ul.listHeader 시작 */}
-      <ul className={styles.listHeader}>
-        <li>번호</li>
-        <li>제목</li>
-        <li>작성자</li> 
-        <li>날짜</li>
-      </ul>
-      {/* ul.listHeader 끝 */}
-
-      {/* ul.listView 시작 */}
-      <ul className={styles.listView}>
-        {notices.length > 0 ? (
-          notices.map(item => (
-            // li.listItem 시작
-            <li key={item.id} className={styles.listItem}>
-              {/* div.listItemHeader 시작 */}
-              <div 
-                className={styles.listItemHeader} 
-                onClick={() => toggleDetails(item.id)}
-              >
-                <span className={styles.listItemNo}>{item.id}</span>
-                <span className={styles.listItemTitle}>
-                  {item.subject}
-                </span>
-                <span className={styles.listItemAuthor}>관리자</span> 
-                <span className={styles.listItemDate}>
-                  {new Date(item.createdAt).toLocaleDateString()}
-                </span>
-              </div>
-              {/* div.listItemHeader 끝 */}
-              
-              {openNoticeId === item.id && (
-                // div.detailContentArea 시작
-                <div className={styles.detailContentArea}>
-                  {/* div.detailContent 시작 */}
-                  <div className={styles.detailContent}>
-                    {item.message && item.message.split('\n').map((line, index) => (
-                      // React.Fragment 시작
-                      <React.Fragment key={index}> 
-                        {line}
-                        <br />
-                      </React.Fragment>
-                      // React.Fragment 끝
-                    ))}
-                  </div>
-                  {/* div.detailContent 끝 */}
+    <>
+      {
+        user?.auth==='ROLE_ADMIN' &&(
+        noticeModal && (
+          modalStatus === 'edit'?
+            <NoticeModal
+              setNoticeModal={setNoticeModal}
+              reloadNotices={reloadNotices}
+              modalStatus={modalStatus}
+              noticeItem={noticeItem}
+              />:
+              <NoticeModal
+              setNoticeModal={setNoticeModal}
+              reloadNotices={reloadNotices}
+              modalStatus={modalStatus}
+            />
+        ))
+      }
+      <section className={styles.content}>
+        <ul className={styles.listHeader}>
+          <li>번호</li>
+          <li>제목</li>
+          <li>작성자</li> 
+          <li>날짜</li>
+        </ul>
+        <ul className={styles.listView}>
+          {notices.length > 0 ? (
+            notices.map((item, index) => (
+              <li key={item.id} className={styles.listItem}>
+                <div 
+                  className={styles.listItemHeader} 
+                  onClick={() => toggleDetails(item.id)}>
+                  <span className={styles.listItemNo}>{index+1}</span>
+                  <span className={styles.listItemTitle}>
+                    {item.subject}
+                  </span>
+                  <span className={styles.listItemAuthor}>관리자</span> 
+                  <span className={styles.listItemDate}>
+                    {new Date(item.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
-                // div.detailContentArea 끝
-              )}
-            </li>
-            // li.listItem 끝
-          ))
-        ) : (
-          // li.noData 시작
-          <li className={styles.noData}>공지사항이 없습니다.</li>
-          // li.noData 끝
-        )}
-      </ul>
-      {/* ul.listView 끝 */}
-
-      {/* div.listFooter 시작 */}
-      <div className={styles.listFooter}>
-        <div className={styles.pagination}>
-          <button
-            onClick={() => setPage(p => Math.max(1, p - 1))}
-            disabled={page === 1}
-          >
-            이전
-          </button>
-          <span>{page} / {getTotalPages()}</span>
-          <button
-            onClick={() => setPage(p => Math.min(getTotalPages(), p + 1))}
-            disabled={page === getTotalPages()}
-          >
-            다음
-          </button>
+                
+                {openNoticeId === item.id && (
+                  <div className={styles.detailContentArea}>
+                    <div className={styles.detailContent}>
+                      {item.message && item.message.split('\n').map((line, index) => (
+                        <React.Fragment key={index}> 
+                          {line}
+                          <br />
+                        </React.Fragment>
+                      ))}
+                    </div>
+                    {
+                      user?.auth==='ROLE_ADMIN' &&(
+                        <div className={styles.notice}>
+                          <button onClick={()=>handleOpenNoticeModal(item)}>수정</button>
+                        </div>
+                      )
+                    }
+                  </div>
+                )}
+              </li>
+            ))
+          ) : (
+            <li className={styles.noData}>공지사항이 없습니다.</li>
+          )}
+        </ul>
+        <div className={styles.listFooter}>
+          {
+            user?.auth==='ROLE_ADMIN' &&(
+            <div className={styles.notice}>
+              <button onClick={()=>handleOpenNoticeModal(null)}>공지사항 추가</button>
+            </div>)
+          }
+          <div className={styles.pagination}>
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}>
+              이전
+            </button>
+            <span>{page} / {getTotalPages()}</span>
+            <button
+              onClick={() => setPage(p => Math.min(getTotalPages(), p + 1))}
+              disabled={page === getTotalPages()}>
+              다음
+            </button>
+          </div>
         </div>
-      </div>
-      {/* div.listFooter 끝 */}
-    </section>
-    // section 끝
+      </section>
+    </>
   );
 };
 

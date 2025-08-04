@@ -214,20 +214,6 @@ textarea {
   line-height: 1.5;
 }
 
-/* --- 버튼 공통 --- */
-button {
-  appearance: none;
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  font: inherit;
-  color: inherit;
-  outline: none;
-  cursor: pointer;
-}
-
-
 /* 공통 메인 버튼 */
 .primaryButton,
 .submitButton {
@@ -310,7 +296,7 @@ button {
 /* --- 리스트 뷰 --- */
 .listView {
   list-style: none;
-  margin: 20px 0;
+  /* margin: 20px 0; */
   padding: 0;
   color: #ddd;
 }
@@ -322,6 +308,7 @@ button {
   gap: 1rem;
   border-bottom: 1px solid #48494e;
   color: #ddd;
+  margin: 20px 0;
 }
 
 .listItemHeader {
@@ -359,9 +346,8 @@ button {
 }
 
 .listItemDate {
-  justify-self: end;
+  justify-self: center;
   align-self: center;
-  padding-right: 20px;
   font-size: 0.9em;
   color: #bbb;
 }
@@ -396,6 +382,7 @@ button {
   padding-top: 15px;
   border-top: 1px solid #48494e;
   color: #bbb;
+  gap: 20px;
 }
 
 /* 페이징 버튼 스타일 */
@@ -405,7 +392,12 @@ button {
   gap: 10px;
 }
 
-.pagination button {
+.notice, .faq{
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.pagination button, .notice button, .faq button{
   padding: 6px 12px;
   background-color: #35373d;
   color: #ddd;
@@ -415,7 +407,7 @@ button {
   transition: background-color 0.2s ease;
 }
 
-.pagination button:hover:not(:disabled) {
+.pagination button:hover:not(:disabled), .notice button:hover, .faq button:hover{
   background-color: #8367C7;
   color: #fff;
 }

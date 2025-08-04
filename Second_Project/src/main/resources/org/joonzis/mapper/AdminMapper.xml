@@ -454,4 +454,47 @@
             </if>
         WHERE ID = #{id}
     </update>
+    
+    <insert id="registerNotice" parameterType="String">
+		INSERT INTO NOTICE VALUES(SEQ_NOTICE.NEXTVAL, #{subject}, #{message}, sysdate)
+    </insert>
+    
+    <update id="editNotice">
+    	UPDATE NOTICE
+    	SET
+    		SUBJECT = #{subject},
+    		MESSAGE = #{message},
+    		CREATED_AT = sysdate
+    	WHERE ID = #{id}
+    </update>
+    
+    <delete id="deleteNotice">
+    	DELETE FROM NOTICE
+    	WHERE ID = #{id}
+    </delete>
+
+
+    
+    <insert id="registerFaq" parameterType="String">
+		INSERT INTO FAQ VALUES(SEQ_FAQ.NEXTVAL, #{question}, #{answer}, #{category}, sysdate)
+    </insert>
+    
+    <update id="editFaq">
+    	UPDATE FAQ
+    	SET
+    		QUESTION = #{question},
+    		ANSWER = #{answer},
+    		CATEGORY = #{category},
+    		CREATED_AT = sysdate
+    	WHERE ID = #{id}
+    </update>
+    
+    <delete id="deleteFaq">
+    	DELETE FROM FAQ
+    	WHERE ID = #{id}
+    </delete>
+    
+    
+    
+    
 </mapper>

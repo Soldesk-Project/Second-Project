@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import '../../css/adminPage/UserRestrict.css';
+import React, { useEffect, useState } from 'react';
+import styles from '../../css/adminPage/UserRestrict.module.css';
 
 const UserRestrict = () => {
   const token = localStorage.getItem('token');
@@ -26,6 +26,9 @@ const UserRestrict = () => {
     }));
   };
 
+  useEffect(()=>{
+    handleSearch();
+  },[])
   // 검색 버튼 클릭 핸들러
   const handleSearch = async () => {
     setLoading(true);
@@ -153,6 +156,11 @@ const UserRestrict = () => {
     }
   };
 
+  // 접속 금지 버튼
+  const handleApplyOnlineBan=()=>{
+
+  }
+
   console.log(users);
   
 
@@ -172,21 +180,20 @@ const UserRestrict = () => {
   };
 
   return (
-    <div className="user-restrict-container">
+    <div className={styles.userRestrictContainer}>
       <h1>유저 제재</h1>
       <hr/>
       {/* 검색 폼 */}
-      <div className="search-section">
+      <div className={styles.searchSection}>
         <h3>제재 현황/대상 검색</h3>
-        <div className="search-controls">
+        <div className={styles.searchControls}>
           <label htmlFor="searchType">검색 기준: </label>
           <select
             id="searchType"
             name="searchType"
             value={searchConditions.searchType}
             onChange={handleChange}
-            className="search-select"
-          >
+            className={styles.searchSelect}>
             <option value="userId">ID</option>
             <option value="userNick">별명</option>
             <option value="userRank">랭크</option>
@@ -199,13 +206,11 @@ const UserRestrict = () => {
             value={searchConditions.searchValue}
             onChange={handleChange}
             placeholder={getPlaceholderText()}
-            className="search-input"
-          />
+            className={styles.searchInput}/>
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="search-button"
-          >
+            className={styles.searchButton}>
             {loading ? '검색중' : '검색'}
           </button>
         </div>
@@ -214,32 +219,47 @@ const UserRestrict = () => {
       <hr />
         
       {/* 로딩 및 에러 메시지 표시 */}
-      {loading && <p className="loading-message">사용자 정보를 불러오는 중입니다...</p>}
-      {error && <p className="error-message">오류: {error}</p>}
+      {loading && <p className={styles.loadingMessage}>사용자 정보를 불러오는 중입니다...</p>}
+      {error && <p className={styles.errorMessage}>오류: {error}</p>}
 
       {/* 검색 결과 표 조건부 렌더링 */}
       {!loading && !error && users.length > 0 ? (
-        <div className="search-results">
-          <h3>검색 결과</h3>
-          <table className="user-table">
+        <div className={styles.searchResults}>
+          <div className={styles.searchHeader}>
+            <div>
+              <h3>검색 결과</h3>
+            </div>
+            <div className={styles.banBtnWrapper}>
+              {/* 채팅금지 적용 버튼 */}
+              <button
+                onClick={handleApplyChatBan}
+                disabled={loading || selectedUserNos.size === 0}
+                className={styles.applyBanButton}>
+                {loading ? '적용중...' : `채팅금지 적용 (${selectedUserNos.size}명)`}
+              </button>
+              {/* 접속 금지 버튼 */}
+              <button
+                onClick={handleApplyOnlineBan}
+                disabled={loading || selectedUserNos.size === 0}
+                className={styles.applyBanButton}>
+                {loading ? '적용중...' : `접속금지 적용 (${selectedUserNos.size}명)`}
+              </button>
+            </div>
+          </div>
+          <table className={styles.userTable}>
             <thead>
               <tr>
-                <th>회원번호</th>
                 <th>ID</th>
                 <th>별명</th>
                 <th>이메일</th>
                 <th>가입일</th>
-                <th>포인트</th>
-                <th>랭크</th>
-                <th>채팅금지 여부</th>
-                <th>권한</th>
-                <th>선택</th> {/* 체크박스 열 */}
+                <th>계정 상태</th>
+                <th>선택</th>
               </tr>
             </thead>
             <tbody>
               {users.map((user) => (
                 <tr key={user.user_no}>
-                  <td className="user-no-col">{user.user_no}</td>
                   <td>{user.user_id}</td>
                   <td>{user.user_nick}</td>
                   <td>{user.user_email}</td>
@@ -252,20 +272,17 @@ const UserRestrict = () => {
                         : 'N/A (날짜 변환 오류)';
                     })() : 'N/A'}
                   </td>
-                  <td>{user.user_point}</td>
-                  <td>{user.user_rank}</td>
-                  <td className="chat-ban-status">
+                  <td className={styles.chatBanStatus}>
                     {user.ischatbanned === 1 ? '금지' : '정상'}
                     {user.ischatbanned === 1 && user.banned_timestamp && (
-                      <span className="ban-duration">
+                      <span className={styles.banDuration}>
                         (~ {new Date(new Date(user.banned_timestamp).getTime() + 72 * 60 * 60 * 1000).toLocaleDateString('ko-KR')}까지)
                       </span>
                     )}
                   </td>
-                  <td>{user.auth}</td>
-                  <td className="checkbox-col">
+                  <td className={styles.checkboxCol}>
                     <input
-                      type="checkbox"
+                      type='checkbox'
                       checked={selectedUserNos.has(user.user_no)}
                       onChange={() => handleCheckboxChange(user.user_no)}
                     />
@@ -275,19 +292,9 @@ const UserRestrict = () => {
             </tbody>
           </table>
 
-          {/*채팅금지 적용 버튼 */}
-          <div className="chat-ban-action">
-            <button
-              onClick={handleApplyChatBan}
-              disabled={loading || selectedUserNos.size === 0}
-              className="apply-ban-button"
-            >
-              {loading ? '적용중...' : `채팅금지 적용 (${selectedUserNos.size}명)`}
-            </button>
-          </div>
         </div>
       ) : (
-        !loading && !error && <p className="no-results-message">검색 결과가 없습니다. 검색 조건을 선택하고 '검색' 버튼을 눌러주세요.</p>
+        !loading && !error && <p className={styles.noResultsMessage}>검색 결과가 없습니다. 검색 조건을 선택하고 '검색' 버튼을 눌러주세요.</p>
       )}
     </div>
   );

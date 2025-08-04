@@ -17,6 +17,7 @@ import AchDelete from '../components/adminBodyComp/AchDelete';
 import ItemRegister from '../components/adminBodyComp/ItemRegister';
 import ItemEdit from '../components/adminBodyComp/ItemEdit';
 import ItemDelete from '../components/adminBodyComp/ItemDelete';
+import ReportDetails from '../components/adminBodyComp/ReportDetails';
 
 const AdminPage = () => {
   const currentUser = useSelector((state) => state.user.user);
@@ -64,6 +65,8 @@ const AdminPage = () => {
     switch (activeUserMenu){
       case 'userRestrict':
         return <UserRestrict/>;
+      case 'reportDetails':
+        return <ReportDetails/>;
       default:
         return <UserRestrict/>;
     }

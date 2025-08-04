@@ -711,4 +711,33 @@ public class AdminServiceImpl implements AdminService {
         }
         adminMapper.updateQuestRequest(questRequestVO);
     }
+	
+	@Override
+	public void registerNotice(String subject, String message) {
+		adminMapper.registerNotice(subject, message);
+	}
+	@Override
+	public void editNotice(long id, String subject, String message) {
+		adminMapper.editNotice(id, subject, message);
+	}
+	@Override
+	public void deleteNotice(long id) {
+		adminMapper.deleteNotice(id);
+	}
+	
+	@Override
+	public void registerFaq(String question, String answer, String category) {
+		adminMapper.registerFaq(question, answer, category);
+	}
+	@Override
+	public void editFaq(long id, String question, String answer, String category) {
+		adminMapper.editFaq(id, question, answer, category);
+	}
+	@Override
+	public void deleteFaq(long id) {
+		adminMapper.deleteFaq(id);
+	}
+	
+	
+	
 }

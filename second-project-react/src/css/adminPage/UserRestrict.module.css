@@ -1,15 +1,15 @@
-.user-restrict-container {
+.userRestrictContainer {
   /* padding: 20px; */
   font-family: Arial, sans-serif;
   color: #333;
 }
 
-h1 {
+.userRestrictContainer h1 {
   color: #fff;
   margin-bottom: 20px;
 }
 
-hr {
+.userRestrictContainer hr {
   border: 0;
   height: 1px;
   background: #eee;
@@ -17,30 +17,30 @@ hr {
 }
 
 /* 검색 섹션 */
-.search-section {
+.searchSection {
   margin-bottom: 20px;
 }
 
-.search-section h3 {
+.searchSection h3 {
   color: #fff;
   margin-bottom: 15px;
 }
 
-.search-controls {
+.searchControls {
   display: flex;
   align-items: center;
   gap: 15px; /* 요소들 사이의 간격 */
   margin-bottom: 10px;
 }
 
-.search-controls label {
+.searchControls label {
   font-weight: bold;
   margin-right: 5px; /* 레이블과 다음 요소 사이 간격 */
   color: #fff;
 }
 
-.search-select,
-.search-input {
+.searchSelect,
+.searchInput {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -49,11 +49,11 @@ hr {
   color: #ddd;
 }
 
-.search-input {
+.searchInput {
   width: 200px;
 }
 
-.search-button {
+.searchButton {
   padding: 10px 20px;
   background-color: #35373d;
   color: white;
@@ -64,59 +64,64 @@ hr {
   transition: background-color 0.2s ease-in-out;
 }
 
-.search-button:hover:not(:disabled) {
+.searchButton:hover:not(:disabled) {
   background-color: #5a6268;
 }
 
-.search-button:disabled {
+.searchButton:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
 }
 
 /* 메시지 스타일 */
-.loading-message {
+.loadingMessage {
   color: #007bff;
   font-style: italic;
   margin-top: 20px;
 }
 
-.error-message {
+.errorMessage {
   color: red;
   font-weight: bold;
   margin-top: 20px;
 }
 
-.no-results-message {
+.noResultsMessage {
   margin-top: 20px;
   color: #555;
   font-style: italic;
 }
 
 /* 검색 결과 테이블 */
-.search-results h3 {
+.searchResults h3 {
   color: #fff;
-  margin-bottom: 15px;
+  margin: 0;
+}
+.searchHeader{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.user-table {
+.userTable {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
   margin-top: 20px;
 }
 
-.user-table th,
-.user-table td {
+.userTable th,
+.userTable td {
   padding: 10px;
   vertical-align: middle; /* 텍스트 수직 정렬 */
   color: #ddd;
 }
 
-.user-table td{
+.userTable td{
   font-size: 14px;
 }
 
-.user-table th {
+.userTable th {
   background-color: #171a23;
   white-space: nowrap;
   color: #ddd;
@@ -124,42 +129,37 @@ hr {
   border-bottom: 1px solid #eee;
 }
 
-.user-table tbody tr:nth-child(even) {
+.userTable tbody tr:nth-child(even) {
   background-color: #171a23;
 }
 
-.user-table tbody tr:hover {
+.userTable tbody tr:hover {
   background-color: #171a23;
 }
 
-.user-no-col {
-  width: 80px; /* 회원번호 열 너비 조정 */
-}
-
-.chat-ban-status {
+.chatBanStatus {
   text-align: center;
   white-space: nowrap; /* 줄 바꿈 방지 */
 }
 
-.ban-duration {
+.banDuration {
   font-size: 0.8em;
   color: #888;
   display: block; /* 괄호 안의 텍스트를 새 줄에 표시 */
   margin-top: 5px;
 }
 
-.checkbox-col {
+.checkboxCol {
   text-align: center;
   width: 50px; /* 체크박스 열 너비 조정 */
 }
 
-/* 채팅금지 적용 버튼 */
-.chat-ban-action {
-  margin-top: 20px;
-  text-align: right;
+.banBtnWrapper{
+  display: flex;
+  gap: 20px;
 }
 
-.apply-ban-button {
+.applyBanButton {
   padding: 10px 20px;
   background-color: #35373d;
   color: white;
@@ -170,11 +170,11 @@ hr {
   transition: background-color 0.2s ease-in-out;
 }
 
-.apply-ban-button:hover:not(:disabled) {
+.applyBanButton:hover:not(:disabled) {
   background-color: #c82333;
 }
 
-.apply-ban-button:disabled {
+.applyBanButton:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
 }

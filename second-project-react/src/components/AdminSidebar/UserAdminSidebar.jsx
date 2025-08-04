@@ -10,10 +10,11 @@ const UserAdminSidebar = ({setActiveUserMenu}) => {
 
   return (
     <div>
-      <button className='AuthMenu' onClick={toggleAuthMenu}>유저 권한 관리 {isAuthMenuOpen ? '▼' : '▶'}</button>
+      <button className='AuthMenu' onClick={toggleAuthMenu}>유저 관리 {isAuthMenuOpen ? '▼' : '▶'}</button>
       {isAuthMenuOpen && (
         <ul className="submenu-list">
           <li><button className="userRestrictBtn" onClick={()=> setActiveUserMenu('userRestrict')}>유저 제재</button></li>
+          <li><button className="userRestrictBtn" onClick={()=> setActiveUserMenu('reportDetails')}>신고 내역</button></li>
         </ul>
       )}
     </div>

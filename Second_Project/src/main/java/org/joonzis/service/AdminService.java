@@ -14,51 +14,64 @@ public interface AdminService {
     
 	//문제 관련 메소드
 	//문제 등록 메소드
-	void registerQuestion(QuestionDTO questionDTO);
-    //문제 검색 메소드
-	Map<String, Object> searchQuestions(String subjectCode, String query, int page, int limit);
+	public void registerQuestion(QuestionDTO questionDTO);
+	//문제 검색 메소드
+	public Map<String, Object> searchQuestions(String subjectCode, String query, int page, int limit);
     //문제 수정 메소드
-	void updateQuestion(QuestionDTO questionDTO);
+	public void updateQuestion(QuestionDTO questionDTO);
 	//문제 삭제 메소드
-	void deleteQuestions(List<Integer> questionIds, String subjectCode);
+	public void deleteQuestions(List<Integer> questionIds, String subjectCode);
 
 	//문제 등록 요청 관련 메소드
 	//문제 등록 요청 조회 메소드
-	Map<String, Object> getQuestRequests(int page, int limit, String searchTerm, String filterStatus);
+	public Map<String, Object> getQuestRequests(int page, int limit, String searchTerm, String filterStatus);
 	//문제 등록 요청 검색 메소드
-	QuestRequestVO getQuestRequestById(long id);
+	public QuestRequestVO getQuestRequestById(long id);
 	//문제 등록 요청 수정 메소드
-	void updateQuestRequest(QuestRequestVO questRequestVO);
+	public void updateQuestRequest(QuestRequestVO questRequestVO);
 	
 	//유저 관련 메소드
 	//유저 조회 메소드
-	List<UsersVO> getAllUsers();
+	public List<UsersVO> getAllUsers();
 	//유저 검색 메소드
-	List<UsersVO> searchUsers(String searchType, String searchValue);
+	public List<UsersVO> searchUsers(String searchType, String searchValue);
 	//유저 채금 적용 메소드
-	int banChatusers(List<Integer> userNos);
+	public int banChatusers(List<Integer> userNos);
     //유저 채금 해제 메소드
-	void unbanChatUsers();
+	public void unbanChatUsers();
 	
 	//업적 관련 메소드
 	//업적 등록 메소드
-	void registerAchievement(AchievementDTO achievementDTO);
+	public void registerAchievement(AchievementDTO achievementDTO);
 	//업적 검색 메소드
-	Map<String, Object> searchAchievement(String type, String query, int page, int limit);
+	public Map<String, Object> searchAchievement(String type, String query, int page, int limit);
 	//업적 삭제 메소드
-	boolean deleteAchievementsByTitles(String type, List<String> achievementTitles);
+	public boolean deleteAchievementsByTitles(String type, List<String> achievementTitles);
 	
 	//아이템 관련 메소드
 	//아이템 등록 메소드
-	void registerItem(ItemVO itemVO) throws Exception;
+	public void registerItem(ItemVO itemVO) throws Exception;
+
 	//아이템 검색 메소드
-	Map<String, Object> searchItems(String decodedType, String decodedQuery, int page, int limit);
+	public Map<String, Object> searchItems(String decodedType, String decodedQuery, int page, int limit);
 	//아이템 수정 메소드
-	void updateItem(int itemNo, String type, String itemName, int itemPrice, MultipartFile itemImage, String originalImageFileName);
+	public void updateItem(int itemNo, String type, String itemName, int itemPrice, MultipartFile itemImage, String originalImageFileName);
 	//아이템 삭제 메소드
-	void deleteItems(String itemType, int itemNo);
-	
-	
+
+	public void deleteItems(String itemType, int itemNo);
+
+	// 공지사항 작성
+	public void registerNotice(String subject, String message);
+	// 공지사항 수정
+	public void editNotice(long id, String subject, String message);
+	// 공지사항 삭제
+	public void deleteNotice(long id);
+	// faq 작성
+	public void registerFaq(String question, String answer, String category);
+	// faq 수정
+	public void editFaq(long id, String question, String answer, String category);
+	// faq 삭제
+	public void deleteFaq(long id);
 	
 	
 }

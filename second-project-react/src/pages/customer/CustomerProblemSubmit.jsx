@@ -81,7 +81,8 @@ const CustomerProblemSubmit = () => {
     e.preventDefault();
 
     if (!consent) {
-      return alert('개인정보 수집 동의가 필요합니다.');
+      alert('개인정보 수집 동의가 필요합니다.');
+      return;
     }
 
     if (!probCate.trim()) {
