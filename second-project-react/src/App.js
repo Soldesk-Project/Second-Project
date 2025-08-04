@@ -29,7 +29,6 @@ import ResetPasswordPage from './pages/login/ResetPasswordPage';
 import ErrorEvent from './pages/ErrorEvent';
 import ProtectedRoute from './components/ProtectedRoute';
 import ErrorEvent403 from './pages/ErrorEvent403';
-import FileUploadComponent from './components/FileUploadComponent';
 
 function App() {
   const dispatch = useDispatch();
@@ -73,7 +72,6 @@ function App() {
           <Route path="/admin" element={<ProtectedRoute requiredRole="ROLE_ADMIN"><AdminPage/></ProtectedRoute>}/>
           <Route path="/inquiries/:id" element={<InquiryDetail />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/upload" element={<FileUploadComponent />} />
           <Route path="/403" element={<ErrorEvent403 />} />
           <Route path="/*" element={<ErrorEvent />} />
         </Routes>
