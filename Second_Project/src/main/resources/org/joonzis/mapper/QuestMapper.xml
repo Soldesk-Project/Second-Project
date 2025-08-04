@@ -15,6 +15,7 @@
             image_data,
             user_no,
             REQUEST_CREATED_AT
+            request_created_at
         ) VALUES (
             seq_questRequest.NEXTVAL,
             #{subject},

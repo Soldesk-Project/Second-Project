@@ -26,4 +26,9 @@ public interface PlayMapper {
 	
 	public List<UserQuestionHistoryDTO> getUserQuestionHistory(@Param("submittedAt") String submittedAt);
 	
+	public void saveReport(UserQuestionHistoryDTO report);
+	
+	public List<UserQuestionHistoryDTO> getReportQuestion(@Param("offset") int offset, @Param("size") int size);
+	
+	public int getReportQuestionCount();
 }

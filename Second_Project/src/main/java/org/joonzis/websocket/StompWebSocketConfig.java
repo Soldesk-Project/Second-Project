@@ -20,12 +20,12 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-chat")
-                .setAllowedOrigins("http://localhost:3000", "http://192.168.0.112:9099")
+                .setAllowedOrigins("*")
                 .withSockJS();
 
         // 게임방 전용 WebSocket 엔드포인트
         registry.addEndpoint("/ws-game-chat")
-                .setAllowedOrigins("http://localhost:3000", "http://192.168.0.112:9099")
+                .setAllowedOrigins("*")
                 .withSockJS();
     }
 }

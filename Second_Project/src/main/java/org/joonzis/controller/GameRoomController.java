@@ -16,9 +16,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -73,6 +75,28 @@ public class GameRoomController {
 		log.info(list);
 		return ResponseEntity.ok(list);
 	}
+	
+	@GetMapping(value = "/getReportQuestion", produces = "application/json; charset=UTF-8")
+	public ResponseEntity<Map<String, Object>> getReportQuestion(
+	        @RequestParam(defaultValue = "1") int page,
+	        @RequestParam(defaultValue = "5") int size) {
+
+	    int offset = (page - 1) * size;
+	    List<UserQuestionHistoryDTO> reports = playService.getReportQuestion(offset, size);
+	    int totalCount = playService.getReportQuestionCount(); // 전체 개수 조회
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("items", reports);
+	    response.put("totalCount", totalCount);
+
+	    return ResponseEntity.ok(response);
+	}
+	
+	@PostMapping(value = "/reportQuestion", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<String> reportQuestion(@RequestBody UserQuestionHistoryDTO report) {
+		playService.saveReport(report);
+        return ResponseEntity.ok("문제 오류 신고가 접수되었습니다.");
+    }
 	
 	
 	@PostMapping("/usePoint")

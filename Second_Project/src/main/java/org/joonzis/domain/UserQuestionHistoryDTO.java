@@ -31,6 +31,8 @@ public class UserQuestionHistoryDTO {
 	private String option_2;
 	private String option_3;
 	private String option_4;
+	private Date report_at;
+	private String reason;
 	
 	@JsonInclude(JsonInclude.Include.NON_NULL)
     private byte[] image_data;  // BLOB 컬럼

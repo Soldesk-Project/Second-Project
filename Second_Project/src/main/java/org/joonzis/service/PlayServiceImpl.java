@@ -1,5 +1,6 @@
 package org.joonzis.service;
 
+import java.util.Base64;
 import java.util.List;
 
 import org.joonzis.domain.QuestionDTO;
@@ -73,5 +74,39 @@ public class PlayServiceImpl implements PlayService {
 	public List<UserQuestionHistoryDTO> getUserQuestionHistory(String submittedAt) {
 		return playMapper.getUserQuestionHistory(submittedAt);
 	}
+	
+	// 문제 오류 저장
+	@Override
+    public void saveReport(UserQuestionHistoryDTO report) {
+        // 이미지 Base64 → byte[] 변환 처리
+        if (report.getImage_data_base64() != null && !report.getImage_data_base64().isEmpty()) {
+            String base64 = report.getImage_data_base64();
+            if (base64.startsWith("data:")) {
+                base64 = base64.substring(base64.indexOf(",") + 1);
+            }
+            report.setImage_data(Base64.getDecoder().decode(base64));
+        }
+        playMapper.saveReport(report);
+    }
+	
+	// 문제 오류 가져오기
+	@Override
+	public List<UserQuestionHistoryDTO> getReportQuestion(int offset, int size){
+	    List<UserQuestionHistoryDTO> reports = playMapper.getReportQuestion(offset, size);
+
+	    for (UserQuestionHistoryDTO report : reports) {
+	        if (report.getImage_data() != null) {
+	            report.setImage_data_base64(Base64.getEncoder().encodeToString(report.getImage_data()));
+	            report.setImage_data(null);
+	        }
+	    }
+	    return reports;
+	}
+
+	@Override
+	public int getReportQuestionCount() {
+		return playMapper.getReportQuestionCount();
+	}
+	
 	
 }

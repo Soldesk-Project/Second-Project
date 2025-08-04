@@ -293,6 +293,26 @@
 	    WHERE ROWNUM &lt;= #{offset} + #{limit}
 	  )
 	  WHERE rn > #{offset}
+=======
+    <select id="searchItems" resultType="org.joonzis.domain.ItemVO" parameterType="map">
+	    SELECT item_no, item_name, item_price, item_type, image_file_name as imageFileName
+	    FROM (
+	        SELECT
+	            item_no, item_name, item_price, item_type, image_file_name,
+	            ROWNUM AS rn
+	        FROM (
+	            SELECT
+	                item_no, item_name, item_price, item_type, image_file_name
+	            FROM items
+	            WHERE item_type = #{item_type}
+	            <if test="query != null and query != ''">
+	                AND item_name LIKE '%' || #{query} || '%'
+	            </if>
+	            ORDER BY item_no ASC
+	        )
+	        WHERE ROWNUM &lt;= #{offset} + #{limit}
+	    )
+	    WHERE rn > #{offset}
 	</select>
 
 	<select id="getTotalItemCount" resultType="int" parameterType="map">

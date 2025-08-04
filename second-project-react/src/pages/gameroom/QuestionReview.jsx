@@ -6,6 +6,7 @@ import { WebSocketContext } from '../../util/WebSocketProvider';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../../components/Loading';
+import QuestionReportModal from '../../components/modal/QuestionReportModal';
 import Test from '../../components/Test';
 
 const QuestionReview = () => {
@@ -22,11 +23,12 @@ const QuestionReview = () => {
   const [point, setPoint] = useState(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [explanation, setExplanation] = useState("");  // ← 해설 내용
+  const [reportModal, setReportModal] = useState(false);
   const [explanationLoading, setExplanationLoading] = useState(false); // ← 로딩 표시용
   const questionListRef = useRef([]);
   const { user, server } = useSelector((state) => state.user);
-  const userNick = user.user_nick;
-  const userNo = user.user_no;
+  const userNick = user?.user_nick;
+  const userNo = user?.user_no;
   const userId = user?.user_id;
   const nav = useNavigate();
 
@@ -39,7 +41,9 @@ const QuestionReview = () => {
       if (socket.readyState === 1) {
         socket.send(JSON.stringify({ action: 'join', server, userNick }));
       } else {
-        socket.onopen = socket.send(JSON.stringify({ action: 'join', server, userNick }));;
+        socket.onopen = () => {
+          socket.send(JSON.stringify({ action: 'join', server, userNick }));
+        };
       }
   
       socket.onmessage = (event) => {
@@ -120,14 +124,7 @@ const QuestionReview = () => {
     if (play) {
       if (confirm('포인트를 소모하여 정답을 확인하시겠습니까?')) {
         await axios.post('/api/usePoint', {userNo});
-        // console.log("정답 : "+question.correct_answer);
-        // console.log("아이디 : "+question.history_id);
-        // console.log("고른답 : "+question.selected_answer);
-        // console.log("정답유무 : "+question._correct);
-        // console.log("문제 : "+question.question_text);
-        // console.log("과목 : "+question.subject);
         
-        console.log(question);
         setExplanation("");
         setExplanationLoading(true);
         setShowAnswer(true);
@@ -185,6 +182,16 @@ const QuestionReview = () => {
     nav('/main/' + server);
   };
 
+  console.log(question);
+
+  const openReportModal = () => {
+    setReportModal(true);
+  }
+
+  const closeReportModal = () => {
+    setReportModal(false);
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.body}>
@@ -213,10 +220,12 @@ const QuestionReview = () => {
                   {
                     play &&
                     <table>
-                      <tr>
-                        <td>번호</td>
-                        <td>정답</td>
-                      </tr>
+                      <tbody>
+                        <tr>
+                          <td>번호</td>
+                          <td>정답</td>
+                        </tr>
+                      </tbody>
                       {
                         reviewQuestions.map((a, idx)=>(
                           <tr key={idx}>
@@ -235,8 +244,11 @@ const QuestionReview = () => {
                         <Test question={question} 
                               nextId={nextId}
                               onSelectAnswer={setSelectAnswer}
-                              selectedAnswer={selectAnswer}/> 
-                        <span>내가 선택한 정답 : {selectedAnswer!==0?selectedAnswer:'선택하지 않음'}</span>
+                              selectedAnswer={selectAnswer}/>
+                        <div className={styles.answerRow}>
+                          <span>내가 선택한 정답 : {selectedAnswer!==0?selectedAnswer:'선택하지 않음'}</span>
+                          <button className={styles.reportBtn} onClick={()=>openReportModal()}>오류제보</button>
+                        </div>
                       </> : 
                     <h2>대기중</h2>
                   }
@@ -277,6 +289,9 @@ const QuestionReview = () => {
                 </div>
               )))
           }
+          {reportModal && (
+            <QuestionReportModal onClose={closeReportModal} question={question} />
+          )}
         </div>
       </div>
     </div>

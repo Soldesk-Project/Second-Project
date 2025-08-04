@@ -21,5 +21,10 @@ public interface PlayService {
 	public List<UserQuestionHistoryDTO> getQuestionReviewList(String user_nick);
 	
 	public List<UserQuestionHistoryDTO> getUserQuestionHistory(String submittedAt);
-
+	
+	public void saveReport(UserQuestionHistoryDTO report);
+	
+	public List<UserQuestionHistoryDTO> getReportQuestion(int offset, int size);
+	
+	public int getReportQuestionCount();
 }

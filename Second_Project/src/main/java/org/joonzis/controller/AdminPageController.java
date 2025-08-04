@@ -400,7 +400,6 @@ public class AdminPageController {
             String decodedQuery = URLDecoder.decode(query, "UTF-8");
 
             Map<String, Object> result = adminService.searchItems(decodedType, decodedQuery, page, limit);
-            System.out.println("result : " + result);
             return new ResponseEntity<>(result, HttpStatus.OK);
 
         } catch (UnsupportedEncodingException e) {

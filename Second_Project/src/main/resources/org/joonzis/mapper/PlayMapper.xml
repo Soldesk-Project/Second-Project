@@ -113,5 +113,49 @@
 			submitted_at=#{submittedAt}
     </select>
     
+     <insert id="saveReport" parameterType="org.joonzis.domain.UserQuestionHistoryDTO">
+        INSERT INTO question_report (
+            id,
+            subject,
+            question_text,
+            option_1,
+            option_2,
+            option_3,
+            option_4,
+            correct_answer,
+            image_data,
+            report_at,
+            user_nick,
+            reason
+        )
+        VALUES (
+            SEQ_QUESTION_REPORT.NEXTVAL,
+            #{subject},
+            #{question_text},
+            #{option_1},
+            #{option_2},
+            #{option_3},
+            #{option_4},
+            #{correct_answer},
+            #{image_data, jdbcType=BLOB},
+            SYSDATE,
+            #{user_nick},
+            #{reason}
+        )
+    </insert>
     
+    <select id="getReportQuestion" resultType="org.joonzis.domain.UserQuestionHistoryDTO" parameterType="map">
+		<![CDATA[
+		  SELECT * FROM (
+		    SELECT a.*, ROWNUM rnum FROM (
+		      SELECT * FROM question_report ORDER BY report_at DESC
+		    ) a WHERE ROWNUM <= #{offset} + #{size}
+		  ) WHERE rnum > #{offset}
+		]]>
+	</select>
+		
+	<select id="getReportQuestionCount" resultType="int">
+		SELECT COUNT(*) FROM question_report
+	</select>
+	    
 </mapper>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../../css/adminPage/UserRestrict.css';
 
 const UserRestrict = () => {
+  const token = localStorage.getItem('token');
   // 검색 조건을 위한 상태
   const [searchConditions, setSearchConditions] = useState({
     searchType: 'userId',
@@ -125,6 +126,7 @@ const UserRestrict = () => {
         const response = await fetch('/admin/users/ban-chat', {
           method: 'POST',
           headers: {
+            "Authorization": `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ userNos: usersToBan }), // 실제 금지할 사용자만 보냅니다.

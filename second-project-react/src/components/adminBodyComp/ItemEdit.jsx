@@ -99,6 +99,9 @@ const ItemEdit = () => {
                 imageUrl: item.imageFileName ? `/images/${item.imageFileName}` : null
             }));
 
+            console.log(itemsWithImageUrl);
+            
+
         setSearchResults(itemsWithImageUrl);
         setTotalPages(data.totalPages);
         setCurrentPage(page);
