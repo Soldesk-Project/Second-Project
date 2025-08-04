@@ -21,18 +21,18 @@ const ItemDelete = () => {
     '테두리',
     '칭호',
     '글자색',
-    '배경',
+    '명함',
     '말풍선',
-    '랜덤박스',
+    '유니크'
   ];
 
   const typeTableMap = {
     '테두리' : 'boundary',
     '칭호': 'title',
-    '글자색' : 'textColor',
-    '배경' : 'wallpaper',
-    '말풍선' : 'speechBubble',
-    '랜덤박스' : 'randomBoxe',
+    '글자색' : 'fontColor',
+    '명함' : 'background',
+    '말풍선' : 'balloon',
+    '유니크' : 'unique'
   };
 
   const handleTypeChange = (e) => {

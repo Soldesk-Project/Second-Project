@@ -50,13 +50,13 @@ public interface AdminService {
 	
 	//아이템 관련 메소드
 	//아이템 등록 메소드
-	void registerItem(ItemVO itemVO, MultipartFile itemImage) throws Exception;
+	void registerItem(ItemVO itemVO) throws Exception;
 	//아이템 검색 메소드
 	Map<String, Object> searchItems(String decodedType, String decodedQuery, int page, int limit);
 	//아이템 수정 메소드
 	void updateItem(int itemNo, String type, String itemName, int itemPrice, MultipartFile itemImage, String originalImageFileName);
 	//아이템 삭제 메소드
-	void deleteItems(String itemType, List<Integer> itemNos);
+	void deleteItems(String itemType, int itemNo);
 	
 	
 	

@@ -10,6 +10,7 @@ import { WebSocketContext } from '../util/WebSocketProvider';
 import { triggerRefreshRanking } from '../store/rankingSlice';
 import NickModal from './modal/NickModal';
 import { setUser, fetchUserInfo } from '../store/userSlice';
+import { useNavigate } from 'react-router-dom';
 
 const TABS = ['테두리', '칭호', '글자색', '명함', '말풍선', '유니크'];
 
@@ -312,6 +313,10 @@ const UserInfo = () => {
                 alert('닉네임 변경 중 오류가 발생했습니다.');
             });
     };
+    const nav = useNavigate();
+    const uploadTest = () => {
+        nav('/upload');
+      };
 
     const handleChangePw = useCallback(async () => {
         if (loading) return;
@@ -417,6 +422,7 @@ const UserInfo = () => {
                     <button className={styles.invenBtn} onClick={() => setIsModalOpen(true)}>Inventory</button>
                     <button className={styles.invenBtn} onClick={() => setIsNickModalOpen(true)}>닉네임 변경</button>
                     <button className={styles.invenBtn} onClick={handleChangePw} disabled={loading}>{loading ? '요청 중...' : '비밀번호 변경'}</button>
+                    <button className={styles.invenBtn} onClick={uploadTest}>업로드 테스트</button>
                 </div>
             </>:
             <>

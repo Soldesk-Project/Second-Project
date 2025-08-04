@@ -11,10 +11,18 @@
 	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
 	
 	<!-- Enables the Spring MVC @Controller programming model -->
-	<annotation-driven />
+	<!-- <annotation-driven />
 
-	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
-	<resources mapping="/resources/**" location="/resources/" />
+	Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory
+	<resources mapping="/resources/**" location="/resources/" /> -->
+
+	<!-- Enables the Spring MVC @Controller programming model -->
+	
+    <!-- 기본 정적 리소스 매핑: /resources/** → /resources/ 폴더 -->
+    <mvc:resources mapping="/resources/**" location="/resources/" />
+
+    <!-- ✅ 추가: /images/** 요청이 들어오면 아래 경로에서 탐색 -->
+    <mvc:resources mapping="/images/**" location="/resources/images/,file:${file.upload-dir}/" cache-period="3600" />
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">

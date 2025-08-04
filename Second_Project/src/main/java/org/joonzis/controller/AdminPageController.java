@@ -15,9 +15,11 @@ import org.joonzis.domain.QuestRequestVO;
 import org.joonzis.domain.QuestionDTO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.service.AdminService;
+import org.joonzis.service.FileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,10 +35,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/admin")
+@CrossOrigin(origins = "*")
 public class AdminPageController {
 
     @Autowired
     private AdminService adminService;
+    
+    @Autowired
+    private FileUploadService fileUploadService;
     
     // 문제 등록
     @PostMapping("/registerQuestion")
@@ -328,7 +334,7 @@ public class AdminPageController {
         }
     }
     
-    // 업적 등록
+    // 아이템 등록
     @PostMapping(value = "/registerItem", produces = "application/json; charset=UTF-8")
     public ResponseEntity<?> registerItem(@RequestParam("type") String type,
             @RequestParam("item_name") String itemName,
@@ -361,13 +367,17 @@ public class AdminPageController {
         }
 
         try {
+        	
+        	String savedFileName = fileUploadService.saveFile(itemImage);
+
             ItemVO itemVO = new ItemVO();
             itemVO.setItem_type(type);
             itemVO.setItem_name(itemName);
             itemVO.setItem_price(itemPrice);
+            itemVO.setImageFileName(savedFileName);
 
             // 서비스 계층으로 데이터 전달
-            adminService.registerItem(itemVO, itemImage); 
+            adminService.registerItem(itemVO); 
             
             return new ResponseEntity<>("아이템 등록 성공!", HttpStatus.OK);
         } catch (IllegalArgumentException e) { 
@@ -390,7 +400,7 @@ public class AdminPageController {
             String decodedQuery = URLDecoder.decode(query, "UTF-8");
 
             Map<String, Object> result = adminService.searchItems(decodedType, decodedQuery, page, limit);
-
+            System.out.println("result : " + result);
             return new ResponseEntity<>(result, HttpStatus.OK);
 
         } catch (UnsupportedEncodingException e) {
@@ -430,14 +440,10 @@ public class AdminPageController {
     @ResponseBody
     public ResponseEntity<?> deleteItems(
             @RequestParam("type") String itemType, // 'type'을 'itemType'으로 변경하여 역할 명확화
-            @RequestParam("itemNos") String itemNosString) {
+            @RequestParam("itemNo") int itemNo) {
         try {
-            List<Integer> itemNos = Arrays.stream(itemNosString.split(","))
-                                         .map(Integer::parseInt)
-                                         .collect(Collectors.toList());
-
             // 서비스 계층으로 삭제 요청 전달 시, type 값을 itemType으로 사용
-            adminService.deleteItems(itemType, itemNos); // **여기에 itemType 전달**
+            adminService.deleteItems(itemType, itemNo); // **여기에 itemType 전달**
 
             return new ResponseEntity<>("아이템이 성공적으로 삭제되었습니다.", HttpStatus.OK);
         } catch (NumberFormatException e) {

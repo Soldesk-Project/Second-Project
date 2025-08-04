@@ -35,6 +35,9 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private AdminMapper adminMapper;
     
+    @Autowired
+    private FileUploadService fileUploadService;
+    
     //임시 이미지 업로드 경로
     private final String uploadDir = "C:/Dev/workspace/workspace_2ndProject/second-project-react/public/images/";
     
@@ -471,53 +474,60 @@ public class AdminServiceImpl implements AdminService {
     }
 
 	@Override
-	@Transactional
-	public void registerItem(ItemVO itemVO, MultipartFile itemImage) throws Exception {
-		// 1. 이미지 파일 처리 및 저장
-		String imageFileName = null;
-		if (itemImage != null && !itemImage.isEmpty()) {
-			try {
-				// 원본 파일명에서 확장자 추출
-				String originalFilename = itemImage.getOriginalFilename();
-				String fileExtension = "";
-				if (originalFilename != null && originalFilename.contains(".")) {
-					fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-				}
-				
-				// 고유한 파일명 생성 (UUID + 확장자)
-				imageFileName = UUID.randomUUID().toString() + fileExtension;
-				
-				// 파일을 저장할 경로 생성
-				Path uploadPath = Paths.get(uploadDir);
-				if (!Files.exists(uploadPath)) {
-					Files.createDirectories(uploadPath);
-				}
-				
-				Path filePath = uploadPath.resolve(imageFileName);
-				
-				// 파일 저장
-				itemImage.transferTo(filePath.toFile());
-				System.out.println("이미지 파일 저장 성공: " + filePath.toString());
-				
-			} catch (IOException e) {
-				System.err.println("이미지 파일 저장 실패: " + e.getMessage());
-				throw new IOException("이미지 파일 저장에 실패했습니다.", e);
-			}
-		} else {
-			throw new IllegalArgumentException("이미지 파일이 존재하지 않습니다.");
-		}
-		
-		// 2. ItemVO 객체에 이미지 파일명 설정
-		itemVO.setImageFileName(imageFileName);
-		
-		// 3. ItemVO의 'type'에 따라 해당 테이블에 아이템 정보 저장
+//	@Transactional
+	public void registerItem(ItemVO itemVO) throws Exception {
 		try {
-			adminMapper.insertItem(itemVO);
-			System.out.println("DB에 아이템 정보 저장 성공: " + itemVO);
-		} catch (Exception e) {
-			System.err.println("DB 아이템 저장 실패 (타입: " + itemVO.getItem_type() + "): " + e.getMessage());
-			throw new Exception("아이템 정보를 데이터베이스에 저장하는 데 실패했습니다.", e);
-		}
+	        adminMapper.insertItem(itemVO);
+	        System.out.println("DB에 아이템 정보 저장 성공: " + itemVO);
+	    } catch (Exception e) {
+	        System.err.println("DB 아이템 저장 실패 (타입: " + itemVO.getItem_type() + "): " + e.getMessage());
+	        throw new Exception("아이템 정보를 데이터베이스에 저장하는 데 실패했습니다.", e);
+	    }
+		// 1. 이미지 파일 처리 및 저장
+//		String imageFileName = null;
+//		if (itemImage != null && !itemImage.isEmpty()) {
+//			try {
+//				// 원본 파일명에서 확장자 추출
+//				String originalFilename = itemImage.getOriginalFilename();
+//				String fileExtension = "";
+//				if (originalFilename != null && originalFilename.contains(".")) {
+//					fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+//				}
+//				
+//				// 고유한 파일명 생성 (UUID + 확장자)
+//				imageFileName = UUID.randomUUID().toString() + fileExtension;
+//				
+//				// 파일을 저장할 경로 생성
+//				Path uploadPath = Paths.get(uploadDir);
+//				if (!Files.exists(uploadPath)) {
+//					Files.createDirectories(uploadPath);
+//				}
+//				
+//				Path filePath = uploadPath.resolve(imageFileName);
+//				
+//				// 파일 저장
+//				itemImage.transferTo(filePath.toFile());
+//				System.out.println("이미지 파일 저장 성공: " + filePath.toString());
+//				
+//			} catch (IOException e) {
+//				System.err.println("이미지 파일 저장 실패: " + e.getMessage());
+//				throw new IOException("이미지 파일 저장에 실패했습니다.", e);
+//			}
+//		} else {
+//			throw new IllegalArgumentException("이미지 파일이 존재하지 않습니다.");
+//		}
+//		
+//		// 2. ItemVO 객체에 이미지 파일명 설정
+//		itemVO.setImageFileName(imageFileName);
+//		
+//		// 3. ItemVO의 'type'에 따라 해당 테이블에 아이템 정보 저장
+//		try {
+//			adminMapper.insertItem(itemVO);
+//			System.out.println("DB에 아이템 정보 저장 성공: " + itemVO);
+//		} catch (Exception e) {
+//			System.err.println("DB 아이템 저장 실패 (타입: " + itemVO.getItem_type() + "): " + e.getMessage());
+//			throw new Exception("아이템 정보를 데이터베이스에 저장하는 데 실패했습니다.", e);
+//		}
 	}
 
 	@Override
@@ -561,62 +571,103 @@ public class AdminServiceImpl implements AdminService {
         return result;
     }
 
+//	@Override
+//	public void updateItem(int itemNo, String type, String itemName, int itemPrice, MultipartFile itemImage,String originalImageFileName) {
+//		String imageFileNameToUpdate = null; // DB에 업데이트할 최종 이미지 파일명
+//
+//	    log.info("ServiceImpl: updateItem 호출 - itemNo: " + itemNo + ", type: " + type + ", itemName: " + itemName + ", itemPrice: " + itemPrice + ", originalImageFileName: " + originalImageFileName);
+//
+//	    try{//1.. 기존 이미지 파일 삭제 (클라이언트가 넘겨준 originalImageFileName 사용)
+//	    	if (originalImageFileName != null && !originalImageFileName.isEmpty()) {
+//	    		deleteImageFile(originalImageFileName);
+//	    	}
+//
+//	    	//2. 새 이미지 저장 
+//	    	Path uploadPath = Paths.get(uploadDir);
+//	    	if (!Files.exists(uploadPath)) {
+//	    		Files.createDirectories(uploadPath);
+//	    	}
+//	    	String originalFileName = itemImage.getOriginalFilename();
+//	    	String fileExtension = "";
+//	    	if (originalFileName != null && originalFileName.contains(".")) {
+//	    		fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+//	    	}
+//	    	imageFileNameToUpdate = UUID.randomUUID().toString() + fileExtension;
+//	    	Path filePath = uploadPath.resolve(imageFileNameToUpdate);
+//	    	Files.copy(itemImage.getInputStream(), filePath);
+//	    	log.info("새 이미지 파일 저장 성공: " + imageFileNameToUpdate);
+//		} catch (IOException e) {
+//			log.error("아이템 이미지 처리 중 오류 발생: " + e.getMessage(), e);
+//			throw new RuntimeException("아이템 이미지 파일 처리 중 오류가 발생했습니다.", e);
+//		}
+//
+//	    // 3. ItemVO 객체 생성 및 DB 업데이트 (기존과 동일)
+//	    ItemVO itemVO = new ItemVO();
+//	    itemVO.setItem_no(itemNo);
+//	    itemVO.setItem_type(type);
+//	    itemVO.setItem_name(itemName);
+//	    itemVO.setItem_price(itemPrice);
+//	    itemVO.setImageFileName(imageFileNameToUpdate);
+//
+//	    try {
+//	        int updatedRows = adminMapper.updateItem(itemVO);
+//	        if (updatedRows == 0) {
+//	            log.warn("아이템 수정 실패: item_no " + itemNo + ", item_type " + type + "에 해당하는 아이템을 찾을 수 없습니다.");
+//	            throw new IllegalArgumentException("수정할 아이템을 찾을 수 없습니다.");
+//	        }
+//	        log.info("아이템 수정 성공: " + itemVO);
+//	    } catch (Exception e) {
+//	        log.error("DB 아이템 수정 실패: " + e.getMessage(), e);
+//	        throw new RuntimeException("아이템 정보를 데이터베이스에서 수정하는 데 실패했습니다.", e);
+//	    }
+//	}
 	@Override
-	public void updateItem(int itemNo, String type, String itemName, int itemPrice, MultipartFile itemImage,String originalImageFileName) {
-		String imageFileNameToUpdate = null; // DB에 업데이트할 최종 이미지 파일명
-
-	    log.info("ServiceImpl: updateItem 호출 - itemNo: " + itemNo + ", type: " + type + ", itemName: " + itemName + ", itemPrice: " + itemPrice + ", originalImageFileName: " + originalImageFileName);
-
-	    try{//1.. 기존 이미지 파일 삭제 (클라이언트가 넘겨준 originalImageFileName 사용)
-	    	if (originalImageFileName != null && !originalImageFileName.isEmpty()) {
-	    		deleteImageFile(originalImageFileName);
-	    	}
-
-	    	//2. 새 이미지 저장 
-	    	Path uploadPath = Paths.get(uploadDir);
-	    	if (!Files.exists(uploadPath)) {
-	    		Files.createDirectories(uploadPath);
-	    	}
-	    	String originalFileName = itemImage.getOriginalFilename();
-	    	String fileExtension = "";
-	    	if (originalFileName != null && originalFileName.contains(".")) {
-	    		fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
-	    	}
-	    	imageFileNameToUpdate = UUID.randomUUID().toString() + fileExtension;
-	    	Path filePath = uploadPath.resolve(imageFileNameToUpdate);
-	    	Files.copy(itemImage.getInputStream(), filePath);
-	    	log.info("새 이미지 파일 저장 성공: " + imageFileNameToUpdate);
-		} catch (IOException e) {
-			log.error("아이템 이미지 처리 중 오류 발생: " + e.getMessage(), e);
-			throw new RuntimeException("아이템 이미지 파일 처리 중 오류가 발생했습니다.", e);
-		}
-
-	    // 3. ItemVO 객체 생성 및 DB 업데이트 (기존과 동일)
-	    ItemVO itemVO = new ItemVO();
-	    itemVO.setItem_no(itemNo);
-	    itemVO.setItem_type(type);
-	    itemVO.setItem_name(itemName);
-	    itemVO.setItem_price(itemPrice);
-	    itemVO.setImageFileName(imageFileNameToUpdate);
+	@Transactional
+	public void updateItem(int itemNo, String type, String itemName, int itemPrice, MultipartFile itemImage, String originalImageFileName) {
+	    String imageFileNameToUpdate = originalImageFileName;  // 기본값은 기존 이미지 파일명 유지
 
 	    try {
+	        if (itemImage != null && !itemImage.isEmpty()) {
+	            // 새 이미지가 들어온 경우 기존 이미지 삭제
+	            if (originalImageFileName != null && !originalImageFileName.isEmpty()) {
+	                deleteImageFile(originalImageFileName);
+	            }
+
+	            // 새 이미지 저장 및 파일명 얻기
+	            imageFileNameToUpdate = fileUploadService.saveFile(itemImage);
+	        }
+
+	        // ItemVO 생성 및 데이터 세팅
+	        ItemVO itemVO = new ItemVO();
+	        itemVO.setItem_no(itemNo);
+	        itemVO.setItem_type(type);
+	        itemVO.setItem_name(itemName);
+	        itemVO.setItem_price(itemPrice);
+	        itemVO.setImageFileName(imageFileNameToUpdate);
+
+	        // DB 업데이트
 	        int updatedRows = adminMapper.updateItem(itemVO);
 	        if (updatedRows == 0) {
-	            log.warn("아이템 수정 실패: item_no " + itemNo + ", item_type " + type + "에 해당하는 아이템을 찾을 수 없습니다.");
 	            throw new IllegalArgumentException("수정할 아이템을 찾을 수 없습니다.");
 	        }
+
 	        log.info("아이템 수정 성공: " + itemVO);
+
+	    } catch (IOException e) {
+	        log.error("이미지 저장 중 오류 발생: " + e.getMessage(), e);
+	        throw new RuntimeException("아이템 이미지 파일 처리 중 오류가 발생했습니다.", e);
 	    } catch (Exception e) {
-	        log.error("DB 아이템 수정 실패: " + e.getMessage(), e);
+	        log.error("아이템 수정 중 오류 발생: " + e.getMessage(), e);
 	        throw new RuntimeException("아이템 정보를 데이터베이스에서 수정하는 데 실패했습니다.", e);
 	    }
 	}
 
+
 	@Override
-	public void deleteItems(String itemType, List<Integer> itemNos) {
+	public void deleteItems(String itemType, int itemNo) {
 		 Map<String, Object> params = new HashMap<>();
 	        params.put("itemType", itemType);
-	        params.put("itemNos", itemNos);
+	        params.put("itemNo", itemNo);
 
 	        adminMapper.deleteItems(params);
 	}
