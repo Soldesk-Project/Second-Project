@@ -271,30 +271,31 @@
     WHERE rn > #{offset}
 	</select> -->
 	<select id="searchItems" resultType="org.joonzis.domain.ItemVO" parameterType="map">
-	  SELECT item_no, item_name, item_price, item_type, imageFileName
-	  FROM (
-	    SELECT
-	      item_no, item_name, item_price, item_type, image_file_name AS imageFileName,
-	      ROWNUM AS rn
-	    FROM (
-	      SELECT
-	        item_no, item_name, item_price, item_type, image_file_name
-	      FROM items
-	      <where>
-	        <if test="item_type != null and item_type != 'all'">
-	          item_type = #{item_type}
-	        </if>
-	        <if test="query != null and query != ''">
-	          AND item_name LIKE '%' || #{query} || '%'
-	        </if>
-	      </where>
-	      ORDER BY item_no ASC
-	    )
-	    WHERE ROWNUM &lt;= #{offset} + #{limit}
-	  )
-	  WHERE rn > #{offset}
-=======
-    <select id="searchItems" resultType="org.joonzis.domain.ItemVO" parameterType="map">
+		 SELECT item_no, item_name, item_price, item_type, imageFileName
+		 FROM (
+		   SELECT
+		     item_no, item_name, item_price, item_type, image_file_name AS imageFileName,
+		     ROWNUM AS rn
+		   FROM (
+		     SELECT
+		       item_no, item_name, item_price, item_type, image_file_name
+		     FROM items
+		     <where>
+		       <if test="item_type != null and item_type != 'all'">
+		         item_type = #{item_type}
+		       </if>
+		       <if test="query != null and query != ''">
+		         AND item_name LIKE '%' || #{query} || '%'
+		       </if>
+		     </where>
+		     ORDER BY item_no ASC
+		   )
+		   WHERE ROWNUM &lt;= #{offset} + #{limit}
+		 )
+		 WHERE rn > #{offset}
+	 </select>
+	  
+  <!--   <select id="searchItems" resultType="org.joonzis.domain.ItemVO" parameterType="map">
 	    SELECT item_no, item_name, item_price, item_type, image_file_name as imageFileName
 	    FROM (
 	        SELECT
@@ -313,7 +314,7 @@
 	        WHERE ROWNUM &lt;= #{offset} + #{limit}
 	    )
 	    WHERE rn > #{offset}
-	</select>
+	</select> -->
 
 	<select id="getTotalItemCount" resultType="int" parameterType="map">
 	    SELECT COUNT(*)
@@ -415,23 +416,23 @@
     </select>
 
     <select id="selectQuestRequestById" resultType="org.joonzis.domain.QuestRequestVO">
-    SELECT
-        qr.ID AS id,
-        qr.USER_NO AS user_no,
-        u.USER_ID AS user_id,
-        qr.SUBJECT AS subject,
-        qr.QUESTION_TEXT AS question_text,
-        qr.OPTION_1 AS option_1,
-        qr.OPTION_2 AS option_2,
-        qr.OPTION_3 AS option_3,
-        qr.OPTION_4 AS option_4,
-        qr.CORRECT_ANSWER AS correct_answer,
-        qr.IMAGE_DATA AS image_data,
-        qr.STATUS AS status,
-        qr.REQUEST_CREATED_AT AS created_at
-    FROM QUESTION_REQUEST qr
-    LEFT JOIN USERS u ON qr.USER_NO = u.USER_NO
-    WHERE qr.ID = #{id}
+	    SELECT
+	        qr.ID AS id,
+	        qr.USER_NO AS user_no,
+	        u.USER_ID AS user_id,
+	        qr.SUBJECT AS subject,
+	        qr.QUESTION_TEXT AS question_text,
+	        qr.OPTION_1 AS option_1,
+	        qr.OPTION_2 AS option_2,
+	        qr.OPTION_3 AS option_3,
+	        qr.OPTION_4 AS option_4,
+	        qr.CORRECT_ANSWER AS correct_answer,
+	        qr.IMAGE_DATA AS image_data,
+	        qr.STATUS AS status,
+	        qr.REQUEST_CREATED_AT AS created_at
+	    FROM QUESTION_REQUEST qr
+	    LEFT JOIN USERS u ON qr.USER_NO = u.USER_NO
+	    WHERE qr.ID = #{id}
 	</select>
 
     <update id="updateQuestRequest">
