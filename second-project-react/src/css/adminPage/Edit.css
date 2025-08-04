@@ -44,6 +44,37 @@
   background-color: #5a6268;
 }
 
+.button-group button.reset-button2 {
+  background-color: #35373d;
+  margin: 0 10px;
+}
+
+.button-group button.reset-button2:hover {
+  background-color: #5a6268;
+  margin: 0 10px;
+}
+
+.button-group button.submit-button2 {
+  background-color: #35373d;
+  margin: 0 10px;
+}
+
+.button-group button.submit-button2:hover {
+  background-color: #5a6268;
+  margin: 0 10px;
+}
+
+.button-group button.delete-button2 {
+  background-color: red;
+  color: white;
+  margin: 0 10px;
+}
+
+.button-group button.delete-button2:hover {
+  background-color: #ff4d4d;
+  margin: 0 10px;
+}
+
 /* 본문, 선택지 등 입력 필드의 disabled 상태 스타일 */
 .question-detail-form input[type="text"]:disabled,
 .item-detail-form input[type="text"]:disabled,

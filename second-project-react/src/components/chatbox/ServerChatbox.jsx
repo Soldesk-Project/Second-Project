@@ -143,6 +143,14 @@ const ServerChatbox = () => {
                 mTimestamp: Date.now()
             };
 
+             stompClientInstanceRef.current.send(
+            "/app/serverChat.sendMessage",  // 서버에 맞는 메시지 엔드포인트로 변경 필요
+            {},
+            JSON.stringify(messageToSend)
+        );
+
+        setMessageInput('');
+
         } else {
             if (!stompClientInstanceRef.current) {
                 console.warn("메시지 전송 실패 (ServerChatbox): STOMP Client 인스턴스가 없습니다.");

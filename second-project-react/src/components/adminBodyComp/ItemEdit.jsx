@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import '../../css/adminPage/Edit.css';
 
 const ItemEdit = () => {
@@ -6,7 +6,7 @@ const ItemEdit = () => {
     const [previewImage, setPreviewImage] = useState(null);
     const [itemName, setItemName] = useState('');
     const [itemPrice, setItemPrice] = useState('');
-    const [type, setType] = useState('테두리');
+    const [type, setType] = useState('전체');
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [selectedItemNo, setSelectedItemNo] = useState(null);
@@ -21,33 +21,39 @@ const ItemEdit = () => {
     const lastSearchQuery = useRef('');
   
     const types = [
+    '전체',
     '테두리',
     '칭호',
     '글자색',
-    '배경',
+    '명함',
     '말풍선',
-    '랜덤박스',
+    '유니크'
   ];
 
   const typeTableMap = {
+    '전체': 'all',
     '테두리' : 'boundary',
     '칭호': 'title',
-    '글자색' : 'textColor',
-    '배경' : 'wallpaper',
-    '말풍선' : 'speechBubble',
-    '랜덤박스' : 'randomBoxe',
+    '글자색' : 'fontColor',
+    '명함' : 'background',
+    '말풍선' : 'balloon',
+    '유니크' : 'unique'
   };
-  
+
+  useEffect(() => {
+    handleSearchItem(1);
+  }, []);
+
     const handleTypeChange = (e) => {
       const selectedType = e.target.value;
       setType(selectedType);
-      setSearchResults([]);
+      // setSearchResults([]);
       setSearchQuery('');
       setSelectedItemNo(null);
       handleReset();
-      setCurrentPage(1);
-      setTotalPages(1);
-      setStartPage(1);
+      // setCurrentPage(1);
+      // setTotalPages(1);
+      // setStartPage(1);
       lastSearchQuery.current = '';
     };
   
@@ -55,11 +61,7 @@ const ItemEdit = () => {
       const file = event.target.files[0];
         if (file) {
             setSelectedImage(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreviewImage(reader.result);
-            };
-            reader.readAsDataURL(file);
+            setPreviewImage(URL.createObjectURL(file));
         } else {
             setSelectedImage(null);
             setPreviewImage(null);
@@ -114,15 +116,63 @@ const ItemEdit = () => {
         setStartPage(1);
       }
     };
+
+    const handleDeleteItem = async () => {
+      if (selectedItemNo === null) {
+        alert('삭제할 아이템을 먼저 선택해주세요.');
+        return;
+      }
+
+      if (!window.confirm(`아이템 번호 ${selectedItemNo}를 정말 삭제하시겠습니까?`)) {
+        return;
+      }
+
+      const tableName = typeTableMap[type];
+      if (!tableName) {
+        alert('유효하지 않은 타입입니다.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/admin/deleteItems?type=${encodeURIComponent(tableName)}&itemNo=${selectedItemNo}`, {
+          method: 'DELETE',
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          alert('아이템이 성공적으로 삭제되었습니다.');
+          // 초기화 및 목록 갱신
+          handleReset();
+          setSearchResults([]);
+          setSearchQuery('');
+          setSelectedItemNo(null);
+          handleSearchItem(currentPage);
+        } else {
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const errorData = await response.json();
+            alert('아이템 삭제 실패: ' + (errorData.message || '알 수 없는 오류'));
+          } else {
+            alert('아이템 삭제 실패: 서버 응답 오류입니다.');
+          }
+        }
+      } catch (error) {
+        console.error('아이템 삭제 중 오류:', error);
+        alert('아이템 삭제 중 클라이언트 오류가 발생했습니다.');
+      }
+    };
   
     const handleSelectItem = (item) => {
       setSelectedItemNo(item.item_no);
       setItemName(item.item_name);
       setItemPrice(item.item_price);
-  
-      if (item.imageFilename) {
+      if (item.imageFileName) {
             setSelectedImage(null);
             setPreviewImage(`/images/${item.imageFileName}`);
+            
         } else {
             setPreviewImage(null);
             setSelectedImage(null);
@@ -291,7 +341,8 @@ const ItemEdit = () => {
             <hr />
             <div className='item-detail-form'>
               <h2>선택된 아이템 수정</h2>
-              <p>선택된 아이템 번호: <strong>{selectedItemNo}</strong></p>
+              <span className="item-no">[No: {selectedItemNo}] {itemName.length > 80 ? itemName.substring(0, 80) + '...' : itemName}</span>
+              {/* <p>선택된 아이템 번호: <strong>{selectedItemNo}</strong></p> */}
               <div className='itemName'>
                 <h3>2. 아이템 이름 입력</h3>
                 <input
@@ -324,14 +375,17 @@ const ItemEdit = () => {
                 </div>
                 {previewImage && (
                 <div className="image-preview-container">
-                  <h3 className="image-preview-title">이미지 미리보기:</h3>
+                  <h3 className="image-preview-title">{itemName}</h3>
                   <img src={previewImage} alt="Image Preview" className="image-preview" />
                 </div>
                 )}
               </div>
               <div className="button-group">
-                <button onClick={handleReset} className="reset-button">현재 내용 초기화</button>
-                <button onClick={handleItemEditSubmit} className="submit-button">수정 완료</button>
+                <button onClick={handleReset} className="reset-button2">현재 내용 초기화</button>
+                <button onClick={handleItemEditSubmit} className="submit-button2">수정 완료</button>
+                <button onClick={handleDeleteItem} className="delete-button2">
+                아이템 삭제
+              </button>
               </div>
             </div>
           </>

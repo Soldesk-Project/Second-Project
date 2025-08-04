@@ -34,6 +34,7 @@ public class Config extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .antMatchers("/admin", "/admin/**").hasRole("ADMIN") // ROLE_은 자동으로 붙으므로 "ADMIN"만
         .antMatchers("/api/login").permitAll()
+        .antMatchers("/images/**").permitAll()
         .antMatchers("/**").permitAll()
         .anyRequest().authenticated()
         .and()

@@ -14,18 +14,18 @@ const ItemRegister = () => {
     '테두리',
     '칭호',
     '글자색',
-    '배경',
+    '명함',
     '말풍선',
-    '랜덤박스',
+    '유니크'
   ];
 
   const typeTableMap = {
     '테두리' : 'boundary',
     '칭호': 'title',
-    '글자색' : 'textColor',
-    '배경' : 'wallpaper',
-    '말풍선' : 'speechBubble',
-    '랜덤박스' : 'randomBoxe',
+    '글자색' : 'fontColor',
+    '명함' : 'background',
+    '말풍선' : 'balloon',
+    '유니크' : 'unique'
   };
 
   const handleTypeChange = (e) => {
@@ -36,11 +36,7 @@ const ItemRegister = () => {
     const file = event.target.files[0];
     if (file) {
       setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      setPreviewImage(URL.createObjectURL(file));
     } else {
       setSelectedImage(null);
       setPreviewImage(null);
@@ -168,7 +164,7 @@ const ItemRegister = () => {
         </div>
         {previewImage && (
           <div className="image-preview-container">
-            <h3 className="image-preview-title">이미지 미리보기:</h3>
+            <h3 className="image-preview-title">{selectedImage.name}</h3>
             <img src={previewImage} alt="Image Preview" className="image-preview" />
           </div>
         )}

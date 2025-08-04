@@ -250,7 +250,7 @@
         )
     </insert>
 
-    <select id="searchItems" resultType="org.joonzis.domain.ItemVO" parameterType="map">
+    <!-- <select id="searchItems" resultType="org.joonzis.domain.ItemVO" parameterType="map">
     SELECT item_no, item_name, item_price, item_type, image_file_name
     FROM (
         SELECT
@@ -269,15 +269,51 @@
         WHERE ROWNUM &lt;= #{offset} + #{limit}
     )
     WHERE rn > #{offset}
+	</select> -->
+	<select id="searchItems" resultType="org.joonzis.domain.ItemVO" parameterType="map">
+	  SELECT item_no, item_name, item_price, item_type, imageFileName
+	  FROM (
+	    SELECT
+	      item_no, item_name, item_price, item_type, image_file_name AS imageFileName,
+	      ROWNUM AS rn
+	    FROM (
+	      SELECT
+	        item_no, item_name, item_price, item_type, image_file_name
+	      FROM items
+	      <where>
+	        <if test="item_type != null and item_type != 'all'">
+	          item_type = #{item_type}
+	        </if>
+	        <if test="query != null and query != ''">
+	          AND item_name LIKE '%' || #{query} || '%'
+	        </if>
+	      </where>
+	      ORDER BY item_no ASC
+	    )
+	    WHERE ROWNUM &lt;= #{offset} + #{limit}
+	  )
+	  WHERE rn > #{offset}
 	</select>
 
-    <select id="getTotalItemCount" resultType="int">
+	<select id="getTotalItemCount" resultType="int" parameterType="map">
+	    SELECT COUNT(*)
+	    FROM items
+	    <where>
+	        <if test="item_type != null and item_type != 'all'">
+	            item_type = #{item_type}
+	        </if>
+	        <if test="query != null and query != ''">
+	            AND item_name LIKE '%' || #{query} || '%'
+	        </if>
+	    </where>
+	</select>
+    <!-- <select id="getTotalItemCount" resultType="int">
         SELECT COUNT(*)
         FROM items
         WHERE item_type = #{item_type}
         <if test="query != null and query != ''">
             AND item_name LIKE '%' || #{query} || '%' </if>
-    </select>
+    </select> -->
 
 	<update id="updateItem" parameterType="org.joonzis.domain.ItemVO">
         UPDATE items
@@ -289,11 +325,10 @@
     </update>
 
     <delete id="deleteItems" parameterType="map">
-        DELETE FROM items WHERE item_type = #{itemType} AND item_no IN
-        <foreach collection="itemNos" item="itemNo" open="(" separator="," close=")">
-            #{itemNo}
-        </foreach>
-    </delete>
+	    DELETE FROM items
+	    WHERE item_type = #{itemType}
+	      AND item_no = #{itemNo}
+	</delete>
 
     <select id="selectQuestRequests" resultType="org.joonzis.domain.QuestRequestVO" parameterType="map">
     SELECT

@@ -10,6 +10,7 @@ import { WebSocketContext } from '../util/WebSocketProvider';
 import { triggerRefreshRanking } from '../store/rankingSlice';
 import NickModal from './modal/NickModal';
 import { setUser, fetchUserInfo } from '../store/userSlice';
+import { useNavigate } from 'react-router-dom';
 
 const TABS = ['테두리', '칭호', '글자색', '명함', '말풍선', '유니크'];
 
