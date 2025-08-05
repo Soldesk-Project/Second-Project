@@ -250,3 +250,20 @@
 .chargeBtn:hover {
   background: linear-gradient(90deg, #6c4ec7, #5a3fb8);
 }
+
+.ownedBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 128, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.8em;
+}
+
+.ownedCard {
+  opacity: 0.6;
+  pointer-events: none; /* 보유중 클릭 방지 */
+  position: relative; /* 배지를 카드 안에서 위치시키려면 필요 */
+}

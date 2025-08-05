@@ -49,9 +49,6 @@ public class AdminPageController {
     // 문제 등록
     @PostMapping("/registerQuestion")
     public ResponseEntity<?> registerQuestion(@RequestBody QuestionDTO questionDTO) {
-        System.out.println("문제 등록 요청 수신: " + questionDTO);
-        System.out.println("수신된 과목 (DB 저장용): " + questionDTO.getSubject());
-
         try {
             // 이미지 데이터 처리
             if (questionDTO.getImage_data_base64() != null && !questionDTO.getImage_data_base64().isEmpty()) {
@@ -97,9 +94,6 @@ public class AdminPageController {
     // 문제 수정
     @PostMapping("/editQuestion")
     public ResponseEntity<?> editQuestion(@RequestBody QuestionDTO questionDTO) {
-        System.out.println("문제 수정 요청 수신: " + questionDTO);
-        System.out.println("수신된 과목: " + questionDTO.getSubject());
-
         try {
             if (questionDTO.getImage_data_base64() != null && !questionDTO.getImage_data_base64().isEmpty()) {
                 byte[] decodedBytes = Base64.getDecoder().decode(questionDTO.getImage_data_base64());
@@ -122,11 +116,7 @@ public class AdminPageController {
     
     // 문제 삭제
     @DeleteMapping("/deleteQuestions")
-    public ResponseEntity<?> deleteQuestions(
-    		@RequestParam("subject") String subjectCode,
-            @RequestParam("ids") String idsParam) {
-    	System.out.println("문제 삭제 요청 수신 - 과목: " + subjectCode + ", ID 목록: " + idsParam);
-
+    public ResponseEntity<?> deleteQuestions(@RequestParam("subject") String subjectCode, @RequestParam("ids") String idsParam) {
         try {
             List<Integer> questionIds = Arrays.stream(idsParam.split(","))
                                               .map(Integer::parseInt)
@@ -190,9 +180,7 @@ public class AdminPageController {
 
     // 3. 문제 등록 요청 수정 (상태 변경 및 내용 수정)
     @PutMapping(value = "/questRequests/{id}", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<?> updateQuestRequest(
-            @PathVariable("id") int id,
-            @RequestBody QuestRequestVO questRequestVO) {
+    public ResponseEntity<?> updateQuestRequest(@PathVariable("id") int id, @RequestBody QuestRequestVO questRequestVO) {
         try {
             // PathVariable의 ID와 RequestBody의 ID가 다를 경우를 대비한 검증 (선택 사항)
             if (id != questRequestVO.getId()) {
@@ -216,10 +204,7 @@ public class AdminPageController {
     
     // 유저 검색 (조건 有) - ischatbanned, banned_timestamp 포함하도록 수정 필요
     @GetMapping(value = "/users/search", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<List<UsersVO>> searchUsers(
-            @RequestParam(name = "searchType") String searchType,
-            @RequestParam(name = "searchValue", required = false, defaultValue = "") String searchValue) {
-
+    public ResponseEntity<List<UsersVO>> searchUsers(@RequestParam(name = "searchType") String searchType, @RequestParam(name = "searchValue", required = false, defaultValue = "") String searchValue) {
         List<UsersVO> users = adminService.searchUsers(searchType, searchValue);
         System.out.println(users);
         return new ResponseEntity<>(users, HttpStatus.OK);
@@ -250,8 +235,6 @@ public class AdminPageController {
     // 업적 등록
     @PostMapping("/registerAchievement")
     public ResponseEntity<?> registerAchievement(@RequestBody AchievementDTO achievementDTO) {
-        System.out.println("업적 등록 요청 수신: " + achievementDTO);
-
         // 필수 입력 필드 검증
         if (achievementDTO.getAch_title() == null || achievementDTO.getAch_title().trim().isEmpty()) {
             return new ResponseEntity<>("업적 제목을 입력해주세요.", HttpStatus.BAD_REQUEST);
@@ -306,11 +289,7 @@ public class AdminPageController {
     
     // 업적 삭제
     @DeleteMapping("/deleteAchievements")
-    public ResponseEntity<?> deleteAchievements(
-            @RequestParam("type") String type,
-            @RequestParam("titles") String titles) {
-        System.out.println("업적 삭제 요청 수신 - 타입: " + type + ", 이름 목록: " + titles);
-
+    public ResponseEntity<?> deleteAchievements(@RequestParam("type") String type, @RequestParam("titles") String titles) {
         try {
             String decodedType = URLDecoder.decode(type, "UTF-8");
         	List<String> achievementTitles = Arrays.stream(titles.split(","))
@@ -343,13 +322,6 @@ public class AdminPageController {
             @RequestParam("item_price") int itemPrice,
             @RequestPart(value = "item_image") MultipartFile itemImage
     ) {
-        System.out.println("아이템 등록 요청 수신: ");
-        System.out.println("타입: " + type);
-        System.out.println("아이템 이름: " + itemName);
-        System.out.println("아이템 가격: " + itemPrice);
-        System.out.println("이미지 파일 존재 여부: " + (itemImage != null && !itemImage.isEmpty()));
-        
-
         // 1. 필수 입력 필드 검증 (아이템 타입, 이름, 가격, 이미지)
         if (type == null || type.trim().isEmpty()) {
             return new ResponseEntity<>("아이템 타입이 누락되었습니다.", HttpStatus.BAD_REQUEST);
@@ -439,9 +411,7 @@ public class AdminPageController {
     //아이템 삭제
     @DeleteMapping("/deleteItems")
     @ResponseBody
-    public ResponseEntity<?> deleteItems(
-            @RequestParam("type") String itemType, // 'type'을 'itemType'으로 변경하여 역할 명확화
-            @RequestParam("itemNo") int itemNo) {
+    public ResponseEntity<?> deleteItems(@RequestParam("type") String itemType, @RequestParam("itemNo") int itemNo) {
         try {
             // 서비스 계층으로 삭제 요청 전달 시, type 값을 itemType으로 사용
             adminService.deleteItems(itemType, itemNo); // **여기에 itemType 전달**
@@ -535,14 +505,4 @@ public class AdminPageController {
     		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     	}
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }

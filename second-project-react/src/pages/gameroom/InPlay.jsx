@@ -580,12 +580,12 @@ const InPlay = () => {
                     <div className={styles.profileImageWrapper}>
                       <img
                         src={`/images/${profile.imageFileName}`}
-                        alt="테두리"
+                        onError={(e) => { e.target.src = "/images/defaultProfileBoarder.png"; }}
                         className={styles.borderImage}
                       />
                       <img
                         src={profile.user_profile_img}
-                        alt="프로필"
+                        onError={(e) => { e.target.src = "/images/profile_default.png"; }}
                         className={styles.profileImage}
                       />
                     </div>

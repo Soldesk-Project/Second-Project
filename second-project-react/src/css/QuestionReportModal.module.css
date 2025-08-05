@@ -18,6 +18,7 @@
   width: 400px;
   max-width: 90%;
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  color: black;
 }
 
 .textarea {
@@ -54,7 +55,7 @@
 }
 
 .submitBtn {
-  background-color: #4CAF50;
+  background-color: #ff4d4f;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -63,5 +64,6 @@
 }
 
 .submitBtn:hover {
-  background-color: #45a049;
+  background-color: #e04344;
+  transform: scale(1.05); 
 }

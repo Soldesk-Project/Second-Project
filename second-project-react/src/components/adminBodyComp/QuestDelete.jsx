@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import '../../css/adminPage/Delete.css';
+// import '../../css/adminPage/Delete.css';
 
 const QuestDelete = () => {
   const [subject, setSubject] = useState('정보처리기사');

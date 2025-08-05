@@ -1,8 +1,9 @@
 /* 전체적인 페이지 제목 스타일 */
-h1 {
+.h1 {
+  color: #fff;
   text-align: center;
-  color: #333;
   margin-bottom: 30px;
+  font-size: 2em;
 }
 
 /* 카테고리 선택 및 검색 섹션 */

@@ -9,14 +9,14 @@ const QuestErrRepoManage = () => {
   const [page, setPage] = useState(1);
   const [totalReports, setTotalReports] = useState(0);
   const [openReportId, setOpenReportId] = useState(null);
+  const [editReport, setEditReport] = useState(null);
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     const fetchReports = async () => {
       try {
         const res = await axios.get(`/api/getReportQuestion?page=${page}&size=${PAGE_SIZE}`);
-        console.log(res.data);
-
-        setReports(res.data.items || res.data); // items 없으면 배열 그대로 사용
+        setReports(res.data.items || res.data);
         setTotalReports(res.data.totalCount || (res.data.length || 0));
       } catch (error) {
         console.error('신고 목록 불러오기 실패', error);
@@ -24,11 +24,9 @@ const QuestErrRepoManage = () => {
         setTotalReports(0);
       }
     };
-
     fetchReports();
   }, [page]);
 
-  // 카테고리 변환 함수
   const setKoreanToCategory = (category) => {
     switch (category) {
       case "random": return "랜덤";
@@ -48,15 +46,68 @@ const QuestErrRepoManage = () => {
 
   const toggleDetails = (id) => {
     setOpenReportId(openReportId === id ? null : id);
+    if (openReportId === id) {
+      setEditReport(null);
+    }
   };
 
-  const getTotalPages = () => {
-    return Math.max(1, Math.ceil(totalReports / PAGE_SIZE));
+  const getTotalPages = () => Math.max(1, Math.ceil(totalReports / PAGE_SIZE));
+
+  const modifyQuestion = (report) => {
+    setEditReport({
+      ...report,
+    });
+  };
+
+  const handleEditChange = (key, value) => {
+    setEditReport((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const saveEdit = async () => {
+    try {
+      const res = await axios.post(
+        '/admin/editQuestion',
+        {
+          id: editReport.question_id,
+          subject: editReport.subject,
+          question_text: editReport.question_text,
+          option_1: editReport.option_1,
+          option_2: editReport.option_2,
+          option_3: editReport.option_3,
+          option_4: editReport.option_4,
+          correct_answer: editReport.correct_answer
+        },
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log('수정 데이터 전송:', editReport);
+      alert('수정 완료');
+
+      // 수정 후 목록 갱신
+      setEditReport(null);
+      setOpenReportId(null);
+      setPage(1);
+    } catch (error) {
+      console.error('수정 실패', error);
+      alert('수정 중 오류가 발생했습니다.');
+    }
+  }
+
+  const cancelEdit = () => {
+    setEditReport(null);
   };
 
   return (
     <section className={styles.content}>
-      <h2>문제 오류 신고 관리</h2>
+      <h1>문제 오류 신고 관리</h1>
 
       <ul className={styles.listHeader}>
         <li>번호</li>
@@ -67,57 +118,111 @@ const QuestErrRepoManage = () => {
 
       <ul className={styles.listView}>
         {reports.length > 0 ? (
-          reports.map((report, idx) => (
-            <li key={report.history_id || idx} className={styles.listItem}>
-              <div
-                className={styles.listItemHeader}
-                onClick={() => toggleDetails(report.history_id || idx)}
-                style={{ cursor: 'pointer' }}
-              >
-                <span className={styles.listItemNo}>{report.history_id || idx + 1}</span>
-                <span className={styles.listItemTitle}>
-                  [{setKoreanToCategory(report.subject)}] 문제 오류 제보
-                </span>
-                <span className={styles.listItemAuthor}>{report.user_nick || '익명'}</span>
-                <span className={styles.listItemDate}>
-                  {report.report_at
-                    ? new Date(report.report_at).toLocaleDateString()
-                    : '-'}
-                </span>
-              </div>
+          reports.map((report, idx) => {
+            const isOpen = openReportId === (report.history_id || idx);
+            const isEditing = editReport && editReport.history_id === report.history_id;
 
-              {openReportId === (report.history_id || idx) && (
-                <div className={styles.detailContentArea}>
-                  <div className={styles.detailContent}>
-                    <p>{report.reason}</p>
-                    <hr />
-                    {/* 문제 텍스트 */}
-                    <p className={styles.questionText}>
-                      {report.question_text || '문제 내용이 없습니다.'}
-                    </p>
-
-                    {/* 문제 이미지 */}
-                    {report.image_data_base64 && (
-                      <div className={styles.questionImage}>
-                        <img src={`data:image/png;base64,${report.image_data_base64}`} alt="문제 이미지"/>
-                      </div>
-                    )}
-
-                    {/* 보기 4개 */}
-                    <ul className={styles.optionList}>
-                      {[report.option_1, report.option_2, report.option_3, report.option_4].map(
-                        (option, index) => (
-                          <li key={index} className={ report.correct_answer === index + 1 ? styles.correctAnswer : '' }>
-                            {option || '-'}
-                          </li>
-                        )
-                      )}
-                    </ul>
-                  </div>
+            return (
+              <li key={report.history_id || idx} className={styles.listItem}>
+                <div
+                  className={styles.listItemHeader}
+                  onClick={() => toggleDetails(report.history_id || idx)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <span className={styles.listItemNo}>{report.history_id || idx + 1}</span>
+                  <span className={styles.listItemTitle}>
+                    [{setKoreanToCategory(report.subject)}] 문제 오류 제보
+                  </span>
+                  <span className={styles.listItemAuthor}>{report.user_nick || '익명'}</span>
+                  <span className={styles.listItemDate}>
+                    {report.report_at ? new Date(report.report_at).toLocaleDateString() : '-'}
+                  </span>
                 </div>
-              )}
-            </li>
-          ))
+
+                {isOpen && (
+                  <div className={styles.detailContentArea}>
+                    <div className={styles.detailContent}>
+                      <p>{report.reason}</p>
+                      <hr />
+                      {isEditing ? (
+                        <>
+                          <textarea
+                            rows={4}
+                            className={styles.questionText}
+                            value={editReport.question_text}
+                            onChange={(e) => handleEditChange('question_text', e.target.value)}
+                          />
+
+                          {report.image_data_base64 && (
+                            <div className={styles.questionImage}>
+                              <img src={`data:image/png;base64,${report.image_data_base64}`} alt="문제 이미지" />
+                            </div>
+                          )}
+
+                          <ul className={styles.optionList}>
+                            {[1, 2, 3, 4].map((num) => (
+                              <li
+                                key={num}
+                                className={editReport.correct_answer === num ? styles.correctAnswer : ''}
+                              >
+                                <input
+                                  type="text"
+                                  value={editReport[`option_${num}`] || ''}
+                                  onChange={(e) => handleEditChange(`option_${num}`, e.target.value)}
+                                  style={{ width: '90%' }}
+                                />
+                                <label style={{ marginLeft: 10 }}>
+                                  <input
+                                    type="radio"
+                                    name={`correct_answer_${report.history_id}`}
+                                    checked={editReport.correct_answer === num}
+                                    onChange={() => handleEditChange('correct_answer', num)}
+                                  />
+                                  정답
+                                </label>
+                              </li>
+                            ))}
+                          </ul>
+
+                          <button onClick={saveEdit}>저장</button>
+                          <button onClick={cancelEdit} style={{ marginLeft: 10 }}>
+                            취소
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <p className={styles.questionText}>
+                            {report.question_text || '문제 내용이 없습니다.'}
+                          </p>
+
+                          {report.image_data_base64 && (
+                            <div className={styles.questionImage}>
+                              <img src={`data:image/png;base64,${report.image_data_base64}`} alt="문제 이미지" />
+                            </div>
+                          )}
+
+                          <ul className={styles.optionList}>
+                            {[report.option_1, report.option_2, report.option_3, report.option_4].map(
+                              (option, index) => (
+                                <li
+                                  key={index}
+                                  className={report.correct_answer === index + 1 ? styles.correctAnswer : ''}
+                                >
+                                  {option || '-'}
+                                </li>
+                              )
+                            )}
+                          </ul>
+
+                          <button onClick={() => modifyQuestion(report)}>수정</button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </li>
+            );
+          })
         ) : (
           <li className={styles.noData}>신고된 문제가 없습니다.</li>
         )}

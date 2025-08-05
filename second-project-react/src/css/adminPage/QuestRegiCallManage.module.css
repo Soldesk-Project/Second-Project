@@ -2,10 +2,7 @@
 
 /* 전체 페이지 컨테이너 */
 .pageContainer {
-    padding: 20px;
-    max-width: 1400px; /* 전체 페이지 최대 너비 설정 (조정 가능) */
     margin: 0 auto; /* 가운데 정렬 */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .pageContainer button,
@@ -14,8 +11,8 @@
 }
 
 .pageContainer h1 {
+    color: #fff;
     text-align: center;
-    color: #2c3e50;
     margin-bottom: 30px;
     font-size: 2em;
 }

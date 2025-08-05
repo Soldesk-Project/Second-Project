@@ -13,6 +13,7 @@ const QuestionReportModal = ({ onClose, question }) => {
       try {
         const res = await axios.post('/api/reportQuestion', {
           subject: question.subject,
+          question_id: question.question_id,
           question_text: question.question_text,
           option_1: question.option_1,
           option_2: question.option_2,
@@ -23,8 +24,8 @@ const QuestionReportModal = ({ onClose, question }) => {
           reason: reason, // 필요 시 base64 or null
           user_nick: userNick,          // 신고한 사용자
         });
-        console.log('신고 완료:', res.data);
         alert('문제 오류 신고가 접수되었습니다.');
+        onClose();
       } catch (err) {
         console.error('신고 실패:', err);
         alert('신고 중 오류가 발생했습니다.');

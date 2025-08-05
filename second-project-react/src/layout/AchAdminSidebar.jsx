@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../../css/adminsidebar.css';
+import '../css/adminsidebar.css';
 
 const AchAdminSidebar = ({setActiveAchMenu}) => {
   const [isAchMenuOpen, setIsAchMenuOpen] = useState(false);
@@ -27,7 +27,7 @@ const AchAdminSidebar = ({setActiveAchMenu}) => {
         <ul className="submenu-list">
           <li><button className="itemRegisterBtn" onClick={()=> setActiveAchMenu('itemRegister')}>상점 아이템 등록</button></li>
           <li><button className="itemRegisterBtn" onClick={()=> setActiveAchMenu('itemEdit')}>상점 아이템 수정</button></li>
-          <li><button className="itemDeleteBtn" onClick={()=> setActiveAchMenu('itemDelete')}>상점 아이템 삭제</button></li>
+          {/* <li><button className="itemDeleteBtn" onClick={()=> setActiveAchMenu('itemDelete')}>상점 아이템 삭제</button></li> */}
         </ul>
       )}
     </div>

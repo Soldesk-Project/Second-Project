@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../css/adminPage/Edit.css';
+import styles from '../../css/adminPage/QuestErrRepoManage.module.css';
 
 const QuestEdit = () => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -14,6 +15,7 @@ const QuestEdit = () => {
   const [selectedQuestId, setSelectedQuestId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedQuestionsToDelete, setSelectedQuestionsToDelete] = useState(new Set());
   // 한 페이지에 보이는 문제 개수를 5개로 변경
   const itemsPerPage = 5;
   const [startPage, setStartPage] = useState(1);
@@ -98,6 +100,9 @@ const QuestEdit = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
+
+      console.log(data.questions);
+      
       setSearchResults(data.questions);
       setTotalPages(data.totalPages);
       setCurrentPage(page);
@@ -222,9 +227,50 @@ const QuestEdit = () => {
     setBase64ImageString('');
   };
 
+  const handleDeleteSelectedQuests = async (selectedQuestId) => {
+
+    const dbSubjectValue = subjectValueMap[subject];
+
+    const isConfirmed = window.confirm("선택된 문제를 정말 삭제하시겠습니까?");
+    if (!isConfirmed) return; // 취소 시 함수 종료
+
+    try {
+      const response = await fetch(
+        `/admin/deleteQuestions?subject=${encodeURIComponent(dbSubjectValue)}&ids=${encodeURIComponent(selectedQuestId)}`,
+        {
+          method: 'DELETE',
+          headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }
+        }
+      );
+
+      if (response.ok) {
+        alert('선택된 문제가 성공적으로 삭제되었습니다.');
+        setSelectedQuestionsToDelete(new Set());
+        setSelectedQuestId(null); // 삭제 후 상세 정보 초기화
+        handleSearchQuest(currentPage); // 현재 페이지를 다시 불러와 목록 업데이트
+      } else {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await response.json();
+          console.error('문제 삭제 실패 상세:', errorData);
+          alert('문제 삭제 실패: ' + (errorData.message || '알 수 없는 오류'));
+        } else {
+          console.error('문제 삭제 실패: 서버 응답 형식 오류');
+          alert('문제 삭제 실패: 서버 응답 오류. 콘솔을 확인하세요.');
+        }
+      }
+    } catch (error) {
+      console.error('문제 삭제 중 클라이언트 오류:', error);
+      alert('문제 삭제 중 클라이언트 오류가 발생했습니다.');
+    }
+  };
+
   return (
     <div>
-      <h1>문제 수정</h1>
+      <h1 className={styles.title}>문제 수정</h1>
       <div className='category'>
         <h3>1. 카테고리 선택 및 문제 검색</h3>
         <select name="cateSelect" value={subject} onChange={handleSubjectChange}>
@@ -321,6 +367,7 @@ const QuestEdit = () => {
                     <div className="button-group">
                       <button onClick={handleReset} className="reset-button">현재 내용 초기화</button>
                       <button onClick={handleQuestEditSubmit} className="submit-button">수정 완료</button>
+                      <button onClick={()=>handleDeleteSelectedQuests(selectedQuestId)} className="delete-button">삭제</button>
                     </div>
                   </div>
                 )}

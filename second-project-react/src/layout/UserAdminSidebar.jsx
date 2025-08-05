@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../../css/adminsidebar.css';  
+import '../css/adminsidebar.css';  
 
 const UserAdminSidebar = ({setActiveUserMenu}) => {
   const [isAuthMenuOpen, setIsAuthMenuOpen] = useState(false);

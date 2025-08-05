@@ -342,7 +342,7 @@ const UserInfo = () => {
                 <div className={styles.profileWrapper}>
                     <img 
                         src={profileSrc} 
-                        alt='프로필'  
+                        alt='/images/profile_default.png'  
                         className={styles.profileImg}/>
                     <img
                         src='/images/switch.png'
@@ -353,7 +353,7 @@ const UserInfo = () => {
                     {user.imageFileName && (
                     <img
                         src={`/images/${user.imageFileName}`}
-                        alt="테두리 이미지"
+                        alt="/images/defaultProfileBoarder"
                         className={styles.frameOverlay}
                     />
                     )}
@@ -470,16 +470,16 @@ const UserInfo = () => {
                     <div key={item.item_no} className={styles.card} onClick={() => setSelectedItem(item)}>
                         <div className={styles.itemCss}>
                         {/* title 타입은 텍스트 데코, 그 외엔 이미지 */}
-                        {(item.item_type === 'fontColor' || item.item_type === 'title' || item.item_type === 'unique') ? (
-                        <span className={decoStyles[item.css_class_name]}>
-                            [{titleTextMap[item.css_class_name]}]
-                        </span>
+                        {(item.item_type === 'boundary' || item.item_type === 'background' || item.item_type === 'balloon' || (item.item_type==='unique' && item.item_no===118) ||(item.item_type==='unique' && item.item_no===119)) ? (
+                            <img 
+                                src={item.imgUrl}
+                                alt={item.item_name}
+                                className={styles.itemImage}
+                            />
                         ) : (
-                        <img 
-                            src={item.imgUrl}
-                            alt={item.item_name}
-                            className={styles.itemImage}
-                        />
+                            <span className={decoStyles[item.css_class_name]}>
+                                [{titleTextMap[item.css_class_name]}]
+                            </span>
                         )}
                     </div>
                             {/* <span className={decoStyles[item.css_class_name]} style={{marginRight: '5px', fontWeight: 'bold'}}>

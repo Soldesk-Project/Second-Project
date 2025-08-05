@@ -35,7 +35,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //         여러개의 인증 예외 경로 처리
         String[] openEndpoints = {"/api/login", "/api/signUp", "/api/findId", "/api/findPw"};
         if (Arrays.stream(openEndpoints).anyMatch(requestURI::startsWith)) {
-        	System.out.println("로그인관련");
             filterChain.doFilter(request, response);
             return;
         }
@@ -62,7 +61,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                    
                     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                    System.out.println("현재 인증 권한: " + auth.getAuthorities());
                 }
             } catch (Exception e) {
             	e.printStackTrace();

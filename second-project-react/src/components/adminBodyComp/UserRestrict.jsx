@@ -58,11 +58,9 @@ const UserRestrict = () => {
       }
 
       const data = await response.json();
-      console.log("⭐ RECEIVED DATA FROM BACKEND:", data);
 
       if (Array.isArray(data)) {
         setUsers(data);
-        console.log("Users state updated with", data.length, "items.");
       } else {
         console.error("Fetched data is not an array:", data);
         setError("서버에서 예상치 못한 형식의 데이터를 반환했습니다.");
@@ -160,10 +158,6 @@ const UserRestrict = () => {
   const handleApplyOnlineBan=()=>{
 
   }
-
-  console.log(users);
-  
-
 
   // 선택된 searchType에 따라 placeholder 텍스트를 반환하는 헬퍼 함수
   const getPlaceholderText = () => {

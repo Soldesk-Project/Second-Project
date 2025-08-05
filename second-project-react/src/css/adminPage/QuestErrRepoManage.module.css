@@ -69,8 +69,14 @@ button {
 
 .content {
   animation: fadeIn 0.2s ease-in;
-  max-width: 1000px;
   color: #fff;
+}
+
+.content h1 {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2em;
 }
 
 /* --- 리스트 스타일 (헤더/항목 공통) --- */
@@ -309,7 +315,7 @@ button {
 /* --- 리스트 뷰 --- */
 .listView {
   list-style: none;
-  margin: 20px 0;
+  /* margin: 20px 0; */
   padding: 0;
   color: #ddd;
 }
@@ -321,6 +327,7 @@ button {
   gap: 1rem;
   border-bottom: 1px solid #48494e;
   color: #ddd;
+  margin: 20px 0px;
 }
 
 .listItemHeader {
@@ -341,9 +348,9 @@ button {
 }
 
 .listItemTitle {
-  justify-self: start;
+  justify-self: center;
   align-self: center;
-  text-align: left;
+  text-align: center;
   padding-left: 10px;
   font-weight: 500;
   white-space: nowrap;
@@ -358,9 +365,9 @@ button {
 }
 
 .listItemDate {
-  justify-self: end;
+  justify-self: center;
   align-self: center;
-  padding-right: 20px;
+  /* padding-right: 20px; */
   font-size: 0.9em;
   color: #bbb;
 }
@@ -435,9 +442,9 @@ button {
 @media (max-width: 768px) {
   .listHeader,
   .listItem {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    gap: 8px;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  gap: 8px;
   }
 
   .listHeader li,
@@ -457,4 +464,11 @@ button {
   .listFooter {
     justify-content: center;
   }
+}
+
+.title {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2em;
 }

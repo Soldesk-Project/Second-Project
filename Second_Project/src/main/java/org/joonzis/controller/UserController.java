@@ -85,7 +85,6 @@ public class UserController {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("category", mappedCategory);
         paramMap.put("user_no", user_no);
-        System.out.println(service.getInventoryCategory(paramMap));
 	    return service.getInventoryCategory(paramMap);
 	}
 	

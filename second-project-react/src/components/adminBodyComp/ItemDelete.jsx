@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import '../../css/adminPage/Delete.css';
+// import '../../css/adminPage/Delete.css';
 
 const ItemDelete = () => {
   const [type, setType] = useState('테두리');

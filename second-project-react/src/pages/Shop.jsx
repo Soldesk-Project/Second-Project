@@ -41,6 +41,9 @@ const Shop = () => {
     }
   }
 
+  console.log(ownedItems);
+  
+
   useEffect(() => {
     fetchGetPoint();
   }, [userId]);
@@ -152,62 +155,64 @@ const Shop = () => {
         <div className={styles.shopMaingrid}>
           <div className={styles.grid}>
             {items.length ? (
-              items.map(item => (
-                <div 
-                  key={item.item_no} 
-                  className={styles.card} 
-                  onClick={() => setSelectedItem(item)}>
-                  <div className={styles.itemCss}>
-                  {/* 가끔 경로가 안되는 경우가 있음 */}
-                  {/* <img  
-                    src={`/images/${item.imageFileName}`} 
-                    alt={item.item_name} 
-                    className={styles.itemImage} /> */}
-                  {item.item_type === 'title' && (
-                  // 1) 칭호: 텍스트 매핑
-                  <span
-                    className={decoStyles[item.css_class_name]}
-                    style={{ fontWeight: 'bold', fontSize: '1.2em' }}
-                  >
-                    { titleTextMap[item.css_class_name] || item.item_name }
-                  </span>
-                )}
+              items.map(item => {
+                // 보유 여부 체크 (이름으로 비교)
+                const isOwned = ownedItems.some(
+                  owned => owned.item_name === item.item_name
+                );
 
-                {item.item_type === 'fontColor' && (
-                  // 2) 글자색: 고정 텍스트 + 컬러 클래스
-                  <span
-                    className={decoStyles[item.css_class_name]}
-                    style={{ fontSize: '1.5em' }}
+                return (
+                  <div 
+                    key={item.item_no} 
+                    className={`${styles.card} ${isOwned ? styles.ownedCard : ''}`}
+                    onClick={() => !isOwned && setSelectedItem(item)} // 보유중이면 클릭 방지
                   >
-                    가나다abc
-                  </span>
-                )}
+                    {/* 보유중 배지 */}
+                    {isOwned && <span className={styles.ownedBadge}>보유중</span>}
 
-                {item.item_type === 'etc' && (
-                  // 3) 기타: 고정 텍스트
-                  <span
-                    className={decoStyles[item.css_class_name]}
-                    style={{ fontWeight: 'bold', fontSize: '1.2em', color: 'black' }}
-                  >
-                    { titleTextMap[item.css_class_name] || item.item_name }
-                  </span>
-                )}
+                    <div className={styles.itemCss}>
+                      {item.item_type === 'title' && (
+                        <span
+                          className={decoStyles[item.css_class_name]}
+                          style={{ fontWeight: 'bold', fontSize: '1.2em' }}
+                        >
+                          { titleTextMap[item.css_class_name] || item.item_name }
+                        </span>
+                      )}
 
-                {item.item_type !== 'title' && item.item_type !== 'fontColor' && item.item_type !== 'etc' && (
-                  // 3) 나머지(테두리, 배경, 말풍선, 기타): 이미지
-                  <img
-                    src={item.imgUrl}
-                    alt={item.item_name}
-                    className={styles.itemImage}
-                  />
-                )}
+                      {item.item_type === 'fontColor' && (
+                        <span
+                          className={decoStyles[item.css_class_name]}
+                          style={{ fontSize: '1.5em' }}
+                        >
+                          가나다abc
+                        </span>
+                      )}
+
+                      {item.item_type === 'etc' && (
+                        <span
+                          className={decoStyles[item.css_class_name]}
+                          style={{ fontWeight: 'bold', fontSize: '1.2em', color: 'black' }}
+                        >
+                          { titleTextMap[item.css_class_name] || item.item_name }
+                        </span>
+                      )}
+
+                      {item.item_type !== 'title' && item.item_type !== 'fontColor' && item.item_type !== 'etc' && (
+                        <img
+                          src={item.imgUrl}
+                          alt={item.item_name}
+                          className={styles.itemImage}
+                        />
+                      )}
+                    </div>
+                    <div className={styles.cardFooter}>
+                      <div className={styles.itemName}>이름 : {item.item_name}</div>
+                      <div className={styles.itemPrice}>가격 : {item.item_price ? item.item_price.toLocaleString() : '가격 미정'}</div>
+                    </div>
                   </div>
-                  <div className={styles.cardFooter}>
-                    <div className={styles.itemName}>이름 : {item.item_name}</div>
-                    <div className={styles.itemPrice}>가격 : {item.item_price ? item.item_price.toLocaleString() : '가격 미정'}</div>
-                  </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div>상품이 없습니다.</div>
             )}

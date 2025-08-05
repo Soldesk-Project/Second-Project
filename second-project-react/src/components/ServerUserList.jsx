@@ -72,9 +72,9 @@ const ServerUserList = () => {
 
     const sendPayload = () => socket.send(JSON.stringify(payload));
 
-    if (socket.readyState === WebSocket.OPEN) {
+    if (socket && socket.readyState === WebSocket.OPEN) {
       sendPayload();
-    } else {
+    } else if (socket) {
       socket.addEventListener('open', sendPayload, { once: true });
     }
     // if (socket.readyState === WebSocket.OPEN) {
@@ -83,38 +83,40 @@ const ServerUserList = () => {
     //   socket.onopen = () => socket.send(JSON.stringify(payload));
     // }
 
-    socket.onmessage = async (event) => {
-      const data = JSON.parse(event.data);
-      
-      if (data.type === "userList" && data.server === server) {
-        // 1) WebSocket이 준 userNo 리스트를 상세 정보로 보강
-       const detailed = await Promise.all(
-         data.users.map(async u => {
-           const { data: full } = await axios.get(`/user/${u.userNo}`);
-           
-           
-           return {
-             userNo:            full.user_no,
-             userNick:          full.user_nick,
-             backgroundItemNo:  full.backgroundItemNo,
-             titleItemNo:       full.titleItemNo,
-             fontColorItemNo:   full.fontcolorItemNo,
-             userProfileImg:    full.user_profile_img,
-             imageFileName:     full.imageFileName
-           };
-         })
-       );
-        
-        // 2) 본인 맨 앞으로
-        detailed.sort((a, b) =>
-          Number(a.userNo) === Number(user.user_no) ? -1 :
-          Number(b.userNo) === Number(user.user_no) ? 1 : 0
-        );
-        setUsers(detailed);
-        setIsLoading(false);
-      }
-      
-    };
+    if (socket) {
+      socket.onmessage = async (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "userList" && data.server === server) {
+          // 1) WebSocket이 준 userNo 리스트를 상세 정보로 보강
+          const detailed = await Promise.all(
+            data.users.map(async (u) => {
+              const { data: full } = await axios.get(`/user/${u.userNo}`);
+              return {
+                userNo: full.user_no,
+                userNick: full.user_nick,
+                backgroundItemNo: full.backgroundItemNo,
+                titleItemNo: full.titleItemNo,
+                fontColorItemNo: full.fontcolorItemNo,
+                userProfileImg: full.user_profile_img,
+                imageFileName: full.imageFileName,
+              };
+            })
+          );
+
+          // 2) 본인 맨 앞으로
+          detailed.sort((a, b) =>
+            Number(a.userNo) === Number(user.user_no)
+              ? -1
+              : Number(b.userNo) === Number(user.user_no)
+              ? 1
+              : 0
+          );
+          setUsers(detailed);
+          setIsLoading(false);
+        }
+      };
+    }
         
 
     socket.onerror = (e) => console.error("소켓 에러", e);

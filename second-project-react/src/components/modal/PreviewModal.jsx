@@ -25,6 +25,9 @@ const PreviewModal = ({
 
   const previewStyle = { ...user };
 
+  console.log(item);
+  
+
   switch (item.item_type) {
     case 'boundary':
       previewStyle.boundary_class_name = item.css_class_name;
@@ -42,10 +45,12 @@ const PreviewModal = ({
       previewStyle.balloon_class_name = item.css_class_name;
       break;
     case 'unique':
-      if (item.css_class_name.includes('fontColor')) {
+      if (item.css_class_name?.includes('fontColor')) {
         previewStyle.fontcolor_class_name = item.css_class_name; // 무지개 글자 같은 색상
-      } else if (item.css_class_name.includes('title')) {
+      } else if (item.css_class_name?.includes('title')) {
         previewStyle.title_class_name = item.css_class_name; // 콜렉터 같은 칭호
+      } else if(item.imgUrl?.includes('/images/syberBackground.png')){
+        console.log(1);
       }
       break;
     default:
@@ -57,7 +62,7 @@ const PreviewModal = ({
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
 
         {/* boundary 타입 */}
-        {item.item_type === 'boundary' && (
+        {item.item_type === 'boundary' || item.item_no === 118 && (
           <div className={`${styles.previewImg} ${styles.boundary}`}>
             <img src={profileSrc} alt="Profile" className={styles.profileImg} />
             <img 
@@ -90,8 +95,19 @@ const PreviewModal = ({
           </div>
         )}
 
+        {/* 유니크 명함 타입 */}
+        {item.item_type === 'unique' && item.item_no === 119 && (
+          <div className={styles.previewImg}>
+            <img 
+              src={`/images/${item.imageFileName}`} 
+              alt="Balloon" 
+              className={styles.background} 
+            />
+          </div>
+        )}
+
         {/* 텍스트 미리보기 */}
-        {(item.item_type === 'fontColor' || item.item_type === 'title' || item.item_type === 'unique') && (
+        {(item.item_type === 'fontColor' || item.item_type === 'title' || (item.item_type === 'unique' && item.item_no !== 119 && item.item_no !== 118)) && (
           <div className={styles.textPreview}>
             {(() => {
               const layers = [

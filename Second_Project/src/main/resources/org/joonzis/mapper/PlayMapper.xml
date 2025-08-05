@@ -92,6 +92,7 @@
     <select id="getUserQuestionHistory" resultType="org.joonzis.domain.UserQuestionHistoryDTO">
     	SELECT
     		h.user_nick,
+    		h.question_id,
 		    q.id,
 		    q.subject,
 		    q.question_text,
@@ -126,7 +127,8 @@
             image_data,
             report_at,
             user_nick,
-            reason
+            reason,
+            question_id
         )
         VALUES (
             SEQ_QUESTION_REPORT.NEXTVAL,
@@ -140,7 +142,8 @@
             #{image_data, jdbcType=BLOB},
             SYSDATE,
             #{user_nick},
-            #{reason}
+            #{reason},
+            #{question_id}
         )
     </insert>
     

@@ -101,6 +101,12 @@
 	        <when test="item_no == 110">
 	          TITLE_ITEM_NO = #{item_no, jdbcType=INTEGER}
 	        </when>
+	        <when test="item_no == 119">
+	        	BACKGROUND_ITEM_NO = #{item_no, jdbcType=INTEGER}
+	        </when>
+	        <when test="item_no == 118">
+	        	BOUNDARY_ITEM_NO = #{item_no, jdbcType=INTEGER}
+	        </when>
 	      </choose>
 	    </set>
 	    WHERE USER_NO = #{user_no}

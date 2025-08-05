@@ -182,8 +182,6 @@ const QuestionReview = () => {
     nav('/main/' + server);
   };
 
-  console.log(question);
-
   const openReportModal = () => {
     setReportModal(true);
   }

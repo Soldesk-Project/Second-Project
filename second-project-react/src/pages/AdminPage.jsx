@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Header from '../layout/Header';
-import QuestAdminSidebar from '../components/AdminSidebar/QuestAdminSidebar';
-import UserAdminSidebar from '../components/AdminSidebar/UserAdminSidebar';
+import QuestAdminSidebar from '../layout/QuestAdminSidebar';
+import UserAdminSidebar from '../layout/UserAdminSidebar';
 import Headerstyles from '../css/MainPage.module.css';
 import styles from '../css/adminPage/AdminPage.module.css';
 import { useSelector } from 'react-redux';
@@ -11,7 +11,7 @@ import QuestDelete from '../components/adminBodyComp/QuestDelete';
 import QuestRegiCallManage from '../components/adminBodyComp/QuestRegiCallManage';
 import QuestErrRepoManage from '../components/adminBodyComp/QuestErrRepoManage';
 import UserRestrict from '../components/adminBodyComp/UserRestrict';
-import AchAdminSidebar from '../components/AdminSidebar/AchAdminSidebar';
+import AchAdminSidebar from '../layout/AchAdminSidebar';
 import AchRegister from '../components/adminBodyComp/AchRegister';
 import AchDelete from '../components/adminBodyComp/AchDelete';
 import ItemRegister from '../components/adminBodyComp/ItemRegister';
