@@ -45,7 +45,10 @@ public interface AdminMapper {
 	public int getTotalAchievementCount(Map<String, Object> params);
 	
 	//업적 삭제 메소드
-	public int deleteAchievementsByTitles(Map<String, Object> params);
+	public int deleteAchievementByTitle(Map<String, Object> params);
+	
+	// 업적 수정
+	public int updateAchievement(AchievementDTO dto);
 	
 	//아이템 등록 메소드
 	public void insertItem(ItemVO itemVO);

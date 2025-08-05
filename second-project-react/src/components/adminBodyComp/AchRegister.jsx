@@ -113,18 +113,31 @@ const AchRegister = () => {
       </div>
       
       <div className="ach-content-section">
-        <h3 className='section-title'>3. 업적 내용 입력</h3>
+        <h3 className='section-title'>3. 업적 내용 입력 
+          {
+            achType === '티어' ? ' - 요구 랭크 점수 입력' :
+            achType === '게임 플레이' ? ' - 요구 플레이 횟수 입력' :
+            achType === '게임 1등' ? ' - 1등 도달 횟수 입력' : ''
+          }
+        </h3>
         <input
-          type='number'
-          value={achContent}
-          onChange={(e) => setAchContent(e.target.value)}
-          className="achievement-text-input"
-          placeholder='업적 내용을 입력하세요'  
-        />
+    type="number"
+    inputMode="numeric"
+    min="0"
+    value={achContent}
+    onChange={(e) => setAchContent(e.target.value)}
+    className="achievement-text-input"
+    placeholder={
+      achType === '티어' ? '예: 2000 (필요한 점수)' :
+      achType === '게임 플레이' ? '예: 100 (필요한 플레이 횟수)' :
+      achType === '게임 1등' ? '예: 10 (1등 달성 횟수)' :
+      '업적 내용을 숫자로 입력하세요'
+    }
+  />
       </div>
 
       <div className='ach-reward-section'>
-        <h3 className='section-title'>4. 업적 보상 입력</h3>
+        <h3 className='section-title'>4. 업적 보상 입력 - point</h3>
         <input
           type='number'
           value={achReward}

@@ -75,6 +75,17 @@
   margin: 0 10px;
 }
 
+.ach-update-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+}
+
+.ach-update-button:hover {
+  background-color: #6fdc88; /* 연한 녹색 hover */
+}
 /* 본문, 선택지 등 입력 필드의 disabled 상태 스타일 */
 .question-detail-form input[type="text"]:disabled,
 .item-detail-form input[type="text"]:disabled,
@@ -87,7 +98,8 @@
 }
 
 /* 드롭다운 상세 수정 폼 */
-.item-detail-form {
+.item-detail-form,
+.achievement-detail-form {
   /* background-color: #f9f9f9; */
   padding: 15px;
   margin-top: 10px;

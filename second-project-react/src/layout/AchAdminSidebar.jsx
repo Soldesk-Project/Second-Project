@@ -19,14 +19,14 @@ const AchAdminSidebar = ({setActiveAchMenu}) => {
       {isAchMenuOpen && (
         <ul className="submenu-list">
           <li><button className="achRegisterBtn" onClick={()=> setActiveAchMenu('achRegister')}>업적 등록</button></li>
-          <li><button className="achDeleteBtn" onClick={()=> setActiveAchMenu('achDelete')}>업적 삭제</button></li>
+          <li><button className="achDeleteBtn" onClick={()=> setActiveAchMenu('achDelete')}>업적 수정 및 삭제</button></li>
         </ul>
       )}
       <button className='ItemMenu' onClick={toggleItemMenu}>상점 아이템 관리 {isItemMenuOpen ? '▼' : '▶'}</button><br/>
       {isItemMenuOpen && (
         <ul className="submenu-list">
           <li><button className="itemRegisterBtn" onClick={()=> setActiveAchMenu('itemRegister')}>상점 아이템 등록</button></li>
-          <li><button className="itemRegisterBtn" onClick={()=> setActiveAchMenu('itemEdit')}>상점 아이템 수정</button></li>
+          <li><button className="itemRegisterBtn" onClick={()=> setActiveAchMenu('itemEdit')}>상점 아이템 수정 및 삭제</button></li>
           {/* <li><button className="itemDeleteBtn" onClick={()=> setActiveAchMenu('itemDelete')}>상점 아이템 삭제</button></li> */}
         </ul>
       )}

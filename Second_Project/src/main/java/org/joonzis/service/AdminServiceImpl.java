@@ -450,27 +450,31 @@ public class AdminServiceImpl implements AdminService {
     //업적 삭제
     @Override
     @Transactional
-    public boolean deleteAchievementsByTitles(String type, List<String> achievementTitles) {
-        log.info("ServiceImpl: deleteAchievementsByTitles 호출 - 타입(ach_type 필터링): " + type + ", 삭제할 이름 목록: " + achievementTitles);
+    public boolean deleteAchievementByTitle(String type, String ach_title) {
+        log.info("ServiceImpl: deleteAchievementByTitle 호출 - 타입(ach_type 필터링): " + type + ", 삭제할 이름: " + ach_title);
 
-        if (achievementTitles == null || achievementTitles.isEmpty()) {
+        if (ach_title == null || ach_title.isEmpty()) {
             log.warn("삭제할 업적 이름이 제공되지 않았습니다.");
             return false;
         }
 
         Map<String, Object> params = new HashMap<>();
-        params.put("type", type); 
-        params.put("titles", achievementTitles);
+        params.put("type", type);
+        params.put("ach_title", ach_title);
 
         try {
-            int deletedCount = adminMapper.deleteAchievementsByTitles(params);
-            log.info("ach_type이 '" + type + "'인 " + deletedCount + "개의 업적이 삭제되었습니다.");
-
+            int deletedCount = adminMapper.deleteAchievementByTitle(params);
             return deletedCount > 0;
         } catch (Exception e) {
             log.error("업적 삭제 중 매퍼 오류 발생: " + e.getMessage(), e);
             throw new RuntimeException("데이터베이스에서 업적을 삭제하는 중 오류가 발생했습니다.", e);
         }
+    }
+    
+    @Override
+    public boolean updateAchievement(AchievementDTO dto) {
+        int result = adminMapper.updateAchievement(dto);
+        return result > 0;
     }
 
 	@Override

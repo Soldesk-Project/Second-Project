@@ -347,29 +347,41 @@ public class AdminPageController {
     
     // 업적 삭제
     @DeleteMapping("/deleteAchievements")
-    public ResponseEntity<?> deleteAchievements(@RequestParam("type") String type, @RequestParam("titles") String titles) {
+    public ResponseEntity<?> deleteAchievement(@RequestParam("type") String type, @RequestParam("title") String title) {
         try {
             String decodedType = URLDecoder.decode(type, "UTF-8");
-        	List<String> achievementTitles = Arrays.stream(titles.split(","))
-        					 								.map(String::trim)
-        					 								.collect(Collectors.toList());
-
-        	boolean success = adminService.deleteAchievementsByTitles(decodedType, achievementTitles); 
+            String decodedTitle = URLDecoder.decode(title, "UTF-8");
+            boolean success = adminService.deleteAchievementByTitle(decodedType, decodedTitle);
 
             if (success) {
                 return new ResponseEntity<>("선택된 업적이 성공적으로 삭제되었습니다.", HttpStatus.OK);
             } else {
-                return new ResponseEntity<>("업적 삭제에 실패했습니다. 일부 업적이 존재하지 않거나 오류가 발생했습니다.", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("업적 삭제에 실패했습니다. 업적이 존재하지 않거나 오류가 발생했습니다.", HttpStatus.BAD_REQUEST);
             }
-
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            return new ResponseEntity<>("타입 디코딩 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("타입 또는 제목 디코딩 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             e.printStackTrace();
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("message", "업적 삭제 중 서버 내부 오류가 발생했습니다.");
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    // 업적 수정
+    @PutMapping("/updateAchievement")
+    public ResponseEntity<?> updateAchievement(@RequestBody AchievementDTO dto) {
+        try {
+            boolean updated = adminService.updateAchievement(dto);
+            if (updated) {
+                return new ResponseEntity<>("업적이 성공적으로 수정되었습니다.", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("업적 수정 실패. 존재하지 않거나 잘못된 입력.", HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("서버 내부 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     

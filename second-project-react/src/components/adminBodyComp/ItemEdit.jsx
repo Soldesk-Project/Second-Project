@@ -225,22 +225,21 @@ const ItemEdit = () => {
                   onClick={() => handleSelectItem(item)}
                   className={selectedItemNo === item.item_no ? 'selected-edit' : ''}
                 >
-                  <span className="item-no">[No: {item.item_no}]</span>
+                  <span className="item-no">[{item.item_no}]</span>
                   {item.item_name.length > 80 ? item.item_name.substring(0, 80) + '...' : item.item_name}
                 </li>
                 {selectedItemNo === item.item_no && (
                   <div className='item-detail-form dropdown-content'>
-                    <h2>선택된 <strong>{selectedItemNo}</strong>번 아이템 수정</h2>
                     <div className='itemName'>
-                      <h3>2. 아이템 이름 입력</h3>
-                      <input type="text" value={itemName} onChange={(e) => setItemName(e.target.value)} />
+                      <h3>1. 아이템 이름</h3>
+                      <input type="text" value={itemName} onChange={(e) => setItemName(e.target.value)} style={{ marginBottom: '10px' }} />
                     </div>
                     <div className='itemPrice'>
-                      <h3>3. 아이템 가격 입력</h3>
-                      <input type="number" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} />
+                      <h3>2. 아이템 가격</h3>
+                      <input type="number" value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} style={{ marginBottom: '10px' }} />
                     </div>
                     <div className="photo-input-section">
-                      <h3>4. 이미지 업로드</h3>
+                      <h3>3. 이미지 업로드</h3>
                       <input type="file" accept="image/*" onChange={handleImageChange} />
                       {previewImage && <img src={previewImage} alt="Preview" className="image-preview" />}
                     </div>

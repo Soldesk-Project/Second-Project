@@ -198,10 +198,15 @@
             	SELECT ach_title, ach_content, ach_reward, ach_type
             	FROM ACHIEVEMENTS
             	<where>
-                	<if test="type != null and type != ''">
-                    	ach_type = #{type, jdbcType=VARCHAR} </if>
-                	<if test="query != null and query != ''">
-                    	AND (ach_title LIKE '%' || #{query, jdbcType=VARCHAR} || '%' OR ach_content LIKE '%' || #{query, jdbcType=VARCHAR} || '%') </if>
+                	<if test="type != null and type != '' and type != 'all'">
+	                    ach_type = #{type}
+	                </if>
+	                <if test="query != null and query != ''">
+	                    <if test="type != null and type != '' and type != 'all'">
+	                        AND
+	                    </if>
+	                    (ach_title LIKE '%' || #{query} || '%' OR ach_content LIKE '%' || #{query} || '%')
+	                </if>
             	</where>
             	ORDER BY ach_title ASC
         	)
@@ -214,29 +219,45 @@
         SELECT COUNT(*)
         FROM ACHIEVEMENTS
         <where>
-            <if test="type != null and type != ''">
-                ach_type = #{type}
-            </if>
-            <if test="query != null and query != ''">
-                AND (ach_title LIKE '%' || #{query} || '%' OR ach_content LIKE '%' || #{query} || '%')
-            </if>
+            <if test="type != null and type != '' and type != 'all'">
+	            ach_type = #{type}
+	        </if>
+	        <if test="query != null and query != ''">
+	            <if test="type != null and type != '' and type != 'all'">
+	                AND
+	            </if>
+	            (ach_title LIKE '%' || #{query} || '%' OR ach_content LIKE '%' || #{query} || '%')
+	        </if>
         </where>
     </select>
 
-    <delete id="deleteAchievementsByTitles">
-        DELETE FROM ACHIEVEMENTS
-        <where>
-            <if test="type != null and type != ''">
-                ach_type = #{type}
-            </if>
-            <if test="titles != null and titles.size > 0">
-                AND ach_title IN
-                <foreach item="title" collection="titles" open="(" separator="," close=")">
-                    #{title}
-                </foreach>
-            </if>
-        </where>
-    </delete>
+    <delete id="deleteAchievementByTitle">
+	    DELETE FROM ACHIEVEMENTS
+	    <where>
+	        <if test="type != null and type != '' and type != 'all'">
+	            ach_type = #{type}
+	        </if>
+	        <if test="ach_title != null and ach_title != ''">
+	            <choose>
+	                <when test="ach_title != null and ach_title != ''">
+	                    AND ach_title = #{ach_title}
+	                </when>
+	                <otherwise>
+	                    ach_title = #{ach_title}
+	                </otherwise>
+	            </choose>
+	        </if>
+	    </where>
+	</delete>
+    
+    <update id="updateAchievement" parameterType="org.joonzis.domain.AchievementDTO">
+	    UPDATE achievements
+	    SET
+	        ach_title = #{ach_title},
+	        ach_content = #{ach_content},
+	        ach_reward = #{ach_reward}
+	    WHERE ach_title = #{originalTitle}
+	</update>
 
     <insert id="insertItem" parameterType="org.joonzis.domain.ItemVO" useGeneratedKeys="true" keyProperty="item_no">
     	<selectKey keyProperty="item_no" resultType="int" order="BEFORE">

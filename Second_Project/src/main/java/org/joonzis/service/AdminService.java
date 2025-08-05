@@ -48,7 +48,10 @@ public interface AdminService {
 	//업적 검색 메소드
 	public Map<String, Object> searchAchievement(String type, String query, int page, int limit);
 	//업적 삭제 메소드
-	public boolean deleteAchievementsByTitles(String type, List<String> achievementTitles);
+	public boolean deleteAchievementByTitle(String type, String ach_title);
+	
+	// 업적 수정
+	public boolean updateAchievement(AchievementDTO dto);
 	
 	//아이템 관련 메소드
 	//아이템 등록 메소드

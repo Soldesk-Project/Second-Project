@@ -1,50 +1,57 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const AchieveDelete = () => {
   const [selectedAchTitle, setSelectedAchTitle] = useState(null);
-  const [achType, setAchType] = useState('티어');
+  const [originalAchTitle, setOriginalAchTitle] = useState(null);
+  const [achType, setAchType] = useState('전체');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedAchData, setSelectedAchData] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
-  const [selectedAchsToDelete, setSelectedAchsToDelete] = useState(new Set());
   const [startPage, setStartPage] = useState(1);
   const pagesToShow = 5;
   const token = localStorage.getItem('token');
 
   const lastSearchQuery = useRef('');
 
-  //타입 선택 관련
+  // 타입 선택 관련
   const achTypes = [
+    '전체',
     '티어',
     '게임 플레이',
     '게임 1등',
   ];
 
   const tableType = {
+    '전체': 'all',
     '티어': 'tier',
     '게임 플레이': 'gamePlay',
     '게임 1등': 'game1st',
   };
 
+  useEffect(() => {
+    handleSearchAch(1); // 페이지 진입 시 최초 1페이지 전체 업적 로드
+  }, []);
+
   const handleTypeChange = (e) => {
-    setAchType(e.target.value);
-    setSearchResults([]);
+    const newType = e.target.value;
+    setAchType(newType);
     setSearchQuery('');
     setSelectedAchTitle(null);
     setSelectedAchData(null);
     setCurrentPage(1);
     setTotalPages(1);
-    setSelectedAchsToDelete(new Set());
     setStartPage(1);
-  }
 
-  const handleSearchAch = async (page = 1) => {
-    const typeValue = tableType[achType];
+    handleSearchAch(1, newType);
+  };
 
-    if (searchQuery !== lastSearchQuery.current || page === 1){
+  const handleSearchAch = async (page = 1, passedType = null) => {
+    const typeValue = tableType[passedType ?? achType];
+
+    if (searchQuery !== lastSearchQuery.current || page === 1) {
       setStartPage(1);
     }
     lastSearchQuery.current = searchQuery;
@@ -57,7 +64,7 @@ const AchieveDelete = () => {
           "Content-Type": "application/json",
         }
       });
-      if (!response.ok){
+      if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
@@ -65,7 +72,7 @@ const AchieveDelete = () => {
       setTotalPages(data.totalPages);
       setCurrentPage(page);
 
-      if (page < startPage || page >= startPage + pagesToShow){
+      if (page < startPage || page >= startPage + pagesToShow) {
         setStartPage(Math.floor((page - 1) / pagesToShow) * pagesToShow + 1);
       }
     } catch (error) {
@@ -78,54 +85,44 @@ const AchieveDelete = () => {
     }
   };
 
+  // 목록 클릭 시 해당 업적 선택
   const handleAchListItemClick = (achievement) => {
     setSelectedAchTitle(achievement.ach_title);
+    setOriginalAchTitle(achievement.ach_title);
     setSelectedAchData(achievement);
   };
 
-  const handleCheckboxChange = (event, achTitle) => {
-    event.stopPropagation();
-    setSelectedAchsToDelete(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(achTitle)) {
-        newSet.delete(achTitle);
-      } else {
-        newSet.add(achTitle);
-      }
-      return newSet;
-    });
-  };
-
-  const handleDeleteSelectedAchs = async () => {
-    console.log("현재 선택된 업적들:", selectedAchsToDelete);
-    console.log("전송될 titles 문자열:", Array.from(selectedAchsToDelete).join(','));
-
-    if (selectedAchsToDelete.size === 0) {
-      alert('삭제할 업적을 하나 이상 선택해주세요.');
+  // 삭제 버튼 클릭 시 단일 삭제 처리
+  const handleDeleteSelectedAch = async () => {
+    if (!selectedAchData) {
+      alert('삭제할 업적이 선택되지 않았습니다.');
       return;
     }
 
-    if (!window.confirm(`${selectedAchsToDelete.size}개의 업적을 정말 삭제하시겠습니까?`)) {
+    if (!window.confirm(`"${selectedAchData.ach_title}" 업적을 정말 삭제하시겠습니까?`)) {
       return;
     }
 
     const typeValue = tableType[achType];
+    const encodedType = encodeURIComponent(typeValue);
+    const encodedTitle = encodeURIComponent(selectedAchData.ach_title);
+
+    const url = `/admin/deleteAchievements?type=${encodedType}&title=${encodedTitle}`;
 
     try {
-      const response = await fetch(`/admin/deleteAchievements?type=${encodeURIComponent(typeValue)}&titles=${Array.from(selectedAchsToDelete).join(',')}`, {
+      const response = await fetch(url, {
         method: 'DELETE',
         headers: {
           "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
+          // "Content-Type": "application/json",
         }
       });
 
       if (response.ok) {
-        alert('선택된 업적이 성공적으로 삭제되었습니다.');
-        setSelectedAchsToDelete(new Set());
-        setSelectedAchTitle(null);
+        alert('업적이 성공적으로 삭제되었습니다.');
         setSelectedAchData(null);
-        handleSearchAch(currentPage); 
+        setSelectedAchTitle(null);
+        handleSearchAch(currentPage);
       } else {
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
@@ -143,9 +140,44 @@ const AchieveDelete = () => {
     }
   };
 
+  // 수정 버튼 클릭
+  const handleUpdateAchievement = async () => {
+    if (!selectedAchData) return;
+
+    if (!window.confirm('이 업적을 수정하시겠습니까?')) return;
+
+    try {
+      const response = await fetch(`/admin/updateAchievement`, {
+        method: 'PUT',
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...selectedAchData,
+          originalTitle: originalAchTitle,
+        })
+      });
+
+      if (response.ok) {
+        alert('업적이 성공적으로 수정되었습니다.');
+        handleSearchAch(currentPage);
+      } else {
+        const err = await response.text();
+        alert(`업적 수정 실패: ${err}`);
+      }
+    } catch (err) {
+      console.error('업적 수정 중 오류 발생:', err);
+      alert('업적 수정 중 오류가 발생했습니다.');
+    }
+  };
+
   return (
     <div>
-      <h1>업적 삭제</h1>
+      <h1 style={{    color: '#fff',
+    textAlign: 'center',
+    marginBottom: '30px',
+    fontSize: '2em'}}>업적 관리</h1>
       <div className='category'>
         <h3>1. 타입 선택 및 업적 검색</h3>
         <select name="cateSelect" value={achType} onChange={handleTypeChange}>
@@ -159,7 +191,7 @@ const AchieveDelete = () => {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="문제 본문 검색어를 입력하세요."
+          placeholder="업적 이름 또는 내용 검색"
           onKeyPress={(e) => {
             if (e.key === 'Enter') {
               handleSearchAch(1);
@@ -171,27 +203,69 @@ const AchieveDelete = () => {
 
       {searchResults.length > 0 && (
         <div className='searchResults'>
-          <h3>검색 결과 ({searchResults.length}개): 삭제할 업적을 선택하세요.</h3>
+          <h3>검색 결과 ({searchResults.length}개): 목록에서 업적을 클릭하세요.</h3>
           <ul>
-            {searchResults.map((ach) => (
+          {searchResults.map((ach) => (
+            <React.Fragment key={ach.ach_title}>
               <li
-                key={ach.ach_title}
                 onClick={() => handleAchListItemClick(ach)}
-                className={selectedAchsToDelete.has(ach.ach_title) ? 'selected-delete' : ''}
+                className={selectedAchTitle === ach.ach_title ? 'selected-edit' : ''}
               >
-                <input
-                  type="checkbox"
-                  checked={selectedAchsToDelete.has(ach.ach_title)}
-                  onChange={(e) => handleCheckboxChange(e, ach.ach_title)}
-                />
-                <span className="quest-id">[ID: {ach.ach_title}]</span>
-                {ach.ach_content.length > 80 ? ach.ach_content.substring(0, 80) + '...' : ach.ach_content}
+                [{ach.ach_title}]
               </li>
-            ))}
-          </ul>
+
+              {selectedAchTitle === ach.ach_title && selectedAchData && (
+                <div className="achievement-detail-form dropdown-content">
+
+                  <h3>1. 업적 이름</h3>
+                  <input
+                    type="text"
+                    value={selectedAchData.ach_title}
+                    onChange={(e) =>
+                      setSelectedAchData((prev) => ({ ...prev, ach_title: e.target.value }))
+                    }
+                    style={{ marginBottom: '10px' }}
+                  />
+
+                  <h3>2. 업적 내용</h3>
+                  <input
+                    type="text"
+                    value={selectedAchData.ach_content}
+                    onChange={(e) =>
+                      setSelectedAchData((prev) => ({ ...prev, ach_content: e.target.value }))
+                    }
+                    style={{ marginBottom: '10px' }}
+                  />
+
+                  <h3>3. 업적 보상</h3>
+                  <input
+                    type="text"
+                    value={selectedAchData.ach_reward}
+                    onChange={(e) =>
+                      setSelectedAchData((prev) => ({ ...prev, ach_reward: e.target.value }))
+                    }
+                    style={{ marginBottom: '10px' }}
+                  />
+
+                  <div className="button-group">
+                    <button
+                      onClick={handleUpdateAchievement}
+                      className="ach-update-button"
+                      style={{ marginRight: '10px' }}
+                    >
+                      업적 수정
+                    </button>
+                    <button onClick={handleDeleteSelectedAch} className="delete-button">
+                      업적 삭제
+                    </button>
+                  </div>
+                </div>
+              )}
+            </React.Fragment>
+          ))}
+        </ul>
           {totalPages > 1 && (
             <div className="pagination">
-              {/* 이전 페이지 블록 버튼 */}
               <button
                 onClick={() => {
                   const newStartPage = Math.max(1, startPage - pagesToShow);
@@ -203,7 +277,6 @@ const AchieveDelete = () => {
               >
                 이전
               </button>
-              {/* 페이지 번호들 */}
               {Array.from({ length: pagesToShow }, (_, i) => startPage + i)
                 .filter(pageNumber => pageNumber <= totalPages)
                 .map(pageNumber => (
@@ -215,12 +288,11 @@ const AchieveDelete = () => {
                     {pageNumber}
                   </button>
                 ))}
-              {/* 다음 페이지 블록 버튼 */}
               <button
                 onClick={() => {
                   const newStartPage = startPage + pagesToShow;
                   setStartPage(newStartPage);
-                  handleSearchAch(newStartPage); // 다음 블록의 첫 페이지로 검색
+                  handleSearchAch(newStartPage);
                 }}
                 disabled={startPage + pagesToShow > totalPages}
                 className="pagination-button"
@@ -231,31 +303,6 @@ const AchieveDelete = () => {
           )}
         </div>
       )}
-
-      {selectedAchData && (
-        <>
-          <hr />
-          <div className='achievement-detail-form'>
-            <h2>선택된 업적 정보</h2>
-            <p>선택된 업적 이름: <strong>{selectedAchData.ach_title}</strong></p>
-            <div className='achContent'>
-              <h3>업적 내용</h3>
-              <div className="read-only-field">
-                {selectedAchData.ach_content}
-              </div>
-            </div>
-            <div className='achReward'>
-              <h3>업적 보상</h3>
-              <div className="read-only-field">
-                {selectedAchData.ach_reward}
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-      <div className="button-group">
-        <button onClick={handleDeleteSelectedAchs} className="delete-button">선택된 업적 삭제</button>
-      </div>
     </div>
   );
 };
