@@ -204,10 +204,20 @@ public class AdminPageController {
     
     // 유저 검색 (조건 有) - ischatbanned, banned_timestamp 포함하도록 수정 필요
     @GetMapping(value = "/users/search", produces = "application/json; charset=UTF-8")
-    public ResponseEntity<List<UsersVO>> searchUsers(@RequestParam(name = "searchType") String searchType, @RequestParam(name = "searchValue", required = false, defaultValue = "") String searchValue) {
-        List<UsersVO> users = adminService.searchUsers(searchType, searchValue);
+    public ResponseEntity<Map<String, Object>> searchUsers(@RequestParam(name = "searchType") String searchType, 
+    												 @RequestParam(name = "searchValue", required = false, defaultValue = "") String searchValue,
+    												 @RequestParam(defaultValue = "1") int page,
+    												 @RequestParam(defaultValue = "8") int size) {
+    	int offset = (page - 1) * size;
+        List<UsersVO> users = adminService.searchUsers(searchType, searchValue, offset, size);
         System.out.println(users);
-        return new ResponseEntity<>(users, HttpStatus.OK);
+        int totalCount = adminService.getAllUsers().size(); // 전체 개수 조회
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("items", users);
+	    response.put("totalCount", totalCount);
+
+	    return ResponseEntity.ok(response);
     }
 
     // 채팅 금지 적용 API

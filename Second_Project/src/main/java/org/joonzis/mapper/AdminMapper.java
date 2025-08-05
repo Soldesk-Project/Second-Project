@@ -30,7 +30,7 @@ public interface AdminMapper {
     
     //유저 검색 메소드
     public List<UsersVO> selectAllUsers();
-	public List<UsersVO> searchUsers(@Param("searchType")String searchType, @Param("searchValue")String searchValue);
+	public List<UsersVO> searchUsers(@Param("searchType")String searchType, @Param("searchValue")String searchValue, @Param("offset")int offset, @Param("size")int size);
 	
 	//유저 채금 확인/적용/해제메소드
 	public List<UsersVO> getUsersChatBanStatus(@Param("userNos") List<Integer> userNos);

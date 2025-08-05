@@ -730,14 +730,14 @@ public class LoginController {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 일치하지 않습니다.");
 	    }
 
-	    // 3. 이미 로그인된 사용자 확인
-//	    if (user.getIs_logged_in() == 1) {
-//	        return ResponseEntity.status(HttpStatus.CONFLICT)
-//	                .body("이미 로그인된 사용자입니다.");
-//	    }
+//	     3. 이미 로그인된 사용자 확인
+	    if (user.getIs_logged_in() == 1) {
+	        return ResponseEntity.status(HttpStatus.CONFLICT)
+	                .body("이 계정은 "+user.getBanned_timestamp()+"까지 정지되었습니다.");
+	    }
 
 	    // 4. 로그인 처리
-	    userservice.updateLoginStatus(inputId, 1);
+//	    userservice.updateLoginStatus(inputId, 1);
 	    UserDetails userDetails = userDetailsService.loadUserByUsername(inputId);
 	    
 	    String role = userDetails.getAuthorities().stream()

@@ -32,6 +32,7 @@
   align-items: center;
   gap: 15px; /* 요소들 사이의 간격 */
   margin-bottom: 10px;
+  justify-content: center;
 }
 
 .searchControls label {
@@ -109,50 +110,55 @@
   border-collapse: collapse;
   text-align: left;
   margin-top: 20px;
+  border: 1px solid #333; /* 테이블 전체 경계선 추가 */
 }
 
 .userTable th,
 .userTable td {
-  padding: 10px;
-  vertical-align: middle; /* 텍스트 수직 정렬 */
+  padding: 10px 15px;
+  vertical-align: middle;
   color: #ddd;
+  border-bottom: 1px solid #444; /* 셀 아래 구분선 추가 */
 }
 
-.userTable td{
+.userTable td {
   font-size: 14px;
 }
 
 .userTable th {
   background-color: #171a23;
   white-space: nowrap;
-  color: #ddd;
+  color: #eee; /* 약간 더 밝게 */
   text-align: center;
-  border-bottom: 1px solid #eee;
+  border-bottom: 2px solid #555; /* 헤더 아래 경계선 강조 */
 }
 
 .userTable tbody tr:nth-child(even) {
-  background-color: #171a23;
+  background-color: #1f2230; /* 어두운 배경 색 약간 밝게 */
 }
 
 .userTable tbody tr:hover {
-  background-color: #171a23;
+  background-color: #2a2d3f; /* 명확한 hover 색상 */
+  cursor: pointer; /* 마우스 올리면 표시 */
 }
 
 .chatBanStatus {
   text-align: center;
-  white-space: nowrap; /* 줄 바꿈 방지 */
+  white-space: nowrap;
+  width: 150px;
 }
 
 .banDuration {
   font-size: 0.8em;
-  color: #888;
-  display: block; /* 괄호 안의 텍스트를 새 줄에 표시 */
+  color: #aaa;
+  display: block;
   margin-top: 5px;
 }
 
 .checkboxCol {
   text-align: center;
-  width: 50px; /* 체크박스 열 너비 조정 */
+  width: 50px;
+  vertical-align: middle; /* 체크박스 수직 중앙 정렬 */
 }
 
 .banBtnWrapper{
@@ -178,4 +184,56 @@
 .applyBanButton:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
+}
+
+.userId{
+  width: 500px;
+}
+
+.report_count{
+  color: red;
+  height: 20px;
+  display: block;
+}
+
+
+.listFooter {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 15px;
+  border-top: 1px solid #48494e;
+  color: #bbb;
+}
+/* 페이징 버튼 스타일 */
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  background-color: #35373d;
+  color: #ddd;
+  border: 1px solid #48494e;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #8367C7;
+  color: #fff;
+}
+
+.pagination button:disabled {
+  background-color: #2b2e35;
+  color: #555;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-weight: bold;
+  color: #bbb;
+  user-select: none;
 }

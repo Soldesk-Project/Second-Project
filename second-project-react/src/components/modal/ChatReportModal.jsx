@@ -6,6 +6,7 @@ const ChatReportModal = ({ isOpen, onClose, reportMessage }) => {
     const [reportedReason, setReportedReason] = useState('');
     const token = localStorage.getItem('token');
     if (!isOpen) return null;
+    console.log(reportMessage.mSender);
 
     const handleReportSubmit=async()=>{
         if (reportedReason.length>100) {
@@ -14,7 +15,7 @@ const ChatReportModal = ({ isOpen, onClose, reportMessage }) => {
         }
         
         try {
-            const res = await axios.post('/chat/report',{reported_user_id: reportMessage.mSenderNo, message: reportMessage.mContent, reason: reportedReason, status: 'pending'},{
+            const res = await axios.post('/chat/report',{reported_user: reportMessage.mSender, message: reportMessage.mContent, reason: reportedReason, status: 'pending'},{
                 headers: {
                 "Authorization": `Bearer ${token}`,
                 'Content-Type': 'application/json'

@@ -4,10 +4,22 @@
 
 <mapper namespace="org.joonzis.mapper.ChatMapper">
 	<insert id="reportHistory" parameterType="org.joonzis.domain.ReportHistoryVO">
-		INSERT INTO REPORT_HISTORY VALUES (REPORT_HISTORY_SEQ.NEXTVAL, #{reported_user_id}, #{message}, #{reason, jdbcType=CHAR}, SYSTIMESTAMP, #{status})
+		INSERT INTO REPORT_HISTORY VALUES (REPORT_HISTORY_SEQ.NEXTVAL, #{reported_user}, #{message}, #{reason, jdbcType=CHAR}, SYSTIMESTAMP, #{status})
 	</insert>  
 
-  
+	<select id="getReportHistory" resultType="org.joonzis.domain.ReportHistoryVO" parameterType="map">
+		<![CDATA[
+		  SELECT * FROM (
+		    SELECT a.*, ROWNUM rnum FROM (
+		      SELECT * FROM REPORT_HISTORY ORDER BY REPORTED_AT DESC
+		    ) a WHERE ROWNUM <= #{offset} + #{size}
+		  ) WHERE rnum > #{offset}
+		]]>
+	</select>
+		
+	<select id="getReportHistoryCount" resultType="int">
+		SELECT COUNT(*) FROM REPORT_HISTORY
+	</select>
   
   
   

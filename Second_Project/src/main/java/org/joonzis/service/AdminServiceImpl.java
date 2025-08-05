@@ -304,9 +304,9 @@ public class AdminServiceImpl implements AdminService {
 
     // 유저 검색
     @Override
-    public List<UsersVO> searchUsers(String searchType, String searchValue) {
+    public List<UsersVO> searchUsers(String searchType, String searchValue, int offset, int size) {
         log.info("ServiceImpl: searchUsers 호출 - 검색 타입: " + searchType + ", 검색 값: " + searchValue);
-        return adminMapper.searchUsers(searchType, searchValue);
+        return adminMapper.searchUsers(searchType, searchValue, offset, size);
     }
 
     // 유저 채금 적용

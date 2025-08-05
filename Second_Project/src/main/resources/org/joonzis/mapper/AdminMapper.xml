@@ -115,27 +115,34 @@
     </select>
 
     <select id="searchUsers" resultType="org.joonzis.domain.UsersVO" parameterType="map">
-        SELECT USER_NO, USER_ID, USER_NICK, USER_EMAIL, USER_DATE, USER_POINT, USER_RANK, USER_PLAY_COUNT, USER_1ST_COUNT, USER_PW, ISCHATBANNED, BANNED_TIMESTAMP, AUTH
-        FROM USERS
-        <where>
-            <if test="searchType != null and searchValue != null and searchValue != ''">
-                <choose>
-                    <when test="searchType == 'userNo'">
-                        USER_NO LIKE '%' || #{searchValue} || '%'
-                    </when>
-                    <when test="searchType == 'userId'">
-                        USER_ID LIKE '%' || #{searchValue} || '%'
-                    </when>
-                    <when test="searchType == 'userNick'">
-                        USER_NICK LIKE '%' || #{searchValue} || '%'
-                    </when>
-                    <when test="searchType == 'userRank'">
-                        TO_CHAR(USER_RANK) LIKE '%' || #{searchValue} || '%'
-                    </when>
-                </choose>
-            </if>
-        </where>
-        ORDER BY USER_NO DESC
+	    SELECT * FROM (
+		    SELECT a.*, ROWNUM rnum FROM (
+		        SELECT USER_NO, USER_ID, USER_NICK, USER_EMAIL, USER_DATE, USER_PW, ISCHATBANNED, BANNED_TIMESTAMP,
+		        	(SELECT COUNT(*) FROM REPORT_HISTORY WHERE REPORTED_USER=USER_NICK) AS REPORT_COUNT
+		        FROM USERS
+		        <where>
+		            <if test="searchType != null and searchValue != null and searchValue != ''">
+		                <choose>
+		                    <when test="searchType eq 'userNo'">
+		                        TO_CHAR(USER_NO) LIKE '%' || #{searchValue} || '%'
+		                    </when>
+		                    <when test="searchType eq 'userId'">
+		                        USER_ID LIKE '%' || #{searchValue} || '%'
+		                    </when>
+		                    <when test="searchType eq 'userNick'">
+		                        USER_NICK LIKE '%' || #{searchValue} || '%'
+		                    </when>
+		                    <when test="searchType eq 'userRank'">
+		                        TO_CHAR(USER_RANK) LIKE '%' || #{searchValue} || '%'
+		                    </when>
+		                </choose>
+		            </if>
+		        </where>
+		        ORDER BY USER_NO DESC
+		<![CDATA[
+		    ) a WHERE ROWNUM <= (#{offset} + #{size})
+		) WHERE rnum > #{offset}
+		]]>
     </select>
 
     <select id="getUsersChatBanStatus" resultType="org.joonzis.domain.UsersVO" parameterType="map">

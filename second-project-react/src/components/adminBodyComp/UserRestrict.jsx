@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../../css/adminPage/UserRestrict.module.css';
 
+const PAGE_SIZE = 8;
+
 const UserRestrict = () => {
   const token = localStorage.getItem('token');
   // 검색 조건을 위한 상태
@@ -13,6 +15,8 @@ const UserRestrict = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalUsers, setTotalReports] = useState(0);
 
   // 체크박스 선택된 사용자 ID 목록
   const [selectedUserNos, setSelectedUserNos] = useState(new Set());
@@ -28,7 +32,7 @@ const UserRestrict = () => {
 
   useEffect(()=>{
     handleSearch();
-  },[])
+  },[page])
   // 검색 버튼 클릭 핸들러
   const handleSearch = async () => {
     setLoading(true);
@@ -40,7 +44,7 @@ const UserRestrict = () => {
       const encodedSearchType = encodeURIComponent(searchConditions.searchType);
       const encodedSearchValue = encodeURIComponent(searchConditions.searchValue);
       // ischatbanned 컬럼도 백엔드에서 함께 가져오도록 API 수정 필요
-      const apiUrl = `/admin/users/search?searchType=${encodedSearchType}&searchValue=${encodedSearchValue}`;
+      const apiUrl = `/admin/users/search?searchType=${encodedSearchType}&searchValue=${encodedSearchValue}&page=${page}&size=${PAGE_SIZE}`;
         
       const token = localStorage.getItem('token');
       
@@ -59,10 +63,11 @@ const UserRestrict = () => {
 
       const data = await response.json();
 
-      if (Array.isArray(data)) {
-        setUsers(data);
+      if (Array.isArray(data.items)) {
+        setUsers(data.items);
+        setTotalReports(data.totalCount);
       } else {
-        console.error("Fetched data is not an array:", data);
+        console.error("Fetched data is not an array:", data.items);
         setError("서버에서 예상치 못한 형식의 데이터를 반환했습니다.");
         setUsers([]);
       }
@@ -154,6 +159,10 @@ const UserRestrict = () => {
     }
   };
 
+  const getTotalPages = () => Math.max(1, Math.ceil(totalUsers / PAGE_SIZE));
+
+
+
   // 접속 금지 버튼
   const handleApplyOnlineBan=()=>{
 
@@ -179,7 +188,6 @@ const UserRestrict = () => {
       <hr/>
       {/* 검색 폼 */}
       <div className={styles.searchSection}>
-        <h3>제재 현황/대상 검색</h3>
         <div className={styles.searchControls}>
           <label htmlFor="searchType">검색 기준: </label>
           <select
@@ -254,8 +262,8 @@ const UserRestrict = () => {
             <tbody>
               {users.map((user) => (
                 <tr key={user.user_no}>
-                  <td>{user.user_id}</td>
-                  <td>{user.user_nick}</td>
+                  <td className={styles.userId}>{user.user_id}</td>
+                  <td>{user.user_nick} <span className={styles.report_count}>[ {user.report_count} ]</span></td>
                   <td>{user.user_email}</td>
                   <td>
                     {user.user_date ? (() => {
@@ -286,6 +294,19 @@ const UserRestrict = () => {
             </tbody>
           </table>
 
+          <div className={styles.listFooter}>
+            <div className={styles.pagination}>
+              <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+                이전
+              </button>
+              <span>{page} / {getTotalPages()}</span>
+              <button
+                onClick={() => setPage((p) => Math.min(getTotalPages(), p + 1))}
+                disabled={page === getTotalPages()}>
+                다음
+              </button>
+            </div>
+          </div>
         </div>
       ) : (
         !loading && !error && <p className={styles.noResultsMessage}>검색 결과가 없습니다. 검색 조건을 선택하고 '검색' 버튼을 눌러주세요.</p>

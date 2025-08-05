@@ -1,0 +1,305 @@
+/* --- 공통 리셋 --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+button {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
+/* --- 상위 컨테이너 및 탭 --- */
+.customerServiceCenter {
+  color: #fff;
+  background: url('../../../public/images/violet2.png');
+  min-height: 100vh;
+}
+
+.topNav {
+  height: 70px;
+  background-color: #0A0D17;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  font-weight: bold;
+}
+
+.tabs {
+  display: flex;
+  gap: 6rem;
+  padding: 0 20px;
+  justify-content: center;
+}
+
+.tabs .tab {
+  background: transparent;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.tabs .tab:hover {
+  background: white;
+  border-radius: 6px;
+  color: black;
+}
+
+.tabs .active {
+  border-bottom: 3px solid #8367C7;
+  font-weight: bold;
+}
+
+.tabPanels {
+  padding: 50px 20px 20px;
+}
+
+.content {
+  animation: fadeIn 0.2s ease-in;
+  color: #fff;
+}
+
+.content h1 {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2em;
+}
+
+/* --- 리스트 스타일 (헤더/항목 공통) --- */
+.listHeader {
+  list-style: none;
+  margin: 5px 0 0;
+  padding: 10px 0;
+  display: grid;
+  grid-template-columns: 80px 1fr 120px 140px;
+  gap: 1rem;
+  align-items: center;
+  border-top: 2px solid #35373d;
+  border-bottom: 1px solid #48494e;
+  font-weight: bold;
+  text-align: center;
+}
+
+.listItem {
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-template-columns: 80px 1fr 120px 140px;
+  gap: 1rem;
+  align-items: stretch;
+  border-bottom: 1px solid #48494e;
+}
+
+.listItemHeader {
+  display: contents;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  padding: 15px 0;
+}
+
+.listItem:hover .listItemHeader {
+  background-color: rgba(131, 103, 199, 0.1);
+}
+
+/* 상세 보기 페이지 */
+.detailBox {
+  margin: 100px auto 20px;
+  max-width: 800px;
+  background: #35373d;
+  border-radius: 8px;
+  padding: 24px;
+  color: #ddd;
+}
+
+/* 페이징 버튼 */
+.pagination button {
+  padding: 6px 12px;
+  background-color: #35373d;
+  color: #ddd;
+  border: 1px solid #48494e;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.pagination button:hover:not(:disabled) {
+  background-color: #48494e;
+}
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: #2b2e35;
+}
+
+/* --- 리스트 뷰 --- */
+.listView {
+  list-style: none;
+  /* margin: 20px 0; */
+  padding: 0;
+  color: #ddd;
+}
+
+.listItem {
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-template-columns: 80px 1fr 120px 140px;
+  gap: 1rem;
+  border-bottom: 1px solid #48494e;
+  color: #ddd;
+  margin: 20px 0px;
+}
+
+.listItemHeader {
+  display: contents;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  padding: 15px 0;
+}
+
+.listItem:hover .listItemHeader {
+  background-color: rgba(131, 103, 199, 0.1);
+}
+
+.listItemNo {
+  justify-self: center;
+  align-self: center;
+  font-size: 0.9em;
+}
+
+.listItemTitle {
+  justify-self: center;
+  align-self: center;
+  text-align: center;
+  padding-left: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.listItemAuthor {
+  justify-self: center;
+  align-self: center;
+  font-size: 0.9em;
+}
+
+.listItemDate {
+  justify-self: center;
+  align-self: center;
+  /* padding-right: 20px; */
+  font-size: 0.9em;
+  color: #bbb;
+}
+
+/* 상세 내용 */
+.detailContentArea {
+  grid-column: 1 / -1;
+  padding: 15px 30px;
+  background-color: #1f222b;
+  border-top: 1px dashed #48494e;
+  color: #ccc;
+  font-size: 0.95em;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 15px;
+}
+
+/* 공지사항 없을 때 */
+.noData {
+  grid-column: 1 / -1;
+  padding: 30px 0;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+/* 리스트 하단 (페이징 영역) */
+.listFooter {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 15px;
+  border-top: 1px solid #48494e;
+  color: #bbb;
+}
+
+/* 페이징 버튼 스타일 */
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  background-color: #35373d;
+  color: #ddd;
+  border: 1px solid #48494e;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #8367C7;
+  color: #fff;
+}
+
+.pagination button:disabled {
+  background-color: #2b2e35;
+  color: #555;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-weight: bold;
+  color: #bbb;
+  user-select: none;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .listHeader,
+  .listItem {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  gap: 8px;
+  }
+
+  .listHeader li,
+  .listItemNo,
+  .listItemTitle,
+  .listItemAuthor,
+  .listItemDate {
+    justify-self: start;
+    text-align: left;
+    padding-left: 0;
+  }
+
+  .detailContentArea {
+    padding: 10px 15px;
+  }
+
+  .listFooter {
+    justify-content: center;
+  }
+}
+
+.title {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2em;
+}

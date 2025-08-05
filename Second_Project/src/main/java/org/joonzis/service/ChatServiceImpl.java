@@ -1,5 +1,7 @@
 package org.joonzis.service;
 
+import java.util.List;
+
 import org.joonzis.domain.ReportHistoryVO;
 import org.joonzis.mapper.ChatMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,4 +16,16 @@ public class ChatServiceImpl implements ChatService {
 	public void reportHistory(ReportHistoryVO reportHistory) {
 		chatMapper.reportHistory(reportHistory);
 	}
+	
+	@Override
+	public List<ReportHistoryVO> getReportHistory(int offset, int size) {
+		return chatMapper.getReportHistory(offset, size);
+	}
+	
+	@Override
+	public int getReportHistoryCount() {
+		return chatMapper.getReportHistoryCount();
+	}
+	
+	
 }

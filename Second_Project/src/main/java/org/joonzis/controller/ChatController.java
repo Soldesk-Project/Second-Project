@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,8 +29,10 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class ChatController {
@@ -203,6 +206,18 @@ public class ChatController {
     	}
     }
     
+    @GetMapping(value = "/chat/getReportHistory", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<Map<String, Object>> reportHistory(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "5") int size) {
+    	int offset = (page - 1) * size;
+	    List<ReportHistoryVO> reports = chatService.getReportHistory(offset, size);
+	    int totalCount = chatService.getReportHistoryCount(); // 전체 개수 조회
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("items", reports);
+	    response.put("totalCount", totalCount);
+
+	    return ResponseEntity.ok(response);
+    }
     
     
 }

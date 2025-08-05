@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReportHistoryVO {
-	private int report_id, reported_user_id;
-	private String message, reason, status;
-	private Date created_at;
+	private int report_id;
+	private String reported_user, message, reason, status;
+	private Date reported_at;
 }

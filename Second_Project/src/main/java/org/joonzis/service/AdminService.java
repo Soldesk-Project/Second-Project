@@ -34,7 +34,7 @@ public interface AdminService {
 	//유저 조회 메소드
 	public List<UsersVO> getAllUsers();
 	//유저 검색 메소드
-	public List<UsersVO> searchUsers(String searchType, String searchValue);
+	public List<UsersVO> searchUsers(String searchType, String searchValue, int offset, int size);
 	//유저 채금 적용 메소드
 	public int banChatusers(List<Integer> userNos);
     //유저 채금 해제 메소드
