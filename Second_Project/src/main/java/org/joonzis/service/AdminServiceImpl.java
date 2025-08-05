@@ -60,6 +60,7 @@ public class AdminServiceImpl implements AdminService {
     
     static {
         Map<String, String> map = new HashMap<>();
+        map.put("all", "전체");
         map.put("cpe", "정보처리기사");
         map.put("cpei", "정보처리산업기사");
         map.put("cpet", "정보처리기능사");
@@ -115,20 +116,6 @@ public class AdminServiceImpl implements AdminService {
         // 2. subject 코드 유효성 검사
         if (subjectCode == null || !isValidSubjectCode(subjectCode)) {
             throw new IllegalArgumentException("유효하지 않은 과목(subject) 코드입니다: " + subjectCode);
-        }
-
-        // 3. Service 계층에서 Base64 디코딩 수행
-        if (questionDTO.getImage_data_base64() != null && !questionDTO.getImage_data_base64().isEmpty()) {
-            try {
-                byte[] decodedBytes = Base64.getDecoder().decode(questionDTO.getImage_data_base64());
-                questionDTO.setImage_data(decodedBytes);
-                questionDTO.setImage_data_base64(null);
-            } catch (IllegalArgumentException e) {
-                log.error("Base64 이미지 데이터 디코딩 실패: " + e.getMessage(), e);
-                throw new IllegalArgumentException("유효하지 않은 이미지 데이터 형식입니다.", e);
-            }
-        } else {
-            questionDTO.setImage_data(null);
         }
 
         // 4. Mapper 호출을 위한 QuestionDTO 직접 사용
