@@ -711,6 +711,11 @@ public class AdminServiceImpl implements AdminService {
         }
         adminMapper.updateQuestRequest(questRequestVO);
     }
+	// 실제 문제 등록
+	@Override
+	public void insertQuestion2(QuestRequestVO vo) {
+		adminMapper.insertQuestion2(vo);
+	}
 	
 	@Override
 	public void registerNotice(String subject, String message) {

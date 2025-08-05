@@ -15,14 +15,15 @@
     text-align: center;
     margin-bottom: 30px;
     font-size: 2em;
+    width:1580px;
 }
 
 /* 좌우 분할 뷰 컨테이너 */
 .splitViewContainer {
     display: flex; /* Flexbox를 사용하여 좌우 정렬 */
     gap: 25px; /* 좌우 패널 사이의 간격 */
-    min-height: calc(100vh - 150px); /* 화면 높이에 따라 유동적으로 (헤더, 푸터, 제목 높이 고려하여 조정) */
-    background-color: #f8f9fa;
+    min-height: calc(100vh - 222px); /* 화면 높이에 따라 유동적으로 (헤더, 푸터, 제목 높이 고려하여 조정) */
+    /* background-color: #f8f9fa; */
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     padding: 20px;
@@ -31,10 +32,10 @@
 
 /* 왼쪽 패널 (검색 및 목록) */
 .leftPanel {
-    flex: 1.5; /* 왼쪽 패널이 오른쪽보다 조금 더 넓게 (조정 가능) */
+    flex: 6; /* 왼쪽 패널이 오른쪽보다 조금 더 넓게 (조정 가능) */
     display: flex;
     flex-direction: column;
-    background-color: #fff;
+    /* background-color: #fff; */
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 20px;
@@ -44,8 +45,8 @@
 
 /* 오른쪽 패널 (상세 미리보기) */
 .rightPanel {
-    flex: 1; /* 남은 공간을 채우도록 설정 */
-    background-color: #fff;
+    flex: 4; /* 남은 공간을 채우도록 설정 */
+    /* background-color: #fff; */
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 20px;
@@ -98,7 +99,7 @@
 
 /* 테이블 컨테이너 */
 .tableContainer {
-    flex-grow: 1; /* 테이블이 남은 공간을 채우도록 */
+    /* flex-grow: 1; 테이블이 남은 공간을 채우도록 */
     overflow-x: auto; /* 테이블이 너무 넓을 경우 가로 스크롤 */
     margin-bottom: 15px;
     border: 1px solid #e9ecef;
@@ -220,7 +221,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 25px;
+    /* margin-top: 25px; */
     gap: 8px;
     padding-top: 15px;
     border-top: 1px solid #eee;
@@ -294,8 +295,9 @@
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
-    color: #495057;
-    font-size: 0.95em;
+    color: white;
+    font-size: 1.2em;
+    margin-top: 20px;
 }
 
 .formGroup input[type="text"],
@@ -332,7 +334,7 @@
 
 .detailActions {
     margin-top: 30px;
-    text-align: right;
+    text-align: center;
     border-top: 1px solid #eee;
     padding-top: 20px;
 }
@@ -369,4 +371,13 @@
     background-color: #f0f2f5;
     border-radius: 8px;
     margin-top: 50px;
+}
+
+.callTable tbody tr {
+}
+
+.callTable td {
+    padding: 10px 8px;
+    height: 40px;
+    line-height: 1.2;
 }

@@ -15,9 +15,11 @@ import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.NoticeVO;
 import org.joonzis.domain.QuestRequestVO;
 import org.joonzis.domain.QuestionDTO;
+import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.service.AdminService;
 import org.joonzis.service.FileUploadService;
+import org.joonzis.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +44,9 @@ public class AdminPageController {
 
     @Autowired
     private AdminService adminService;
+    
+    @Autowired
+    private UserService userService;
     
     @Autowired
     private FileUploadService fileUploadService;
@@ -192,6 +197,49 @@ public class AdminPageController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("문제 등록 요청 업데이트 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    // 4. 문제 실제 등록
+    @PostMapping("/questions")
+    public ResponseEntity<?> registerQuestion(@RequestBody QuestRequestVO vo) {
+        try {
+            // base64 이미지 디코딩
+            if (vo.getImage_data_base64() != null && !vo.getImage_data_base64().isEmpty()) {
+                byte[] imageBytes = Base64.getDecoder().decode(vo.getImage_data_base64());
+                vo.setImage_data(imageBytes); // DB 컬럼용 필드
+            }
+
+            // 문제 등록
+            adminService.insertQuestion2(vo);
+            
+            // 유저 이메일 조회
+            UserInfoDTO user = userService.getUserById(vo.getUser_id());
+            if (user != null && user.getUser_email() != null) {
+                userService.sendQuestRequestStatusMail(user.getUser_email(), "등록하신 문제가 정상적으로 접수되었습니다.");
+            }
+
+            return ResponseEntity.ok().body("등록 완료");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생");
+        }
+    }
+    
+    @PutMapping("/questRequests/{id}/reject")
+    public ResponseEntity<?> rejectQuestRequest(@PathVariable int id, @RequestBody QuestRequestVO vo) {
+        try {
+            adminService.updateQuestRequest(vo); // 상태 업데이트 (반려)
+            
+            // 유저 이메일 발송
+            UserInfoDTO user = userService.getUserById(vo.getUser_id());
+            if (user != null && user.getUser_email() != null) {
+                userService.sendQuestRequestStatusMail(user.getUser_email(), "등록하신 문제가 반려되었습니다. 다시 확인해주세요.");
+            }
+
+            return ResponseEntity.ok("반려 처리 완료");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생");
         }
     }
     

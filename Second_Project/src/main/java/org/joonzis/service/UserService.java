@@ -105,6 +105,8 @@ public interface UserService {
 
 	// 정답률 통계 가져오기
 	public List<UserAccuracyDTO> getUserAccuracyList(String user_nick);
-
 	
+	// 문제 등록 결과 이메일 전송
+	void sendQuestRequestStatusMail(String toEmail, String messageContent) throws MessagingException;
+
 }
