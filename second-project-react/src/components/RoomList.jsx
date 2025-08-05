@@ -358,16 +358,16 @@ const RoomList = () => {
       </div>
       )}
 
+
+      <div className={styles.roomListBody}>
       <div className={styles.roomListHeader}>
         <button onClick={handleOpenFilterModal} className={styles.createBtn}>필터</button>
         <button onClick={handleOpenModal} className={styles.createBtn}>일반 게임</button>
         <button onClick={handleQuickMatch} className={styles.createBtn}>랭크 게임</button>
         <button onClick={handleQuestionReview} className={styles.createBtn}>오답 풀이</button>
       </div>
-
-      <div className={styles.roomListBody}>
         {gameRoomList.length === 0 ? (
-          <div>방이 없음</div>
+          <div className={styles.noneRoomList}>방이 없음</div>
         ) : (
           gameRoomList.map((room, index) => (
             <div

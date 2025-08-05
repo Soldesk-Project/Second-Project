@@ -35,6 +35,8 @@ function formatTimestamp(timestamp) {
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [isChatBanModalOpen, setIsChatBanModalOpen] = useState(false);
     const [reportMessage, setReportMessage] = useState('');
+    const [alertMessage, setAlertMessage] = useState('');
+
 
     const isCurrentUserChatBanned = currentUser?.ischatbanned === 1;
     const currentUserBanTimestamp = currentUser?.banned_timestamp;
@@ -169,6 +171,16 @@ function formatTimestamp(timestamp) {
 
     // 메시지 전송 함수
     const sendMessage = () => {
+        console.log(messageInput.length);
+        
+        if (messageInput.length>1000) {
+            setAlertMessage('채팅이 너무 깁니다. 1,000자 이하로 입력해 주세요.');
+            setTimeout(() => {
+                setAlertMessage('');
+            }, 3000);
+            setMessageInput('');
+            return;
+        }
         // 채팅 금지 상태 확인
         if (isCurrentUserChatBanned) {
             setIsChatBanModalOpen(true); // 채팅 금지 모달 띄우기
@@ -228,19 +240,10 @@ function formatTimestamp(timestamp) {
         setIsReportModalOpen(false);
     };
 
+    
 
     return (
         <div className="chatbox-container">
-            <div className="chatbox-header">
-                {/* 게임방에서는 귓속말 버튼 제거 또는 비활성화 */}
-                <button onClick={() => setIsWhisperMode(false)}
-                        className={!isWhisperMode ? 'active-mode-btn' : ''}>전체</button>
-                {/* <button onClick={() => setIsWhisperMode(true)}
-                        className={isWhisperMode ? 'active-mode-btn' : ''}
-                        disabled={true}>귓속말</button> 
-                */}
-            </div>
-
             <div className="chatbox-log" ref={chatLogRef}>
                 {messages.map((msg, index) => (
                     <div key={index} className={`chat-message ${msg.mSender === userNick ? 'my-message' : ''} ${msg.mType === 'GAME_JOIN' || msg.mType === 'GAME_LEAVE' ? 'system-message' : ''}`}>
@@ -258,6 +261,9 @@ function formatTimestamp(timestamp) {
                 ))}
             </div>
 
+            <div className="chatbox-alert">
+                {alertMessage && <span>{alertMessage}</span>}
+            </div>
             <div className="chatbox-input">
                 <input
                     type="text"

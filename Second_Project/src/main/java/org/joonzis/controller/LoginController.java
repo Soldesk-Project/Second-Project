@@ -6,7 +6,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -127,7 +130,6 @@ public class LoginController {
 	                    .body("이미 로그인된 사용자입니다.");
 	        }
 
-	        userservice.updateLoginStatus(user.getUser_id(), 1);
 	        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUser_id());
 		    
 		    String role = userDetails.getAuthorities().stream()
@@ -330,7 +332,6 @@ public class LoginController {
 	                    .body("이미 로그인된 사용자입니다.");
 	        }
 
-	        userservice.updateLoginStatus(user.getUser_id(), 1);
 	        
 	        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUser_id());
 		    
@@ -450,7 +451,6 @@ public class LoginController {
 	                    .body("이미 로그인된 사용자입니다.");
 	        }
 
-	        userservice.updateLoginStatus(user.getUser_id(), 1);
 	        
 	        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUser_id());
 		    
@@ -685,7 +685,7 @@ public class LoginController {
 	    }
 	}
 	
-	@PostMapping("/login")
+	@PostMapping(value = "/login", produces = "application/json; charset=UTF-8")
 	@ResponseBody
 	public ResponseEntity<?> login(@RequestBody UserInfoDTO dto, HttpSession session) {
 	    // 사용자가 입력한 ID와 PW
@@ -730,14 +730,22 @@ public class LoginController {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 일치하지 않습니다.");
 	    }
 
-//	     3. 이미 로그인된 사용자 확인
+	    // 3. 접속 정지 사용자 확인
 	    if (user.getIs_logged_in() == 1) {
-	        return ResponseEntity.status(HttpStatus.CONFLICT)
-	                .body("이 계정은 "+user.getBanned_timestamp()+"까지 정지되었습니다.");
+	    	Date bannedTimestamp = user.getBanned_timestamp();
+
+	    	Calendar cal = Calendar.getInstance();
+	    	cal.setTime(bannedTimestamp);
+	    	cal.add(Calendar.DATE, 3);
+
+	    	Date newDate = new Date(cal.getTimeInMillis());
+
+	    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm");
+	    	String formattedDate = sdf.format(newDate);
+	        return ResponseEntity.status(HttpStatus.CONFLICT).body("이 계정은 "+formattedDate+" 까지 정지되었습니다.");
 	    }
 
 	    // 4. 로그인 처리
-//	    userservice.updateLoginStatus(inputId, 1);
 	    UserDetails userDetails = userDetailsService.loadUserByUsername(inputId);
 	    
 	    String role = userDetails.getAuthorities().stream()
@@ -761,7 +769,6 @@ public class LoginController {
 	public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {
 	    String userId = request.get("userId");
 	    if (userId != null) {
-	    	userservice.updateLoginStatus(userId, 0);  // DB에 로그아웃 상태 저장
 	        return ResponseEntity.ok("로그아웃 완료");
 	    }
 	    return ResponseEntity.badRequest().body("잘못된 요청");

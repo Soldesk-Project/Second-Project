@@ -178,6 +178,18 @@
   transition: border-color 0.2s;
   margin: 0;
 }
+.report-preview{
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  justify-content: center;
+  align-items: center;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+}
 
 
 /* --- 모달 푸터 (버튼) --- */
@@ -216,4 +228,28 @@
 
 .report-send-btn:hover {
   background-color: #d32f2f;
+}
+
+
+.message-content{
+  max-width: fit-content;
+  overflow-wrap: break-word;  /* 긴 단어도 줄바꿈 허용 */
+  word-break: break-word;
+  white-space: normal;
+}
+
+.chatbox-alert {
+    height: 24px; /* 고정 높이로 레이아웃 유지 */
+    color: #ff5555;
+    font-size: 12px;
+    margin-bottom: 5px;
+    font-weight: 600;
+    transition: opacity 0.3s ease;
+}
+
+.chatbox-alert span {
+    display: inline-block;
+    background-color: #ffe6e6;
+    padding: 2px 6px;
+    border-radius: 4px;
 }

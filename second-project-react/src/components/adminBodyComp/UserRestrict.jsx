@@ -164,8 +164,68 @@ const UserRestrict = () => {
 
 
   // 접속 금지 버튼
-  const handleApplyOnlineBan=()=>{
+  const handleApplyOnlineBan=async()=>{
+    if (selectedUserNos.size === 0) {
+      alert('접속금지를 적용할 사용자를 한 명 이상 선택해주세요.');
+      return;
+    }
 
+    const usersToBan = [];
+    const userMap = new Map(users.map(user => [user.user_no, user]));
+
+    // 먼저, 이미 금지된 사용자들을 걸러내고 메시지를 띄웁니다.
+    for (const userNo of selectedUserNos) {
+        const user = userMap.get(userNo);
+        if (user) {
+            if (user.is_logged_in === 1) {
+                alert(`${user.user_nick} 회원은 이미 채팅 금지가 적용되었습니다.`);
+            } else {
+                usersToBan.push(userNo); // 아직 금지되지 않은 사용자만 목록에 추가
+            }
+        }
+    }
+
+    if (usersToBan.length === 0) {
+        // 모든 선택된 사용자가 이미 금지되었거나, 선택된 사용자가 없는 경우
+        setSelectedUserNos(new Set()); // 선택된 항목 초기화
+        return; // 백엔드 요청을 보내지 않고 함수 종료
+    }
+
+    const isConfirmed = window.confirm(`선택된 회원 중 ${usersToBan.length}명에 대해 접속금지를 적용하시겠습니까?`);
+
+    if (isConfirmed) {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch('/admin/users/ban-login', {
+          method: 'POST',
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userNos: usersToBan }), // 실제 금지할 사용자만 보냅니다.
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+
+        const result = await response.json();
+        console.log("Chat ban application result:", result);
+        alert(result.message || '접속금지가 성공적으로 적용되었습니다.');
+
+        await handleSearch(); // 변경된 상태를 반영하기 위해 다시 검색
+        setSelectedUserNos(new Set()); // 선택된 항목 초기화
+
+      } catch (err) {
+        console.error("Error applying chat ban:", err);
+        setError(`접속금지 적용에 실패했습니다. `);
+      } finally {
+        setLoading(false);
+      }
+    }
   }
 
   // 선택된 searchType에 따라 placeholder 텍스트를 반환하는 헬퍼 함수
@@ -275,8 +335,9 @@ const UserRestrict = () => {
                     })() : 'N/A'}
                   </td>
                   <td className={styles.chatBanStatus}>
-                    {user.ischatbanned === 1 ? '금지' : '정상'}
-                    {user.ischatbanned === 1 && user.banned_timestamp && (
+                    {user.is_logged_in === 1 ? '접속금지': (user.ischatbanned ===1?'채팅금지':'정상')}
+
+                    {(user.ischatbanned === 1 || user.is_logged_in === 1) && user.banned_timestamp && (
                       <span className={styles.banDuration}>
                         (~ {new Date(new Date(user.banned_timestamp).getTime() + 72 * 60 * 60 * 1000).toLocaleDateString('ko-KR')}까지)
                       </span>

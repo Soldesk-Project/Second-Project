@@ -337,6 +337,52 @@ public class AdminServiceImpl implements AdminService {
             return 0;
         }
     }
+    
+    
+    // 유저 접속 금지
+    @Override
+    @Transactional
+    public int banLoginUsers(List<Integer> userNos) {
+    	log.info("ServiceImpl: banChatusers 호출 - 사용자 번호 목록: " + userNos);
+        if (userNos == null || userNos.isEmpty()) {
+            log.info("접속 금지할 사용자 번호가 없습니다.");
+            return 0;
+        }
+
+        List<Integer> actualUsersToBan = new ArrayList<>();
+
+        List<UsersVO> currentStatuses = adminMapper.getUsersLoginBanStatus(userNos);
+        log.debug("현재 접속 금지 상태 조회 결과: " + currentStatuses.size() + "명");
+
+        for (Integer userNo : userNos) {
+            boolean alreadyBanned = false;
+            for (UsersVO user : currentStatuses) {
+                if (user.getUser_no() == userNo.intValue()) {
+                    if (user.getIschatbanned() == 1) {
+                        alreadyBanned = true;
+                        log.debug("User " + user.getUser_nick() + "(" + userNo + ")는 이미 접속 금지 상태입니다. 건너뜁니다.");
+                        break;
+                    }
+                }
+            }
+            if (!alreadyBanned) {
+                actualUsersToBan.add(userNo);
+            }
+        }
+
+        if (!actualUsersToBan.isEmpty()) {
+            log.info(actualUsersToBan.size() + "명의 사용자에게 접속 금지 적용 예정.");
+        	
+//    	    userservice.updateLoginStatus(inputId, 1);
+            int updatedCount = adminMapper.updateLoginBanStatus(actualUsersToBan, new Timestamp(System.currentTimeMillis()));
+            log.info(updatedCount + "명의 사용자에게 접속 금지가 적용되었습니다.");
+            return updatedCount;
+        } else {
+            log.info("새로 접속 금지할 사용자가 없습니다.");
+            return 0;
+        }
+    }
+    
 
     // 유저 채금 해제 (1시간마다 실행되도록 스케줄링)
     @Scheduled(fixedRate = 3600000) // 1시간 = 3600000 밀리초

@@ -64,7 +64,7 @@ const LoginForm = () => {
       if (!err.response) {
         alert("네트워크 오류가 발생했습니다.");
       } else if (err.response.status === 409) {
-        alert('이미 로그인된 사용자입니다.');
+        alert(err.response.data);
       } else if (err.response.status === 401) {
         alert('아이디 또는 비밀번호가 잘못되었습니다.');
       } else {

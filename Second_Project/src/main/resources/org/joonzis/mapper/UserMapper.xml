@@ -295,13 +295,6 @@
 		WHERE u.user_id = #{user_id}
 	</select>
 	
-	<!-- 유저 접속 정보 업데이트 -->
-	<update id="updateLoginStatus">
-	    UPDATE users
-	    SET is_logged_in = #{status}
-	    WHERE user_id = #{userId}
-	</update>
-	
 	<!-- 전 체 유저 정답률 -->
 	<select id="getUserAccuracyList" resultType="org.joonzis.domain.UserAccuracyDTO">
 	    SELECT

@@ -41,6 +41,10 @@ public interface AdminService {
 	public int banChatusers(List<Integer> userNos);
     //유저 채금 해제 메소드
 	public void unbanChatUsers();
+	// 접속 금지 적용 메소드
+	public int banLoginUsers(List<Integer> userNos);
+	// 접속 금지 해제 메소드
+//	public void unbanChatUsers();
 	
 	//업적 관련 메소드
 	//업적 등록 메소드

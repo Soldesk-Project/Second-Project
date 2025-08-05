@@ -85,7 +85,7 @@ button {
   margin: 5px 0 0;
   padding: 10px 0;
   display: grid;
-  grid-template-columns: 80px 1fr 120px 140px;
+  grid-template-columns: 80px 1fr 200px 140px;
   gap: 1rem;
   align-items: center;
   border-top: 2px solid #35373d;
@@ -97,7 +97,7 @@ button {
 .listItem {
   display: grid;
   grid-template-rows: auto auto;
-  grid-template-columns: 80px 1fr 120px 140px;
+  grid-template-columns: 80px 1fr 200px 140px;
   gap: 1rem;
   align-items: stretch;
   border-bottom: 1px solid #48494e;
@@ -323,7 +323,7 @@ button {
 .listItem {
   display: grid;
   grid-template-rows: auto auto;
-  grid-template-columns: 80px 1fr 120px 140px;
+  grid-template-columns: 80px 1fr 200px 140px;
   gap: 1rem;
   border-bottom: 1px solid #48494e;
   color: #ddd;

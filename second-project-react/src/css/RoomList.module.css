@@ -38,7 +38,22 @@
 .createBtn:hover::after{
   width: 60%;
 }
+.noneRoomList{
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
+  font-size: 18px;
+  font-weight: 600;
+  color: #888;
+
+  height: 150px;
+  user-select: none;
+
+  background-color: rgba(239, 224, 255, 0.15);
+  border-radius: 8px; 
+}
 .roomListSearch{
   height: 40px;
   margin: 0 10px;

@@ -19,7 +19,7 @@ public class UsersVO {
 	private long user_point;
 	private String user_nick, user_id, user_pw, user_email, user_profile_img;
 	private Date user_date;
-	private int ischatbanned;
+	private int ischatbanned, is_logged_in;
     private Timestamp banned_timestamp;
     private String auth;
 }

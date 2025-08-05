@@ -149,6 +149,7 @@
 .answerTable {
   width: 150px;
   flex-shrink: 0;
+  padding: 20px 0;
 }
 
 .answerTable table {

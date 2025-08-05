@@ -289,6 +289,28 @@ public class AdminPageController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // 접속 금지 적용 API
+    @PostMapping(value = "/users/ban-login", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<Map<String, String>> banLoginUsers(@RequestBody Map<String, List<Integer>> requestBody) {
+    	List<Integer> userNos = requestBody.get("userNos");
+    	Map<String, String> response = new HashMap<>();
+    	
+    	if (userNos == null || userNos.isEmpty()) {
+    		response.put("message", "접속 금지를 적용할 사용자 번호가 제공되지 않았습니다.");
+    		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    	}
+    	
+    	try {
+    		int updatedCount = adminService.banLoginUsers(userNos);
+    		response.put("message", updatedCount + "명의 사용자에게 접속 금지가 성공적으로 적용되었습니다.");
+    		return new ResponseEntity<>(response, HttpStatus.OK);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		response.put("message", "접속 금지 적용 중 오류가 발생했습니다: " + e.getMessage());
+    		return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    }
     
     // 업적 등록
     @PostMapping("/registerAchievement")

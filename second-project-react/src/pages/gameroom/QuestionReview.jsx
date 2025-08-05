@@ -113,6 +113,7 @@ const QuestionReview = () => {
   // 다음 문제 버튼
   const prevQuestion=()=>{
     setNextId(prev=>prev-1);
+    
   }
   const nextQuestion=()=>{
       setSelectAnswer(null);
@@ -122,6 +123,8 @@ const QuestionReview = () => {
   // 포인트로 정답 확인 버튼
   const getAnswer=async()=>{
     if (play) {
+      console.log(explanation);
+      
       if (confirm('포인트를 소모하여 정답을 확인하시겠습니까?')) {
         await axios.post('/api/usePoint', {userNo});
         

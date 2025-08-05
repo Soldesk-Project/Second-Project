@@ -117,7 +117,7 @@
     <select id="searchUsers" resultType="org.joonzis.domain.UsersVO" parameterType="map">
 	    SELECT * FROM (
 		    SELECT a.*, ROWNUM rnum FROM (
-		        SELECT USER_NO, USER_ID, USER_NICK, USER_EMAIL, USER_DATE, USER_PW, ISCHATBANNED, BANNED_TIMESTAMP,
+		        SELECT USER_NO, USER_ID, USER_NICK, USER_EMAIL, USER_DATE, USER_PW, ISCHATBANNED, BANNED_TIMESTAMP, IS_LOGGED_IN, 
 		        	(SELECT COUNT(*) FROM REPORT_HISTORY WHERE REPORTED_USER=USER_NICK) AS REPORT_COUNT
 		        FROM USERS
 		        <where>
@@ -176,6 +176,41 @@
             AND BANNED_TIMESTAMP IS NOT NULL
             AND BANNED_TIMESTAMP <![CDATA[ <= ]]> (SYSTIMESTAMP - INTERVAL '72' HOUR)
     </update>
+
+
+    <select id="getUsersLoginBanStatus" resultType="org.joonzis.domain.UsersVO" parameterType="map">
+        SELECT user_no, IS_LOGGED_IN, user_nick
+        FROM users
+        WHERE user_no IN
+        <foreach item="userNo" collection="userNos" open="(" separator="," close=")">
+            #{userNo}
+        </foreach>
+    </select>
+
+    <update id="updateLoginBanStatus" parameterType="map">
+        UPDATE users
+        SET
+            IS_LOGGED_IN = 1,
+            BANNED_TIMESTAMP = #{bannedTimestamp}
+        WHERE user_no IN
+        <foreach item="userNo" collection="userNos" open="(" separator="," close=")">
+            #{userNo}
+        </foreach>
+        AND IS_LOGGED_IN = 0
+    </update>
+
+<!-- 
+    <update id="unbanChatUsers">
+        UPDATE USERS
+        SET
+            ISCHATBANNED = 0,
+            BANNED_TIMESTAMP = NULL
+        WHERE
+            ISCHATBANNED = 1
+            AND BANNED_TIMESTAMP IS NOT NULL
+            AND BANNED_TIMESTAMP <![CDATA[ <= ]]> (SYSTIMESTAMP - INTERVAL '72' HOUR)
+    </update>
+ -->
 
 
     <insert id="insertAchievement">
