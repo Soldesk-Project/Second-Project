@@ -106,7 +106,6 @@ const AdminPage = () => {
               업적/상점관리
             </button>
           </div>
-          <span className={styles.admin_info}>관리자 {userNick} 님</span>
         </div>
       {/*메인 바디 */}
       <div className={styles.body}>

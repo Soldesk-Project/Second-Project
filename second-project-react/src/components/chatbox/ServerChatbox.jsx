@@ -5,6 +5,7 @@ import '../../css/chatbox.css'; // 동일한 CSS 사용 가능
 import { useSelector } from 'react-redux';
 import ChatReportModal from '../modal/ChatReportModal';
 import ChatBanModal from '../modal/ChatBanModal';
+import axios from 'axios';
 
 function formatTimestamp(timestamp) {
     if (!timestamp) return '';
@@ -29,6 +30,7 @@ const ServerChatbox = () => {
     const hasSentAddUserRef = useRef(false);
     const [isConnected, setIsConnected] = useState(false); // 웹소켓 연결 상태를 추적하는 state
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [reportMessage, setReportMessage] = useState('');
     const [isChatBanModalOpen, setIsChatBanModalOpen] = useState(false);
 
     const currentUser = useSelector((state) => state.user.user);
@@ -36,6 +38,8 @@ const ServerChatbox = () => {
     const userNo = currentUser?.user_no;
     const isCurrentUserChatBanned = currentUser?.ischatbanned === 1;
     const currentUserBanTimestamp = currentUser?.banned_timestamp;
+    const token = localStorage.getItem('token');
+
 
     useEffect(() => {
 
@@ -172,19 +176,14 @@ const ServerChatbox = () => {
     };
 
     //신고처리
-    const openReportModal = () => {
+    const openReportModal = (msg) => {
         console.log("신고버튼 클릭");
+        setReportMessage(msg)
         setIsReportModalOpen(true);
     };
 
     const closeReportModal = () => {
         setIsReportModalOpen(false);
-    };
-
-    const handleReportSubmit = () => {
-        console.log("신고하기 버튼 클릭됨. 다음 채팅 내역이 신고될 수 있습니다:", messages);
-        alert("채팅이 신고되었습니다. 관리자가 확인 후 조치할 예정입니다.");
-        closeReportModal(); // 신고 처리 후 모달 닫기
     };
 
     return (
@@ -201,14 +200,14 @@ const ServerChatbox = () => {
                                 </span>
                                 <span className="message-content">{msg.mContent}</span>
                                 <span className="timestamp">[{formatTimestamp(msg.mTimestamp)}]</span>
-                                <button id="reportBtn" onClick={openReportModal}> 신고</button>
+                                <button id="reportBtn" onClick={()=>openReportModal(msg)}> 신고</button>
                             </>
                         ) : (
                             <>
-                                <span className="sender">{msg.mSender}:</span>
-                                <span className="message-content">{msg.mContent}</span>
-                                <span className="timestamp">[{formatTimestamp(msg.mTimestamp)}]</span>
-                                <button id="reportBtn" onClick={openReportModal}> 신고</button>
+                                <span className="sender">{msg.mSender} : </span>
+                                <span className="message-content">{msg.mContent}</span>&nbsp;
+                                <span className="timestamp">[{formatTimestamp(msg.mTimestamp)}]</span>&nbsp;
+                                <button id="reportBtn" onClick={()=>openReportModal(msg)}> 신고</button>
                             </>
                         )}
                     </div>
@@ -233,8 +232,7 @@ const ServerChatbox = () => {
             <ChatReportModal
                 isOpen={isReportModalOpen}
                 onClose={closeReportModal}
-                onReportSubmit={handleReportSubmit}
-                // recentMessages={messages.slice(-5)} // 필요하다면 최근 메시지를 props로 전달
+                reportMessage={reportMessage}
             />
             {/* 채팅 금지 모달 컴포넌트 */}
             <ChatBanModal

@@ -34,6 +34,7 @@ function formatTimestamp(timestamp) {
     const [isConnected, setIsConnected] = useState(false);
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [isChatBanModalOpen, setIsChatBanModalOpen] = useState(false);
+    const [reportMessage, setReportMessage] = useState('');
 
     const isCurrentUserChatBanned = currentUser?.ischatbanned === 1;
     const currentUserBanTimestamp = currentUser?.banned_timestamp;
@@ -218,7 +219,8 @@ function formatTimestamp(timestamp) {
     };
 
     //신고처리 (기존과 동일)
-    const openReportModal = () => {
+    const openReportModal = (msg) => {
+        setReportMessage(msg)
         setIsReportModalOpen(true);
     };
 
@@ -226,10 +228,6 @@ function formatTimestamp(timestamp) {
         setIsReportModalOpen(false);
     };
 
-    const handleReportSubmit = () => {
-        alert("채팅이 신고되었습니다. 관리자가 확인 후 조치할 예정입니다.");
-        closeReportModal(); // 신고 처리 후 모달 닫기
-    };
 
     return (
         <div className="chatbox-container">
@@ -250,10 +248,10 @@ function formatTimestamp(timestamp) {
                             <span className="system-text">{msg.mContent} <span className="timestamp">[{formatTimestamp(msg.mTimestamp)}]</span></span>
                         ) : (
                             <>
-                                <span className="sender">{msg.mSender}:</span>
+                                <span className="sender">{msg.mSender} : </span>
                                 <span className="message-content">{msg.mContent}</span>
                                 <span className="timestamp">[{formatTimestamp(msg.mTimestamp)}]</span>
-                                <button id="reportBtn" onClick={openReportModal}> 신고</button>
+                                <button id="reportBtn" onClick={()=>openReportModal(msg)}> 신고</button>
                             </>
                         )}
                     </div>
@@ -277,7 +275,7 @@ function formatTimestamp(timestamp) {
             <ChatReportModal
                 isOpen={isReportModalOpen}
                 onClose={closeReportModal}
-                onReportSubmit={handleReportSubmit}
+                reportMessage={reportMessage}
             />
 
             <ChatBanModal

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.joonzis.mapper.ChatMapper">
+	<insert id="reportHistory" parameterType="org.joonzis.domain.ReportHistoryVO">
+		INSERT INTO REPORT_HISTORY VALUES (REPORT_HISTORY_SEQ.NEXTVAL, #{reported_user_id}, #{message}, #{reason, jdbcType=CHAR}, SYSTIMESTAMP, #{status})
+	</insert>  
+
+  
+  
+  
+  
+  
+</mapper>

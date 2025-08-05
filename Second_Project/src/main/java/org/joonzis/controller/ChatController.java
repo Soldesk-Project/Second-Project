@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,13 +17,19 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.joonzis.domain.ChatRoomDTO;
+import org.joonzis.domain.ReportHistoryVO;
+import org.joonzis.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 public class ChatController {
@@ -32,6 +39,9 @@ public class ChatController {
     private static final Queue<String> serverChatLogQueue = new ConcurrentLinkedQueue<>();
     private static final ConcurrentHashMap<Long, ConcurrentLinkedQueue<String>> gameChatQueues = new ConcurrentHashMap<>();
     private String logDirectoryPath;
+    
+    @Autowired
+    private ChatService chatService;
 
     @PostConstruct
     public void init() {
@@ -40,14 +50,10 @@ public class ChatController {
         if (!logDir.exists()) {
             logDir.mkdirs();
         }
-        System.out.println("INFO : " + getClass().getName() + " - ChatController initialized. Log directory: " + logDirectoryPath);
-        System.out.println("INFO : " + getClass().getName() + " - ChatController instance hash code: " + this.hashCode());
     }
 
     @PreDestroy
     public void onShutdown() {
-        System.out.println("INFO : " + getClass().getName() + " - Shutting down. Saving all pending chat logs...");
-
         // 서버 채팅 로그 저장
         if (!serverChatLogQueue.isEmpty()) {
             saveChatLogsToFile("server_chat_final", serverChatLogQueue);
@@ -65,24 +71,16 @@ public class ChatController {
                 System.out.println("INFO : " + getClass().getName() + " - No pending game chat messages for room " + gameroomNo + " to save on shutdown.");
             }
         }
-        System.out.println("INFO : " + getClass().getName() + " - All pending chat logs saved on shutdown.");
     }
     
     // 서버 공지 메시지 전송 (전체 공통 채팅방용)
     @MessageMapping("/serverChat.sendMessage")
     public void serverSendMessage(@Payload ChatRoomDTO chatRoomDTO) {
-    	System.out.println("--- ServerChat: 메시지 수신됨 ---");
-        System.out.println("Sender: " + chatRoomDTO.getMSender());
-        System.out.println("Content: " + chatRoomDTO.getMContent());
-        System.out.println("Type: " + chatRoomDTO.getMType()); // ★ 중요: GAME_CHAT 또는 SERVER_CHAT인지 확인
-        System.out.println("Timestamp: " + chatRoomDTO.getMTimestamp()); // ★ 중요: 유효한 Long 값인지 확인
-        System.out.println("----------------------------");
         // 메시지 큐에 추가
         serverChatLogQueue.offer(chatRoomDTO.getMSender() + ": " + chatRoomDTO.getMContent());
         
         // STOMP를 통해 구독자에게 메시지 전송
         simpMessagingTemplate.convertAndSend("/serverChat/public", chatRoomDTO);
-        System.out.println("DEBUG: serverChat/public 토픽으로 메시지 발행 시도 완료.");
     }
 
  // 게임 채팅방 메시지 전송
@@ -90,19 +88,11 @@ public class ChatController {
     public void gameSendMessage(@Payload ChatRoomDTO chatRoomDTO) {
     	Long gameroomNo = chatRoomDTO.getGameroomNo();
     	
-    	System.out.println("--- GameChat: 메시지 수신됨 (룸 " + gameroomNo + ") ---");
-        System.out.println("Sender: " + chatRoomDTO.getMSender());
-        System.out.println("Content: " + chatRoomDTO.getMContent());
-        System.out.println("Type: " + chatRoomDTO.getMType()); // ★ 중요: GAME_CHAT인지 확인
-        System.out.println("Timestamp: " + chatRoomDTO.getMTimestamp()); // ★ 중요: 유효한 Long 값인지 확인
-        System.out.println("------------------------------------");
-    	
     	// 해당 게임방의 큐를 가져오거나 없으면 새로 생성
         ConcurrentLinkedQueue<String> queue = gameChatQueues.computeIfAbsent(gameroomNo, k -> new ConcurrentLinkedQueue<>());
         String logMessage = "[게임방 " + gameroomNo + "] " + chatRoomDTO.getMSender() + ": " + chatRoomDTO.getMContent();
         queue.offer(logMessage); // 해당 게임방 큐에 추가
         simpMessagingTemplate.convertAndSend("/gameChat/" + gameroomNo, chatRoomDTO);
-        System.out.println("DEBUG: /gameChat/" + gameroomNo + " 토픽으로 메시지 발행 시도 완료.");
     }
 
     // 게임 채팅방 입장
@@ -156,13 +146,11 @@ public class ChatController {
     @Scheduled(fixedRate = 3600000)
 //    @Scheduled(fixedRate = 60000)
     public void saveScheduledLogs() {
-        System.out.println("DEBUG: " + getClass().getName() + " - Before saving scheduled logs: serverChatLogQueue size = " + serverChatLogQueue.size());
         if (!serverChatLogQueue.isEmpty()) {
             saveChatLogsToFile("server_chat", serverChatLogQueue);
         } else {
             System.out.println("INFO : " + getClass().getName() + " - No new chat messages in serverChatLogQueue. Skipping log save.");
         }
-        System.out.println("INFO : " + getClass().getName() + " - 자동로그저장완료 (서버 채팅만 해당)");
         // 게임방 채팅은 스케줄러가 아닌, 게임방 종료 시점에 별도로 저장됩니다.
     }
 
@@ -173,14 +161,10 @@ public class ChatController {
         String fileName = prefix + "_" + timestamp + ".log";
         String fullPath = logDirectoryPath + File.separator + fileName;
 
-        System.out.println("DEBUG: " + getClass().getName() + " - saveChatLogsToFile method called for prefix: " + prefix + ". Initial queue size: " + queue.size());
-        System.out.println("DEBUG: " + getClass().getName() + " - Log directory path: " + logDirectoryPath);
-
         try (FileWriter fw = new FileWriter(fullPath, true);
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter out = new PrintWriter(bw)) {
 
-            System.out.println("DEBUG: " + getClass().getName() + " - FileWriter and PrintWriter successfully initialized for: " + fullPath);
 
             int messagesWritten = 0;
             while (!queue.isEmpty()) {
@@ -191,9 +175,6 @@ public class ChatController {
                 }
             }
             out.flush();
-            System.out.println("DEBUG: " + getClass().getName() + " - Finished processing queue. Messages attempted to write: " + messagesWritten);
-            System.out.println("DEBUG: " + getClass().getName() + " - PrintWriter flushed.");
-
             if (messagesWritten == 0) {
                 System.out.println("INFO : " + getClass().getName() + " - No new chat messages to save for: " + fullPath + ". File created but empty.");
             } else {
@@ -207,4 +188,21 @@ public class ChatController {
             System.out.println("DEBUG: " + getClass().getName() + " - saveChatLogsToFile method finished. Final queue size: " + queue.size());
         }
     }
+    
+    
+    @PostMapping(value = "/chat/report", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> reportHistory(@RequestBody ReportHistoryVO reportHistory) {
+    	try {
+    		chatService.reportHistory(reportHistory);
+    		return new ResponseEntity<>("채팅이 신고되었습니다. 관리자가 확인 후 조치할 예정입니다.", HttpStatus.OK);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		Map<String, String> errorResponse = new HashMap<>();
+    		errorResponse.put("message", "채팅 신고중 오류 발생: " + e.getMessage());
+    		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    }
+    
+    
+    
 }
