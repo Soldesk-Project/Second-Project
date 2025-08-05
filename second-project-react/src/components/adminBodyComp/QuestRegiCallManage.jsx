@@ -405,7 +405,11 @@ const QuestRegiCallManage = () => {
                                 <div>
                                     {[1, 2, 3, 4].map(num => (
                                     <div key={num}>
-                                        <label>
+                                        <label style={{
+                                            display: 'flex',
+                                            alignItems: 'center', // 세로 정렬 핵심!
+                                            gap: '8px',           // 버튼과 텍스트 간격
+                                            }}>
                                         <input
                                             type="radio"
                                             name={`q${selectedCall.id}`}
