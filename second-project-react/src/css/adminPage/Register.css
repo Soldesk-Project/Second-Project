@@ -20,6 +20,10 @@
   font-size: 2em;
 }
 
+.quest-register-title{
+  margin-bottom: 10px !important;
+}
+
 .section-title {
   color: #ddd;
   margin-bottom: 10px;
@@ -40,7 +44,7 @@
 .ach-reward-section,
 .item-Name-section,
 .item-Price-section {
-  margin-bottom: 25px;
+  margin-bottom: 10px;
 }
 
 .category-select,
@@ -48,7 +52,7 @@
 .achtype-select,
 .itemType-select {
   width: 157px;
-  padding: 10px;
+  padding: 0 10px;
   border: 1px solid #ddd;
   color: #808080;
   border-radius: 4px;
@@ -97,6 +101,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  height: 105px;
 }
 
 .image-upload-label {
@@ -125,6 +130,10 @@
   background-color: #5a6268;
 }
 
+.quest-register-imageContainer{
+  height: 100%;
+}
+
 .image-preview-title {
   margin-top: 0;
   color: #ddd;
@@ -137,6 +146,7 @@
   border: 1px solid #eee;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
+  height: 115px;
 }
 
 /* 버튼 그룹 */
@@ -186,4 +196,43 @@
 
 .delete-button:hover {
   transform: translateY(-1px);
+}
+
+.quest-register-splitViewContainer {
+    display: flex;
+    gap: 25px;
+    min-height: calc(100vh - 222px);
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    color: #ddd;
+}
+
+.quest-register-leftPanel {
+    flex: 6;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-y: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.quest-register-rightPanel {
+    flex: 4;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-y: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.quest-register-container input,
+.quest-register-container select{
+  height: 30px;
+}
+
+.quest-register-container button {
+  height: 40px;
 }

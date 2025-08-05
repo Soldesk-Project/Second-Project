@@ -142,81 +142,140 @@ const QuestRegister = () => {
 
   return (
     <div className="quest-register-container">
-      <h1 className="quest-register-title">문제 등록</h1>
-      
-      <div className='category-section'>
-        <h3 className="section-title">1. 카테고리 선택</h3>
-        <select name="cateSelect" value={subject} onChange={handleSubjectChange} className="category-select">
-          {subjects.map((subject, index) => (
-            <option key={index} value={subject}>
-              {subject}
-            </option>
-          ))}
-        </select>
-      </div>
-      
-      <div className='question-text-section'>
-        <h3 className="section-title">2. 문제 본문 입력</h3>
-        <input
-          type="text"
-          value={questionText}
-          onChange={(e) => setQuestionText(e.target.value)}
-          className="question-text-input"
-          placeholder="문제 본문을 입력하세요."
-        />
-      </div>
-      
-      <div className='option-section'>
-        <h3 className="section-title">3. 선택지 입력</h3>
-        {options.map((option, index) => (
-          <div key={index} className="option-item">
+      <div className="quest-register-splitViewContainer">
+        <div className="quest-register-leftPanel">
+          <h1 className="quest-register-title">문제 등록</h1>
+          
+          <div className='category-section'>
+            <h3 className="section-title">1. 카테고리 선택</h3>
+            <select name="cateSelect" value={subject} onChange={handleSubjectChange} className="category-select">
+              {subjects.map((subject, index) => (
+                <option key={index} value={subject}>
+                  {subject}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div className='question-text-section'>
+            <h3 className="section-title">2. 문제 본문 입력</h3>
             <input
               type="text"
-              value={option}
-              onChange={(e) => {
-                const newOptions = [...options];
-                newOptions[index] = e.target.value;
-                setOptions(newOptions);
-              }}
-              className="option-input"
-              placeholder={`${index + 1}번 선택지를 입력하세요.`}
+              value={questionText}
+              onChange={(e) => setQuestionText(e.target.value)}
+              className="question-text-input"
+              placeholder="문제 본문을 입력하세요."
             />
           </div>
-        ))}
-      </div>
-      
-      <div className='correct-answer-section'>
-        <h3 className="section-title">4. 정답 입력</h3>
-        <select name="corAnsSelect" value={correctAnswer} onChange={(e) => setCorrectAnswer(e.target.value)} className="correct-answer-select">
-          {options.map((_, index) => (
-            <option key={index + 1} value={String(index + 1)}>{index + 1}</option>
-          ))}
-        </select>
-      </div>
-      
-      <div className="photo-input-section">
-        <h3 className="section-title">5. 이미지 업로드 (선택 사항)</h3>
-        <div className="image-upload-wrapper">
-          <label htmlFor="image-upload" className="image-upload-label">이미지 선택:</label>
-          <input
-            type="file"
-            id="image-upload"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="image-upload-input"
-          />
-        </div>
-        {previewImage && (
-          <div className="image-preview-container">
-            <h3 className="image-preview-title">이미지 미리보기:</h3>
-            <img src={previewImage} alt="Image Preview" className="image-preview" />
+          
+          <div className='option-section'>
+            <h3 className="section-title">3. 선택지 입력</h3>
+            {options.map((option, index) => (
+              <div key={index} className="option-item">
+                <input
+                  type="text"
+                  value={option}
+                  onChange={(e) => {
+                    const newOptions = [...options];
+                    newOptions[index] = e.target.value;
+                    setOptions(newOptions);
+                  }}
+                  className="option-input"
+                  placeholder={`${index + 1}번 선택지를 입력하세요.`}
+                />
+              </div>
+            ))}
           </div>
-        )}
-      </div>
-      
-      <div className="button-group">
-        <button onClick={handleReset} className="reset-button">초기화</button>
-        <button onClick={handleQuestRegisterSubmit} className="submit-button">제출</button>
+          
+          <div className='correct-answer-section'>
+            <h3 className="section-title">4. 정답 입력</h3>
+            <select name="corAnsSelect" value={correctAnswer} onChange={(e) => setCorrectAnswer(e.target.value)} className="correct-answer-select">
+              {options.map((_, index) => (
+                <option key={index + 1} value={String(index + 1)}>{index + 1}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="photo-input-section">
+            <h3 className="section-title">5. 이미지 업로드 (선택 사항)</h3>
+            <div className="image-upload-wrapper">
+              <label htmlFor="image-upload" className="image-upload-label">이미지 선택:</label>
+              <input
+                type="file"
+                id="image-upload"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="image-upload-input"
+              />
+            {previewImage && (
+              <div className="quest-register-imageContainer">
+                <h3 className="image-preview-title">이미지 미리보기:</h3>
+                <img src={previewImage} alt="Image Preview" className="image-preview" />
+              </div>
+            )}
+            </div>
+          </div>
+          
+          <div className="button-group">
+            <button onClick={handleReset} className="reset-button">초기화</button>
+            <button onClick={handleQuestRegisterSubmit} className="submit-button">제출</button>
+          </div>
+        </div>
+        <div className="quest-register-rightPanel">
+            <div style={{ padding: '20px' }}>
+              <h2 style={{marginBottom:'20px'}}>미리보기</h2>
+
+              {/* 문제 본문 */}
+              <div style={{ 
+                marginBottom: '10px', 
+                display: '-webkit-box',
+                WebkitLineClamp: 8,       // 최대 보여줄 줄 수
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis' 
+                }}>
+                <h3>{questionText || '문제 본문이 여기에 표시됩니다.'}</h3>
+              </div>
+
+              {/* 이미지 */}
+              {previewImage && (
+                <div style={{ marginBottom: '10px' }}>
+                  <img
+                    src={previewImage}
+                    alt="미리보기 이미지"
+                    style={{ maxWidth: '162px', height: 'auto', border: '1px solid #ccc' }}
+                  />
+                </div>
+              )}
+
+              {/* 선택지 */}
+              <div style={{ marginBottom: '10px' }}>
+                {options.map((opt, idx) => (
+                  <div key={idx} style={{ margin: '5px 0' }}>
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center', // 세로 정렬 핵심!
+                      gap: '8px',           // 버튼과 텍스트 간격
+                    }}>
+                      <input
+                        type="radio"
+                        name="previewAnswer"
+                        value={idx + 1}
+                        checked={String(idx + 1) === correctAnswer}
+                        readOnly
+                      />
+                      {opt || `${idx + 1}번 선택지`}
+                    </label>
+                  </div>
+                ))}
+              </div>
+
+              {/* 정답 */}
+              <div style={{ marginTop: '10px', fontWeight: 'bold' }}>
+                {correctAnswer ? `정답: ${correctAnswer}번` : '정답을 선택해주세요.'}
+              </div>
+            </div>
+        </div>
       </div>
     </div>
   );

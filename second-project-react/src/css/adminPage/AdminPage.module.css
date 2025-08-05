@@ -98,7 +98,7 @@
 /* 상단 컨텐츠: 유저정보 + 중앙 */
 .body_content {
   display: flex;
-  width: 1400px;
+  width: 1600px;
   max-width: 100%;
   flex-direction: column;
   gap: 20px;
@@ -106,7 +106,7 @@
   /* background-color: #171a23; */
   overflow-y: auto;
   max-height: calc(100vh - 50px - 50px - 40px);
-  margin: 0 auto;
+  /* margin: 0 auto; */
   &::-webkit-scrollbar {
     width: 8px; /* 스크롤바 너비 */
   }

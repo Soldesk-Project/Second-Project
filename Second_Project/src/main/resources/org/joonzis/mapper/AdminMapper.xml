@@ -462,6 +462,32 @@
         WHERE ID = #{id}
     </update>
     
+    <insert id="insertQuestion2" parameterType="org.joonzis.domain.QuestRequestVO">
+    	INSERT INTO QUESTION (
+    		ID,
+    		SUBJECT,
+    		QUESTION_TEXT,
+    		OPTION_1,
+    		OPTION_2,
+    		OPTION_3,
+    		OPTION_4,
+    		CORRECT_ANSWER,
+    		<if test="image_data != null">IMAGE_DATA,</if>
+    		CREATED_AT
+    	) VALUES (
+    		QUESTION_SEQ.NEXTVAL,
+    		#{subject},
+    		#{question_text},
+            #{option_1},
+            #{option_2},
+            #{option_3},
+            #{option_4},
+            #{correct_answer},
+            <if test="image_data != null">#{image_data, jdbcType=BLOB},</if>
+            SYSTIMESTAMP
+    	)
+    </insert>
+    
     <insert id="registerNotice" parameterType="String">
 		INSERT INTO NOTICE VALUES(SEQ_NOTICE.NEXTVAL, #{subject}, #{message}, sysdate)
     </insert>

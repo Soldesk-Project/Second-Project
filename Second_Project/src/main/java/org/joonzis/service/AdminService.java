@@ -29,6 +29,8 @@ public interface AdminService {
 	public QuestRequestVO getQuestRequestById(long id);
 	//문제 등록 요청 수정 메소드
 	public void updateQuestRequest(QuestRequestVO questRequestVO);
+	// 실제 문제 등록
+	public void insertQuestion2(QuestRequestVO vo);
 	
 	//유저 관련 메소드
 	//유저 조회 메소드

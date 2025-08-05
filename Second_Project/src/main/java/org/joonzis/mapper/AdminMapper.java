@@ -67,6 +67,8 @@ public interface AdminMapper {
 	public QuestRequestVO selectQuestRequestById(long id);
 
 	public void updateQuestRequest(QuestRequestVO questRequestVO);
+	// 실제 문제 등록
+	public void insertQuestion2(QuestRequestVO vo);
 
 	// 공지사항 등록
 	public void registerNotice(@Param("subject") String subject, @Param("message") String message);

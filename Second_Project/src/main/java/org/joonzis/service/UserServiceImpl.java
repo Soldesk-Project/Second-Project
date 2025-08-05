@@ -264,4 +264,16 @@ public class UserServiceImpl implements UserService{
 	public List<UserAccuracyDTO> getUserAccuracyList(String user_nick) {
 	    return mapper.getUserAccuracyList(user_nick);
 	  }
+	public void sendQuestRequestStatusMail(String toEmail, String messageContent) throws MessagingException {
+	    MimeMessage message = mailSender.createMimeMessage();
+	    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+	    helper.setTo(toEmail);
+	    helper.setSubject("[CotePlay] 문제 등록 상태 안내");
+	    helper.setText("<p>안녕하세요.</p>"
+	        + "<p>" + messageContent + "</p>"
+	        + "<p>감사합니다.</p>", true);
+
+	    mailSender.send(message);
+	}
 }
