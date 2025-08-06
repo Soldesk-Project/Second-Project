@@ -172,13 +172,14 @@
         AND ISCHATBANNED = 0
     </update>
 
-    <update id="unbanChatUsers">
+    <update id="unbanUsers">
         UPDATE USERS
         SET
             ISCHATBANNED = 0,
+            IS_LOGGED_IN = 0,
             BANNED_TIMESTAMP = NULL
         WHERE
-            ISCHATBANNED = 1
+            ( ISCHATBANNED = 1 or IS_LOGGED_IN = 1 )
             AND BANNED_TIMESTAMP IS NOT NULL
             AND BANNED_TIMESTAMP <![CDATA[ <= ]]> (SYSTIMESTAMP - INTERVAL '72' HOUR)
     </update>

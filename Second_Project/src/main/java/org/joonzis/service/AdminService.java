@@ -39,12 +39,10 @@ public interface AdminService {
 	public List<UsersVO> searchUsers(String searchType, String searchValue, int offset, int size);
 	//유저 채금 적용 메소드
 	public int banChatusers(List<Integer> userNos);
-    //유저 채금 해제 메소드
-	public void unbanChatUsers();
 	// 접속 금지 적용 메소드
 	public int banLoginUsers(List<Integer> userNos);
-	// 접속 금지 해제 메소드
-//	public void unbanChatUsers();
+	//유저 정지 해제 메소드
+	public void unbanUsers();
 	
 	//업적 관련 메소드
 	//업적 등록 메소드

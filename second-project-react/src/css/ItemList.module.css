@@ -1,6 +1,6 @@
 .box {
   background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  border-radius: 12px;
   flex: 1;
   min-height: 0;
   overflow-x: hidden;
@@ -8,45 +8,60 @@
   max-height: 100%;
   padding: 10px;
   max-width: 1190px;
+  box-sizing: border-box;
 }
 .category{
   max-width: 1160px;
+  margin-bottom: 10px;
 }
 .title {
-  height: 35px;
-  padding-left: 5px;
-  padding-right: 5px;
+  height: 40px;
+  padding: 0 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  background-color: #f9f9f9bd;
-  font-weight: bold;
-  margin-bottom: 1px;
-  border-radius: 8px;
+  background-color: rgba(249, 249, 249, 0.85);
+  font-weight: 700;
+  font-size: 1.07rem;
+  color: #3c3c3c;
+  border-radius: 10px;
+  user-select: none;
+  box-shadow: 0 1px 6px rgb(0 0 0 / 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.title:hover {
+  background-color:  rgba(235, 230, 215, 0.6);
+}
+
+.title > div:last-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.94rem;
+  color: #555;
 }
 
 .dropdown {
   background-color: transparent;
-  padding-left: 10px;
   color: #555;
-
   display: flex;
   flex-direction: row;
   gap: 10px;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 10px 0;
-
+  padding: 10px 0 0 0;
   width: 100%;
-  min-width: 0; /* flexbox에서 overflow-x: auto가 제대로 작동하게 함 */
+  min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
 }
 
 .card {
   background-color: white;
-  border-radius: 10px;
+  border-radius: 15px;
   width: 200px;
   height: 200px;
   display: flex;
@@ -69,28 +84,44 @@
 }
 
 .owned {
-  background-color: #dff0d8; /* 연한 녹색 계열 - 보유 표시 */
-  border: 2px solid #4caf50;
+  background-color: #dff0d8;
+ border: 2px solid #4caf50;
+  box-shadow: 0 0 8px #90ee9080;
+  transition: border-color 0.3s ease;
 }
 
+.owned:hover {
+  border-color: #388e3c;
+  box-shadow: 0 0 10px #4caf5080;
+}
 .rewardButton {
-  margin-left: 10px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  border: 1px solid #333;
-  font-size: 0.9rem;
+  margin-left: 8px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: #fff;
-  background-color: #4caf50;
+  background: linear-gradient(90deg, #4caf50, #3a9d3a);
   cursor: pointer;
-  opacity: 1;
+  box-shadow: 0 4px 10px rgba(74, 179, 72, 0.45);
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+  user-select: none;
+}
+
+.rewardButton:hover:not(.rewardButtonDisabled) {
+  background: linear-gradient(90deg, #43a047, #357a38);
+  box-shadow: 0 6px 14px rgba(41, 139, 41, 0.6);
 }
 
 .rewardButtonDisabled {
-  background-color: #ccc;
+  background: #bdbdbd;
   cursor: not-allowed;
-  opacity: 0.5;
+  box-shadow: none;
+  color: #7f7f7f;
+  opacity: 0.6;
+  pointer-events: none;
 }
-
 .itemImage{
   width: 100%;
 }

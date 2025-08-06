@@ -369,9 +369,9 @@ public class AdminServiceImpl implements AdminService {
     @Scheduled(fixedRate = 60000) // 1시간 = 3600000 밀리초
     @Override
     @Transactional
-    public void unbanChatUsers() {
+    public void unbanUsers() {
         log.info("ServiceImpl: unbanChatUsers (스케줄링) 호출");
-        int unbannedCount = adminMapper.unbanChatUsers();
+        int unbannedCount = adminMapper.unbanUsers();
         if (unbannedCount > 0) {
             log.info(unbannedCount + "명의 사용자의 채팅 금지가 해제되었습니다.");
         } else {

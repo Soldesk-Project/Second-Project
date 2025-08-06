@@ -1,7 +1,8 @@
-/* === 레이아웃 === */
 .box {
   background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(80, 40, 200, 0.07);
+  padding: 10px;
   flex: 1;
   min-height: 0;
   overflow: auto;
@@ -10,14 +11,16 @@
 .tableWrapper {
   width: 100%;
   overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 3px 15px rgba(95, 41, 210, 0.05);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .scrollBody {
-  max-height: 100%;
+  max-height: 529px;
   overflow-y: auto;
 }
 
-/* === 테이블 공통 === */
 .tableWrapper table,
 .scrollBody table {
   width: 100%;
@@ -25,69 +28,120 @@
   border-collapse: collapse;
 }
 
-.table th, td {
-  border: 1px solid #ccc;
-  padding: 12px;
+.table th,
+.table td {
+  padding: 14px 8px;
+  border: none;
   text-align: center;
+  font-size: 1.06rem;
   vertical-align: middle;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: background 0.2s;
 }
 
-/* === 컬럼 너비 === */
-.col_title   { width: 45%; }
-.col_content { width: 20%; }
-.col_reward  { width: 15%; }
-.col_button  { width: 20%; }
-
-/* === 색상 스타일 === */
 .table thead th {
-  background-color: #f9f9f9;
-  font-weight: bold;
-  /* background-color: #171a23; */
+  background: linear-gradient(90deg, #e8e5ff 60%, #e2d8fe 100%);
+  color: #5236a5;
+  font-weight: 600;
+  font-size: 1.13rem;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 .table tbody td {
-  background-color: #f9f9f9;
+  background-color: #f7f6fd;
+  border-bottom: 1px solid #efeefd;
 }
 
-/* === 버튼 공통 === */
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.col_title   { width: 41%; }
+.col_content { width: 25%; }
+.col_reward  { width: 14%; }
+.col_button  { width: 20%; }
+
+.table select {
+  margin-left: 10px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #b4b3ed;
+  background: #fafcff;
+  color: #4b348e;
+  font-size: 1rem;
+}
+
+.table select:focus {
+  outline: none;
+  border-color: #845fff;
+  background: #f1eeff;
+}
+
 .button,
 .allRewardButton {
   color: white;
   border: none;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 6px 12px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  background: linear-gradient(to right, #6A5BFF, #C700E0);
+  font-size: 1rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(168, 122, 255, 0.08);
+  background: linear-gradient(89deg, #6a5bff, #b856e0 65%, #ff75c2);
+  transition: background 0.27s, box-shadow 0.2s, transform 0.16s;
+  margin: 0 2px;
 }
 
 .button:hover,
 .allRewardButton:hover {
-  background: linear-gradient(to right, #584ad1, #a200b9);
+  background: linear-gradient(89deg, #4f3ec7, #8e39b8 60%, #e962b7);
+  transform: translateY(-1.5px) scale(1.03);
+  box-shadow: 0 4px 14px #a876ff38;
 }
 
-/* === '모두 받기' 버튼 별도 스타일 === */
 .allRewardButton {
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 9px 20px;
+  border-radius: 7px;
   font-weight: bold;
+  font-size: 1.09rem;
+  letter-spacing: 0.02em;
 }
 
-/* === 비활성화 버튼 === */
 .disabledButton,
 .disabledAllRewardButton {
-  background-color: #e0e0e0;
-  padding: 4px 8px;
-  color: #9e9e9e;
+  background: linear-gradient(90deg, #ddd 60%, #c1bcce 100%);
+  color: #999;
   cursor: not-allowed;
-  opacity: 0.7;
+  opacity: 0.77;
+  box-shadow: none;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
 }
 
-/* === 보상 완료된 행 === */
-.rewardedRow {
-  background-color: #e0e0e0 !important;
-  opacity: 0.7;
+.disabledButton:hover,
+.disabledAllRewardButton:hover {
+  background: #eaeaea !important;
+  box-shadow: none;
+  transform: none;
 }
+
+.rewardedRow td {
+  background: linear-gradient(90deg, #efefef 60%, #e7e5f3 100%);
+  color: #b3aac7;
+  opacity: 0.8;
+}
+
+.scrollBody {
+  max-height: 519px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollBody::-webkit-scrollbar {
+  display: none;
+}
+

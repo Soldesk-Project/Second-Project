@@ -35,12 +35,13 @@ public interface AdminMapper {
 	//유저 채금 확인/적용/해제메소드
 	public List<UsersVO> getUsersChatBanStatus(@Param("userNos") List<Integer> userNos);
 	public int updateChatBanStatus(@Param("userNos") List<Integer> userNos, @Param("bannedTimestamp") Timestamp bannedTimestamp);
-	public int unbanChatUsers();
 
 	//유저 채금 확인/적용/해제메소드
 	public List<UsersVO> getUsersLoginBanStatus(@Param("userNos") List<Integer> userNos);
 	public int updateLoginBanStatus(@Param("userNos") List<Integer> userNos, @Param("bannedTimestamp") Timestamp bannedTimestamp);
-//	public int unbanChatUsers();
+
+	// 정지 해제
+	public int unbanUsers();
 	
 	//업적 등록 메소드
 	public void insertAchievement(AchievementDTO achievementDTO);
