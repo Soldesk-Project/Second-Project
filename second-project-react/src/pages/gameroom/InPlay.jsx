@@ -66,7 +66,6 @@ const InPlay = () => {
   const [userElapsedTimes, setUserElapsedTimes] = useState([]);
   const [countdown, setCountdown] = useState(10);
   const [leaveModal, setLeaveModal] = useState(false);
-  const [shopItems, setShopItems] = useState([]);
   const [date, setDate] = useState(()=> new Date())
   const myTotalElapsed = userElapsedTimes.reduce((sum, t) => sum + t, 0);
   const questionListRef = useRef([]);
@@ -77,10 +76,13 @@ const InPlay = () => {
   const userNo = user?.user_no;
   const location = useLocation();
   const category = location.state?.category || 'random';
+  const shopItems = useSelector(state => state.shop.items);
   // 랭크 진입 경로 일 때도 항상 gameMode를 제대로 받게 한다
   const gameMode = location.state?.gameMode || location.state?.game_mode || 'normal';
   const rankedUsers = useMemo(() => getRankedUsers(users, gameMode), [users, gameMode]);
   const messageTimeoutRef = useRef({});
+  
+  console.log(shopItems);
   
   // 소켓
   const sockets = useContext(WebSocketContext);
@@ -100,22 +102,22 @@ const InPlay = () => {
   }, [shopItems]);
 
 	 // 🆕 useEffect: 샵 전체 아이템 한 번만 불러오기
-  useEffect(() => {
-    const cats = ['테두리','칭호','글자색','명함','말풍선', '유니크'];
-    Promise.all(cats.map(cat =>
-      axios.get(`/api/shop/items?category=${encodeURIComponent(cat)}`)
-    ))
-    .then(results => {
-      const all = results.flatMap(r =>
-        r.data.map(it => ({
-          ...it,
-          imgUrl: it.imageFileName ? `/images/${it.imageFileName}` : ''
-        }))
-      );
-      setShopItems(all);
-    })
-    .catch(err => console.error('샵 아이템 로드 실패', err));
-  }, []);
+  // useEffect(() => {
+  //   const cats = ['테두리','칭호','글자색','명함','말풍선', '유니크'];
+  //   Promise.all(cats.map(cat =>
+  //     axios.get(`/api/shop/items?category=${encodeURIComponent(cat)}`)
+  //   ))
+  //   .then(results => {
+  //     const all = results.flatMap(r =>
+  //       r.data.map(it => ({
+  //         ...it,
+  //         imgUrl: it.imageFileName ? `/images/${it.imageFileName}` : ''
+  //       }))
+  //     );
+  //     setShopItems(all);
+  //   })
+  //   .catch(err => console.error('샵 아이템 로드 실패', err));
+  // }, []);
   
   // 제출 버튼 클릭 시 수정 불가
   // [제출 버튼]
@@ -223,9 +225,6 @@ const InPlay = () => {
             ...data.profiles
           }));
         }
-
-        console.log(data.profiles);
-        
       }
 
       if (

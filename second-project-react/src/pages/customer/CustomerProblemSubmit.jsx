@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 
-const CustomerProblemSubmit = () => {
+const CustomerProblemSubmit = ({ activeTab }) => {
   const navigate = useNavigate();
   const [postPassword, setPostPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -291,7 +291,7 @@ const CustomerProblemSubmit = () => {
             <button
               type="button"
               className={styles.submitButton}
-              onClick={() => navigate('/inquiries', { state: { initialTab: '문제 제출' } })}
+              onClick={() => navigate('/inquiries', { state: { initialTab: activeTab || '1:1 문의' } })}
             >
               돌아가기
             </button>

@@ -8,7 +8,7 @@ const QuestErrRepoManage = () => {
   const [reports, setReports] = useState([]);
   const [page, setPage] = useState(1);
   const [totalReports, setTotalReports] = useState(0);
-  const [openReportId, setOpenReportId] = useState(null);
+  const [selectedReport, setSelectedReport] = useState(null);
   const [editReport, setEditReport] = useState(null);
   const token = localStorage.getItem('token');
 
@@ -44,19 +44,13 @@ const QuestErrRepoManage = () => {
     }
   };
 
-  const toggleDetails = (id) => {
-    setOpenReportId(openReportId === id ? null : id);
-    if (openReportId === id) {
-      setEditReport(null);
-    }
+  const handleSelectReport = (report) => {
+    setSelectedReport(report);
+    setEditReport(null);
   };
 
-  const getTotalPages = () => Math.max(1, Math.ceil(totalReports / PAGE_SIZE));
-
-  const modifyQuestion = (report) => {
-    setEditReport({
-      ...report,
-    });
+  const modifyQuestion = () => {
+    setEditReport({ ...selectedReport });
   };
 
   const handleEditChange = (key, value) => {
@@ -68,7 +62,7 @@ const QuestErrRepoManage = () => {
 
   const saveEdit = async () => {
     try {
-      const res = await axios.post(
+      await axios.post(
         '/admin/editQuestion',
         {
           id: editReport.question_id,
@@ -87,159 +81,118 @@ const QuestErrRepoManage = () => {
           },
         }
       );
-
-      console.log('수정 데이터 전송:', editReport);
       alert('수정 완료');
-
-      // 수정 후 목록 갱신
       setEditReport(null);
-      setOpenReportId(null);
-      setPage(1);
     } catch (error) {
       console.error('수정 실패', error);
       alert('수정 중 오류가 발생했습니다.');
     }
-  }
-
-  const cancelEdit = () => {
-    setEditReport(null);
   };
 
+  const getTotalPages = () => Math.max(1, Math.ceil(totalReports / PAGE_SIZE));
+
   return (
-    <section className={styles.content}>
+    <section className={styles.pageContainer}>
       <h1>문제 오류 신고 관리</h1>
-
-      <ul className={styles.listHeader}>
-        <li>번호</li>
-        <li>문제 내용</li>
-        <li>신고자</li>
-        <li>신고일</li>
-      </ul>
-
-      <ul className={styles.listView}>
-        {reports.length > 0 ? (
-          reports.map((report, idx) => {
-            const isOpen = openReportId === (report.history_id || idx);
-            const isEditing = editReport && editReport.history_id === report.history_id;
-
-            return (
-              <li key={report.history_id || idx} className={styles.listItem}>
-                <div
-                  className={styles.listItemHeader}
-                  onClick={() => toggleDetails(report.history_id || idx)}
-                  style={{ cursor: 'pointer' }}
+      <div className={styles.splitViewContainer}>
+        {/* 좌측 리스트 */}
+        <div className={styles.leftPanel}>
+          <ul className={styles.listHeader}>
+            <li>번호</li>
+            <li>문제 내용</li>
+            <li>신고자</li>
+            <li>신고일</li>
+          </ul>
+          <ul className={styles.listView}>
+            {reports.length > 0 ? (
+              reports.map((report, idx) => (
+                <li
+                  key={report.history_id || idx}
+                  className={`${styles.listItem} ${
+                    selectedReport?.history_id === report.history_id ? styles.selectedRow : ''
+                  }`}
+                  onClick={() => handleSelectReport(report)}
                 >
-                  <span className={styles.listItemNo}>{report.history_id || idx + 1}</span>
-                  <span className={styles.listItemTitle}>
-                    [{setKoreanToCategory(report.subject)}] 문제 오류 제보
-                  </span>
-                  <span className={styles.listItemAuthor}>{report.user_nick || '익명'}</span>
-                  <span className={styles.listItemDate}>
-                    {report.report_at ? new Date(report.report_at).toLocaleDateString() : '-'}
-                  </span>
-                </div>
+                  <span>{report.history_id || idx + 1}</span>
+                  <span>[{setKoreanToCategory(report.subject)}] 문제 오류 제보</span>
+                  <span>{report.user_nick || '익명'}</span>
+                  <span>{report.report_at ? new Date(report.report_at).toLocaleDateString() : '-'}</span>
+                </li>
+              ))
+            ) : (
+              <li className={styles.noData}>신고된 문제가 없습니다.</li>
+            )}
+          </ul>
+          <div className={styles.pagination}>
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>이전</button>
+            <span>{page} / {getTotalPages()}</span>
+            <button onClick={() => setPage((p) => Math.min(getTotalPages(), p + 1))} disabled={page === getTotalPages()}>다음</button>
+          </div>
+        </div>
 
-                {isOpen && (
-                  <div className={styles.detailContentArea}>
-                    <div className={styles.detailContent}>
-                      <p>{report.reason}</p>
-                      <hr />
-                      {isEditing ? (
-                        <>
-                          <textarea
-                            rows={4}
-                            className={styles.questionText}
-                            value={editReport.question_text}
-                            onChange={(e) => handleEditChange('question_text', e.target.value)}
+        {/* 우측 상세 */}
+        <div className={styles.rightPanel}>
+          {selectedReport ? (
+            <div>
+              {editReport ? (
+                <>
+                  <textarea
+                    rows={4}
+                    value={editReport.question_text}
+                    onChange={(e) => handleEditChange('question_text', e.target.value)}
+                  />
+                  {selectedReport.image_data_base64 && (
+                    <img src={`data:image/png;base64,${selectedReport.image_data_base64}`} alt="문제 이미지" />
+                  )}
+                  <ul>
+                    {[1, 2, 3, 4].map((num) => (
+                      <li key={num}>
+                        <input
+                          type="text"
+                          value={editReport[`option_${num}`] || ''}
+                          onChange={(e) => handleEditChange(`option_${num}`, e.target.value)}
+                        />
+                        <label>
+                          <input
+                            type="radio"
+                            name="correct_answer"
+                            checked={editReport.correct_answer === num}
+                            onChange={() => handleEditChange('correct_answer', num)}
                           />
-
-                          {report.image_data_base64 && (
-                            <div className={styles.questionImage}>
-                              <img src={`data:image/png;base64,${report.image_data_base64}`} alt="문제 이미지" />
-                            </div>
-                          )}
-
-                          <ul className={styles.optionList}>
-                            {[1, 2, 3, 4].map((num) => (
-                              <li
-                                key={num}
-                                className={editReport.correct_answer === num ? styles.correctAnswer : ''}
-                              >
-                                <input
-                                  type="text"
-                                  value={editReport[`option_${num}`] || ''}
-                                  onChange={(e) => handleEditChange(`option_${num}`, e.target.value)}
-                                  style={{ width: '90%' }}
-                                />
-                                <label style={{ marginLeft: 10 }}>
-                                  <input
-                                    type="radio"
-                                    name={`correct_answer_${report.history_id}`}
-                                    checked={editReport.correct_answer === num}
-                                    onChange={() => handleEditChange('correct_answer', num)}
-                                  />
-                                  정답
-                                </label>
-                              </li>
-                            ))}
-                          </ul>
-
-                          <button onClick={saveEdit}>저장</button>
-                          <button onClick={cancelEdit} style={{ marginLeft: 10 }}>
-                            취소
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <p className={styles.questionText}>
-                            {report.question_text || '문제 내용이 없습니다.'}
-                          </p>
-
-                          {report.image_data_base64 && (
-                            <div className={styles.questionImage}>
-                              <img src={`data:image/png;base64,${report.image_data_base64}`} alt="문제 이미지" />
-                            </div>
-                          )}
-
-                          <ul className={styles.optionList}>
-                            {[report.option_1, report.option_2, report.option_3, report.option_4].map(
-                              (option, index) => (
-                                <li
-                                  key={index}
-                                  className={report.correct_answer === index + 1 ? styles.correctAnswer : ''}
-                                >
-                                  {option || '-'}
-                                </li>
-                              )
-                            )}
-                          </ul>
-
-                          <button onClick={() => modifyQuestion(report)}>수정</button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </li>
-            );
-          })
-        ) : (
-          <li className={styles.noData}>신고된 문제가 없습니다.</li>
-        )}
-      </ul>
-
-      <div className={styles.listFooter}>
-        <div className={styles.pagination}>
-          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
-            이전
-          </button>
-          <span>{page} / {getTotalPages()}</span>
-          <button
-            onClick={() => setPage((p) => Math.min(getTotalPages(), p + 1))}
-            disabled={page === getTotalPages()}
-          >
-            다음
-          </button>
+                          정답
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                  <button onClick={saveEdit}>저장</button>
+                  <button onClick={() => setEditReport(null)}>취소</button>
+                </>
+              ) : (
+                <>
+                  <p>{selectedReport.reason}</p>
+                  <hr />
+                  <p>{selectedReport.question_text}</p>
+                  {selectedReport.image_data_base64 && (
+                    <img src={`data:image/png;base64,${selectedReport.image_data_base64}`} alt="문제 이미지" />
+                  )}
+                  <ul>
+                    {[selectedReport.option_1, selectedReport.option_2, selectedReport.option_3, selectedReport.option_4].map(
+                      (opt, idx) => (
+                        <li key={idx} style={{ fontWeight: selectedReport.correct_answer === idx + 1 ? 'bold' : 'normal' }}>
+                          {opt}
+                        </li>
+                      )
+                    )}
+                  </ul>
+                  <button onClick={modifyQuestion}>수정</button>
+                </>
+              )}
+            </div>
+          ) : (
+            <div className={styles.noSelectionMessage}>
+              왼쪽 목록에서 문제 신고를 선택하세요.
+            </div>
+          )}
         </div>
       </div>
     </section>

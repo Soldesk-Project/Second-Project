@@ -31,6 +31,7 @@ const Header = () => {
     else if (page === 'achievements') setActiveTab('업적');
     else if (location.pathname.includes('/shop')) setActiveTab('상점');
     else if (location.pathname.includes('/inquiries')) setActiveTab('고객센터');
+    else if (location.pathname.includes('/admin')) setActiveTab('관리자페이지');
     else setActiveTab('문제풀이');
   }, [location]);
 
@@ -183,7 +184,7 @@ const Header = () => {
           <li><span data-name="inquiries" className={activeTab === '고객센터' ? 'active' : ''} onClick={(e) => {setActiveTab('고객센터'); clickToGo(e)}}>고객센터</span></li>
           {
             user?.auth==='ROLE_ADMIN' &&
-            <li><span data-name="admin" className={activeTab === '관리자 페이지' ? 'active' : ''} onClick={(e) => {setActiveTab('관리자 페이지'); clickToGo(e)}}>관리자 페이지</span></li>
+            <li><span data-name="admin" className={activeTab === '관리자페이지' ? 'active' : ''} onClick={(e) => {setActiveTab('관리자페이지'); clickToGo(e)}}>관리자  페이지</span></li>
           }
         </ul>
       </div>

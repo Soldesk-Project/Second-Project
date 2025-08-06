@@ -8,9 +8,13 @@ const ServerSelect = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const ServerStyle = {
-        textAlign: "center",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "35px",
         borderRadius: "20px",
         marginTop: "25px",
+        cursor: "pointer",
     };
     
     const server = ["1서버","2서버","3서버"];

@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 
 const TABS = ['테두리', '칭호', '글자색', '명함', '말풍선', '유니크'];
 
-const UserInfo = () => {
+const UserInfo = ({userRankingList}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isNickModalOpen, setIsNickModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState(TABS[0]);
@@ -23,14 +23,14 @@ const UserInfo = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [loading, setLoading] = useState(false);
     const [point, setPoint] = useState(0);
-    const [shopItems,setShopItems] = useState([]);
-    const [challengerMinScore, setChallengerMinScore] = useState(0);
+    // const [challengerMinScore, setChallengerMinScore] = useState(0);
     const dispatch = useDispatch();
 
     const { user } = useSelector((state) => state.user);
-    
+    const shopItems = useSelector(state => state.shop.items);
     const userId = user?.user_id;
     const userNick = user?.user_nick;
+    const challengerMinScore = userRankingList[9]?.user_rank;
 
     // 상점 아이템 목록 가져오기(유저 프로필 아이템 랜더링)
     const itemMap = React.useMemo(() => {
@@ -40,40 +40,8 @@ const UserInfo = () => {
         }, {});
     }, [shopItems]);
 
-    // 🆕 useEffect: 샵 전체 아이템 한 번만 불러오기
-    useEffect(() => {
-        const cats = ['테두리','칭호','글자색','명함','말풍선', '유니크'];
-        Promise.all(cats.map(cat =>
-        axios.get(`/api/shop/items?category=${encodeURIComponent(cat)}`)
-        ))
-        .then(results => {
-        const all = results.flatMap(r =>
-            r.data.map(it => ({
-            ...it,
-            imgUrl: it.imageFileName ? `/images/${it.imageFileName}` : ''
-            }))
-        );
-        setShopItems(all);
-        })
-        .catch(err => console.error('샵 아이템 로드 실패', err));
-    }, []);
-
-    const fetchUserRanking = async () => {
-        try {
-        const { data, status } = await axios.get('/user/ranking');
-        if (status === 200) {
-            setChallengerMinScore(data[9].user_rank);
-            
-            setLoading(false);
-        }
-        } catch (error) {
-        console.error('유저 랭킹 로드 실패:', error);
-        }
-    };
-
     useEffect(() => {
         fetchGetPoint();
-        fetchUserRanking();
       }, [userNick]);
 
     const fetchGetPoint = async () => {

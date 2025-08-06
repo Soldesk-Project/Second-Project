@@ -1,4 +1,4 @@
-/* QuestErrRepoManage.css */
+/* QuestRegiCallManage.css */
 
 /* 전체 페이지 컨테이너 */
 .pageContainer {
@@ -26,7 +26,7 @@
     /* background-color: #f8f9fa; */
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    padding: 20px;
+    /* padding: 20px; */
     color: #ddd;
 }
 
@@ -36,7 +36,7 @@
     display: flex;
     flex-direction: column;
     /* background-color: #fff; */
-    border: 1px solid #e0e0e0;
+    border: 1px solid #48494e;
     border-radius: 8px;
     padding: 20px;
     overflow-y: auto; /* 내용이 넘칠 경우 세로 스크롤바 생성 */
@@ -47,7 +47,7 @@
 .rightPanel {
     flex: 4; /* 남은 공간을 채우도록 설정 */
     /* background-color: #fff; */
-    border: 1px solid #e0e0e0;
+    border: 1px solid #48494e;
     border-radius: 8px;
     padding: 20px;
     overflow-y: auto; /* 내용이 넘칠 경우 세로 스크롤바 생성 */
@@ -63,7 +63,7 @@
     flex-wrap: wrap; /* 작은 화면에서 요소들이 줄바꿈되도록 */
     align-items: center;
     padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #48494e;
 }
 
 .filterSection input[type="text"] {
@@ -74,7 +74,7 @@
 .filterSection input,
 .filterSection select {
     padding: 10px 15px;
-    border: 1px solid #ccc;
+    border: 1px solid #48494e;
     border-radius: 5px;
     font-size: 0.95em;
     color: #555;
@@ -102,29 +102,29 @@
     /* flex-grow: 1; 테이블이 남은 공간을 채우도록 */
     overflow-x: auto; /* 테이블이 너무 넓을 경우 가로 스크롤 */
     margin-bottom: 15px;
-    border: 1px solid #e9ecef;
+    /* border: 1px solid #e9ecef; */
     border-radius: 8px;
 }
 
 /* 테이블 스타일 */
 .callTable {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: collapse ;
     color: #ddd;
 }
 
 .callTable th,
 .callTable td {
-    border: 1px solid #dee2e6; /* 테이블 셀 경계선 */
+    border: 1px solid #48494e; /* 테이블 셀 경계선 */
     padding: 12px 15px;
-    text-align: left;
+    text-align: center;
     vertical-align: middle;
     font-size: 0.9em;
-    color: #ddd;
+    /* color: #ddd; */
 }
 
 .callTable th {
-    background-color: #e9ecef;
+    /* background-color: #e9ecef; */
     font-weight: bold;
     position: sticky; /* 스크롤 시 헤더 고정 */
     top: 0;
@@ -134,12 +134,14 @@
 .callTable tbody tr:hover {
     background-color: #f2f2f2;
     cursor: pointer; /* 행에 마우스 오버 시 포인터 변경 */
+    color: black;
 }
 
 /* 선택된 행 하이라이트 */
 .callTable tbody tr.selectedRow {
     background-color: #e0f7fa; /* 밝은 청록색 배경 */
     border-left: 4px solid #00acc1; /* 왼쪽 경계선으로 강조 */
+    color: black;
 }
 
 /* 체크박스 스타일 */
@@ -155,7 +157,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis; /* 내용이 넘칠 때 ... 표시 */
-    color: #007bff; /* 링크처럼 보이게 */
     text-decoration: none;
     cursor: pointer;
 }
@@ -224,7 +225,7 @@
     /* margin-top: 25px; */
     gap: 8px;
     padding-top: 15px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #48494e;
 }
 
 .paginationContainer span {
@@ -328,14 +329,14 @@
 
 .detailView hr {
     border: none;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #48494e;
     margin: 25px 0;
 }
 
 .detailActions {
     margin-top: 30px;
     text-align: center;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #48494e;
     padding-top: 20px;
 }
 
@@ -368,7 +369,7 @@
     padding: 50px;
     color: #777;
     font-size: 1.1em;
-    background-color: #f0f2f5;
+    /* background-color: #f0f2f5; */
     border-radius: 8px;
     margin-top: 50px;
 }

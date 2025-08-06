@@ -17,3 +17,9 @@
   background-image: url('../../public/images/Submit.png');
   height: 35px;
 }
+
+/* 호버 시 배경색 변경 */
+.serverselectBtn:hover {
+  background-image: none;
+  background-color: #A78BFA;
+}

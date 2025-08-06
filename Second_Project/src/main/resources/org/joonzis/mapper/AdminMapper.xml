@@ -28,57 +28,63 @@
     </insert>
 
     <select id="getQuestionsBySearch" resultType="org.joonzis.domain.QuestionDTO" parameterType="map">
-		SELECT
-			id,
-			subject,
-			question_text,
-			option_1,
-			option_2,
-			option_3,
-			option_4,
-			correct_answer,
-			image_data
-		FROM (
-			SELECT
-				id,
-				subject,
-				question_text,
-				option_1,
-				option_2,
-				option_3,
-				option_4,
-				correct_answer,
-				image_data,
-				ROWNUM AS rn FROM (
-				SELECT
-					id,
-					subject,
-					question_text,
-					option_1,
-					option_2,
-					option_3,
-					option_4,
-					correct_answer,
-					image_data
-				FROM Question
-				ORDER BY id DESC
-			)
-		)
-		WHERE rn BETWEEN #{offset} + 1 AND #{offset} + #{limit}
-    </select>
+	    SELECT
+	        id,
+	        subject,
+	        question_text,
+	        option_1,
+	        option_2,
+	        option_3,
+	        option_4,
+	        correct_answer,
+	        image_data
+	    FROM (
+	        SELECT
+	            id,
+	            subject,
+	            question_text,
+	            option_1,
+	            option_2,
+	            option_3,
+	            option_4,
+	            correct_answer,
+	            image_data,
+	            ROWNUM AS rn
+	        FROM (
+	            SELECT
+	                id,
+	                subject,
+	                question_text,
+	                option_1,
+	                option_2,
+	                option_3,
+	                option_4,
+	                correct_answer,
+	                image_data
+	            FROM Question
+	            <where>
+	                subject = #{subjectCode}
+	                <if test="query != null and query != ''">
+	                    AND question_text LIKE '%' || #{query} || '%'
+	                </if>
+	            </where>
+	            ORDER BY id DESC
+	        )
+	    )
+	    WHERE rn BETWEEN #{offset} + 1 AND #{offset} + #{limit}
+	</select>
 
     <select id="getTotalQuestionCount" resultType="int" parameterType="map">
-        SELECT COUNT(*)
-        FROM Question
-        <where>
-            <if test="subjectCode != null and subjectCode != ''">
-                subject = #{subjectCode}
-            </if>
-            <if test="query != null and query != ''">
-                and question_text LIKE '%' || #{query} || '%'
-            </if>
-        </where>
-    </select>
+	    SELECT COUNT(*)
+	    FROM Question
+	    <where>
+	        subject = #{subjectCode}
+	        <if test="query != null and query != ''">
+	            AND question_text LIKE '%' || #{query} || '%'
+	        </if>
+	    </where>
+	</select>
+
 
     <update id="updateQuestion" parameterType="org.joonzis.domain.QuestionDTO">
         UPDATE Question
@@ -416,7 +422,7 @@
 
     <select id="selectQuestRequests" resultType="org.joonzis.domain.QuestRequestVO" parameterType="map">
     SELECT
-        id, user_no, user_id, subject, question_text, option_1, option_2, option_3, option_4, correct_answer, image_data, status, created_at
+        id, user_no, user_id, subject, question_text, option_1, option_2, option_3, option_4, correct_answer, image_data, status, request_created_at
     FROM (
         SELECT
             t2.id,
@@ -431,7 +437,7 @@
             t2.correct_answer,
             t2.image_data,
             t2.status,
-            t2.created_at,
+            t2.request_created_at,
             ROWNUM AS rn
         FROM (
             SELECT
@@ -447,7 +453,7 @@
                 qr.CORRECT_ANSWER AS correct_answer,
                 qr.IMAGE_DATA AS image_data,
                 qr.STATUS AS status,
-                qr.REQUEST_CREATED_AT AS created_at
+                qr.REQUEST_CREATED_AT AS request_created_at
             FROM QUESTION_REQUEST qr
             LEFT JOIN USERS u ON qr.USER_NO = u.USER_NO
             <where>

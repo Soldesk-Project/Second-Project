@@ -85,6 +85,11 @@ public class AdminPageController {
             @RequestParam(value = "limit", defaultValue = "10") int limit) {
         try {
             Map<String, Object> result = adminService.searchQuestions(subjectCode, query, page, limit);
+            
+            System.out.println("과목 -> " + subjectCode);
+            System.out.println("검색어 -> " + query);
+            
+            System.out.println("검색 결과 -> " + result);
 
             return new ResponseEntity<>(result, HttpStatus.OK);
 
@@ -172,6 +177,7 @@ public class AdminPageController {
     public ResponseEntity<?> getQuestRequestById(@PathVariable("id") int id) {
         try {
             QuestRequestVO questRequest = adminService.getQuestRequestById(id);
+            System.out.println("문제 등록 요청 데이터 -> " + questRequest);
             if (questRequest != null) {
                 return new ResponseEntity<>(questRequest, HttpStatus.OK);
             } else {

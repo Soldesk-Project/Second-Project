@@ -7,11 +7,13 @@ import UserRanking from '../components/UserRanking';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { loadUserFromStorage } from '../store/userSlice';
+import { setShopItems } from '../store/shopSlice';
 import ServerChatbox from '../components/chatbox/ServerChatbox';
 import UserInfo from '../components/UserInfo';
 import ItemList from '../components/ItemList';
 import AchievementsList from '../components/AchievementsList';
 import { useSearchParams } from 'react-router-dom';
+import axios from 'axios';
 
 const MainPage = () => {
   const dispatch = useDispatch();
@@ -19,6 +21,40 @@ const MainPage = () => {
   const [currentPage, setCurrentPage] = useState('room');
   const [searchParams] = useSearchParams();
   const page = searchParams.get('page');
+  const [userRankingList, setUserRankingList] = useState([]);
+
+  // 쿼리스트링 만들기
+  const cats = ['테두리','칭호','글자색','명함','말풍선', '유니크'];
+  const queryString = cats.map(cat => `category=${encodeURIComponent(cat)}`).join('&');
+
+  useEffect(() => {
+    fetchUserItems();
+    fetchUserRanking();
+  }, []);
+
+  const fetchUserItems = async () => {
+    try {
+      const response = await axios.get(`/api/shop/items/all?${queryString}`);
+      const all = response.data.map(it => ({
+        ...it,
+        imgUrl: it.imageFileName ? `/images/${it.imageFileName}` : ''
+      }));
+      dispatch(setShopItems(all));
+    } catch (error) {
+      console.log('샵 아이템 로드 실패', error);
+    }
+  }
+  
+  const fetchUserRanking = async () => {
+    try {
+      const { data, status } = await axios.get('/user/ranking');
+      if (status === 200) {
+        setUserRankingList(data);
+      }
+    } catch (error) {
+      console.error('유저 랭킹 로드 실패:', error);
+    }
+  };
 
   useEffect(() => {
     dispatch(loadUserFromStorage());
@@ -35,7 +71,7 @@ const MainPage = () => {
       case 'achievements':
         return <AchievementsList />;
       default:
-        return <RoomList />;
+        return <RoomList/>;
     }
   };
   
@@ -54,7 +90,7 @@ const MainPage = () => {
             {/* 좌측 유저 정보, 최근 플레이 목록 */}
             <div className={styles.user_info}>
               {/* 유저 정보쪽 */}
-              <UserInfo/>
+              <UserInfo userRankingList={userRankingList} />
             </div>
 
             {/* 중앙 영역 (필터, 방 리스트 등) */}
@@ -71,7 +107,7 @@ const MainPage = () => {
         {/* 우측 랭킹 목록/ 유저 목록 */}
         <div className={styles.body_right}>
           {/* 랭킹 목록 */}
-          <div className={styles.user_ranking}><UserRanking/></div>
+          <div className={styles.user_ranking}><UserRanking userRankingList={userRankingList}/></div>
           {/* 유저 목록 */}
           <div className={styles.user_list}><ServerUserList server={server} state={user}/></div>
         </div>

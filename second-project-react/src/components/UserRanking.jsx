@@ -13,8 +13,6 @@ import UserDetailModal from './modal/UserDetailModal';
 
 const UserRanking = () => {
   const [userRankingList, setUserRankingList] = useState([]);
-  const [shopBgItems, setShopBgItems] = useState([]);
-  const [itemList, setItemList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -27,6 +25,7 @@ const UserRanking = () => {
   const sockets = useContext(WebSocketContext);
   const socket = sockets['server'];
   const user_no = user.user_no;
+  const shopItems = useSelector(state => state.shop.items);
 
   // 티어에 따라 클래스명 반환 함수 (단순 점수 기준)
   const getTierClass = (user_rank, isTop10User) => {
@@ -51,40 +50,12 @@ const UserRanking = () => {
     }
   };
 
-  // 2) 인벤토리(착용 가능한 아이템) 불러오기 & imgUrl 세팅
-  const fetchItemList = async () => {
-    try {
-      const { data, status } = await axios.get('/user/item');
-      if (status === 200) {
-        const itemsWithUrl = data.map((it) => ({
-          ...it,
-          imgUrl: it.imageFileName ? `/images/${it.imageFileName}` : '',
-        }));
-        setItemList(itemsWithUrl);
-      }
-    } catch (error) {
-      console.error('아이템 목록 로드 실패:', error);
-    }
-  };
-
-  // 2.1) 샵 전체 배경 아이템 불러오기 & imgUrl 세팅
-  useEffect(() => {
-    axios
-      .get('/api/shop/items?category=명함')
-      .then(({ data }) => {
-        const bgWithUrl = data.map((it) => ({
-          ...it,
-          imgUrl: it.imageFileName ? `/images/${it.imageFileName}` : '',
-        }));
-        setShopBgItems(bgWithUrl);
-      })
-      .catch((err) => console.error('샵 배경 아이템 로드 실패:', err));
-  }, []);
-
-  // 3) 마운트 시 한 번만 인벤토리 로드
-  useEffect(() => {
-    fetchItemList();
-  }, []);
+  const itemMap = React.useMemo(() => {
+      return shopItems.reduce((m, it) => {
+        m[it.item_no] = it;
+        return m;
+      }, {});
+    }, [shopItems]);
 
   // 4) refreshRanking 또는 닉네임 변경 시 랭킹 갱신
   useEffect(() => {
@@ -125,7 +96,7 @@ const UserRanking = () => {
         user_no,
       });
       if (status === 200) {
-        await fetchItemList();
+        // await fetchItemList();
         await fetchUserRanking();
 
         if (socket && socket.readyState === 1) {
@@ -138,21 +109,6 @@ const UserRanking = () => {
       console.error('아이템 전송 중 에러:', error);
     }
   };
-
-  // 8) item_no → 전체 아이템 객체 매핑
-  const itemMap = React.useMemo(() => {
-    return itemList.reduce((m, it) => {
-      m[it.item_no] = it;
-      return m;
-    }, {});
-  }, [itemList]);
-
-  const bgMap = React.useMemo(() => {
-    return shopBgItems.reduce((m, it) => {
-      m[it.item_no] = it;
-      return m;
-    }, {});
-  }, [shopBgItems]);
 
   if (loading)
     return (
@@ -177,7 +133,7 @@ const UserRanking = () => {
           }) => {
             const isTop10User = userRankingList.slice(0, 10).some(u => u.user_no === user_no);
             const tierClass = getTierClass(user_rank, isTop10User);
-            const bgItem = bgMap[backgroundItemNo] || itemMap[backgroundItemNo];
+            const bgItem = itemMap[backgroundItemNo];
             const bgStyle = bgItem?.imgUrl
               ? {
                   backgroundImage: `url(${bgItem.imgUrl})`,
@@ -241,32 +197,32 @@ const UserRanking = () => {
         )}
 
         <TestModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="아이템 테스트">
-          {Object.entries(
-            itemList.reduce((acc, it) => {
-              (acc[it.item_type] ||= []).push(it);
-              return acc;
-            }, {})
-          ).map(([type, items]) => (
-            <div key={type} className={styles.itemGroup}>
-              <h5>{type}</h5>
-              {items.map(({ item_no, item_name, css_class_name, item_type }) => (
-                <div
-                  key={item_no}
-                  style={{ cursor: 'pointer', padding: '4px 0' }}
-                  onClick={() => handleItemSelect(css_class_name, item_type)}
-                >
-                  {item_name}
-                </div>
-              ))}
-            </div>
-          ))}
-        </TestModal>
+        {Object.entries(
+          Object.values(itemMap).reduce((acc, it) => {
+            (acc[it.item_type] ||= []).push(it);
+            return acc;
+          }, {})
+        ).map(([type, items]) => (
+          <div key={type} className={styles.itemGroup}>
+            <h5>{type}</h5>
+            {items.map(({ item_no, item_name, css_class_name, item_type }) => (
+              <div
+                key={item_no}
+                style={{ cursor: 'pointer', padding: '4px 0' }}
+                onClick={() => handleItemSelect(css_class_name, item_type)}
+              >
+                {item_name}
+              </div>
+            ))}
+          </div>
+        ))}
+      </TestModal>
       </div>
 
       {showUserDetailModal && selectedUser && (
         <UserDetailModal
           user={selectedUser}
-          shopItems={[...itemList, ...shopBgItems]}
+          shopItems={shopItems}
           onClose={() => {
             setSelectedUser(null);
             setShowUserDetailModal(false);

@@ -268,11 +268,15 @@ const QuestEdit = () => {
     }
   };
 
+  useEffect(() => {
+    // 페이지 로드 시 첫 페이지 문제 자동 검색
+    handleSearchQuest(1);
+  }, [subject]);
+
   return (
     <div>
       <h1 className={styles.title}>문제 수정</h1>
       <div className='category'>
-        <h3>1. 카테고리 선택 및 문제 검색</h3>
         <select name="cateSelect" value={subject} onChange={handleSubjectChange}>
           {subjects.map((subject, index) => (
             <option key={index} value={subject}>

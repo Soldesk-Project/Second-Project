@@ -1,469 +1,139 @@
-/* --- 공통 리셋 --- */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-*::-webkit-scrollbar {
-  display: none;
-}
-
-button {
-  appearance: none;
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  font: inherit;
-  color: inherit;
-  outline: none;
-  cursor: pointer;
-}
-
-/* --- 상위 컨테이너 및 탭 --- */
-.customerServiceCenter {
+/* 전체 페이지 컨테이너 */
+.pageContainer {
   color: #fff;
   background: url('../../../public/images/violet2.png');
   min-height: 100vh;
 }
 
-.topNav {
-  height: 70px;
-  background-color: #0A0D17;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  font-weight: bold;
-}
-
-.tabs {
-  display: flex;
-  gap: 6rem;
-  padding: 0 20px;
-  justify-content: center;
-}
-
-.tabs .tab {
-  background: transparent;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  color: #fff;
-}
-
-.tabs .tab:hover {
-  background: white;
-  border-radius: 6px;
-  color: black;
-}
-
-.tabs .active {
-  border-bottom: 3px solid #8367C7;
-  font-weight: bold;
-}
-
-.tabPanels {
-  padding: 50px 20px 20px;
-}
-
-.content {
-  animation: fadeIn 0.2s ease-in;
-  color: #fff;
-}
-
-.content h1 {
+.pageContainer h1 {
   color: #fff;
   text-align: center;
   margin-bottom: 30px;
   font-size: 2em;
 }
 
-/* --- 리스트 스타일 (헤더/항목 공통) --- */
-.listHeader {
-  list-style: none;
-  margin: 5px 0 0;
-  padding: 10px 0;
+/* 좌우 분할 레이아웃 */
+.splitViewContainer {
   display: grid;
-  grid-template-columns: 80px 1fr 200px 140px;
-  gap: 1rem;
-  align-items: center;
-  border-top: 2px solid #35373d;
-  border-bottom: 1px solid #48494e;
-  font-weight: bold;
-  text-align: center;
+  grid-template-columns: 2fr 1.2fr; /* 왼쪽 리스트(넓게) + 오른쪽 상세(조금 좁게) */
+  gap: 20px;
 }
 
-.listItem {
-  display: grid;
-  grid-template-rows: auto auto;
-  grid-template-columns: 80px 1fr 200px 140px;
-  gap: 1rem;
-  align-items: stretch;
-  border-bottom: 1px solid #48494e;
-}
-
-.listItemHeader {
-  display: contents;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  padding: 15px 0;
-}
-
-.listItem:hover .listItemHeader {
-  background-color: rgba(131, 103, 199, 0.1);
-}
-
-/* 상세 보기 페이지 */
-.detailBox {
-  margin: 100px auto 20px;
-  max-width: 800px;
-  background: #35373d;
-  border-radius: 8px;
-  padding: 24px;
-  color: #ddd;
-}
-
-/* --- 폼 컨테이너 --- */
-.inqueriesBox {
-  margin: 0 auto;
-  max-width: 700px; /* 한눈에 보기 좋은 폭 */
-  color: #fff;
-}
-
-.inqueriesBox header h1 {
-  text-align: center;
-  font-size: 1.6rem;
-  margin-bottom: 25px;
-}
-
-/* 섹션 스타일 */
-.inqueriesBox fieldset {
+/* 좌측 리스트 */
+.leftPanel {
   border: 1px solid #48494e;
-  background: #2b2e35;
   border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.inqueriesBox legend {
-  font-size: 1.1em;
-  font-weight: bold;
-  padding: 0 6px;
-  color: #fff;
-}
-
-/* 입력 요소 */
-.inqueriesBox .input,
-.inqueriesBox .optionInput,
-.inqueriesBox select,
-textarea {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #48494e;
-  border-radius: 5px;
-  background-color: #1f222b;
-  color: #fff;
-  font-size: 0.95rem;
-  margin-bottom: 15px;
-}
-
-textarea {
-  min-height: 200px;
-  resize: vertical;
-}
-
-/* 옵션 그룹 */
-.optionGroup {
+  padding: 15px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 15px;
 }
 
-/* 이미지 업로드 */
-.fileInputGroup label {
-  display: inline-block;
-  background: #35373d;
-  border: 1px solid #48494e;
-  border-radius: 5px;
-  padding: 8px 12px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-.fileInputGroup label:hover {
-  background-color: #48494e;
-}
-
-.image_preview_container {
-  margin-top: 10px;
-  text-align: center;
-  border: 1px dashed #48494e;
-  padding: 10px;
-  border-radius: 6px;
-  background-color: #1f222b;
-}
-
-.image_preview {
-  max-width: 250px;
-  max-height: 250px;
-  border: 1px solid #48494e;
-  border-radius: 4px;
-}
-
-/* 개인정보 안내 */
-.textsection {
-  font-size: 0.85em;
-  color: #ccc;
-  margin-bottom: 10px;
-  line-height: 1.5;
-}
-
-/* --- 버튼 공통 --- */
-button {
-  appearance: none;
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  font: inherit;
-  color: inherit;
-  outline: none;
-  cursor: pointer;
-}
-
-
-/* 공통 메인 버튼 */
-.primaryButton,
-.submitButton {
-  padding: 8px 15px;
-  background-color: #35373d;
-  color: #ddd;
-  border: 1px solid #48494e;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-.primaryButton:hover,
-.submitButton:hover {
-  background-color: #6a4fa8;
-}
-
-/* 서브 버튼 (취소/리셋) */
-.resetButton {
-  padding: 8px 15px;
-  background: #35373d;
-  border: 1px solid #48494e;
-  color: #ddd;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-.reset-button:hover {
-  background: #48494e;
-}
-
-/* 페이징 버튼 */
-.pagination button {
-  padding: 6px 12px;
-  background-color: #35373d;
-  color: #ddd;
-  border: 1px solid #48494e;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-.pagination button:hover:not(:disabled) {
-  background-color: #48494e;
-}
-.pagination button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  background-color: #2b2e35;
-}
-
-/* 뒤로가기/하단 버튼 */
-.inqBtns {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 20px;
-}
-.backButton {
-  padding: 8px 16px;
-  background: #8367C7;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-.backButton:hover {
-  background-color: #9b7fd9;
-}
-
-/* 반응형 */
-@media (max-width: 768px) {
-  .inqueriesBox {
-    padding: 0 15px;
-  }
-  .inqueriesBox fieldset {
-    padding: 15px;
-  }
-}
-
-/* --- 리스트 뷰 --- */
-.listView {
+/* 리스트 헤더 */
+.listHeader {
   list-style: none;
-  /* margin: 20px 0; */
-  padding: 0;
-  color: #ddd;
-}
-
-.listItem {
   display: grid;
-  grid-template-rows: auto auto;
-  grid-template-columns: 80px 1fr 200px 140px;
-  gap: 1rem;
+  grid-template-columns: 80px 1fr 120px 140px;
+  font-weight: bold;
+  border-bottom: 2px solid #48494e;
+  padding: 10px;
+  text-align: center;
+}
+
+.listView {
+  padding: 0;
+}
+
+/* 리스트 아이템 */
+.listItem {
+  text-align: center;
+  display: grid;
+  grid-template-columns: 80px 1fr 120px 140px;
+  padding: 12px;
   border-bottom: 1px solid #48494e;
-  color: #ddd;
-  margin: 20px 0px;
-}
-
-.listItemHeader {
-  display: contents;
   cursor: pointer;
-  transition: background-color 0.15s ease;
-  padding: 15px 0;
+  transition: background 0.15s ease;
 }
-
-.listItem:hover .listItemHeader {
+.listItem:hover {
   background-color: rgba(131, 103, 199, 0.1);
 }
 
-.listItemNo {
-  justify-self: center;
-  align-self: center;
-  font-size: 0.9em;
+/* 선택된 행 강조 */
+.selectedRow {
+  background-color: rgba(131, 103, 199, 0.2) !important;
 }
 
-.listItemTitle {
-  justify-self: center;
-  align-self: center;
+/* 우측 상세 패널 */
+.rightPanel {
+  /* background: #2b2e35; */
+  border: 1px solid #48494e;
+  border-radius: 8px;
+  padding: 20px;
+  overflow-y: auto;
+  max-height: calc(100vh - 120px); /* 상단 여백 제외 전체 높이에 맞춤 */
+}
+
+/* 상세 정보 없음 안내 */
+.noSelectionMessage {
   text-align: center;
-  padding-left: 10px;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.listItemAuthor {
-  justify-self: center;
-  align-self: center;
-  font-size: 0.9em;
-}
-
-.listItemDate {
-  justify-self: center;
-  align-self: center;
-  /* padding-right: 20px; */
-  font-size: 0.9em;
-  color: #bbb;
-}
-
-/* 상세 내용 */
-.detailContentArea {
-  grid-column: 1 / -1;
-  padding: 15px 30px;
-  background-color: #1f222b;
-  border-top: 1px dashed #48494e;
-  color: #ccc;
-  font-size: 0.95em;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  word-break: break-word;
-  margin-bottom: 15px;
-}
-
-/* 공지사항 없을 때 */
-.noData {
-  grid-column: 1 / -1;
-  padding: 30px 0;
-  text-align: center;
-  color: #666;
+  color: #aaa;
   font-style: italic;
+  margin-top: 50px;
 }
 
-/* 리스트 하단 (페이징 영역) */
-.listFooter {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 15px;
-  border-top: 1px solid #48494e;
-  color: #bbb;
+/* 문제 이미지 */
+.rightPanel img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #48494e;
+  border-radius: 6px;
+  margin: 10px 0;
 }
 
-/* 페이징 버튼 스타일 */
-.pagination {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* 옵션 리스트 */
+.rightPanel ul {
+  list-style: none;
+  margin: 15px 0;
+  padding: 0;
+}
+.rightPanel li {
+  margin-bottom: 10px;
 }
 
-.pagination button {
-  padding: 6px 12px;
-  background-color: #35373d;
+/* 수정 모드 - 입력 필드 */
+.rightPanel textarea,
+.rightPanel input[type="text"] {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  border: 1px solid #48494e;
+  border-radius: 5px;
+  background: #1f222b;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+/* 버튼 영역 */
+.rightPanel button {
+  padding: 8px 14px;
+  background: #35373d;
   color: #ddd;
   border: 1px solid #48494e;
-  border-radius: 4px;
+  border-radius: 5px;
+  margin-right: 10px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background 0.2s ease;
+}
+.rightPanel button:hover {
+  background: #6a4fa8;
 }
 
-.pagination button:hover:not(:disabled) {
-  background-color: #8367C7;
-  color: #fff;
-}
-
-.pagination button:disabled {
-  background-color: #2b2e35;
-  color: #555;
-  cursor: not-allowed;
-}
-
-.pagination span {
-  font-weight: bold;
-  color: #bbb;
-  user-select: none;
-}
-
-/* 반응형 */
-@media (max-width: 768px) {
-  .listHeader,
-  .listItem {
-  grid-template-columns: 1fr;
-  grid-template-rows: auto;
+/* 페이지네이션 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 8px;
-  }
-
-  .listHeader li,
-  .listItemNo,
-  .listItemTitle,
-  .listItemAuthor,
-  .listItemDate {
-    justify-self: start;
-    text-align: left;
-    padding-left: 0;
-  }
-
-  .detailContentArea {
-    padding: 10px 15px;
-  }
-
-  .listFooter {
-    justify-content: center;
-  }
+  margin-top: 15px;
 }
 
 .title {

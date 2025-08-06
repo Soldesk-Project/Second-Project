@@ -266,8 +266,6 @@ const QuestRegiCallManage = () => {
     if (error) {
         return <div className={styles.pageContainer} style={{ color: 'red' }}>오류: {error}</div>;
     }
-    console.log(selectedCall);
-    
 
     return (
         <div className={styles.pageContainer}>
@@ -331,7 +329,7 @@ const QuestRegiCallManage = () => {
                                             </td>
                                             <td>{call.id}</td>
                                             <td>{call.user_id || call.user_no}</td> {/* user_id가 있다면 사용, 없으면 user_no */}
-                                            <td>{new Date(call.created_at).toLocaleString()}</td>
+                                            <td>{new Date(call.request_created_at).toLocaleDateString()}</td>
                                             <td className={styles.titleCell}>
                                                 {call.question_text.length > 50 ? call.question_text.substring(0, 50) + '...' : call.question_text} {/* 본문 미리보기 */}
                                             </td>
@@ -397,7 +395,7 @@ const QuestRegiCallManage = () => {
                                     <img
                                         src={`data:image/png;base64,${selectedCall.image_data}`}
                                         alt="문제 이미지"
-                                        style={{ maxWidth: '100%', height: 'auto', border: '1px solid #ddd' }}
+                                        style={{ maxWidth: '100%', height: 'auto' }}
                                     />
                                     </div>
                                 )}
@@ -459,82 +457,4 @@ const QuestRegiCallManage = () => {
         </div>
     );
 };
-// {selectedCall ? (
-//                         <div className={styles.detailView}>
-//                             <h2>요청 상세 정보</h2>
-//                             <div className={styles.formGroup}>
-//                                 <label>요청 ID:</label>
-//                                 <input type="text" value={selectedCall.id || ''} readOnly />
-//                             </div>
-//                             <div className={styles.formGroup}>
-//                                 <label>제보자:</label>
-//                                 <input type="text" value={selectedCall.user_id || selectedCall.user_no || ''} readOnly />
-//                             </div>
-//                             <div className={styles.formGroup}>
-//                                 <label>접수일시:</label>
-//                                 <input type="text" value={selectedCall.created_at ? new Date(selectedCall.created_at).toLocaleString() : ''} readOnly />
-//                             </div>
-//                             <hr />
-//                             <div className={styles.formGroup}>
-//                                 <label>과목:</label>
-//                                 <input type="text" value={selectedCall.subject || ''} readOnly />
-//                             </div>
-//                             <div className={styles.formGroup}>
-//                                 <label>문제 본문:</label>
-//                                 <textarea name="question_text" value={selectedCall.question_text || ''} onChange={handleDetailChange}></textarea>
-//                             </div>
-//                             {[1, 2, 3, 4].map(idx => (
-//                                 <div className={styles.formGroup} key={idx}>
-//                                     <label>{idx}번 선택지:</label>
-//                                     <input type="text" name={`option_${idx}`} value={selectedCall[`option_${idx}`] || ''} onChange={handleDetailChange} />
-//                                 </div>
-//                             ))}
-//                             <div className={styles.formGroup}>
-//                                 <label>정답:</label>
-//                                 <input type="text" name="correct_answer" value={selectedCall.correct_answer || ''} onChange={handleDetailChange} />
-//                             </div>
-//                             {selectedCall.image_data_base64 && ( // 백엔드에서 Base64로 인코딩하여 보내준 이미지 데이터
-//                                 <div className={styles.formGroup}>
-//                                     <label>첨부 이미지:</label>
-//                                     <img src={`data:image/jpeg;base64,${selectedCall.image_data_base64}`} alt="첨부 이미지" style={{ maxWidth: '100%', height: 'auto' }} />
-//                                 </div>
-//                             )}
-//                             <hr />
-//                             <div className={styles.formGroup}>
-//                                 <label>현재 상태:</label>
-//                                 <select name="status" value={selectedCall.status || ''} onChange={handleDetailChange}>
-//                                     <option value="미확인">미확인</option>
-//                                     <option value="확인 중">확인 중</option>
-//                                     <option value="처리 완료">처리 완료</option>
-//                                     <option value="반려">반려</option>
-//                                 </select>
-//                             </div>
-//                             <div className={styles.formGroup}>
-//                                 <label>담당자:</label>
-//                                 {/* admin_in_charge는 이전에 제외하기로 했으므로, 필요 없으면 제거 */}
-//                                 <input type="text" name="admin_in_charge" value={selectedCall.admin_in_charge || ''} onChange={handleDetailChange} />
-//                             </div>
-//                             <div className={styles.formGroup}>
-//                                 <label>처리 내용/코멘트:</label>
-//                                 {/* process_comment는 이전에 제외하기로 했으므로, 필요 없으면 제거 */}
-//                                 <textarea name="process_comment" value={selectedCall.process_comment || ''} onChange={handleDetailChange}></textarea>
-//                             </div>
-//                             {selectedCall.status === '반려' && (
-//                                 <div className={styles.formGroup}>
-//                                     <label>반려 사유:</label>
-//                                     {/* rejection_reason은 이전에 제외하기로 했으므로, 필요 없으면 제거 */}
-//                                     <textarea name="rejection_reason" value={selectedCall.rejection_reason || ''} onChange={handleDetailChange} required></textarea>
-//                                 </div>
-//                             )}
-
-//                             <div className={styles.detailActions}>
-//                                 <button className={styles.actionButton} onClick={handleDetailSave}>저장</button>
-//                                 <button className={styles.actionButton} onClick={() => setSelectedCall(null)}>미리보기 닫기</button> {/* 미리보기 닫기 버튼 */}
-//                             </div>
-//                         </div>
-//                     ) : (
-//                         <div className={styles.noSelectionMessage}>
-//                             왼쪽 목록에서 문제 요청을 선택하여 상세 정보를 확인하세요.
-//                         </div>
-//                     )}
 export default QuestRegiCallManage;

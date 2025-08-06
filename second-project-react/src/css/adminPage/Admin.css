@@ -17,6 +17,7 @@
   align-items: center;
   gap: 10px;
   flex-wrap: wrap; /* 작은 화면에서 요소들이 줄바꿈되도록 */
+  justify-content: center;
 }
 
 .category h3 {

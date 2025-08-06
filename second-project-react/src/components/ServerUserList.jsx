@@ -9,7 +9,6 @@ import axios from 'axios';
 
 const ServerUserList = () => {
   const [users, setUsers] = useState([]); // 현재 서버에 접속한 유저 목록
-  const [shopItems, setShopItems] = useState([]);
   const { user, server } = useSelector((state) => state.user);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -17,7 +16,9 @@ const ServerUserList = () => {
 
   const sockets = useContext(WebSocketContext);
   const socketRef = useRef(null);
-  
+  const userCache = useRef(new Map()); // userNo 별 캐시
+  const shopItems = useSelector(state => state.shop.items);
+
   const {
     user_nick,
     user_no,
@@ -26,8 +27,8 @@ const ServerUserList = () => {
     fontcolorItemNo,
     user_profile_img,
     imageFileName
-  } = user;
-  
+  } = user || {};
+
   const itemMap = React.useMemo(() => {
     return shopItems.reduce((m, it) => {
       m[it.item_no] = it;
@@ -35,34 +36,18 @@ const ServerUserList = () => {
     }, {});
   }, [shopItems]);
 
-	 // 🆕 useEffect: 샵 전체 아이템 한 번만 불러오기
-  useEffect(() => {
-    const cats = ['테두리','칭호','글자색','명함','말풍선', '유니크'];
-    Promise.all(cats.map(cat =>
-      axios.get(`/api/shop/items?category=${encodeURIComponent(cat)}`)
-    ))
-    .then(results => {
-      const all = results.flatMap(r =>
-        r.data.map(it => ({
-          ...it,
-          imgUrl: it.imageFileName ? `/images/${it.imageFileName}` : ''
-        }))
-      );
-      setShopItems(all);
-    })
-    .catch(err => console.error('샵 아이템 로드 실패', err));
-  }, []);
-
   useEffect(() => {
     if (!server || !user || !user_nick || !user_no) return;
 
     const socket = sockets['server'];
-    socketRef.current = socket; // 단순 참조만
+    if (!socket) return;
+
+    socketRef.current = socket; // 단순 참조
 
     const payload = {
       action: "join",
       server,
-      userNick: user.user_nick,       // 백엔드가 userNick 으로 읽습니다
+      userNick: user.user_nick,
       userNo: user.user_no,
       boundaryItemNo: user.boundaryItemNo,
       titleItemNo: user.titleItemNo,
@@ -72,70 +57,67 @@ const ServerUserList = () => {
 
     const sendPayload = () => socket.send(JSON.stringify(payload));
 
-    if (socket && socket.readyState === WebSocket.OPEN) {
+    if (socket.readyState === WebSocket.OPEN) {
       sendPayload();
-    } else if (socket) {
+    } else {
       socket.addEventListener('open', sendPayload, { once: true });
     }
-    // if (socket.readyState === WebSocket.OPEN) {
-    //   socket.send(JSON.stringify(payload));
-    // } else {
-    //   socket.onopen = () => socket.send(JSON.stringify(payload));
-    // }
 
-    if (socket) {
-      socket.onmessage = async (event) => {
-        const data = JSON.parse(event.data);
+    // 메시지 핸들러 분리
+    const messageHandler = async (event) => {
+      const data = JSON.parse(event.data);
 
-        if (data.type === "userList" && data.server === server) {
-          // 1) WebSocket이 준 userNo 리스트를 상세 정보로 보강
-          const detailed = await Promise.all(
-            data.users.map(async (u) => {
-              const { data: full } = await axios.get(`/user/${u.userNo}`);
-              return {
-                userNo: full.user_no,
-                userNick: full.user_nick,
-                backgroundItemNo: full.backgroundItemNo,
-                titleItemNo: full.titleItemNo,
-                fontColorItemNo: full.fontcolorItemNo,
-                userProfileImg: full.user_profile_img,
-                imageFileName: full.imageFileName,
-              };
-            })
-          );
+      if (data.type === "userList" && data.server === server) {
+        // 중복 userNo 제거
+        const uniqueUserNos = [...new Set(data.users.map(u => u.userNo))];
 
-          // 2) 본인 맨 앞으로
-          detailed.sort((a, b) =>
-            Number(a.userNo) === Number(user.user_no)
-              ? -1
-              : Number(b.userNo) === Number(user.user_no)
-              ? 1
-              : 0
-          );
-          setUsers(detailed);
-          setIsLoading(false);
-        }
-      };
-    }
-        
+        // 캐시에 없는 userNo만 호출
+        const usersToFetch = uniqueUserNos.filter(no => !userCache.current.has(no));
 
+        // API 호출 후 캐싱
+        const fetchedUsers = await Promise.all(
+          usersToFetch.map(async (userNo) => {
+            const { data: full } = await axios.get(`/user/${userNo}`);
+            const detailedUser = {
+              userNo: full.user_no,
+              userNick: full.user_nick,
+              backgroundItemNo: full.backgroundItemNo,
+              titleItemNo: full.titleItemNo,
+              fontColorItemNo: full.fontColorItemNo,
+              userProfileImg: full.user_profile_img,
+              imageFileName: full.imageFileName,
+            };
+            userCache.current.set(userNo, detailedUser);
+            return detailedUser;
+          })
+        );
+
+        // 캐시에서 모든 유저 정보 가져오기
+        const detailed = uniqueUserNos.map(no => userCache.current.get(no));
+
+        // 본인 맨 앞으로 정렬
+        detailed.sort((a, b) =>
+          Number(a.userNo) === Number(user.user_no)
+            ? -1
+            : Number(b.userNo) === Number(user.user_no)
+            ? 1
+            : 0
+        );
+
+        setUsers(detailed);
+        setIsLoading(false);
+      }
+    };
+
+    socket.addEventListener('message', messageHandler);
     socket.onerror = (e) => console.error("소켓 에러", e);
 
+    // 컴포넌트 언마운트시 이벤트 리스너 제거
     return () => {
       setUsers([]);
+      socket.removeEventListener('message', messageHandler);
     };
-  }, [
-    server,
-    user?.user_no,
-    user?.user_nick,
-    user?.backgroundItemNo,
-    user?.boundaryItemNo,
-    user?.titleItemNo,
-    user?.fontcolorItemNo,
-    user_profile_img,
-    imageFileName,
-    sockets
-  ]);
+  }, [server, user_no, user_nick, sockets]);
 
   return (
     <div className={styles.container}>

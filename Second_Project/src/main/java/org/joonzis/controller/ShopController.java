@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -101,11 +102,9 @@ public class ShopController {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "토스 결제 승인 실패");
         }
     }
-    
-    // 상점 - 카테고리별 아이템 목록
-    @GetMapping("/shop/items")
-	public List<ItemVO> getItemCategory(@RequestParam("category") String category) {
 
+    @GetMapping("/shop/items/all")
+    public List<ItemVO> getItemsByCategories(@RequestParam List<String> category) {
         Map<String, String> categoryMap = Map.of(
             "테두리", "boundary",
             "칭호", "title",
@@ -116,9 +115,19 @@ public class ShopController {
             "기타", "etc"
         );
 
-        String mappedCategory = categoryMap.getOrDefault(category, "unknown");
-	    return shopservice.getItemCategory(mappedCategory);
-	}
+        // 클라이언트에서 받은 카테고리 리스트를 매핑
+        List<String> mappedCategories = category.stream()
+            .map(c -> categoryMap.getOrDefault(c, "unknown"))
+            .filter(c -> !c.equals("unknown"))  // unknown 카테고리 제거(옵션)
+            .collect(Collectors.toList());
+
+        if (mappedCategories.isEmpty()) {
+            return List.of(); // 빈 리스트 반환 또는 예외 처리 가능
+        }
+
+        // 서비스에 리스트 넘겨서 한 번에 아이템 조회
+        return shopservice.getItemsByCategories(mappedCategories);
+    }
     
     // 아이템 구매 - 인벤토리에 추가
     @PostMapping("/shop/buyItemInventory")

@@ -10,7 +10,7 @@ import PasswordModal from './modal/PasswordModal';
 import FilterModal from './modal/FilterModal';
 
 
-const RoomList = () => {
+const RoomList = ({ shopItems }) => {
   const [category, setCategory] = useState('random');
   const [gameRoomList, setGameRoomList] = useState([]);
   const [filterModal, setFilterModal] = useState(false);
@@ -63,6 +63,7 @@ const RoomList = () => {
           nav('/questionReview');
           break;
         case "joinRoom":
+          console.log("joinRoom 직전 shopItems:", shopItems); // 로그 확인
           nav('/gameRoom/' + data.roomNo, {state : {category: data.category, gameMode : data.gameMode}});
           break;
         case "joinDenied":

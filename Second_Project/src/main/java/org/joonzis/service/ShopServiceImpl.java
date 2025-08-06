@@ -13,9 +13,9 @@ public class ShopServiceImpl implements ShopService {
 	@Autowired
 	private ShopMapper mapper;
 	
-	// 상점 - 카테고리별 아이템 목록
-	@Override
-	public List<ItemVO> getItemCategory(String category) {
-		return mapper.getItemCategory(category);
-	}
+	// 여러 카테고리를 받아 한번에 조회
+    @Override
+    public List<ItemVO> getItemsByCategories(List<String> categories) {
+        return mapper.getItemsByCategories(categories);
+    }
 }

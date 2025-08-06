@@ -5,7 +5,6 @@ import java.util.List;
 import org.joonzis.domain.ItemVO;
 
 public interface ShopMapper {
-	
-	// 상점 - 카테고리별 아이템 목록
-	public List<ItemVO> getItemCategory(String category);
+	// 여러 카테고리 한번에 조회하는 메서드 추가
+    public List<ItemVO> getItemsByCategories(List<String> categories);
 }

@@ -1,9 +1,5 @@
 package org.joonzis.service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +8,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.ItemVO;
@@ -141,34 +140,26 @@ public class AdminServiceImpl implements AdminService {
         result.put("totalCount", totalCount);
         result.put("error", null);
 
-        log.info("ServiceImpl: searchQuestions 호출 - category(tableName): " + subjectCode + ", 검색어: " + query + ", 페이지: " + page + ", 제한: " + limit);
-
      // subject 코드 유효성 검사
         if (subjectCode == null || !isValidSubjectCode(subjectCode)) {
             result.put("error", "유효하지 않은 과목 코드입니다: " + subjectCode);
-            log.warn("유효하지 않은 과목 코드 요청: " + subjectCode);
             return result;
         }
 
         try {
         	int offset = (page - 1) * limit;
-            log.debug("계산된 OFFSET: " + offset);
 
             Map<String, Object> params = new HashMap<>();
             params.put("subjectCode", subjectCode);
             params.put("query", query);
             params.put("offset", offset);
             params.put("limit", limit);
-            log.debug("매퍼 파라미터 Map 준비: " + params);
-
+            
             try {
                 // getTotalQuestionCount 메서드도 subjectCode를 필터링 기준으로 사용해야 함
                 totalCount = adminMapper.getTotalQuestionCount(params);
-                log.info("총 문제 개수 조회 성공: " + totalCount);
                 totalPages = (int) Math.ceil((double) totalCount / limit);
-                log.debug("계산된 총 페이지 수: " + totalPages);
             } catch (Exception e) {
-                log.error("Mapper.getTotalQuestionCount 호출 중 오류 발생: " + e.getMessage(), e);
                 totalCount = 0;
                 totalPages = 0;
                 result.put("error", "총 문제 개수 조회 중 오류 발생: " + e.getMessage());
@@ -177,7 +168,6 @@ public class AdminServiceImpl implements AdminService {
             if (result.get("error") == null) {
                 try {
                     questions = adminMapper.getQuestionsBySearch(params);
-                    log.info("Mapper.getQuestionsBySearch 호출 성공. 조회된 문제 수: " + (questions != null ? questions.size() : 0));
 
                     if (questions != null) {
                         for (QuestionDTO question : questions) {
@@ -186,7 +176,6 @@ public class AdminServiceImpl implements AdminService {
                                     String base64Image = Base64.getEncoder().encodeToString(question.getImage_data());
                                     question.setImage_data_base64(base64Image);
                                     question.setImage_data(null);
-                                    log.debug("문제 ID " + question.getId() + " 이미지 Base64 변환 성공.");
                                 } catch (Exception e) {
                                     log.error("문제 ID " + question.getId() + " 이미지 Base64 변환 중 오류 발생: " + e.getMessage(), e);
                                     question.setImage_data_base64("");
@@ -213,8 +202,6 @@ public class AdminServiceImpl implements AdminService {
             log.error("ServiceImpl.searchQuestions 메서드 실행 중 알 수 없는 예외 발생: " + e.getMessage(), e);
             result.put("error", "서버 내부 오류가 발생했습니다: " + e.getMessage());
         }
-
-        log.info("ServiceImpl: searchQuestions 결과 반환. questions size: " + ((List)result.get("questions")).size() + ", totalCount: " + result.get("totalCount") + ", error: " + result.get("error"));
         return result;
     }
 
@@ -385,7 +372,7 @@ public class AdminServiceImpl implements AdminService {
     
 
     // 유저 채금 해제 (1시간마다 실행되도록 스케줄링)
-    @Scheduled(fixedRate = 3600000) // 1시간 = 3600000 밀리초
+    @Scheduled(fixedRate = 60000) // 1시간 = 3600000 밀리초
     @Override
     @Transactional
     public void unbanChatUsers() {
