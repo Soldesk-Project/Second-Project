@@ -137,7 +137,7 @@ public class LoginController {
 		    	    .map(GrantedAuthority::getAuthority)
 		    	    .orElse("ROLE_USER");  // 권한 없으면 기본값
 
-	        String jwtToken = jwtUtil.generateToken(user.getUser_id(), role);
+	        String jwtToken = jwtUtil.generateToken(user.getUser_id(), role, user.getUser_no());
 
 	        Map<String, Object> response = new HashMap<>();
 	        response.put("token", jwtToken);
@@ -341,7 +341,7 @@ public class LoginController {
 		    	    .orElse("ROLE_USER");  // 권한 없으면 기본값
 	        
 
-	        String jwtToken = jwtUtil.generateToken(user.getUser_id(), role);
+	        String jwtToken = jwtUtil.generateToken(user.getUser_id(), role, user.getUser_no());
 
 	        Map<String, Object> response = new HashMap<>();
 	        response.put("token", jwtToken);
@@ -459,7 +459,7 @@ public class LoginController {
 		    	    .map(GrantedAuthority::getAuthority)
 		    	    .orElse("ROLE_USER");  // 권한 없으면 기본값
 
-	        String jwtToken = jwtUtil.generateToken(user.getUser_id(), role);
+	        String jwtToken = jwtUtil.generateToken(user.getUser_id(), role, user.getUser_no());
 
 	        Map<String, Object> response = new HashMap<>();
 	        response.put("token", jwtToken);
@@ -691,14 +691,9 @@ public class LoginController {
 	    // 사용자가 입력한 ID와 PW
 	    String inputId = dto.getUser_id();
 	    String inputPw = dto.getUser_pw();
-	    
-	    System.out.println("id -> " + inputId);
-	    System.out.println("password -> " + inputPw);
 
 	    // DB에서 사용자 정보 조회 (비밀번호 포함)
 	    UserInfoDTO user = userservice.getUserById(inputId);
-	    
-	    System.out.println("사용자 -> " + user);
 
 	    if (user == null) {
 	    	System.out.println("사용자 없음");
@@ -753,7 +748,10 @@ public class LoginController {
 	    	    .map(GrantedAuthority::getAuthority)
 	    	    .orElse("ROLE_USER");  // 권한 없으면 기본값
 	    
-	    String token = jwtUtil.generateToken(inputId, role);
+	    String token = jwtUtil.generateToken(inputId, role, user.getUser_no());
+	    
+	    Integer userNoFromToken = jwtUtil.getUserNoFromToken(token);
+	    System.out.println("토큰에서 꺼낸 userNo: " + userNoFromToken);
 	    // 5. 사용자 정보 및 토큰 반환
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("token", token);
@@ -764,7 +762,6 @@ public class LoginController {
 	    return ResponseEntity.ok(response);
 	}
 	
-
 	@PostMapping("/logout")
 	public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {
 	    String userId = request.get("userId");

@@ -29,6 +29,7 @@ import ResetPasswordPage from './pages/login/ResetPasswordPage';
 import ErrorEvent from './pages/ErrorEvent';
 import ProtectedRoute from './components/ProtectedRoute';
 import ErrorEvent403 from './pages/ErrorEvent403';
+import BanListener from "./util/BanListener";
 
 function App() {
   const dispatch = useDispatch();
@@ -54,6 +55,7 @@ function App() {
     // <Router> 대신 위에거 넣으면 히스토리를 메모리에서만 관리해서 유저가 히스토리 이동이 불가능해짐
     <WebSocketProvider>
       <Router>
+      <BanListener/>
         <Routes>
           <Route path="/" element={<LoginForm />} />
           <Route path="/server" element={<ServerSelect />} />

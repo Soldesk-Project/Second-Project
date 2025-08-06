@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styles from '../../css/adminPage/UserRestrict.module.css';
+import { WebSocketContext } from '../../util/WebSocketProvider';
 
 const PAGE_SIZE = 8;
 
 const UserRestrict = () => {
+  const sockets = useContext(WebSocketContext);
   const token = localStorage.getItem('token');
   // 검색 조건을 위한 상태
   const [searchConditions, setSearchConditions] = useState({
@@ -241,6 +243,25 @@ const UserRestrict = () => {
         return '검색어를 입력하세요';
     }
   };
+
+  useEffect(() => {
+    const banSocket = sockets['ban'];
+    if (!banSocket) return;
+
+    banSocket.onmessage = (event) => {
+      let data;
+      try {
+        data = JSON.parse(event.data);
+      } catch {
+        console.warn("🟠 JSON 파싱 실패:", event.data);
+        return;
+      }
+
+      switch (data.type) {
+        
+      }
+    }
+  })
 
   return (
     <div className={styles.userRestrictContainer}>

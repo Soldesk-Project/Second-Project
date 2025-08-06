@@ -330,16 +330,13 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional
     public int banLoginUsers(List<Integer> userNos) {
-    	log.info("ServiceImpl: banChatusers 호출 - 사용자 번호 목록: " + userNos);
         if (userNos == null || userNos.isEmpty()) {
-            log.info("접속 금지할 사용자 번호가 없습니다.");
             return 0;
         }
 
         List<Integer> actualUsersToBan = new ArrayList<>();
 
         List<UsersVO> currentStatuses = adminMapper.getUsersLoginBanStatus(userNos);
-        log.debug("현재 접속 금지 상태 조회 결과: " + currentStatuses.size() + "명");
 
         for (Integer userNo : userNos) {
             boolean alreadyBanned = false;
@@ -358,11 +355,8 @@ public class AdminServiceImpl implements AdminService {
         }
 
         if (!actualUsersToBan.isEmpty()) {
-            log.info(actualUsersToBan.size() + "명의 사용자에게 접속 금지 적용 예정.");
         	
-//    	    userservice.updateLoginStatus(inputId, 1);
             int updatedCount = adminMapper.updateLoginBanStatus(actualUsersToBan, new Timestamp(System.currentTimeMillis()));
-            log.info(updatedCount + "명의 사용자에게 접속 금지가 적용되었습니다.");
             return updatedCount;
         } else {
             log.info("새로 접속 금지할 사용자가 없습니다.");

@@ -11,10 +11,11 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class JwtUtil {
     private final String SECRET_KEY = "your_secret_key";
 
-    public String generateToken(String userId, String role) {
+    public String generateToken(String userId, String role, Integer userNo) {
         return Jwts.builder()
             .setSubject(userId)
-            .claim("auth", role)  // 권한 추가
+            .claim("auth", role)
+            .claim("userNo", userNo)  // userNo 추가
             .setIssuedAt(new Date())
             .setExpiration(new Date(System.currentTimeMillis() + 86400000))
             .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
@@ -35,6 +36,22 @@ public class JwtUtil {
             .parseClaimsJws(token)
             .getBody()
             .get("auth");
+    }
+    
+    public Integer getUserNoFromToken(String token) {
+        Object userNoObj = Jwts.parser()
+            .setSigningKey(SECRET_KEY)
+            .parseClaimsJws(token)
+            .getBody()
+            .get("userNo");
+
+        if (userNoObj instanceof Integer) {
+            return (Integer) userNoObj;
+        }
+        if (userNoObj instanceof Number) { // JWT 라이브러리에서 Long으로 올 수도 있어서
+            return ((Number) userNoObj).intValue();
+        }
+        return null;
     }
     
 

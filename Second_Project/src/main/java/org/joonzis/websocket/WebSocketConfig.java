@@ -17,6 +17,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
 	private GameRoomWebSocketHandler gameRoomHandler;
 	@Autowired
 	private GameMatchWebSocketHandler gameMatchHandler;
+	@Autowired
+	private UserBanWebSocketHandler userBanHandler;
+	
+	@Autowired
+	private JwtHandshakeInterceptor jwtHandshakeInterceptor;
 	
 
     @Override
@@ -24,7 +29,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
         registry.addHandler(serverUserHandler, "/ws/server").setAllowedOrigins("*");
         registry.addHandler(gameRoomHandler, "/ws/room").setAllowedOrigins("*");
         registry.addHandler(gameMatchHandler, "/ws/match").setAllowedOrigins("*");
+        registry.addHandler(userBanHandler, "/ws/ban")
+        		.addInterceptors(jwtHandshakeInterceptor)
+        		.setAllowedOrigins("*");
     }
+    
     @Bean
     public GameRoomWebSocketHandler serverWebSocketHandler() {
         return new GameRoomWebSocketHandler();

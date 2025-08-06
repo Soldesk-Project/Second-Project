@@ -20,6 +20,7 @@ import org.joonzis.domain.UsersVO;
 import org.joonzis.service.AdminService;
 import org.joonzis.service.FileUploadService;
 import org.joonzis.service.UserService;
+import org.joonzis.websocket.UserBanWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +51,9 @@ public class AdminPageController {
     
     @Autowired
     private FileUploadService fileUploadService;
+    
+    @Autowired
+    private UserBanWebSocketHandler userBanWebSocketHandler;
     
     // 문제 등록
     @PostMapping("/registerQuestion")
@@ -304,6 +308,9 @@ public class AdminPageController {
     	
     	try {
     		int updatedCount = adminService.banLoginUsers(userNos);
+    		for (Integer userNo : userNos) {
+                userBanWebSocketHandler.handleUserBan(userNo); // 메시지 전송 메서드 호출
+            }
     		response.put("message", updatedCount + "명의 사용자에게 접속 금지가 성공적으로 적용되었습니다.");
     		return new ResponseEntity<>(response, HttpStatus.OK);
     	} catch (Exception e) {
