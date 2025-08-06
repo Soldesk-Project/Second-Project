@@ -39,7 +39,7 @@ const ServerUserList = () => {
   useEffect(() => {
     if (!server || !user || !user_nick || !user_no) return;
 
-    const socket = sockets['server'];
+    const socket = sockets.current['server'];
     if (!socket) return;
 
     socketRef.current = socket; // 단순 참조

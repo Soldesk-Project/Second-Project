@@ -3,9 +3,6 @@ import styles from '../../css/LeaveModal.module.css';
 
 const LeaveModal = ({ onConfirm, onCancel, gameMode, play }) => {
 
-  console.log(gameMode);
-  
-  
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>

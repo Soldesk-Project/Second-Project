@@ -23,7 +23,7 @@ const UserRanking = () => {
   const refreshRanking = useSelector((state) => state.ranking.refreshRanking);
 
   const sockets = useContext(WebSocketContext);
-  const socket = sockets['server'];
+  const socket = sockets.current['server'];
   const user_no = user.user_no;
   const shopItems = useSelector(state => state.shop.items);
 

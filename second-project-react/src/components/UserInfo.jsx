@@ -61,7 +61,7 @@ const UserInfo = ({userRankingList}) => {
 
     const { isTop10 } = useSelector((state) => state.ranking);
     const sockets = useContext(WebSocketContext);
-    const socket = sockets['server'];
+    const socket = sockets.current['server'];
 
     // --- 1) 프로필 상태
     const [profileSrc, setProfileSrc] = useState('/images/profile_default.png');

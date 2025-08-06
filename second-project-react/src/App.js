@@ -53,8 +53,8 @@ function App() {
   return (
     // <MemoryRouter initialEntries={["/"]}></MemoryRouter>
     // <Router> 대신 위에거 넣으면 히스토리를 메모리에서만 관리해서 유저가 히스토리 이동이 불가능해짐
-    <WebSocketProvider>
-      <Router>
+    <Router>
+      <WebSocketProvider>
       <BanListener/>
         <Routes>
           <Route path="/" element={<LoginForm />} />
@@ -77,8 +77,8 @@ function App() {
           <Route path="/403" element={<ErrorEvent403 />} />
           <Route path="/*" element={<ErrorEvent />} />
         </Routes>
-      </Router>
-    </WebSocketProvider>
+      </WebSocketProvider>
+    </Router>
   );
 }
 

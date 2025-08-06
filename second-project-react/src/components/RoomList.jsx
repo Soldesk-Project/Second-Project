@@ -29,7 +29,7 @@ const RoomList = ({ shopItems }) => {
   const sockets = useContext(WebSocketContext);
 
   useEffect(() => {
-    const socket = sockets['room'];
+    const socket = sockets.current['room'];
     if (!socket) return;
 
     if (socket.readyState === 1) {
@@ -63,7 +63,6 @@ const RoomList = ({ shopItems }) => {
           nav('/questionReview');
           break;
         case "joinRoom":
-          console.log("joinRoom 직전 shopItems:", shopItems); // 로그 확인
           nav('/gameRoom/' + data.roomNo, {state : {category: data.category, gameMode : data.gameMode}});
           break;
         case "joinDenied":
@@ -86,8 +85,8 @@ const RoomList = ({ shopItems }) => {
   }, [server, userNick, sockets]);
 
   useEffect(() => {
-    const matchSocket = sockets['match'];
-    const socket = sockets['room'];
+    const matchSocket = sockets.current['match'];
+    const socket = sockets.current['room'];
     if (!matchSocket) return;
 
     if (matchSocket.readyState !== 1) {
@@ -171,7 +170,7 @@ const RoomList = ({ shopItems }) => {
     try {
       await axios.post('/api/rank/score', { userId: user.user_id });
 
-      const matchSocket = sockets['match'];
+      const matchSocket = sockets.current['match'];
       if (!matchSocket) {
         alert("웹소켓 연결이 존재하지 않습니다.");
         return;
@@ -200,7 +199,7 @@ const RoomList = ({ shopItems }) => {
   };
 
   const handleQuestionReview=()=>{
-    const socket = sockets['room'];
+    const socket = sockets.current['room'];
     if (socket && socket.readyState === 1) {
         socket.send(JSON.stringify({
           action: "joinQuestionReviewRoom",
@@ -229,7 +228,7 @@ const RoomList = ({ shopItems }) => {
   const enterRoom=(room)=>{
     console.log('실행');
     
-    const socket = sockets['room'];
+    const socket = sockets.current['room'];
     if (socket && socket.readyState === 1) {
       if (room.limit > room.currentCount) {
         console.log(room.game_mode);
@@ -253,7 +252,7 @@ const RoomList = ({ shopItems }) => {
   }
 
   const handleCancelMatch = () => {
-    const matchSocket = sockets['match'];
+    const matchSocket = sockets.current['match'];
     if (matchSocket && matchSocket.readyState === 1) {
       matchSocket.send(JSON.stringify({
         action: 'cancelMatch',
@@ -307,7 +306,7 @@ const RoomList = ({ shopItems }) => {
       {modalOpen && (
         <ModalBasic
           setModalOpen={setModalOpen}
-          socket={sockets['room']}
+          socket={sockets.current['room']}
           isWsOpen={isWsOpen}
           onCategorySelect={setCategory}
           
@@ -330,7 +329,7 @@ const RoomList = ({ shopItems }) => {
       {/* ✅ 매칭 수락 모달 */}
       {showMatchModal && matchStatus === 'pending' && (
         <MatchModal
-          socket={sockets['match']}
+          socket={sockets.current['match']}
           currentUserId={user.user_id}
           setShowMatchModal={setShowMatchModal}
           setMatchStatus={setMatchStatus}

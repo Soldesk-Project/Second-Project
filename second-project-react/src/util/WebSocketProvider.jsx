@@ -55,7 +55,7 @@ export const WebSocketProvider = ({ children }) => {
   }, []);
 
   return (
-    <WebSocketContext.Provider value={socketsRef.current}>
+    <WebSocketContext.Provider value={socketsRef}>
       {children}
     </WebSocketContext.Provider>
   );

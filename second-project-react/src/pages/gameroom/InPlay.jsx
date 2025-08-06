@@ -82,8 +82,6 @@ const InPlay = () => {
   const rankedUsers = useMemo(() => getRankedUsers(users, gameMode), [users, gameMode]);
   const messageTimeoutRef = useRef({});
   
-  console.log(shopItems);
-  
   // 소켓
   const sockets = useContext(WebSocketContext);
 
@@ -179,7 +177,7 @@ const InPlay = () => {
 
   // 문제 데이터
   useEffect(() => {
-    const socket = sockets['room'];
+    const socket = sockets.current['room'];
     if (!socket) return;
 
     const joinAndRequestUserList = () => {
@@ -352,7 +350,7 @@ const InPlay = () => {
 
     // 결과 전송
     if (!play && result) {
-      const socket = sockets['room'];
+      const socket = sockets.current['room'];
       if (socket && socket.readyState === 1) {
         const myInfo = rankedUsers.find(u => u.userNick === userNick);
         const myPoint = myInfo.point ?? 0;
@@ -379,7 +377,7 @@ const InPlay = () => {
   // 정답 판단
   const handleAnswerSubmit = (answer, spentTimeSec) => {
     
-    const socket = sockets['room'];
+    const socket = sockets.current['room'];
     if (socket && socket.readyState === 1) {
       socket.send(JSON.stringify({
         action: 'submitAnswer',
@@ -399,7 +397,7 @@ const InPlay = () => {
 
   // 시작 버튼
   const start = () => {
-    const socket = sockets['room'];
+    const socket = sockets.current['room'];
     if (socket && socket.readyState === 1) {
       socket.send(JSON.stringify({
         action: 'startGame',
@@ -437,7 +435,7 @@ const InPlay = () => {
 
   // 나가기 버튼 (플레이 중 불가)
   const leaveRoom = () => {
-    const socket = sockets['room'];
+    const socket = sockets.current['room'];
     if (socket && socket.readyState === 1) {
       socket.send(JSON.stringify({
         action: 'leaveRoom',
@@ -452,12 +450,9 @@ const InPlay = () => {
 
    useEffect(()=>{
     const timeId = setInterval(()=>setDate(new Date()),1000)
-    console.log('setInteval')
 
     return() =>{
       clearInterval(timeId)
-      console.log('clearInterval')
-
     }
   },[])
 
