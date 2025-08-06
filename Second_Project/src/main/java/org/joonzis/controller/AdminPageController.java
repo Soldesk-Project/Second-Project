@@ -85,11 +85,6 @@ public class AdminPageController {
             @RequestParam(value = "limit", defaultValue = "10") int limit) {
         try {
             Map<String, Object> result = adminService.searchQuestions(subjectCode, query, page, limit);
-            
-            System.out.println("과목 -> " + subjectCode);
-            System.out.println("검색어 -> " + query);
-            
-            System.out.println("검색 결과 -> " + result);
 
             return new ResponseEntity<>(result, HttpStatus.OK);
 
