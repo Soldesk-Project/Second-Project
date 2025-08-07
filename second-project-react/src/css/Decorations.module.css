@@ -7,7 +7,10 @@
 .indigo_fontColor { color: indigo !important; font-weight: bold; }
 .violet_fontColor { color: purple !important; font-weight: bold; }
 
-.white_fontColor { color: white !important; font-weight: bold; }
+.white_fontColor { color: white !important; font-weight: bold; text-shadow: none;  }
+.whiteShadow {
+  text-shadow: 2px 0 4px rgba(0, 0, 0, 0.7);
+}
 .black_fontColor { color: black !important; font-weight: bold; }
 
 @keyframes rainbowColor {

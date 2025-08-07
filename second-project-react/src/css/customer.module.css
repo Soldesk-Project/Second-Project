@@ -451,3 +451,9 @@ textarea {
     justify-content: center;
   }
 }
+
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}

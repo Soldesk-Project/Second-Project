@@ -451,40 +451,35 @@ const UserInfo = ({userRankingList}) => {
             <div className={styles.shopMaingrid}>
             <div className={styles.grid}>
                 {items.length ? (
-                items.map(item => (
-                    <div key={item.item_no} className={styles.card} onClick={() => setSelectedItem(item)}>
-                        <div className={styles.itemCss}>
-                        {/* title 타입은 텍스트 데코, 그 외엔 이미지 */}
-                        {(item.item_type === 'boundary' || item.item_type === 'background' || item.item_type === 'balloon' || (item.item_type==='unique' && item.item_no===118) ||(item.item_type==='unique' && item.item_no===119)) ? (
-                            <img 
+                    items.map(item => {
+                        const isWhiteFont = item.css_class_name === 'white_fontColor'; // 하얀 글씨 여부 판단
+                        
+                        return (
+                        <div key={item.item_no} className={styles.card} onClick={() => setSelectedItem(item)}>
+                            <div className={styles.itemCss}>
+                            {(item.item_type === 'boundary' || item.item_type === 'background' || item.item_type === 'balloon' 
+                                || (item.item_type==='unique' && item.item_no===118) 
+                                || (item.item_type==='unique' && item.item_no===119)) ? (
+                                <img 
                                 src={item.imgUrl}
                                 alt={item.item_name}
                                 className={styles.itemImage}
-                            />
-                        ) : (
-                            <span className={decoStyles[item.css_class_name]}>
+                                />
+                            ) : (
+                                <span 
+                                className={`${decoStyles[item.css_class_name]} ${isWhiteFont ? decoStyles.whiteShadow : ''}`}
+                                >
                                 [{titleTextMap[item.css_class_name]}]
-                            </span>
-                        )}
-                    </div>
-                            {/* <span className={decoStyles[item.css_class_name]} style={{marginRight: '5px', fontWeight: 'bold'}}>
-                                [{titleTextMap[item.css_class_name]}]
-                            </span>
+                                </span>
                             )}
-                            <span
-                            className={
-                                item.item_type !== 'title' ? decoStyles[item.css_class_name] : undefined
-                            }
-                            >
-                            아이템
-                            </span> */}
-                    
-                    <div className={styles.itemName}>이름 : {item.item_name}</div>
-                    </div>
-                ))
-                ) : (
-                <div>상품이 없습니다.</div>
-                )}
+                            </div>
+                            <div className={styles.itemName}>이름 : {item.item_name}</div>
+                        </div>
+                        );
+                    })
+                    ) : (
+                    <div>상품이 없습니다.</div>
+                    )}
             </div>
             </div>
         </div>

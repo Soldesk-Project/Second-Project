@@ -115,14 +115,14 @@ const PreviewModal = ({
               ].filter(Boolean);
 
               const textElement = (
-                <span className={decoStyles[previewStyle.fontcolor_class_name]}>
-                  {/* title 출력 */}
+                <span
+                  className={`${decoStyles[previewStyle.fontcolor_class_name]} ${previewStyle.fontcolor_class_name === 'white_fontColor' ? decoStyles.whiteShadow : ''}`}
+                >
                   {titleTextMap[previewStyle.title_class_name] && (
                     <span className={decoStyles[previewStyle.title_class_name]} style={{ marginRight: '5px' }}>
                       [{titleTextMap[previewStyle.title_class_name]}]
                     </span>
                   )}
-                  {/* 닉네임 출력 */}
                   {user.user_nick}
                 </span>
               );
