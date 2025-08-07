@@ -128,14 +128,20 @@ public class UserController {
                                             @RequestBody Map<String, String> body) {
         String user_nick = body.get("user_nick");
         String user_id = body.get("user_id");
+        System.out.println(user_nick);
+        System.out.println(user_id);
+        System.out.println(user_no);
         
         if (user_nick == null || user_nick.trim().isEmpty()) {
+        	System.out.println("1");
             return ResponseEntity.badRequest().body("닉네임이 비어 있습니다.");
         }
         if ((int) service.getUserPoint(user_id) < 5000) {
+        	System.out.println("2");
         	return ResponseEntity.badRequest().body("포인트 부족");
         }
         try {
+        	System.out.println("3");
             service.updateNickname(user_no, user_nick);
             return ResponseEntity.ok().build();
         } catch (Exception e) {

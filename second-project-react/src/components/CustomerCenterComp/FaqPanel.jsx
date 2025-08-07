@@ -97,7 +97,7 @@ const FaqPanel = () => {
                   className={styles.listItemHeader} 
                   onClick={() => toggleDetails(item.id)}
                   >
-                  <span className={styles.listItemNo}>{index+1}</span>
+                  <span className={styles.listItemNo}>{item.id}</span>
                   <span className={styles.listItemTitle}>
                     {item.question} {/* FaqVO의 'question' 필드 사용 */}
                   </span>

@@ -10,6 +10,7 @@ const ITEM_TYPES = [
   { key: 'title', label: '칭호' },
   { key: 'fontColor', label: '글자색' },
   { key: 'background', label: '명함' },
+  { key: 'balloon', label: '말풍선' },
   { key: 'unique', label: '유니크 아이템' },
 ];
 
@@ -28,6 +29,7 @@ const ItemList = () => {
     title: false,
     fontColor: false,
     background: false,
+    balloon: false,
   });
   const [rewardReceived, setRewardReceived] = useState({});
   const [reloadRewardStatus, setReloadRewardStatus] = useState(false);
@@ -174,18 +176,6 @@ const ItemList = () => {
       .catch(console.error);
   };
 
-  const nameChange=(name)=>{
-    switch (name) {
-      case "pinkProfileBorder": return "핑크 테두리";
-      case "lineProfileBorder": return "줄무늬 테두리";
-      case "defaultProfileBorder": return "기본 테두리";
-      case "dogProfileBorder.png": return "강아지 테두리";
-      case "leafProfileBorder": return "잎 테두리";
-      case "catProfileBorder": return "고양이 테두리";
-      default: return name;
-    }
-  }
-
   // UI 렌더링 함수
   const renderItemSection = (typeKey, label) => {
     const { filtered, ownedCount, totalCount, percent } = getItemStats(typeKey);
@@ -242,7 +232,7 @@ const ItemList = () => {
                         </span>
                       )}
                       {
-                        typeKey==='boundary'||typeKey==='background'||(item.item_type==='unique' && item.item_no===118) ||(item.item_type==='unique' && item.item_no===119)?
+                        typeKey==='boundary'||typeKey==='background'||typeKey==='balloon'||(item.item_type==='unique' && item.item_no===118) ||(item.item_type==='unique' && item.item_no===119)?
                         <img src={item.imgUrl} alt={item.item_name} className={styles.itemImage}/>
                         :
                         (
@@ -258,7 +248,7 @@ const ItemList = () => {
                       }
                     </div>
                   </div>
-                  <div className={styles.itemName}>{nameChange(item.item_name)}</div>
+                  <div className={styles.itemName}>{item.item_name}</div>
                 </div>
               ))
             ) : (

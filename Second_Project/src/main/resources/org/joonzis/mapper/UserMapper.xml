@@ -253,8 +253,15 @@
 		<selectKey keyProperty="user_no" resultType="int" order="BEFORE">
 	        SELECT SEQ_USERS.NEXTVAL FROM dual
 	    </selectKey>
-		INSERT INTO USERS (USER_NO, USER_NICK, USER_ID, USER_PW, USER_EMAIL, USER_DATE, ISCHATBANNED)
-		VALUES (#{user_no}, #{user_nick}, #{user_id}, #{user_pw}, #{user_email}, sysdate, 0)
+	    BEGIN
+			INSERT INTO USERS (USER_NO, USER_NICK, USER_ID, USER_PW, USER_EMAIL, USER_DATE, ISCHATBANNED)
+			VALUES (#{user_no}, #{user_nick}, #{user_id}, #{user_pw}, #{user_email}, sysdate, 0);
+			
+			INSERT INTO INVENTORY VALUES(#{user_no}, 'white_fontColor', '하얀 글자', 'fontColor');
+			INSERT INTO INVENTORY VALUES(#{user_no}, null, '기본 테두리', 'boundary');
+			INSERT INTO INVENTORY VALUES(#{user_no}, null, '기본 말풍선', 'balloon');
+			INSERT INTO INVENTORY VALUES(#{user_no}, null, '기본명함', 'background');
+		END;
 	</insert>
 	<!-- 유저 데코,리워드에 추가 -->
 	<insert id="insertDeco">
