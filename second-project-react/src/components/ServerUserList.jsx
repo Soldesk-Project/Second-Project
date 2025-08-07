@@ -18,7 +18,6 @@ const ServerUserList = () => {
   const socketRef = useRef(null);
   const userCache = useRef(new Map()); // userNo 별 캐시
   const shopItems = useSelector(state => state.shop.items);
-
   const {
     user_nick,
     user_no,
@@ -54,10 +53,13 @@ const ServerUserList = () => {
       server,
       userNick: user.user_nick,
       userNo: user.user_no,
+      userRank: user.user_rank,
+      bgItemNo: user.backgroundItemNo,
       boundaryItemNo: user.boundaryItemNo,
       titleItemNo: user.titleItemNo,
       fontColorItemNo: user.fontcolorItemNo,
       userProfileImg: user.user_profile_img,
+      imageFileName: user.imageFileName
     };
 
     const sendPayload = () => socket.send(JSON.stringify(payload));
@@ -71,19 +73,25 @@ const ServerUserList = () => {
     // 메시지 핸들러 분리
     const messageHandler = async (event) => {
       const data = JSON.parse(event.data);
-
+      
       if (data.type === "userList" && data.server === server) {
         // 중복 userNo 제거
         const uniqueUserNos = [...new Set(data.users.map(u => u.userNo))];
 
          // 유저 캐시 강제 갱신: 닉네임이 바뀐 경우 반영
+         
         data.users.forEach((u) => {
           const cached = userCache.current.get(u.userNo) || {};
           userCache.current.set(u.userNo, {
             ...cached,
-            userNo: u.userNo,       // 반드시 포함
+            userNo: u.userNo,
             userNick: u.userNick,
-            // 필요한 다른 속성도 포함
+            userRank: u.userRank,
+            backgroundItemNo: u.bgItemNo ?? cached.backgroundItemNo,
+            titleItemNo: u.titleItemNo ?? cached.titleItemNo,
+            fontColorItemNo: u.fontColorItemNo ?? cached.fontColorItemNo,
+            userProfileImg: u.userProfileImg ?? cached.userProfileImg,
+            imageFileName: u.imageFileName ?? cached.imageFileName,
           });
         });
 
@@ -162,7 +170,6 @@ const ServerUserList = () => {
             const bg = itemMap[u.backgroundItemNo];
             const tt = itemMap[u.titleItemNo];
             const fc = itemMap[u.fontColorItemNo];
-
             const bgStyle = bg?.imgUrl
               ? {
                   backgroundImage: `url(${bg.imgUrl})`,

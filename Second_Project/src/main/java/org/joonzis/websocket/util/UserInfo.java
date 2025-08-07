@@ -14,7 +14,9 @@ import lombok.ToString;
 public class UserInfo {
 	private String userNick;
     private String userNo;
+    private String userRank;
     private String userProfileImg;
+    private String imageFileName;
     private Integer bgItemNo;
     private Integer blItemNo;
     private Integer bdItemNo;

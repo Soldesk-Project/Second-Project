@@ -10,6 +10,7 @@ const UserDetailModal = ({ user, onClose, shopItems }) => {
     const { isTop10 } = useSelector((state) => state.ranking);
     const [stats, setStats] = useState(null);
     
+    
     // 상점 아이템 목록 가져오기(유저 프로필 아이템 랜더링)
     const itemMap = React.useMemo(() => {
         return shopItems.reduce((m, it) => {
@@ -52,7 +53,7 @@ const UserDetailModal = ({ user, onClose, shopItems }) => {
         setProfileSrc(src);
     }, [user.userProfileImg]);
     const renderTier = () => {
-        const rank = user.user_rank;
+        const rank = user.userRank ?? user.user_rank;
         if (rank > 800 && isTop10) return '챌린저';
         if (rank > 800) return '다이아몬드';
         if (rank > 400) return '플래티넘';

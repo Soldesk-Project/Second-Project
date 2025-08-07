@@ -17,7 +17,6 @@ const UserRanking = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showUserDetailModal, setShowUserDetailModal] = useState(false);
-
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
   const refreshRanking = useSelector((state) => state.ranking.refreshRanking);
