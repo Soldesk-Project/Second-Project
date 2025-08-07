@@ -717,6 +717,24 @@ public class AdminServiceImpl implements AdminService {
         }
         return request;
     }
+	
+	// 이미지 제외한 상세 정보 조회 (이미지 필드 null 처리)
+	@Override
+	public QuestRequestVO getQuestRequestInfoById(long id) {
+	    QuestRequestVO request = adminMapper.selectQuestRequestById(id);
+	    if (request != null) {
+	        request.setImage_data(null); // 이미지 제외
+	        request.setImage_data_base64(null);
+	    }
+	    return request;
+	}
+
+	// 이미지 데이터만 반환
+	@Override
+	public byte[] getQuestRequestImageById(long id) {
+	    QuestRequestVO request = adminMapper.selectQuestRequestById(id);
+	    return (request != null) ? request.getImage_data() : null;
+	}
 
 	@Override
 	public void updateQuestRequest(QuestRequestVO questRequestVO) {

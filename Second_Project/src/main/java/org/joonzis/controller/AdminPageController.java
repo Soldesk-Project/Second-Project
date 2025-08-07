@@ -187,6 +187,38 @@ public class AdminPageController {
             return new ResponseEntity<>("문제 등록 요청 상세 정보 로드 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    // 테스트
+    @GetMapping(value = "/questRequests/{id}/info", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> getQuestRequestInfoById(@PathVariable("id") int id) {
+        try {
+            QuestRequestVO questRequest = adminService.getQuestRequestInfoById(id); // 이미지 제외
+            if (questRequest != null) {
+                return new ResponseEntity<>(questRequest, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("해당 ID의 문제 등록 요청을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("문제 등록 요청 상세 정보 로드 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping(value = "/questRequests/{id}/image", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<?> getQuestRequestImageById(@PathVariable("id") int id) {
+        try {
+            byte[] imageData = adminService.getQuestRequestImageById(id);
+            if (imageData != null && imageData.length > 0) {
+                String base64Image = Base64.getEncoder().encodeToString(imageData);
+                Map<String, String> result = new HashMap<>();
+                result.put("image_data_base64", base64Image);
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("이미지가 존재하지 않습니다.", HttpStatus.NO_CONTENT);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("이미지 로드 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     // 3. 문제 등록 요청 수정 (상태 변경 및 내용 수정)
     @PutMapping(value = "/questRequests/{id}", produces = "application/json; charset=UTF-8")

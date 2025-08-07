@@ -89,6 +89,43 @@ const QuestRegiCallManage = () => {
         }
     };
 
+    // 상세 정보만 불러오는 함수 (이미지 제외)
+  const fetchDetailInfo = async (callId) => {
+    const response = await fetch(`/admin/questRequests/${callId}/info`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`상세 정보 로드 실패: ${errorText}`);
+    }
+    return await response.json();
+  };
+
+  // 이미지 데이터만 불러오는 함수
+  const fetchDetailImage = async (callId) => {
+  const response = await fetch(`/admin/questRequests/${callId}/image`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    return null; // 실패 시 null 반환
+  }
+
+  const text = await response.text();
+  if (!text) return null; // 빈 문자열이면 null 처리
+
+  try {
+    const data = JSON.parse(text);
+    return data.image_data_base64 || null;
+  } catch {
+    return null; // JSON 파싱 실패 시 null 반환
+  }
+};
+
     // 벌크 상태 변경 (기존과 동일)
     const handleBulkStatusChange = async (newStatus) => {
         if (selectedCalls.length === 0) {
@@ -129,36 +166,33 @@ const QuestRegiCallManage = () => {
 
     // 상세 미리보기 로드 함수
     const handleRowClick = async (callId) => {
-        // 이미 선택된 항목이면 토글 (선택 해제)
-        if (selectedCall && selectedCall.id === callId) {
-            setSelectedCall(null);
-            return;
-        }
+    if (selectedCall && selectedCall.id === callId) {
+      setSelectedCall(null);
+      return;
+    }
 
-        setLoading(true); // 상세 정보 로딩 중 표시
-        try {
-            // 백엔드 엔드포인트에 맞게 URL 수정
-            const response = await fetch(`/admin/questRequests/${callId}`, {
-                method: 'GET',
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`상세 정보 로드 실패: ${response.status} ${errorText}`);
-            }
-            const data = await response.json();
-            setSelectedCall(data); // 선택된 제보의 상세 정보 설정
-        } catch (error) {
-            console.error("제보 상세 정보 로드 중 오류:", error);
-            alert(`상세 정보 로드 중 오류가 발생했습니다: ${error.message}`);
-            setSelectedCall(null); // 에러 시 상세 정보 비움
-        } finally {
-            setLoading(false); // 로딩 완료
-        }
-    };
+    setLoading(true);
+    try {
+      // 기본 정보 먼저 요청
+      const info = await fetchDetailInfo(callId);
+
+      // 기본 정보 세팅 (이미지는 아직 없음)
+      setSelectedCall(info);
+
+      // 이미지 별도 요청
+      const base64Image = await fetchDetailImage(callId);
+
+      // 이미지가 있으면 selectedCall에 추가해서 다시 세팅
+      if (base64Image) {
+        setSelectedCall((prev) => ({ ...prev, image_data_base64: base64Image }));
+      }
+    } catch (error) {
+      alert(error.message);
+      setSelectedCall(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
     // 상세 미리보기에서 저장 버튼 클릭 시 (수정)
     const handleDetailSave = async () => {
@@ -390,14 +424,12 @@ const QuestRegiCallManage = () => {
                             <div style={{ marginBottom: '40px',  paddingBottom: '20px' }}>
                                 <h3>{selectedCall.question_text}</h3>
 
-                                {selectedCall.image_data && (
-                                    <div style={{ margin: '10px 0' }}>
+                                {selectedCall.image_data_base64 && (
                                     <img
-                                        src={`data:image/png;base64,${selectedCall.image_data}`}
+                                        src={`data:image/png;base64,${selectedCall.image_data_base64}`}
                                         alt="문제 이미지"
-                                        style={{ maxWidth: '100%', height: 'auto' }}
+                                        style={{ maxWidth: '162px', height: 'auto' }}
                                     />
-                                    </div>
                                 )}
 
                                 <div>

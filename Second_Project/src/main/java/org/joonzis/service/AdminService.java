@@ -31,7 +31,8 @@ public interface AdminService {
 	public void updateQuestRequest(QuestRequestVO questRequestVO);
 	// 실제 문제 등록
 	public void insertQuestion2(QuestRequestVO vo);
-	
+	public QuestRequestVO getQuestRequestInfoById(long id);
+	public byte[] getQuestRequestImageById(long id);
 	//유저 관련 메소드
 	//유저 조회 메소드
 	public List<UsersVO> getAllUsers();
