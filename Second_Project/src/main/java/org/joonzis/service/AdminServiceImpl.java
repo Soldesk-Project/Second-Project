@@ -59,7 +59,6 @@ public class AdminServiceImpl implements AdminService {
     
     static {
         Map<String, String> map = new HashMap<>();
-        map.put("all", "전체");
         map.put("cpe", "정보처리기사");
         map.put("cpei", "정보처리산업기사");
         map.put("cpet", "정보처리기능사");
