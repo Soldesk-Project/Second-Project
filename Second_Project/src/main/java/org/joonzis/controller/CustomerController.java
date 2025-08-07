@@ -208,7 +208,7 @@ public class CustomerController {
             @RequestParam(value = "userId", required = false) String UserId,
             @RequestParam("subject") String subject,
             @RequestParam("message") String message,
-            @RequestParam("postPassword") int    postPassword,
+            @RequestParam("postPassword") String postPassword,
             @RequestParam("email") String email,
             @RequestParam("category") String category,
             @RequestParam(value = "files", required = false) List<MultipartFile> files
@@ -218,7 +218,9 @@ public class CustomerController {
         vo.setUserId(UserId);
         vo.setSubject(subject);
         vo.setMessage(message);
-        vo.setPostPassword(postPassword);
+        if (postPassword!=null) {
+        	vo.setPostPassword(postPassword);
+		}
         vo.setEmail(email);
         vo.setCategory(category);
 

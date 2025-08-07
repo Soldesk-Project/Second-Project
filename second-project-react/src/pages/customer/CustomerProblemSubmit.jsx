@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 
-const CustomerProblemSubmit = ({ activeTab }) => {
+const CustomerProblemSubmit = ({ setProblemSubmit , activeTab}) => {
   const navigate = useNavigate();
   const [postPassword, setPostPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -16,6 +16,7 @@ const CustomerProblemSubmit = ({ activeTab }) => {
   const [previewImages, setPreviewImages] = useState([]);
   const [base64ImageStrings, setBase64ImageStrings] = useState([]);
   const fileInputRef = useRef(null);
+  const [isPrivate, setIsPrivate] = useState(false);
 
   // 카테고리 목록
   const categories = [
@@ -76,15 +77,23 @@ const CustomerProblemSubmit = ({ activeTab }) => {
 
   const triggerFileInput = () => fileInputRef.current.click();
 
+  const handlePrivacyChange = (e) => {
+    setIsPrivate(e.target.value === 'private');
+  };
+
   // 폼 제출 핸들러
   const handleProbSubmit = async (e) => {
+    const regPw=/^\d{4}$/;
     e.preventDefault();
 
     if (!consent) {
       alert('개인정보 수집 동의가 필요합니다.');
       return;
     }
-
+    if (isPrivate && !regPw.test(postPassword)) {
+      alert('비밀번호는 4자리 숫자로만 입력해주세요.')
+      return;
+    }
     if (!probCate.trim()) {
       alert('카테고리를 선택해주세요.');
       return;
@@ -112,10 +121,11 @@ const CustomerProblemSubmit = ({ activeTab }) => {
     formData.append('subject', probSub);
     formData.append('message', probMessage);
 
+
     selectedImageFiles.forEach((file, index) => {
       formData.append(`files`, file);
     });
-
+    
     try {
       const response = await axios.post(
         '/api/customer/inquiry',
@@ -137,7 +147,8 @@ const CustomerProblemSubmit = ({ activeTab }) => {
         setPreviewImages([]);
         setBase64ImageStrings([]);
 
-        navigate('/inquiries');
+        setProblemSubmit(false)
+        // navigate('/inquirie');
       } else {
         const errorData = response.data;
         console.error('문의 등록 실패 상세:', errorData);
@@ -150,11 +161,19 @@ const CustomerProblemSubmit = ({ activeTab }) => {
   };
 
   return (
-    <div className={styles.customerServiceCenter}>
-      <div className={styles.inqueriesBox}>
-        <form onSubmit={handleProbSubmit}>
+    <div className={styles.inqueriesBox}>
+      <form onSubmit={handleProbSubmit}>
+        <fieldset>
+          <legend>1. 비밀글</legend>
+          <select onChange={handlePrivacyChange}>
+            <option value="public">공개</option>
+            <option value="private">비공개</option>
+          </select>
+        </fieldset>
+        {
+          isPrivate &&
           <fieldset>
-            <legend>1. 게시글 비밀번호</legend>
+            <legend>1-1. 게시글 비밀번호</legend>
             <input
               className={styles.input}
               type="password"
@@ -162,142 +181,143 @@ const CustomerProblemSubmit = ({ activeTab }) => {
               onChange={e => setPostPassword(e.target.value)}
               placeholder="게시글 비밀번호를 입력하세요"
               required
-            />
-          </fieldset>
-
-          <fieldset>
-            <legend>2. 이메일</legend>
-            <input
-              className={styles.input}
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="문의 결과 안내받을 이메일을 입력하세요"
-              required
-            />
-          </fieldset>
-
-          <fieldset>
-            <legend>3. 카테고리 선택</legend>
-            <select
-              name="cateSelect"
-              value={probCate}
-              onChange={handleCateChange}
-              className={styles.input}
-            >
-              {categories.map((cate, idx) => (
-                <option key={idx} value={cate}>
-                  {cate}
-                </option>
-              ))}
-            </select>
-          </fieldset>
-
-          <fieldset>
-            <legend>4. 문의 제목 입력</legend>
-            <input
-              className={styles.input}
-              type="text"
-              value={probSub}
-              onChange={e => setProbSub(e.target.value)}
-              placeholder="문의 제목을 입력하세요."
-              required
-            />
-          </fieldset>
-
-          <fieldset>
-            <legend>5. 문의 본문 입력</legend>
-            <textarea
-              value={probMessage}
-              onChange={e => setProbMessage(e.target.value)}
-              className={styles.textarea}
-              placeholder="문의 본문을 입력하세요."
-              required
-            />
-            <p className={styles.legnthConfirm}>
-              {probMessage.length}자 입력 / 최대 1000자
-            </p>
-          </fieldset>
-
-          <fieldset className={styles.fileInputGroup}>
-            <legend>6. 첨부 파일 (선택)</legend>
-            <div className={styles.textsection}>
-              파일명은 - , _를 제외한 특수문자는 허용되지 않습니다.
-              <br />
-              아래 이미지 파일 형식만 첨부할 수 있습니다.
-              <br />
-              이미지: .jpeg, .jpg, .gif, .bmp, .png
-            </div>
-
-            <input
-              type="file"
-              multiple
-              accept=".jpeg,.jpg,.gif,.bmp,.png"
-              style={{ display: 'none' }}
-              ref={fileInputRef}
-              onChange={handleFileChange}
-            />
-            <button type="button" className={styles.submitBtn} onClick={triggerFileInput}>
-              파일 첨부
-            </button>
-
-            {selectedImageFiles.length > 0 && (
-              <ul style={{ color: 'white', listStyle: 'none', padding: '10px 0 0 0' }}>
-                {selectedImageFiles.map((file, idx) => (
-                  <li key={idx} style={{ marginBottom: '5px' }}>
-                    {file.name}
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            {previewImages.length > 0 && (
-              <div className={styles.image_preview_container}>
-                <h3 className={styles.image_preview_title}>이미지 미리보기:</h3>
-                <div>
-                  {previewImages.map((url, idx) => (
-                    <div key={idx} className={styles.image_thumbnail_wrapper}>
-                      <img src={url} alt={`Preview ${idx + 1}`} className={styles.image_preview} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </fieldset>
-
-          <fieldset>
-            <legend>7. 개인정보 수집 동의 (필수)</legend>
-            <div className={styles.textsection}>
-              수집하는 개인정보 항목: 이메일 주소
-              <br />
-              작성해 주시는 개인정보는 문제 접수 및 문제 활용을 위해 3년간 보관됩니다.
-              <br />
-              이용자는 본 동의를 거부할 수 있으나, 미동의 시 문제 접수가 불가능합니다.
-            </div>
-            <div>
-              <input
-                type="checkbox"
-                checked={consent}
-                onChange={e => setConsent(e.target.checked)}
               />
-              &nbsp;<span>동의합니다.</span>
-            </div>
           </fieldset>
+        }
 
-          <div className={styles.inqBtns}>  
-            <button type="submit" className={styles.submitButton}>
-              등록
-            </button>
-            <button
-              type="button"
-              className={styles.submitButton}
-              onClick={() => navigate('/inquiries', { state: { initialTab: activeTab || '1:1 문의' } })}
-            >
-              돌아가기
-            </button>
+        <fieldset>
+          <legend>2. 이메일</legend>
+          <input
+            className={styles.input}
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="문의 결과 안내받을 이메일을 입력하세요"
+            required
+          />
+        </fieldset>
+
+        <fieldset>
+          <legend>3. 카테고리 선택</legend>
+          <select
+            name="cateSelect"
+            value={probCate}
+            onChange={handleCateChange}
+            className={styles.input}
+          >
+            {categories.map((cate, idx) => (
+              <option key={idx} value={cate}>
+                {cate}
+              </option>
+            ))}
+          </select>
+        </fieldset>
+
+        <fieldset>
+          <legend>4. 문의 제목 입력</legend>
+          <input
+            className={styles.input}
+            type="text"
+            value={probSub}
+            onChange={e => setProbSub(e.target.value)}
+            placeholder="문의 제목을 입력하세요."
+            required
+          />
+        </fieldset>
+
+        <fieldset>
+          <legend>5. 문의 본문 입력</legend>
+          <textarea
+            value={probMessage}
+            onChange={e => setProbMessage(e.target.value)}
+            className={styles.textarea}
+            placeholder="문의 본문을 입력하세요."
+            required
+          />
+          <p className={styles.legnthConfirm}>
+            {probMessage.length}자 입력 / 최대 1000자
+          </p>
+        </fieldset>
+
+        <fieldset className={styles.fileInputGroup}>
+          <legend>6. 첨부 파일 (선택)</legend>
+          <div className={styles.textsection}>
+            파일명은 - , _를 제외한 특수문자는 허용되지 않습니다.
+            <br />
+            아래 이미지 파일 형식만 첨부할 수 있습니다.
+            <br />
+            이미지: .jpeg, .jpg, .gif, .bmp, .png
           </div>
-        </form>
-      </div>
+
+          <input
+            type="file"
+            multiple
+            accept=".jpeg,.jpg,.gif,.bmp,.png"
+            style={{ display: 'none' }}
+            ref={fileInputRef}
+            onChange={handleFileChange}
+          />
+          <button type="button" className={styles.submitBtn} onClick={triggerFileInput}>
+            파일 첨부
+          </button>
+
+          {selectedImageFiles.length > 0 && (
+            <ul style={{ color: 'white', listStyle: 'none', padding: '10px 0 0 0' }}>
+              {selectedImageFiles.map((file, idx) => (
+                <li key={idx} style={{ marginBottom: '5px' }}>
+                  {file.name}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {previewImages.length > 0 && (
+            <div className={styles.image_preview_container}>
+              <h3 className={styles.image_preview_title}>이미지 미리보기:</h3>
+              <div>
+                {previewImages.map((url, idx) => (
+                  <div key={idx} className={styles.image_thumbnail_wrapper}>
+                    <img src={url} alt={`Preview ${idx + 1}`} className={styles.image_preview} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </fieldset>
+
+        <fieldset>
+          <legend>7. 개인정보 수집 동의 (필수)</legend>
+          <div className={styles.textsection}>
+            수집하는 개인정보 항목: 이메일 주소
+            <br />
+            작성해 주시는 개인정보는 문제 접수 및 문제 활용을 위해 3년간 보관됩니다.
+            <br />
+            이용자는 본 동의를 거부할 수 있으나, 미동의 시 문제 접수가 불가능합니다.
+          </div>
+          <label>
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={e => setConsent(e.target.checked)}
+            />
+            &nbsp;<span>동의합니다.</span>
+          </label>
+        </fieldset>
+
+        <div className={styles.inqBtns}>  
+          <button type="submit" className={styles.submitButton}>
+            등록
+          </button>
+          <button
+            type="button"
+            className={styles.submitButton}
+            // onClick={() => navigate('/inquiries', { state: { initialTab: activeTab || '1:1 문의' } })}
+            onClick={() => setProblemSubmit(false)}
+          >
+            돌아가기
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

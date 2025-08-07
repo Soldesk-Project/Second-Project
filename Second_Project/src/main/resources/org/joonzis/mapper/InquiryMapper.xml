@@ -12,7 +12,8 @@
 			SELECT i.id,
 				u.user_nick AS userNick, i.subject,
 				i.message,
-				i.created_at AS createdAt
+				i.created_at AS createdAt,
+				i.post_password AS postPassword
 			FROM inquiry i
 			JOIN users u ON i.user_id = u.user_id ORDER BY i.created_at DESC
 		) t
@@ -37,7 +38,7 @@
 		#{id}, #{subject},
 		#{message},
 		SYSDATE,
-		#{postPassword},
+		#{postPassword, jdbcType=VARCHAR},
 		#{email},
 		#{userId},
 		#{category}

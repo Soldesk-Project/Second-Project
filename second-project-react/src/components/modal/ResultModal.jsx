@@ -8,7 +8,7 @@ const ResultModal = ({ users, setResult, gameMode, roomNo, userNick, server }) =
   const nav = useNavigate();
 
   const close = () => {
-    const socket = sockets['room'];
+    const socket = sockets.current['room'];
     if (socket && socket.readyState === 1) {
       socket.send(JSON.stringify({
         action: 'leaveRoom',

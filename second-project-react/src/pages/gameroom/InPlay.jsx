@@ -574,7 +574,7 @@ const InPlay = () => {
                     <div className={styles.profileImageWrapper}>
                       <img
                         src={`/images/${profile.imageFileName}`}
-                        onError={(e) => { e.target.src = "/images/defaultProfileBoarder.png"; }}
+                        onError={(e) => { e.target.src = "/images/defaultProfileBorder.png"; }}
                         className={styles.borderImage}
                       />
                       <img

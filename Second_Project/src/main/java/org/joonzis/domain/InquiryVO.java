@@ -24,7 +24,7 @@ public class InquiryVO {
     private String category;
     private String  subject;
     private String  message;
-    private int postPassword;
+    private String postPassword;
     private String email;
     private String userNick;
     
