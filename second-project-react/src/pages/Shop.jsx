@@ -66,7 +66,7 @@ const Shop = () => {
       case '글자색':
         return items.filter(item => item.item_type === 'fontColor');
       case '명함':
-        return items.filter(item => item.item_type === 'title');
+        return items.filter(item => item.item_type === 'background');
       case '말풍선':
         return items.filter(item => item.item_type === 'balloon');
       default:

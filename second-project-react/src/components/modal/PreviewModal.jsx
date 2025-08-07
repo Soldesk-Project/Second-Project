@@ -24,8 +24,6 @@ const PreviewModal = ({
   if (!item) return null;
 
   const previewStyle = { ...user };
-
-  console.log(item);
   
 
   switch (item.item_type) {
@@ -62,7 +60,7 @@ const PreviewModal = ({
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
 
         {/* boundary 타입 */}
-        {item.item_type === 'boundary' || item.item_no === 118 && (
+        {(item.item_type === 'boundary' || item.item_no === 118) && (
           <div className={`${styles.previewImg} ${styles.boundary}`}>
             <img src={profileSrc} alt="Profile" className={styles.profileImg} />
             <img 
