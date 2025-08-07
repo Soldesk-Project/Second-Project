@@ -28,7 +28,12 @@ const ServerUserList = () => {
     user_profile_img,
     imageFileName
   } = user || {};
-
+  
+  const userNoRef = useRef(user_no);
+  useEffect(() => {
+    userNoRef.current = user_no;
+  }, [user_no]);
+  
   const itemMap = React.useMemo(() => {
     return shopItems.reduce((m, it) => {
       m[it.item_no] = it;
@@ -73,14 +78,13 @@ const ServerUserList = () => {
 
          // 유저 캐시 강제 갱신: 닉네임이 바뀐 경우 반영
         data.users.forEach((u) => {
-          const cached = userCache.current.get(u.userNo);
-          if (!cached || cached.userNick !== u.userNick) {
-            userCache.current.set(u.userNo, {
-              ...cached,
-              userNick: u.userNick,
-              // 다른 속성도 필요한 경우 함께 업데이트
-            });
-          }
+          const cached = userCache.current.get(u.userNo) || {};
+          userCache.current.set(u.userNo, {
+            ...cached,
+            userNo: u.userNo,       // 반드시 포함
+            userNick: u.userNick,
+            // 필요한 다른 속성도 포함
+          });
         });
 
         // 캐시에 없는 userNo만 호출
@@ -105,18 +109,15 @@ const ServerUserList = () => {
         );
 
         // 캐시에서 모든 유저 정보 가져오기
-        const detailed = uniqueUserNos.map(no => userCache.current.get(no));
+        const detailed = uniqueUserNos
+          .map(no => userCache.current.get(no))
+          .filter(u => u);
 
-        // 본인 맨 앞으로 정렬
-        detailed.sort((a, b) =>
-          Number(a.userNo) === Number(user.user_no)
-            ? -1
-            : Number(b.userNo) === Number(user.user_no)
-            ? 1
-            : 0
-        );
+        const self = detailed.find(u => Number(u.userNo) === Number(userNoRef.current));
+        const others = detailed.filter(u => Number(u.userNo) !== Number(userNoRef.current));
+        const detailedSorted = self ? [self, ...others] : others;
 
-        setUsers(detailed);
+        setUsers(detailedSorted);
         setIsLoading(false);
       }
       if (data.action === 'updateNick') {
