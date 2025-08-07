@@ -98,6 +98,26 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             } else {
 //                log.warn("해당 서버에 접속 세션이 없음: " + userServer);
             }
+        } else if ("updateNick".equals(action) && userNo != null && userNick != null) {
+            String userServer = findServerByUserNo(userNo);
+            if (userServer == null) {
+                return;
+            }
+
+            Map<WebSocketSession, UserInfo> sessions = serverSessions.get(userServer);
+            if (sessions != null) {
+                boolean updated = false;
+                for (Map.Entry<WebSocketSession, UserInfo> entry : sessions.entrySet()) {
+                    UserInfo info = entry.getValue();
+                    if (userNo.toString().equals(info.getUserNo().toString())) {
+                        info.setUserNick(userNick); // ✅ 닉네임 변경
+                        updated = true;
+                    }
+                }
+                if (updated) {
+                    broadcastUserList(userServer);
+                }
+            }
         }
     }
     private void broadcastStyleUpdateToAll(String userNo) throws Exception {
@@ -121,10 +141,10 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
     private String findServerByUserNo(String userNo) {
         for (Map.Entry<String, Map<WebSocketSession, UserInfo>> entry : serverSessions.entrySet()) {
             for (UserInfo userInfo : entry.getValue().values()) {
-                if (userNo.equals(userInfo.getUserNo())) {
-//                	log.info("findServerByUserNo: userNo=" + userNo + "는 서버 '" + entry.getKey() + "'에 접속 중");
-                    return entry.getKey();
-                }
+            	if (userNo != null && userInfo.getUserNo() != null &&
+                        userNo.toString().equals(userInfo.getUserNo().toString())) {
+                        return entry.getKey();
+                    }
             }
         }
 //        log.warn("findServerByUserNo: userNo=" + userNo + "는 어느 서버에도 접속 중이지 않음");

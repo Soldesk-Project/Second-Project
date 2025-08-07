@@ -239,7 +239,14 @@ const UserInfo = ({userRankingList}) => {
             const data = JSON.parse(event.data);
             if (data.type === 'styleUpdated') {
                 dispatch(triggerRefreshRanking()); 
-                dispatch(fetchUserInfo(user.user_no)); }
+                dispatch(fetchUserInfo(user.user_no)); 
+            } else if (data.type === 'userList') {
+                // 서버에서 보낸 유저 리스트가 변경되었으니
+                // 최신 유저 정보를 가져오거나 상태 업데이트 로직 실행
+                dispatch(fetchUserInfo(user.user_no));
+                dispatch(triggerRefreshRanking());
+            }
+                
         };
 
         socket.addEventListener('message', handleMessage);
@@ -275,6 +282,16 @@ const UserInfo = ({userRankingList}) => {
                 };
                 dispatch(setUser(updatedUser));
                 alert('닉네임이 변경되었습니다!');
+
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                    action: 'updateNick',
+                    userNo: user.user_no,
+                    userNick: newNick
+                    }));
+                } else {
+                    console.warn('WebSocket이 아직 연결되지 않음');
+                }
             })
             .catch(err => {
                 console.error('닉네임 변경 실패', err);

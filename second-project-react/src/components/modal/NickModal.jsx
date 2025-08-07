@@ -1,13 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styles from '../../css/NickModal.module.css'; // 필요 시 CSS 모듈
 import { debounce } from 'lodash';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import { WebSocketContext } from '../../util/WebSocketProvider';
 
 const NickModal = ({ isOpen, onClose, onSubmit, point }) => {
   const [nickname, setNickname] = useState('');
   const [isDuplicateNick, setIsDuplicateNick] = useState(null);
   const [lastCheckedNickname, setLastCheckedNickname] = useState('');
+
+  const user = useSelector((state) => state.user);
+  const socket = useContext(WebSocketContext);
   
   const handleSubmit = () => {
     if (!nickname.trim()) {
@@ -23,6 +27,14 @@ const NickModal = ({ isOpen, onClose, onSubmit, point }) => {
       return;
     }
     onSubmit(nickname);  // 부모(UserInfo)에서 처리
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({
+        action: 'updateNick',
+        userNo: user.user_no,
+        userNick: nickname,
+      }));
+    }
     setNickname('');
     onClose();
   };

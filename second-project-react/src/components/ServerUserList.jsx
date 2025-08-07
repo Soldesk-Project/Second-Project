@@ -71,6 +71,18 @@ const ServerUserList = () => {
         // 중복 userNo 제거
         const uniqueUserNos = [...new Set(data.users.map(u => u.userNo))];
 
+         // 유저 캐시 강제 갱신: 닉네임이 바뀐 경우 반영
+        data.users.forEach((u) => {
+          const cached = userCache.current.get(u.userNo);
+          if (!cached || cached.userNick !== u.userNick) {
+            userCache.current.set(u.userNo, {
+              ...cached,
+              userNick: u.userNick,
+              // 다른 속성도 필요한 경우 함께 업데이트
+            });
+          }
+        });
+
         // 캐시에 없는 userNo만 호출
         const usersToFetch = uniqueUserNos.filter(no => !userCache.current.has(no));
 
@@ -106,6 +118,23 @@ const ServerUserList = () => {
 
         setUsers(detailed);
         setIsLoading(false);
+      }
+      if (data.action === 'updateNick') {
+        const { userNo, userNick } = data;
+
+        setUsers((prevUsers) => {
+          // 기존 users 중 닉네임 변경 대상 찾아서 갱신
+          const newUsers = prevUsers.map(u =>
+            Number(u.userNo) === Number(userNo) ? { ...u, userNick } : u
+          );
+          return newUsers;
+        });
+
+        // 만약 userCache도 같이 갱신하고 싶으면
+        if (userCache.current.has(userNo)) {
+          const cachedUser = userCache.current.get(userNo);
+          userCache.current.set(userNo, { ...cachedUser, userNick });
+        }
       }
     };
 
