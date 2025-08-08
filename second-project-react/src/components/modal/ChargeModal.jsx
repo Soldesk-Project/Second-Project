@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from '../css/ChargeModal.module.css';
+import styles from '../../css/ChargeModal.module.css';
 import { useSelector } from 'react-redux';
 import { loadTossPayments } from '@tosspayments/payment-sdk';
 import axios from 'axios';
@@ -12,15 +12,15 @@ const ChargeModal = ({ onClose }) => {
   const tossClientKey = 'test_ck_ALnQvDd2VJ6enAxbomzxVMj7X41m'; // ✅ 토스 클라이언트 키
 
   // ✅ 카카오페이 처리 (기존 방식 유지)
-  const handleKakaoPay = async () => {
-    try {
-      const res = await axios.post('/api/pay/kakao', { userId, amount });
-      window.location.href = res.data;
-    } catch (err) {
-      alert('카카오페이 결제 요청 실패');
-      console.error(err);
-    }
-  };
+  // const handleKakaoPay = async () => {
+  //   try {
+  //     const res = await axios.post('/api/pay/kakao', { userId, amount });
+  //     window.location.href = res.data;
+  //   } catch (err) {
+  //     alert('카카오페이 결제 요청 실패');
+  //     console.error(err);
+  //   }
+  // };
 
   // ✅ 토스페이 처리 (JS SDK로 직접 호출)
   const handleTossPay = async () => {
@@ -31,7 +31,7 @@ const ChargeModal = ({ onClose }) => {
       tossPayments.requestPayment('카드', {
         amount,
         orderId,
-        orderName: '아식스 슈퍼블라스트2',
+        orderName: '포인트 충전',
         customerName: userId,
         successUrl: `http://localhost:9099/api/pay/toss/success?userId=${userId}`, // ✅ 수정
         failUrl: 'http://localhost:3000/pay/fail',
@@ -50,9 +50,7 @@ const ChargeModal = ({ onClose }) => {
         value={amount}
         onChange={(e) => setAmount(Number(e.target.value))}
       />
-      <button onClick={handleTossPay}>토스페이로 결제</button>
-      <button onClick={handleKakaoPay}>카카오페이로 결제</button>
-      <button onClick={onClose}>닫기</button>
+      {handleTossPay()}
     </div>
   );
 };

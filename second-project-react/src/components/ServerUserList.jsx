@@ -40,13 +40,15 @@ const ServerUserList = () => {
     }, {});
   }, [shopItems]);
 
+
+  console.log(itemMap);
+  
   useEffect(() => {
     if (!server || !user || !user_nick || !user_no) return;
 
     const socket = sockets.current['server'];
+    
     if (!socket) return;
-
-    socketRef.current = socket; // 단순 참조
 
     const payload = {
       action: "join",
@@ -156,6 +158,9 @@ const ServerUserList = () => {
       socket.removeEventListener('message', messageHandler);
     };
   }, [server, user_no, user_nick, sockets]);
+
+  console.log(selectedUser);
+  
 
   return (
     <div className={styles.container}>

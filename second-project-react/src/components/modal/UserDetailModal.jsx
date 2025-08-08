@@ -9,6 +9,9 @@ const UserDetailModal = ({ user, onClose, shopItems }) => {
     const [profileSrc, setProfileSrc] = useState('/images/profile_default.png');
     const { isTop10 } = useSelector((state) => state.ranking);
     const [stats, setStats] = useState(null);
+
+    console.log(user);
+    
     
     
     // 상점 아이템 목록 가져오기(유저 프로필 아이템 랜더링)

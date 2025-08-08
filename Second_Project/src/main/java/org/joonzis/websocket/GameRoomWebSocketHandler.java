@@ -157,8 +157,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
 		String gameMode = json.get("game_mode").asText();
 		
-		System.out.println("게임모드 -> " + gameMode);
-
 		GameRoomDTO newRoom = new GameRoomDTO(roomNo, json.get("title").asText(), json.get("category").asText(),
 				gameMode, json.get("is_private").asText(), json.get("limit").asInt(),
 				json.get("pwd") != null ? json.get("pwd").asText() : null);
@@ -281,8 +279,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		String broadcastServer = "rank".equals(gameMode) ? "rank" : server;
 		
 		String status = roomStatus.getOrDefault(broadcastServer, Collections.emptyMap()).get(roomNo);
-		
-		System.out.println("status -> " + status);
 		
 		if (gameMode.equals("rank") && (status.equals("rankPlaying") || status.equals("rankCreate"))) {
 			playService.leavePanalty(user_nick);

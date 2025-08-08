@@ -296,7 +296,27 @@
 	
 	<!-- 유저 정보 조회 -->
 	<select id="getUserById" parameterType="String" resultType="org.joonzis.domain.UserInfoDTO">
-		SELECT *
+		SELECT
+			u.user_no,
+			u.user_rank,
+			u.user_play_count,
+			u.user_1st_count,
+			u.is_logged_in,
+			u.user_point,
+			u.user_nick,
+			u.user_id,
+			u.user_pw,
+			u.user_email,
+			u.user_date,
+			u.ischatbanned,
+			u.user_profile_img,
+			u.auth,
+			u.banned_timestamp,
+			d.boundary_item_no as boundaryItemNo,
+			d.title_item_no as titleItemNo,
+			d.fontcolor_item_no as fontcolorItemNo,
+			d.background_item_no as backgroundItemNo,
+			d.balloon_item_no as balloonItemNo
 		FROM users u
 		JOIN user_deco d ON u.user_no = d.user_no
 		WHERE u.user_id = #{user_id}
