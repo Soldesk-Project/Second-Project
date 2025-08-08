@@ -150,7 +150,7 @@ const InPlay = () => {
         });
         // 타이머가 실행된 후에는 ref에서도 해당 타이머 ID 제거
         delete messageTimeoutRef.current[chatMessage.mSender]; 
-      }, 10000000000); // 마지막 메시지 출력 후 5초 뒤에 사라짐
+      }, 5000); // 마지막 메시지 출력 후 5초 뒤에 사라짐
 
       // 4. 새로 설정된 타이머 ID를 useRef에 저장
       messageTimeoutRef.current[chatMessage.mSender] = timerId;

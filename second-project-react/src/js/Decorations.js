@@ -1,5 +1,5 @@
 const titleTextMap = {
-  admin_title: '관리자',
+  admin_title: '고수',
   tester_title: '테스터',
   vip_title: 'VIP',
   collector_title: '콜렉터',

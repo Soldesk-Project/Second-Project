@@ -85,6 +85,10 @@ public class UserController {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("category", mappedCategory);
         paramMap.put("user_no", user_no);
+        System.out.println(service.getInventoryCategory(paramMap));
+        System.out.println(category);
+        System.out.println(user_no);
+        System.out.println(mappedCategory);
 	    return service.getInventoryCategory(paramMap);
 	}
 	
@@ -187,5 +191,10 @@ public class UserController {
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .build();
         }
+    }
+    
+    @PatchMapping(value = "/{user_no}/clearStyle")
+    public void clearUserStyle(@PathVariable("user_no") int user_no) {
+    	service.clearUserStyle(user_no);
     }
 }

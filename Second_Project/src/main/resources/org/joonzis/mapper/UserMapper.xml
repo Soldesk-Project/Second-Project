@@ -338,4 +338,10 @@
 	    ORDER BY accuracyPct DESC
 	</select>
 	
+	<update id="clearUserStyle">
+		UPDATE USER_DECO SET TITLE_ITEM_NO=null WHERE USER_NO = #{user_no} 
+	</update>
+	
+	
+	
 </mapper>

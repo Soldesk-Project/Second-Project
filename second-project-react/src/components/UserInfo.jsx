@@ -87,6 +87,7 @@ const UserInfo = ({userRankingList}) => {
         '/images/profile_6.png',
         '/images/profile_7.png',
         '/images/profile_8.png',
+        '/images/profile_default.png',
     ];
 
     const onSelectProfile = (src) => {
@@ -134,6 +135,8 @@ const UserInfo = ({userRankingList}) => {
           return { ...item, imgUrl: src };
         });
         setItems(withImg);
+        console.log(items);
+        
       })
       .catch(() => setItems([]));
     }, [activeTab, user.user_no]);
@@ -319,6 +322,33 @@ const UserInfo = ({userRankingList}) => {
         }
     }, [user.user_id, user.user_email, loading]);
 
+    const handleClearStyle=async ()=>{
+        await axios.patch(`/user/${user.user_no}/clearStyle`);
+        
+        const res = await axios.get(`/user/${user.user_no}`);
+                
+                // console.log('🔔 GET /user/4 리턴 data=', res.data);
+        dispatch(setUser({
+        user_no:               res.data.user_no,
+        user_nick:             res.data.user_nick,
+        user_profile_img:      res.data.user_profile_img,
+        imageFileName:    res.data.imageFileName,
+        boundaryItemNo:   res.data.boundaryItemNo,
+        titleItemNo:      res.data.titleItemNo,
+        fontcolorItemNo:  res.data.fontcolorItemNo,
+        backgroundItemNo: res.data.backgroundItemNo,
+        balloonItemNo:    res.data.balloonItemNo
+        }));
+        setSelectedItem(null);
+        if (socket && socket.readyState === 1) {
+            socket.send(JSON.stringify({
+                action: 'updateStyle',
+                userNo: user.user_no
+            }));
+        } else {
+            console.warn('WebSocket이 아직 연결되지 않음');
+        }
+    }
     const fontcolor = itemMap[user.fontcolorItemNo]?.css_class_name;
   return (
     <div>
@@ -477,9 +507,15 @@ const UserInfo = ({userRankingList}) => {
                         </div>
                         );
                     })
-                    ) : (
+                ) : (
                     <div>상품이 없습니다.</div>
-                    )}
+                )}
+                {
+                    (activeTab==='칭호' && items.length>0) &&
+                    <div className={styles.card} onClick={() => handleClearStyle()}>
+                        <div className={styles.itemNone}>클릭 하여 즉시 장착해제</div>
+                    </div>
+                }
             </div>
             </div>
         </div>

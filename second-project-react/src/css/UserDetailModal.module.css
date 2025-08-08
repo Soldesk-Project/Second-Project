@@ -5,32 +5,46 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(30, 42, 61, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeInModal 0.3s;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .modalContent {
-  background-color: white;
+  background: linear-gradient(120deg, #fff 96%, #e4eefc 100%);
   padding: 24px;
   border-radius: 10px;
   max-width: 470px;
   width: 90%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(30,42,61,0.15);
+  position: relative;
+  min-width: 320px;
+  animation: popUp 0.3s;
 }
-
+@keyframes popUp {
+  from { transform: scale(.92); opacity: .5; }
+  to { transform: scale(1); opacity: 1; }
+}
 .modalContent h2 {
   margin-bottom: 40px;
+  font-weight: 700;
+  color: #243c58;
 }
 
 .userInfo_Box_1{
   display: flex;
   flex-direction: row;
   align-items: center;
-  /* justify-content: center; */
-  gap: 30px;
+  justify-content: center;
+  gap: 50px;
 }
 
 .profileWrapper {
@@ -67,7 +81,12 @@
 }
 
 .userInfo_Name p {
-    margin-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 1.08rem;
+  color: blueviolet;
+  letter-spacing: 0.2px;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
 }
 
 .bar_set {
@@ -76,21 +95,38 @@
 }
 
 .progressLine {
-  background-color: #e0e0e0;
-  border-radius: 8px;
+  background: linear-gradient(90deg, #e7effa 0%, #f5f6fa 100%);
+  border-radius: 9px;
   overflow: hidden;
-  height: 8px;
-  margin-bottom: 4px;
+  height: 10px;
 }
 
 .progressFill {
   height: 100%;
-  background-color: #4caf50;  /* 원하는 색으로 바꿔도 됩니다 */
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, #3fd676 0%, #15bbff 100%);
+  box-shadow: 0 0 8px 0 #8fe7b6;
+  transition: width 0.28s cubic-bezier(.5,.45,.45,.8);
+  border-radius: 9px;
 }
 
 .label {
   font-size: 0.875rem;
   text-align: center;
   color: black;
+}
+
+.modalContent button {
+  padding: 6px 18px;
+  border-radius: 6px;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 21px auto 4px auto;
+  background-color: #f44336;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px 0 rgba(69, 126, 255, 0.08);
+}
+.modalContent button:hover {
+  background-color: #cf392e;
 }
