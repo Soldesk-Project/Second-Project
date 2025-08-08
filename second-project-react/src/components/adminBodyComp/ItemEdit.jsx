@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '../../css/adminPage/Edit.css';
+import { useDispatch } from 'react-redux';
+import { fetchUserItems } from '../../store/shopSlice';
 
 const ItemEdit = () => {
+  const dispatch = useDispatch();
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [itemName, setItemName] = useState('');
@@ -76,8 +79,6 @@ const ItemEdit = () => {
 
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-
-      console.log(data);
       
 
       const itemsWithImageUrl = data.items.map(item => ({
@@ -140,6 +141,7 @@ const ItemEdit = () => {
         setSearchQuery('');
         setSelectedItemNo(null);
         handleSearchItem(currentPage);
+        dispatch(fetchUserItems());
       }
     } catch (error) {
       console.error('아이템 삭제 오류:', error);
@@ -181,6 +183,7 @@ const ItemEdit = () => {
         setSearchQuery('');
         setSelectedItemNo(null);
         handleSearchItem(currentPage);
+        dispatch(fetchUserItems());
       }
     } catch (error) {
       console.error('아이템 수정 오류:', error);
@@ -244,9 +247,9 @@ const ItemEdit = () => {
                       {previewImage && <img src={previewImage} alt="Preview" className="image-preview" />}
                     </div>
                     <div className="button-group">
-                      <button onClick={handleReset} className="reset-button">현재 내용 초기화</button>
-                      <button onClick={handleItemEditSubmit} className="submit-button">수정 완료</button>
-                      <button onClick={handleDeleteItem} className="delete-button">삭제</button>
+                      <button type="button" onClick={handleReset} className="reset-button">현재 내용 초기화</button>
+                      <button type="button" onClick={handleItemEditSubmit} className="submit-button">수정 완료</button>
+                      <button type="button" onClick={handleDeleteItem} className="delete-button">삭제</button>
                     </div>
                   </div>
                 )}

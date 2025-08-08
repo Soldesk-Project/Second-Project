@@ -96,11 +96,14 @@
             option_3 = #{option_3},
             option_4 = #{option_4},
             correct_answer = #{correct_answer},
-            <if test="image_data != null">
-                image_data = #{image_data, jdbcType=BLOB}
-            </if>
-            <if test="image_data == null">
-                image_data = NULL </if>
+            <choose>
+			    <when test="image_data != null">
+			        image_data = #{image_data, jdbcType=BLOB}
+			    </when>
+			    <otherwise>
+			        image_data = image_data  <!-- 또는 생략 가능 -->
+			    </otherwise>
+			</choose>
         WHERE
             id = #{id}
     </update>
@@ -412,13 +415,12 @@
             item_name = #{item_name},
             item_price = #{item_price},
             image_file_name = #{imageFileName}
-        WHERE item_no = #{item_no} AND item_type = #{item_type}
+        WHERE item_no = #{item_no}
     </update>
 
     <delete id="deleteItems" parameterType="map">
 	    DELETE FROM items
-	    WHERE item_type = #{itemType}
-	      AND item_no = #{itemNo}
+	    WHERE item_no = #{itemNo}
 	</delete>
 
     <select id="selectQuestRequests" resultType="org.joonzis.domain.QuestRequestVO" parameterType="map">

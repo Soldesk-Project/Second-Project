@@ -7,7 +7,7 @@ import UserRanking from '../components/UserRanking';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { loadUserFromStorage } from '../store/userSlice';
-import { setShopItems } from '../store/shopSlice';
+import { fetchUserItems, setShopItems } from '../store/shopSlice';
 import ServerChatbox from '../components/chatbox/ServerChatbox';
 import UserInfo from '../components/UserInfo';
 import ItemList from '../components/ItemList';
@@ -28,22 +28,9 @@ const MainPage = () => {
   const queryString = cats.map(cat => `category=${encodeURIComponent(cat)}`).join('&');
 
   useEffect(() => {
-    fetchUserItems();
+    dispatch(fetchUserItems());
     fetchUserRanking();
   }, []);
-
-  const fetchUserItems = async () => {
-    try {
-      const response = await axios.get(`/api/shop/items/all?${queryString}`);
-      const all = response.data.map(it => ({
-        ...it,
-        imgUrl: it.imageFileName ? `/images/${it.imageFileName}` : ''
-      }));
-      dispatch(setShopItems(all));
-    } catch (error) {
-      console.log('샵 아이템 로드 실패', error);
-    }
-  }
   
   const fetchUserRanking = async () => {
     try {

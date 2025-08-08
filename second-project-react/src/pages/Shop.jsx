@@ -20,7 +20,7 @@ const Shop = () => {
   const user = useSelector(state => state.user.user);
   const userId = user?.user_id;
   const items = useSelector(state => state.shop.items);
-
+  
   const fetchGetPoint = async () => {
     if (!userId) return;
     try {
@@ -31,6 +31,10 @@ const Shop = () => {
     }
   };
 
+  useEffect(() => {
+    fetchGetPoint();
+  }, [userId]);
+
   const fetchGetItems = async () => {
     if (!user?.user_no) return;
     try {
@@ -40,10 +44,6 @@ const Shop = () => {
       console.error('보유 아이템 불러오기 실패:', error);
     }
   };
-
-  useEffect(() => {
-    fetchGetPoint();
-  }, [userId]);
 
   useEffect(() => {
     fetchGetItems();

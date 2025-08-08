@@ -146,7 +146,7 @@ const QuestEdit = () => {
       }
     }
   };
-
+  
   const handleQuestEditSubmit = async () => {
     if (selectedQuestId === null) {
       alert('수정할 문제를 먼저 선택해주세요.');
@@ -182,7 +182,9 @@ const QuestEdit = () => {
       image_data_base64: base64ImageString,
     };
 
-    console.log('수정할 문제 데이터:', questData);
+    if (base64ImageString !== '') {
+      questData.image_data_base64 = base64ImageString;
+    }
 
     try {
       const response = await fetch(`/admin/editQuestion?`, {

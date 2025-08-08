@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import '../../css/adminPage/Register.css';
+import { useDispatch } from 'react-redux';
+import { fetchUserItems } from '../../store/shopSlice';
 
 const ItemRegister = () => {
   console.log("ItemRegister 컴포넌트 렌더링 시작");
+  const dispatch = useDispatch();
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [itemName, setItemName] = useState('');
@@ -87,6 +90,7 @@ const ItemRegister = () => {
       if (response.ok) {
         alert('아이템 등록 성공!');
         handleReset();
+        dispatch(fetchUserItems());
       } else {
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {

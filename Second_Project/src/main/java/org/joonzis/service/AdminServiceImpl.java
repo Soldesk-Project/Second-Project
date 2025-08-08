@@ -230,6 +230,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         try {
+        	System.out.println("Service단 image_data 길이: " + (questionDTO.getImage_data() != null ? questionDTO.getImage_data().length : "null"));
             adminMapper.updateQuestion(questionDTO); // ⭐ QuestionDTO 자체를 넘기도록 변경
             log.info(getSubjectDisplayName(subjectCode) + " 과목의 문제 ID " + questionDTO.getId() + " 수정 성공.");
         } catch (Exception e) {
@@ -661,7 +662,7 @@ public class AdminServiceImpl implements AdminService {
 	        itemVO.setItem_name(itemName);
 	        itemVO.setItem_price(itemPrice);
 	        itemVO.setImageFileName(imageFileNameToUpdate);
-
+	        System.out.println("서비스 : " + itemVO);
 	        // DB 업데이트
 	        int updatedRows = adminMapper.updateItem(itemVO);
 	        if (updatedRows == 0) {

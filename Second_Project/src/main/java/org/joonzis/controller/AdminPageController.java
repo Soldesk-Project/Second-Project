@@ -103,15 +103,9 @@ public class AdminPageController {
     // 문제 수정
     @PostMapping("/editQuestion")
     public ResponseEntity<?> editQuestion(@RequestBody QuestionDTO questionDTO) {
+        System.out.println("데이터 확인 : " + questionDTO);
         try {
-            if (questionDTO.getImage_data_base64() != null && !questionDTO.getImage_data_base64().isEmpty()) {
-                byte[] decodedBytes = Base64.getDecoder().decode(questionDTO.getImage_data_base64());
-                questionDTO.setImage_data(decodedBytes);
-                questionDTO.setImage_data_base64(null);
-            } else {
-                questionDTO.setImage_data(null);
-            }
-
+            // 디코딩은 ServiceImpl에서 일괄 처리
             adminService.updateQuestion(questionDTO);
             return new ResponseEntity<>("문제 수정 성공!", HttpStatus.OK);
         } catch (IllegalArgumentException e) {
@@ -122,6 +116,32 @@ public class AdminPageController {
             return new ResponseEntity<>("문제 수정 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+//    @PostMapping("/editQuestion")
+//    public ResponseEntity<?> editQuestion(@RequestBody QuestionDTO questionDTO) {
+//    	System.out.println("데이터 확인 : " + questionDTO);
+//        try {
+//            if (questionDTO.getImage_data_base64() != null && !questionDTO.getImage_data_base64().isEmpty()) {
+//            	System.out.println("Base64 길이: " + questionDTO.getImage_data_base64().length());
+//                byte[] decodedBytes = Base64.getDecoder().decode(questionDTO.getImage_data_base64());
+//                System.out.println("디코딩된 바이트 길이: " + decodedBytes.length);
+//                System.out.println("수정 전 image_data is null? : " + (questionDTO.getImage_data() == null));
+//                questionDTO.setImage_data(decodedBytes);
+//                System.out.println("수정 후 image_data is null? : " + (questionDTO.getImage_data() == null));
+//                questionDTO.setImage_data_base64(null);
+//            } else {
+//                questionDTO.setImage_data(null);
+//            }
+//
+//            adminService.updateQuestion(questionDTO);
+//            return new ResponseEntity<>("문제 수정 성공!", HttpStatus.OK);
+//        } catch (IllegalArgumentException e) {
+//            e.printStackTrace();
+//            return new ResponseEntity<>("잘못된 요청 데이터입니다: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return new ResponseEntity<>("문제 수정 중 오류 발생: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
     
     // 문제 삭제
     @DeleteMapping("/deleteQuestions")
@@ -528,6 +548,8 @@ public class AdminPageController {
             @RequestPart(value = "item_image", required = false) MultipartFile itemImage,
             @RequestParam(value = "original_image_file_name", required = false) String originalImageFileName) {
         try {
+        	System.out.println("컨트롤러 : " + itemImage);
+        	System.out.println("컨트롤러 : " + originalImageFileName);
             adminService.updateItem(itemNo, type, itemName, itemPrice, itemImage, originalImageFileName);
             return new ResponseEntity<>("아이템 수정 성공!", HttpStatus.OK);
         } catch (NumberFormatException e) {
