@@ -54,9 +54,20 @@
   font-size: 0.8em; /* 글자 크기 작게 */
 }
 
-.chatbox-log button{
-  border: 1px solid white;
-  color: red;
+.chatbox-log button {
+  border: 2px solid #e74c3c;      /* 선을 조금 두껍고 선명한 빨간색으로 */
+  background-color: white;         /* 배경은 흰색으로 깔끔하게 */
+  color: #e74c3c;                  /* 텍스트도 선명한 빨간색 */
+  padding: 3px 5px;               /* 버튼 크기 적당히 늘리기 */
+  border-radius: 6px;              /* 둥근 모서리 */
+  font-weight: bold;               /* 글자를 진하게 */
+  cursor: pointer;                 /* 마우스 올리면 손모양 */
+  transition: background-color 0.3s, color 0.3s; /* 부드러운 효과 */
+}
+
+.chatbox-log button:hover {
+  background-color: #e74c3c;       /* 마우스 올리면 배경 빨간색 */
+  color: white;                    /* 글자는 흰색 */
 }
 .chatbox-input{
   display: flex;

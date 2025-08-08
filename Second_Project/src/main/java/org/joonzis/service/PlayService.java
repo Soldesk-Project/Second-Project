@@ -27,4 +27,6 @@ public interface PlayService {
 	public List<UserQuestionHistoryDTO> getReportQuestion(int offset, int size);
 	
 	public int getReportQuestionCount();
+
+	public void leavePanaltyZero(String user_nick);
 }

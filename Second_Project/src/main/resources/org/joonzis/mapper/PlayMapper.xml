@@ -161,4 +161,8 @@
 		SELECT COUNT(*) FROM question_report
 	</select>
 	    
+	<update id="leavePanaltyZero">
+		UPDATE USERS SET USER_RANK = 0 WHERE USER_NICK = #{user_nick}
+	</update>    
+	    
 </mapper>

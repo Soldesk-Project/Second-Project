@@ -273,7 +273,13 @@ public class UserServiceImpl implements UserService{
 	    mailSender.send(message);
 	}
 	
+	@Override
 	public void clearUserStyle(int user_no) {
 		mapper.clearUserStyle(user_no);
+	}
+	
+	@Override
+	public int getRank(String user_nick) {
+		return mapper.getRank(user_nick);
 	}
 }

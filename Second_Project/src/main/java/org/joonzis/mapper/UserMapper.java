@@ -109,4 +109,6 @@ public interface UserMapper {
 	//칭호 장착해제
 	public void clearUserStyle(@Param("user_no") int user_no);
 	
+	// 이름으로 랭킹 조회
+	public int getRank(@Param("user_nick") String user_nick);
 }

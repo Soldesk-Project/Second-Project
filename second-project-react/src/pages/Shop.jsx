@@ -11,6 +11,7 @@ import { fetchUserItems } from '../store/shopSlice';
 
 const Shop = () => {
   const allTabs = ['테두리', '칭호', '글자색', '명함', '말풍선'];
+  const defaultAndUniqueItem = [61, 90, 91, 130, 108, 110, 118, 119];
   const [activeTab, setActiveTab] = useState(allTabs[0]);
   const [ownedItems, setOwnedItems] = useState([]);
   const [point, setPoint] = useState(0);
@@ -69,15 +70,15 @@ const Shop = () => {
   const filteredItems = useMemo(() => {
     switch (activeTab) {
       case '테두리':
-        return items.filter(item => item.item_type === 'boundary');
+        return items.filter(item => item.item_type === 'boundary' && !defaultAndUniqueItem.includes(item.item_no));
       case '칭호':
-        return items.filter(item => item.item_type === 'title');
+        return items.filter(item => item.item_type === 'title' && !defaultAndUniqueItem.includes(item.item_no));
       case '글자색':
-        return items.filter(item => item.item_type === 'fontColor');
+        return items.filter(item => item.item_type === 'fontColor' && !defaultAndUniqueItem.includes(item.item_no));
       case '명함':
-        return items.filter(item => item.item_type === 'background');
+        return items.filter(item => item.item_type === 'background' && !defaultAndUniqueItem.includes(item.item_no));
       case '말풍선':
-        return items.filter(item => item.item_type === 'balloon');
+        return items.filter(item => item.item_type === 'balloon' && !defaultAndUniqueItem.includes(item.item_no));
       default:
         return [];
     }

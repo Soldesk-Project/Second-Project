@@ -108,5 +108,9 @@ public class PlayServiceImpl implements PlayService {
 		return playMapper.getReportQuestionCount();
 	}
 	
+	@Override
+	public void leavePanaltyZero(String user_nick) {
+		playMapper.leavePanaltyZero(user_nick);
+	}
 	
 }

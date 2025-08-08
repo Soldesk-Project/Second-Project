@@ -109,4 +109,6 @@ public interface UserService {
 	// 칭호 장착해제
 	public void clearUserStyle(int user_no);
 	
+	// 이름으로 랭크 조회
+	public int getRank(String user_nick);
 }

@@ -31,4 +31,6 @@ public interface PlayMapper {
 	public List<UserQuestionHistoryDTO> getReportQuestion(@Param("offset") int offset, @Param("size") int size);
 	
 	public int getReportQuestionCount();
+	
+	public void leavePanaltyZero(@Param("user_nick") String user_nick);
 }
