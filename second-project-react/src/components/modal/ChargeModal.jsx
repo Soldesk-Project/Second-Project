@@ -50,7 +50,8 @@ const ChargeModal = ({ onClose }) => {
         value={amount}
         onChange={(e) => setAmount(Number(e.target.value))}
       />
-      {handleTossPay()}
+      <button onClick={handleTossPay}>충전하기</button>
+      <button onClick={onClose}>닫기</button>
     </div>
   );
 };

@@ -426,6 +426,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		Map<String, Object> payload = Map.of("type", "gameStart", "server", server, "roomNo", roomNo, "initiator",
 				userNick, "list", list, "nextId", nextId);
 
+		broadcastRoomList(server);
 		broadcast(server, payload);
 	}
 
@@ -589,7 +590,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         	playService.countFirst(user_nick);
         }
         
-        roomStatus.computeIfAbsent(broadcastServer, k -> new ConcurrentHashMap<>()).put(roomNo, "waiting");
+//        roomStatus.computeIfAbsent(broadcastServer, k -> new ConcurrentHashMap<>()).put(roomNo, "waiting");
 
         String historyUuid = UUID.randomUUID().toString();
         
@@ -657,7 +658,9 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		List<GameRoomDTO> rooms = serverRooms.getOrDefault(server, Collections.emptyList());
 		Map<String, Set<String>> roomUserMap = roomUsers.getOrDefault(server, Collections.emptyMap());
 		List<Map<String, Object>> roomListWithCount = new ArrayList<>();
+		
 		for (GameRoomDTO room : rooms) {
+			System.out.println(roomStatus.getOrDefault(server, Collections.emptyMap()).get(room.getGameroom_no()));
 			Map<String, Object> roomMap = new HashMap<>();
 			roomMap.put("gameroom_no", room.getGameroom_no());
 			roomMap.put("title", room.getTitle());
@@ -792,8 +795,6 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 
 	            String roomState = roomStatus.getOrDefault(server, Collections.emptyMap()).get(roomNo);
 	            
-	            System.out.println("상태 -> " + roomState);
-
 	            if ("rankPlaying".equals(roomState) || "rankCreate".equals(roomState)) {
 	                playService.leavePanalty(user_nick);
 	            }

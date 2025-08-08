@@ -585,7 +585,7 @@ const InPlay = () => {
                         return (
                           <>
                             <span className={styles.rank}>랭크: {profile.user_rank}</span>
-                            <span className={styles.title}>칭호: {title?.item_name ?? '-'}</span>
+                            <span className={`${styles.title} ${title ? decoStyles[title.css_class_name] : ''}`}>[{title?.item_name ?? '-'}]</span>
                           </>
                         );
                       })()}

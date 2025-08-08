@@ -1,8 +1,8 @@
 /* 전체 페이지 컨테이너 */
 .pageContainer {
   color: #fff;
-  background: url('../../../public/images/violet2.png');
-  min-height: 100vh;
+  /* background: url('../../../public/images/violet2.png'); */
+  /* min-height: 100vh; */
 }
 
 .pageContainer h1 {
