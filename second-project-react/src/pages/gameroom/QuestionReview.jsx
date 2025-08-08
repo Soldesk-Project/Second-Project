@@ -211,7 +211,7 @@ const QuestionReview = () => {
                 }
                 <button onClick={getAnswer} >포인트로 정답 확인하기</button>
                 {
-                  play?(<p className={styles.isCorrect}>내가 {isCorrect?'맞춘':'틀린'} 문제 입니다</p>):null
+                  play?(<span className={styles.isCorrect}>내가 {isCorrect?'맞춘':'틀린'} 문제 입니다</span>):null
                 }
                 <span>내 보유 포인트 : {point}p</span>
                 <button onClick={leaveRoom} className={styles.leaveBtn}>나가기</button>
@@ -282,9 +282,8 @@ const QuestionReview = () => {
                   <div>
                     <button onClick={()=>playQuestionReviewHistory(questionList.submitted_at)} className={styles.playBtn}>풀어보기</button>
                   </div>
-                  <div className={styles.role_badge}>{formatDate(questionList.submit_date)??'x'}</div>
                   <div className={styles.questionList_info}>
-                    <span className={styles.nick}>{questionList.user_nick===userNick?userNick:'잘못된 닉네임'}</span>
+                    <span className={styles.role_badge}>{formatDate(questionList.submit_date)??'x'}</span>
                     <span className={styles.score}>정답율: {questionList.correct_count*5??'x'}%</span>
                   </div>
                 </div>
