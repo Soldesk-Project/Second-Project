@@ -200,7 +200,7 @@ const ItemEdit = () => {
 
   return (
     <div>
-      <h1 className='edit-title'>아이템 수정</h1>
+      <h1 className='edit-title'>아이템 수정 및 삭제</h1>
       <div className='category'>
         <h3>1. 타입 선택 및 아이템 검색</h3>
         <select name="typeSelect" value={type} onChange={handleTypeChange}>

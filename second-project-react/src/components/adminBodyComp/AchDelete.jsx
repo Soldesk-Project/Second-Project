@@ -177,7 +177,7 @@ const AchieveDelete = () => {
       <h1 style={{    color: '#fff',
     textAlign: 'center',
     marginBottom: '30px',
-    fontSize: '2em'}}>업적 관리</h1>
+    fontSize: '2em'}}>업적 수정 및 삭제</h1>
       <div className='category'>
         <h3>1. 타입 선택 및 업적 검색</h3>
         <select name="cateSelect" value={achType} onChange={handleTypeChange}>

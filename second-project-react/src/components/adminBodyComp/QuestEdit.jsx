@@ -277,7 +277,7 @@ const QuestEdit = () => {
 
   return (
     <div>
-      <h1 className={styles.title}>문제 수정</h1>
+      <h1 className={styles.title}>문제 수정 및 삭제</h1>
       <div className='category'>
         <select name="cateSelect" value={subject} onChange={handleSubjectChange}>
           {subjects.map((subject, index) => (
