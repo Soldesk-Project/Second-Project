@@ -106,4 +106,7 @@ public interface UserService {
 	// 문제 등록 결과 이메일 전송
 	void sendQuestRequestStatusMail(String toEmail, String messageContent) throws MessagingException;
 
+	// 칭호 장착해제
+	public void clearUserStyle(int user_no);
+	
 }

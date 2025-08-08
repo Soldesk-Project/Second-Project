@@ -272,4 +272,8 @@ public class UserServiceImpl implements UserService{
 
 	    mailSender.send(message);
 	}
+	
+	public void clearUserStyle(int user_no) {
+		mapper.clearUserStyle(user_no);
+	}
 }

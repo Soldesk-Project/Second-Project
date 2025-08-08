@@ -3,7 +3,7 @@ import Header from '../layout/Header';
 import styles from '../css/ShopPage.module.css';
 import decoStyles from '../css/Decorations.module.css';
 import axios from 'axios';
-import ChargeModal from '../components/ChargeModal';
+import ChargeModal from '../components/modal/ChargeModal';
 import { useSelector } from 'react-redux';
 import titleTextMap from '../js/Decorations';
 import PreviewModal from '../components/modal/PreviewModal';

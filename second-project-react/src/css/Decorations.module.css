@@ -32,7 +32,7 @@
 .admin_title { color: #00FFC6; font-weight: bold;}
 .tester_title { color: 	#FFD700; font-weight: bold;}
 .vip_title {
-  font-weight: 600;
+  font-weight: bold;
   font-size: 1.1em;
   color: #1E90FF; /* 딥블루 */
   text-shadow: 1px 1px 2px rgba(30, 144, 255, 0.5);

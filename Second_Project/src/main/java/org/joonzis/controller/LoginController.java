@@ -11,11 +11,13 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
+import org.joonzis.domain.ItemVO;
 import org.joonzis.domain.UserInfoDTO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.security.JwtUtil;
@@ -691,15 +693,24 @@ public class LoginController {
 	    // 사용자가 입력한 ID와 PW
 	    String inputId = dto.getUser_id();
 	    String inputPw = dto.getUser_pw();
-
+	    
+	    List<ItemVO> item = userservice.getItemList();
+	    
 	    // DB에서 사용자 정보 조회 (비밀번호 포함)
 	    UserInfoDTO user = userservice.getUserById(inputId);
+	    
+	    for (ItemVO items : item) {
+	        if (items.getItem_no() == user.getBoundaryItemNo()) {
+	            user.setImageFileName(items.getImageFileName());
+	            break; // 찾았으면 더 이상 돌 필요 없어
+	        }
+	    }
 
 	    if (user == null) {
 	    	System.out.println("사용자 없음");
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("존재하지 않는 사용자입니다.");
 	    }
-
+	    
 	    // DB에 저장된 비밀번호
 	    String storedPw = user.getUser_pw();
 	    boolean isMatch = false;
@@ -751,7 +762,6 @@ public class LoginController {
 	    String token = jwtUtil.generateToken(inputId, role, user.getUser_no());
 	    
 	    Integer userNoFromToken = jwtUtil.getUserNoFromToken(token);
-	    System.out.println("토큰에서 꺼낸 userNo: " + userNoFromToken);
 	    // 5. 사용자 정보 및 토큰 반환
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("token", token);

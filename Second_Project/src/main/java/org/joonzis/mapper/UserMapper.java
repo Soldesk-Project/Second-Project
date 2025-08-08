@@ -106,5 +106,7 @@ public interface UserMapper {
 	// 유저 정보 조회
 	UserInfoDTO getUserById(@Param("user_id") String user_id);
 	
+	//칭호 장착해제
+	public void clearUserStyle(@Param("user_no") int user_no);
 	
 }

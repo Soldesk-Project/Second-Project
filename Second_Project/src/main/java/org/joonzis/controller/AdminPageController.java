@@ -315,7 +315,6 @@ public class AdminPageController {
     												 @RequestParam(defaultValue = "8") int size) {
     	int offset = (page - 1) * size;
         List<UsersVO> users = adminService.searchUsers(searchType, searchValue, offset, size);
-        System.out.println(users);
         int totalCount = adminService.getAllUsers().size(); // 전체 개수 조회
 
 	    Map<String, Object> response = new HashMap<>();

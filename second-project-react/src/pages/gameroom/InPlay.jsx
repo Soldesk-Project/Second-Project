@@ -56,7 +56,7 @@ const InPlay = () => {
   const [users, setUsers] = useState([]);
   const [question, setQuestion] = useState(null);
   const [nextId, setNextId] = useState(0);
-  const [time, setTime] = useState('30');
+  const [time, setTime] = useState('5');
   const [result, setResult] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [userAnswerHistory, setUserAnswerHistory] = useState([]);
@@ -98,24 +98,6 @@ const InPlay = () => {
       return m;
     }, {});
   }, [shopItems]);
-
-	 // 🆕 useEffect: 샵 전체 아이템 한 번만 불러오기
-  // useEffect(() => {
-  //   const cats = ['테두리','칭호','글자색','명함','말풍선', '유니크'];
-  //   Promise.all(cats.map(cat =>
-  //     axios.get(`/api/shop/items?category=${encodeURIComponent(cat)}`)
-  //   ))
-  //   .then(results => {
-  //     const all = results.flatMap(r =>
-  //       r.data.map(it => ({
-  //         ...it,
-  //         imgUrl: it.imageFileName ? `/images/${it.imageFileName}` : ''
-  //       }))
-  //     );
-  //     setShopItems(all);
-  //   })
-  //   .catch(err => console.error('샵 아이템 로드 실패', err));
-  // }, []);
   
   // 제출 버튼 클릭 시 수정 불가
   // [제출 버튼]
@@ -168,7 +150,7 @@ const InPlay = () => {
         });
         // 타이머가 실행된 후에는 ref에서도 해당 타이머 ID 제거
         delete messageTimeoutRef.current[chatMessage.mSender]; 
-      }, 10000000000); // 마지막 메시지 출력 후 5초 뒤에 사라짐
+      }, 5000); // 마지막 메시지 출력 후 5초 뒤에 사라짐
 
       // 4. 새로 설정된 타이머 ID를 useRef에 저장
       messageTimeoutRef.current[chatMessage.mSender] = timerId;
@@ -255,7 +237,7 @@ const InPlay = () => {
         (gameMode === 'rank' ? data.server === 'rank' : data.server === server)
       ) {
         setPlay(false);
-        setTime('30');
+        setTime('5');
       }
 
       if (
@@ -265,7 +247,7 @@ const InPlay = () => {
       ) {
         const nextId = Number(data.nextId);
         setNextId(nextId);
-        setTime(1);
+        setTime(5);
 
         if (questionListRef.current.length === 0) {
           console.error("questionListRef가 비어 있습니다.");
@@ -277,7 +259,7 @@ const InPlay = () => {
         } else {
           setPlay(false);
           setResult(true);
-          setTime('30');
+          setTime('5');
         }
       }
 
@@ -343,7 +325,7 @@ const InPlay = () => {
 
     // 타이머가 0이 되면 자동 제출(한 번만)
     if (play && typeof time === "number" && time === 0) {
-      const spentTimeSec = 30;
+      const spentTimeSec = 5;
       handleAnswerSubmit(selectedAnswer, spentTimeSec);
       //setPlay(false);
     }
@@ -603,7 +585,7 @@ const InPlay = () => {
                         return (
                           <>
                             <span className={styles.rank}>랭크: {profile.user_rank}</span>
-                            <span className={styles.title}>칭호: {title?.item_name ?? '-'}</span>
+                            <span className={`${styles.title} ${title ? decoStyles[title.css_class_name] : ''}`}>[{title?.item_name ?? '-'}]</span>
                           </>
                         );
                       })()}
