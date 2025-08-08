@@ -45,7 +45,6 @@ const ExamOMRViewer = ({question, onSelectAnswer, selectedAnswer, nextId}) => {
             ))}
           </div>
           <div>
-           <span> 정답 : {currentQuestion.correct_answer} </span>
           </div>
             {/* <button onClick={handleSubmit} style={{ marginTop: '20px' }} disabled={disabled}>제출</button> */}
         </div>

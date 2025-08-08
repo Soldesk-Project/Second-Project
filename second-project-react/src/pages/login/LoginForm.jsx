@@ -37,12 +37,12 @@ const LoginForm = () => {
 
     window.location.href = naverAuthUrl;
   };
-  useEffect(() => {
-    if (user) {
-      // 이미 로그인 상태면 서버 메인 페이지 등으로 이동
-      navigate('/server');
-    }
-  }, [user, navigate]);
+  // useEffect(() => {
+  //   if (user) {
+  //     // 이미 로그인 상태면 서버 메인 페이지 등으로 이동
+  //     navigate('/server');
+  //   }
+  // }, [user, navigate]);
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault(); // ✅ form 제출 시 기본 동작 방지
@@ -56,10 +56,24 @@ const LoginForm = () => {
       localStorage.removeItem('token');
 
       const res = await axios.post('/api/login', { user_id: id, user_pw: pw });
+      if (res.data.message) {
+        alert(res.data.messgae);
+        return;
+      }
 
       localStorage.setItem('token', res.data.token);
       dispatch(setUser(res.data.user));
       navigate('/server');
+
+      // 브라우저 종료 시 로그아웃 호출 이벤트 등록
+      window.addEventListener('beforeunload', async () => {
+        try {
+          await axios.post('/api/logout', { userId: id });
+        } catch (error) {
+          // 무시해도 됨
+        }
+      });
+      
     } catch (err) {
       if (!err.response) {
         alert("네트워크 오류가 발생했습니다.");

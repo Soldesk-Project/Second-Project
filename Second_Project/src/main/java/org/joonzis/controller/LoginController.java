@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpSession;
 
@@ -49,6 +50,7 @@ import lombok.extern.log4j.Log4j;
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class LoginController {
+	private static final ConcurrentHashMap<String, HttpSession> loginSessions = new ConcurrentHashMap<>();
 	
 	@Value("${kakao.client-id}")
     private String clientId;
@@ -766,6 +768,12 @@ public class LoginController {
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("token", token);
 	    response.put("user", user); // 비밀번호 포함 주의 (프론트 전달 시 제거 권장)
+	    
+	    // 중복 로그인 방지: 이미 로그인 되어있는 세션이 있으면 무효화
+        HttpSession existingSession = loginSessions.put(inputId, session);
+        if (existingSession != null && !existingSession.isNew()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 로그인된 계정입니다.");
+        }
 
 	    session.setAttribute("user_id", inputId);
 
@@ -775,7 +783,10 @@ public class LoginController {
 	@PostMapping("/logout")
 	public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {
 	    String userId = request.get("userId");
-	    if (userId != null) {
+	    if (userId != null && loginSessions.containsKey(userId)) {
+	        HttpSession session = loginSessions.get(userId);
+	        session.invalidate();  // 세션 무효화
+	        loginSessions.remove(userId); // 맵에서 제거
 	        return ResponseEntity.ok("로그아웃 완료");
 	    }
 	    return ResponseEntity.badRequest().body("잘못된 요청");

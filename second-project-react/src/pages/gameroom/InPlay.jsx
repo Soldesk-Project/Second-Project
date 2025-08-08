@@ -91,6 +91,40 @@ const InPlay = () => {
   // 사용자별 최근 채팅 메시지를 저장할 상태
   const [userRecentChats, setUserRecentChats] = useState({});
 
+  useEffect(() => {
+    window.history.pushState(null, '', window.location.href);
+
+    const handlePopState = () => {
+      window.history.pushState(null, '', window.location.href);
+      console.log('뒤로가기 막음');
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // F5 또는 Ctrl+R 입력 시 기본 새로고침 방지
+      if (
+        e.key === 'F5' ||
+        (e.ctrlKey && e.key.toLowerCase() === 'r')
+      ) {
+        e.preventDefault();
+        console.log("새로고침 방지됨");
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   // 상점 아이템 목록 가져오기(유저 프로필 아이템 랜더링)
   const itemMap = React.useMemo(() => {
     return shopItems.reduce((m, it) => {

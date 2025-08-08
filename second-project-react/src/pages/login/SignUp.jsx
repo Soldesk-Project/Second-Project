@@ -46,6 +46,11 @@ const SignUp = () => {
             return;
         }
 
+         // ✅ 닉네임 길이 제한 추가 (6자 제한)
+        if (name === 'user_nick') {
+            if (value.length > 6) return;
+        }
+
         if (name === 'pwConfirm') {
             setPwConfirm(value);
             return;
@@ -233,7 +238,7 @@ const SignUp = () => {
                     <input
                         type="text"
                         name='user_nick'
-                        placeholder="닉네임을 입력하세요."
+                        placeholder="닉네임 입력 (최대 6자)"
                         value={users.user_nick}
                         ref={nickRef}
                         onChange={handleInputChange}

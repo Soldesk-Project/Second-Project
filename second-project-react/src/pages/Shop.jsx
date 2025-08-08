@@ -4,9 +4,10 @@ import styles from '../css/ShopPage.module.css';
 import decoStyles from '../css/Decorations.module.css';
 import axios from 'axios';
 import ChargeModal from '../components/modal/ChargeModal';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import titleTextMap from '../js/Decorations';
 import PreviewModal from '../components/modal/PreviewModal';
+import { fetchUserItems } from '../store/shopSlice';
 
 const Shop = () => {
   const allTabs = ['테두리', '칭호', '글자색', '명함', '말풍선'];
@@ -20,6 +21,14 @@ const Shop = () => {
   const user = useSelector(state => state.user.user);
   const userId = user?.user_id;
   const items = useSelector(state => state.shop.items);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchUserItems());
+  }, [dispatch]);
+
+  console.log(items);
+  
   
   const fetchGetPoint = async () => {
     if (!userId) return;

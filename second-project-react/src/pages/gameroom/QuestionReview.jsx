@@ -1,13 +1,14 @@
 /* eslint-disable no-restricted-globals */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import styles from '../../css/QuestionReview.module.css';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { WebSocketContext } from '../../util/WebSocketProvider';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Loading from '../../components/Loading';
 import QuestionReportModal from '../../components/modal/QuestionReportModal';
 import Test from '../../components/Test';
+import { fetchUserInfo } from '../../store/userSlice';
 
 const QuestionReview = () => {
   const [questionReviewList, setQuestionReviewList]=useState([]);
@@ -31,8 +32,31 @@ const QuestionReview = () => {
   const userNo = user?.user_no;
   const userId = user?.user_id;
   const nav = useNavigate();
+  const dispatch = useDispatch();
+
+  const token = localStorage.getItem("token");
+  // JWT에서 userId, userNo 추출
+  const getUserInfoFromToken = (token) => {
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return {
+        userId: payload.userId || payload.sub || payload.username || null,
+        userNo: payload.userNo || payload.user_no || null,
+      };
+    } catch (e) {
+      console.error("JWT 파싱 오류:", e);
+      return null;
+    }
+  };
 
   const sockets = useContext(WebSocketContext);
+
+  useEffect(() => {
+      const userInfo = getUserInfoFromToken(token);
+      const userNo = userInfo.userNo;
+      dispatch(fetchUserInfo(userNo));
+    }, [dispatch]);
 
   useEffect(() => {
       const socket = sockets['room'];
@@ -63,16 +87,16 @@ const QuestionReview = () => {
       };
     }, [server, sockets, userNick]);
 
-  useEffect(()=>{
-    getQuestionReviewList();
-    getPoint();
-  },[])
+  useEffect(() => {
+    if (userId && userNick) {
+      getQuestionReviewList();
+      getPoint();
+    }
+  }, [userId, userNick]);
 
   const getQuestionReviewList=async()=>{
     const resp=await axios.post('/api/questionReviewList', {userNick});
-    console.log('userNick:', userNick);
     const data=resp.data
-    console.log(data);
     
     setQuestionReviewList(data);    
     setLoading(false);
@@ -206,7 +230,7 @@ const QuestionReview = () => {
                 {
                   <>
                     <button onClick={prevQuestion} disabled={nextId === 0 || !play}>이전 문제</button>
-                    <button onClick={nextQuestion} disabled={nextId === 19 || !play}>다음 문제</button>
+                    <button onClick={nextQuestion} disabled={(nextId === 19 || nextId === 4) || !play}>다음 문제</button>
                   </>
                 }
                 <button onClick={getAnswer} >포인트로 정답 확인하기</button>

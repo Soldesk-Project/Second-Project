@@ -418,10 +418,14 @@
         WHERE item_no = #{item_no}
     </update>
 
-    <delete id="deleteItems" parameterType="map">
-	    DELETE FROM items
-	    WHERE item_no = #{itemNo}
-	</delete>
+    <update id="deleteItems" parameterType="int" statementType="CALLABLE">
+	  <![CDATA[
+	  BEGIN
+	    DELETE FROM inventory WHERE item_name = (SELECT item_name FROM items WHERE item_no = #{itemNo});
+	    DELETE FROM items WHERE item_no = #{itemNo};
+	  END;
+	  ]]>
+	</update>
 
     <select id="selectQuestRequests" resultType="org.joonzis.domain.QuestRequestVO" parameterType="map">
     SELECT

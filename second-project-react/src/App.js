@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, MemoryRouter } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
-import { setUser } from './store/userSlice';
+import { setUser, loadUserFromStorage } from './store/userSlice';
 
 import LoginForm from './pages/login/LoginForm';
 import MainPage from './pages/MainPage';
@@ -35,6 +35,9 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+
+    dispatch(loadUserFromStorage())
+
     const token = localStorage.getItem('token');
     if (token) {
       axios.get('/api/auth/me', {
@@ -50,30 +53,10 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      // F5, Ctrl+R, Cmd+R (Mac)
-      if (
-        e.key === 'F5' ||
-        (e.ctrlKey && e.key.toLowerCase() === 'r') ||
-        (e.metaKey && e.key.toLowerCase() === 'r') // Mac
-      ) {
-        e.preventDefault();
-        console.log("전체 새로고침 방지됨!");
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
   return (
     // <MemoryRouter initialEntries={["/"]}></MemoryRouter>
     // <Router> 대신 위에거 넣으면 히스토리를 메모리에서만 관리해서 유저가 히스토리 이동이 불가능해짐
-    <MemoryRouter initialEntries={["/"]}>
+    <Router>
       <WebSocketProvider>
       <BanListener/>
         <Routes>
@@ -98,7 +81,7 @@ function App() {
           <Route path="/*" element={<ErrorEvent />} />
         </Routes>
       </WebSocketProvider>
-    </MemoryRouter>
+    </Router>
   );
 }
 
