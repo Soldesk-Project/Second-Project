@@ -23,6 +23,7 @@
   height: 30px;
   line-height: 28px;
   box-sizing: border-box;
+  cursor: pointer;
 
   display: flex;
   align-items: baseline;

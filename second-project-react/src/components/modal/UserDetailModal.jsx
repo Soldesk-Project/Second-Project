@@ -69,7 +69,7 @@ const UserDetailModal = ({ user, onClose, shopItems }) => {
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-        <h2>유저 상세 정보</h2>
+        <h2>유저 정보</h2>
         <div className={styles.userInfo_Box_1}>
             <div className={styles.profileWrapper}>
                 <img 
