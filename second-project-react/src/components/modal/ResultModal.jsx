@@ -3,7 +3,7 @@ import styles from '../../css/ResultModal.module.css';
 import { WebSocketContext } from '../../util/WebSocketProvider';
 import { useNavigate } from 'react-router-dom';
 
-const ResultModal = ({ users, setResult, gameMode, roomNo, userNick, server }) => {
+const ResultModal = ({ users, setResult, gameMode, roomNo, userNick, server, questionListLength }) => {
   const sockets = useContext(WebSocketContext);
   const nav = useNavigate();
 
@@ -44,7 +44,7 @@ const ResultModal = ({ users, setResult, gameMode, roomNo, userNick, server }) =
                   <td>{rank}</td>
                   <td>{userNick}</td>
                   <td>{score ?? 0}</td>
-                  <td>{score ? `${score*5}%` : '0'}</td>
+                  <td>{score ? `${score/questionListLength*100}%` : '0'}</td>
                   <td>+{point}</td>
                   {gameMode === 'rank' && <td>{rankPoint ?? '-'}</td>}
                 </tr>

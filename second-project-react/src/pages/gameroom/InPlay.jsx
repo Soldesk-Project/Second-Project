@@ -684,7 +684,9 @@ const InPlay = () => {
               myTotalElapsed={myTotalElapsed}
               roomNo={roomNo}
               userNick={userNick}
-              server={server}/>
+              server={server}
+              questionListLength={questionListRef.current.length}
+              />
         }
       </div>
     </div>
