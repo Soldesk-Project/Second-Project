@@ -23,6 +23,7 @@ import org.joonzis.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -77,13 +78,48 @@ public class ChatController {
     }
     
     // 서버 공지 메시지 전송 (전체 공통 채팅방용)
-    @MessageMapping("/serverChat.sendMessage")
-    public void serverSendMessage(@Payload ChatRoomDTO chatRoomDTO) {
+    @MessageMapping("/serverChat.sendMessage/{server}")
+    public void serverSendMessage(@DestinationVariable Long server, @Payload ChatRoomDTO chatRoomDTO) {
         // 메시지 큐에 추가
         serverChatLogQueue.offer(chatRoomDTO.getMSender() + ": " + chatRoomDTO.getMContent());
         
         // STOMP를 통해 구독자에게 메시지 전송
-        simpMessagingTemplate.convertAndSend("/serverChat/public", chatRoomDTO);
+        simpMessagingTemplate.convertAndSend("/serverChat/" + server, chatRoomDTO);
+    }
+    
+    // 서버 채팅방 입장
+    @MessageMapping("/serverChat.addUser/{server}")
+    public void serverAddUser(@DestinationVariable Long server,
+                              @Payload ChatRoomDTO chatRoomDTO,
+                              SimpMessageHeaderAccessor headerAccessor) {
+
+        headerAccessor.getSessionAttributes().put("username", chatRoomDTO.getMSender());
+        headerAccessor.getSessionAttributes().put("serverNo", server);
+
+        // 로그 큐에 저장
+        String logMessage = "[서버 " + server + "] " + chatRoomDTO.getMSender() + "님이 입장했습니다.";
+        serverChatLogQueue.offer(logMessage);
+
+        chatRoomDTO.setMType(ChatRoomDTO.MessageType.SERVER_JOIN);
+        chatRoomDTO.setMContent(chatRoomDTO.getMSender() + "님이 입장했습니다");
+        chatRoomDTO.setMTimestamp(System.currentTimeMillis());
+
+        simpMessagingTemplate.convertAndSend("/serverChat/" + server, chatRoomDTO);
+    }
+
+    // 서버 채팅방 퇴장
+    @MessageMapping("/serverChat.leaveUser/{server}")
+    public void serverLeaveUser(@DestinationVariable Long server,
+                                @Payload ChatRoomDTO chatRoomDTO) {
+
+        String logMessage = "[서버 " + server + "] " + chatRoomDTO.getMSender() + "님이 퇴장했습니다.";
+        serverChatLogQueue.offer(logMessage);
+
+        chatRoomDTO.setMType(ChatRoomDTO.MessageType.SERVER_LEAVE);
+        chatRoomDTO.setMContent(chatRoomDTO.getMSender() + "님이 퇴장했습니다");
+        chatRoomDTO.setMTimestamp(System.currentTimeMillis());
+
+        simpMessagingTemplate.convertAndSend("/serverChat/" + server, chatRoomDTO);
     }
 
  // 게임 채팅방 메시지 전송

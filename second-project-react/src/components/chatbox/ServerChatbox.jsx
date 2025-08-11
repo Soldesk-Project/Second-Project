@@ -32,6 +32,7 @@ const ServerChatbox = () => {
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [reportMessage, setReportMessage] = useState('');
     const [isChatBanModalOpen, setIsChatBanModalOpen] = useState(false);
+    const { server } = useSelector((state) => state.user);
 
     const currentUser = useSelector((state) => state.user.user);
     const userNick = currentUser?.user_nick;
@@ -50,7 +51,7 @@ const ServerChatbox = () => {
         // 엄격 모드(StrictMode) 대응 및 이미 연결되어 있다면 재연결 시도하지 않음
         if (stompClientInstanceRef.current && isConnected) {
             if (!hasSentAddUserRef.current) {
-                stompClientInstanceRef.current.send("/app/serverChat.addUser", {}, JSON.stringify({
+                stompClientInstanceRef.current.send(`/app/serverChat.addUser/${server}`, {}, JSON.stringify({
                     mType: 'SERVER_JOIN',
                     mSender: userNick,
                     mSenderNo: userNo
@@ -71,7 +72,7 @@ const ServerChatbox = () => {
             setMessages([]); // 새로운 연결 시 메시지 목록 초기화
 
             // 공개 채팅방 구독
-            client.subscribe('/serverChat/public', message => {
+            client.subscribe(`/serverChat/${server}`, message => {
                 try{
                     const receivedMessage = JSON.parse(message.body);
                     console.log("🟢 ServerChatbox: 수신된 공개 채팅 메시지:", receivedMessage);
@@ -85,7 +86,7 @@ const ServerChatbox = () => {
 
             // 'addUser' 메시지 전송
             if (!hasSentAddUserRef.current) {
-                client.send("/app/serverChat.addUser", {}, JSON.stringify({
+                client.send(`/app/serverChat.addUser/${server}`, {}, JSON.stringify({
                     mType: 'SERVER_JOIN',
                     mSender: userNick,
                     mSenderNo: userNo
@@ -106,7 +107,7 @@ const ServerChatbox = () => {
 
             if (currentClient && currentClient.connected) {
                 // SERVER_LEAVE 메시지 전송
-                currentClient.send("/app/serverChat.leaveUser", {}, JSON.stringify({
+                currentClient.send(`/app/serverChat.leaveUser/${server}`, {}, JSON.stringify({
                     mType: 'SERVER_LEAVE',
                     mSender: userNick,
                     mSenderNo: userNo
@@ -148,7 +149,7 @@ const ServerChatbox = () => {
             };
 
              stompClientInstanceRef.current.send(
-            "/app/serverChat.sendMessage",  // 서버에 맞는 메시지 엔드포인트로 변경 필요
+            `/app/serverChat.sendMessage/${server}`,  // 서버에 맞는 메시지 엔드포인트로 변경 필요
             {},
             JSON.stringify(messageToSend)
         );
