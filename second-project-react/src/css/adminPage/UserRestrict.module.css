@@ -193,7 +193,7 @@
 .report_count{
   color: red;
   height: 20px;
-  display: block;
+  display: inline;
 }
 
 
