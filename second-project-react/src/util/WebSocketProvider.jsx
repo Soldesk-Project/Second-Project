@@ -18,7 +18,6 @@ export const WebSocketProvider = ({ children }) => {
         userNo: payload.userNo || payload.user_no || null,
       };
     } catch (e) {
-      console.error("JWT 파싱 오류:", e);
       return null;
     }
   };
@@ -31,25 +30,20 @@ export const WebSocketProvider = ({ children }) => {
     socketsRef.current[name] = socket;
 
     socket.onopen = () => {
-      console.log(`✅ [${name}] 연결 성공`);
     };
 
     socket.onclose = (e) => {
-      console.warn(`❌ [${name}] 연결 종료됨:`, e.reason);
       socketsRef.current[name] = null;
 
       if (retryCount < MAX_RECONNECT_ATTEMPTS) {
         setTimeout(() => {
-          console.log(`🔁 [${name}] 재연결 시도 (${retryCount + 1})`);
           connectSocket(name, url, retryCount + 1);
         }, 2000 * (retryCount + 1));
       } else {
-        console.error(`🚫 [${name}] 재연결 실패 (최대 시도 초과)`);
       }
     };
 
     socket.onerror = (e) => {
-      console.error(`⚠️ [${name}] 소켓 오류 발생`, e);
       socket.close();
     };
   };

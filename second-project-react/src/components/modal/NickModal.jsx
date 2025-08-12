@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import styles from '../../css/NickModal.module.css'; // 필요 시 CSS 모듈
+import styles from '../../css/modal/NickModal.module.css'; // 필요 시 CSS 모듈
 import { debounce } from 'lodash';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
@@ -18,8 +18,8 @@ const NickModal = ({ isOpen, onClose, onSubmit, point }) => {
       alert('닉네임을 입력해주세요.');
       return;
     }
-    if (nickname.length>6) {
-      alert('닉네임은 6글자를 초과할 수 없습니다.');
+    if (nickname.length>4) {
+      alert('닉네임은 4글자를 초과할 수 없습니다.');
       return;
     }
 
@@ -83,8 +83,8 @@ const NickModal = ({ isOpen, onClose, onSubmit, point }) => {
         />
         {
           nickname && (
-            nickname.length > 6 ? (
-              <p style={{ color: 'red' }}>6글자를 초과한 닉네임입니다.</p>
+            nickname.length > 4 ? (
+              <p style={{ color: 'red' }}>4글자를 초과한 닉네임입니다.</p>
             ) : isDuplicateNick === true ? 
               <p style={{ color: 'red' }}>이미 사용 중인 닉네임입니다.</p>
               : 

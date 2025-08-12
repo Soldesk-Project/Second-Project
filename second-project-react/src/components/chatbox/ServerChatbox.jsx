@@ -75,8 +75,6 @@ const ServerChatbox = () => {
             client.subscribe(`/serverChat/${server}`, message => {
                 try{
                     const receivedMessage = JSON.parse(message.body);
-                    console.log("🟢 ServerChatbox: 수신된 공개 채팅 메시지:", receivedMessage);
-                    console.log("🟢 ServerChatbox: setMessages 호출 전 prevMessages:", messages);
                     setMessages(prevMessages => [...prevMessages, receivedMessage]);
                 } catch (e){
                     console.error("🚫 ServerChatbox: 메시지 파싱 오류:", e, "원본 메시지:", message.body);
@@ -178,7 +176,6 @@ const ServerChatbox = () => {
 
     //신고처리
     const openReportModal = (msg) => {
-        console.log("신고버튼 클릭");
         setReportMessage(msg)
         setIsReportModalOpen(true);
     };

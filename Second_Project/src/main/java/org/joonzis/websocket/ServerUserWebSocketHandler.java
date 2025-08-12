@@ -62,6 +62,13 @@ public class ServerUserWebSocketHandler extends TextWebSocketHandler {
             // 3) 해당 서버에 접속한 유저 목록 전송
             broadcastUserList(server);
         }
+        
+        else if ("leave".equals(action) && server != null && userNick != null) {
+            removeSessionFromAllServers(session);
+
+            broadcastUserList(server);
+        }
+        
         else if ("updateStyle".equals(action) && userNo != null) {
 //            log.info("[Server] updateStyle 요청 수신 userNo=" + userNo);
             UserInfoDTO updatedUser = userService.getUserInfoByUserNo(Integer.parseInt(userNo));

@@ -86,7 +86,6 @@ const QuestRegister = () => {
 
     // `subjectValueMap`을 사용하여 실제 DB에 저장될 값을 가져옴
     const dbSubjectValue = subjectValueMap[subject];
-    console.log('클라이언트에서 서버로 보낼 subject 값:', dbSubjectValue);
     if (!dbSubjectValue) {
       alert('유효하지 않은 과목입니다.');
       return;

@@ -40,9 +40,6 @@ const ServerUserList = () => {
     }, {});
   }, [shopItems]);
 
-
-  console.log(itemMap);
-  
   useEffect(() => {
     if (!server || !user || !user_nick || !user_no) return;
 
@@ -158,9 +155,6 @@ const ServerUserList = () => {
       socket.removeEventListener('message', messageHandler);
     };
   }, [server, user_no, user_nick, sockets]);
-
-  console.log(selectedUser);
-  
 
   return (
     <div className={styles.container}>

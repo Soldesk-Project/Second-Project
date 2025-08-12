@@ -154,7 +154,6 @@ const ItemList = () => {
   const handleRewardClick = (typeKey) => {
     
     const reward = REWARDS[typeKey];
-    console.log(reward.item_type);
     
     if (!reward) return;
     // API 호출 등 비동기 처리도 가능

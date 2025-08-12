@@ -238,7 +238,7 @@ const SignUp = () => {
                     <input
                         type="text"
                         name='user_nick'
-                        placeholder="닉네임 입력 (최대 6자)"
+                        placeholder="닉네임 입력 (최대 4자)"
                         value={users.user_nick}
                         ref={nickRef}
                         onChange={handleInputChange}

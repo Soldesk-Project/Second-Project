@@ -342,7 +342,7 @@
 		UPDATE USER_DECO SET TITLE_ITEM_NO=null WHERE USER_NO = #{user_no} 
 	</update>
 	
-	<select id="getRank" parameterType="int">
+	<select id="getRank">
 		SELECT USER_RANK FROM USERS WHERE USER_NICK = #{user_nick}
 	</select>
 	

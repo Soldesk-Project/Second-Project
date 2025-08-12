@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from '../../css/ModalBasic.module.css';
+import styles from '../../css/modal/ModalBasic.module.css';
 
 const ModalBasic = ({ setModalOpen, socket, isWsOpen, onCategorySelect }) => {
   const [title, setTitle] = useState('');

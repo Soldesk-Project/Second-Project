@@ -69,10 +69,6 @@ const RoomList = ({ shopItems }) => {
           alert(data.reason);
           break;
         case "filterRoomList":
-          console.log('filterRoomList 받음');
-          console.log(data.rooms);
-          
-          
           setGameRoomList(data.rooms);
           break;
         default:
@@ -90,7 +86,7 @@ const RoomList = ({ shopItems }) => {
     if (!matchSocket) return;
 
     if (matchSocket.readyState !== 1) {
-      matchSocket.onopen = () => console.log("🧩 매칭 소켓 연결 완료");
+      matchSocket.onopen = () => console.log();
     }
 
     matchSocket.onmessage = (event) => {
@@ -156,12 +152,11 @@ const RoomList = ({ shopItems }) => {
           break;
         
         default:
-          console.log("🟡 알 수 없는 매칭 메시지:", data);
       }
     };
 
     matchSocket.onerror = (err) => console.error("WebSocket error (match):", err);
-    matchSocket.onclose = () => console.log("🛑 매칭 소켓 종료됨");
+    matchSocket.onclose = () => console.log();
   }, [sockets, nav]);
 
   const handleQuickMatch = async () => {
@@ -226,8 +221,6 @@ const RoomList = ({ shopItems }) => {
   };
   
   const enterRoom=(room)=>{
-    console.log('실행');
-    
     const socket = sockets.current['room'];
     if (socket && socket.readyState === 1) {
       if (room.limit > room.currentCount) {
@@ -386,7 +379,7 @@ const RoomList = ({ shopItems }) => {
               <div className={styles.roomMeta}>
                 <span>{room.currentCount ?? 0} / {room.limit}명</span>
                 <span>{room.is_private === 'Y' ? '비공개' : '공개'}</span>
-                <span>{room.status === 'playing'?'게임중':"대기중"}</span>
+                <span>{(room.status === 'playing' || room.status === 'endgame')?'게임중':"대기중"}</span>
               </div>
             </div>
           ))

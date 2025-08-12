@@ -205,7 +205,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
 		nickToUserNoMap.put(userNick, userNo);
 
 		// 게임 중 입장 거부
-		if ("playing".equals(status)) {
+		if ("playing".equals(status) || "endgame".equals(status)) {
 			try {
 				// JSON으로 메시지 전송
 				session.sendMessage(new TextMessage(
@@ -590,7 +590,7 @@ public class GameRoomWebSocketHandler extends TextWebSocketHandler {
         	playService.countFirst(user_nick);
         }
         
-//        roomStatus.computeIfAbsent(broadcastServer, k -> new ConcurrentHashMap<>()).put(roomNo, "waiting");
+        roomStatus.computeIfAbsent(broadcastServer, k -> new ConcurrentHashMap<>()).put(roomNo, "endgame");
 
         String historyUuid = UUID.randomUUID().toString();
         

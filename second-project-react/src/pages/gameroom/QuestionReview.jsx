@@ -102,13 +102,10 @@ const QuestionReview = () => {
     setLoading(false);
   }
   const getPoint=async()=>{
-    // console.log("userId : "+userId);
     
     if (!userId) return;
     try {
       const resp = await axios.get(`/api/user/point?user_id=${userId}`);
-      console.log(resp.data);
-      
       setPoint(resp.data);
     } catch (error) {
       console.error('포인트 불러오기 실패:', error);
@@ -121,11 +118,8 @@ const QuestionReview = () => {
   }
 
   const playQuestionReviewHistory=async(submittedAt)=>{
-    // console.log(submittedAt);
     const resp=await axios.post('/api/userQuestionHistory', {submittedAt});
-    // console.log('submmitedAt:', submittedAt);
     const data=resp.data
-    console.log(data);
     questionListRef.current = data
     setReviewQuestions(resp.data);
     setNextId(0);
@@ -147,8 +141,6 @@ const QuestionReview = () => {
   // 포인트로 정답 확인 버튼
   const getAnswer=async()=>{
     if (play) {
-      console.log(explanation);
-      
       if (confirm('포인트를 소모하여 정답을 확인하시겠습니까?')) {
         await axios.post('/api/usePoint', {userNo});
         
@@ -308,7 +300,7 @@ const QuestionReview = () => {
                   </div>
                   <div className={styles.questionList_info}>
                     <span className={styles.role_badge}>{formatDate(questionList.submit_date)??'x'}</span>
-                    <span className={styles.score}>정답율: {questionList.correct_count*5??'x'}%</span>
+                    <span className={styles.score}>정답율: {questionList.correct_count*5*4??'x'}%</span>
                   </div>
                 </div>
               )))

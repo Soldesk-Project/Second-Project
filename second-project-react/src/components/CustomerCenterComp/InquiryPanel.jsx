@@ -25,9 +25,7 @@ const InquiryPanel = () => {
     const fetchInquiries = async () => {
       try {
         const res = await axios.get(`/api/customer/inquiries?page=${page}&size=${PAGE_SIZE}`);
-        console.log("Inquiries data received:", res.data);
         setInquiries(res.data.items);
-        console.log(res.data.items);
         
         setTotalInquiries(res.data.totalCount);
       } catch (error) {
@@ -161,14 +159,17 @@ const InquiryPanel = () => {
                           <ul className={styles.attachmentList}>
                             {item.files.map((file, fileIndex) => (
                               <li key={fileIndex}>
-                                <a 
+                                {/* <a 
                                   href={file.filepath} 
                                   target="_blank" 
                                   rel="noopener noreferrer"
                                   className={styles.attachmentLink}
                                   >
                                   {file.filename}
-                                </a>
+                                </a> */}
+                                {
+                                  <img src={`/images/${file.filepath}`} alt="이미지" />
+                                }         
                               </li>
                             ))}
                           </ul>

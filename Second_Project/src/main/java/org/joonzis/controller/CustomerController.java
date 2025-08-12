@@ -1,13 +1,10 @@
 package org.joonzis.controller;
 
 import java.io.IOException;
-
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.web.bind.annotation.PathVariable;
 import org.joonzis.domain.InquiryVO;
-import org.joonzis.domain.QuestRequestVO;
 import org.joonzis.service.FaqService;
 import org.joonzis.service.FileUploadService;
 import org.joonzis.service.InquiryService;
@@ -19,11 +16,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -200,10 +197,7 @@ public class CustomerController {
     }
 
     // 4-3) 1:1문의 게시글 등록 페이지
-    @PostMapping(
-      path = "/inquiry",
-      consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
+    @PostMapping(path = "/inquiry", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String,String>> createInquiry(
             @RequestParam(value = "userId", required = false) String UserId,
             @RequestParam("subject") String subject,

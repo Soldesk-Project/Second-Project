@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { WebSocketContext } from '../../util/WebSocketProvider';
-import styles from '../../css/FilterModal.module.css';
+import styles from '../../css/modal/FilterModal.module.css';
 
 const FilterModal = ({setFilterModal, server}) => {
   const [category, setCategory] = useState('all');
@@ -13,12 +13,9 @@ const FilterModal = ({setFilterModal, server}) => {
   };
 
   const handleSearchRoom=()=>{
-    console.log('category : '+category);
-    console.log('isPrivate : '+isPrivate);
     
-    const socket = sockets['room'];
+    const socket = sockets.current['room'];
     if (socket && socket.readyState === 1) {
-        console.log('소켓요청');
         socket.send(JSON.stringify({
           action: "filterRoomList",
           server: server,

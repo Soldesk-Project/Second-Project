@@ -10,7 +10,6 @@ const BanListener = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log("banSocket 폴링 시작");
     const interval = setInterval(() => {
       const banSocket = socketsRef.current["ban"];
       if (banSocket) {

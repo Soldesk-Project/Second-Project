@@ -77,6 +77,7 @@ const InPlay = () => {
   const location = useLocation();
   const category = location.state?.category || 'random';
   const shopItems = useSelector(state => state.shop.items);
+  const [resultUsers, setResultUsers] = useState([]);
   // 랭크 진입 경로 일 때도 항상 gameMode를 제대로 받게 한다
   const gameMode = location.state?.gameMode || location.state?.game_mode || 'normal';
   const rankedUsers = useMemo(() => getRankedUsers(users, gameMode), [users, gameMode]);
@@ -96,7 +97,6 @@ const InPlay = () => {
 
     const handlePopState = () => {
       window.history.pushState(null, '', window.location.href);
-      console.log('뒤로가기 막음');
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -114,7 +114,6 @@ const InPlay = () => {
         (e.ctrlKey && e.key.toLowerCase() === 'r')
       ) {
         e.preventDefault();
-        console.log("새로고침 방지됨");
       }
     };
 
@@ -213,7 +212,6 @@ const InPlay = () => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      // console.log(data);
       
       // ✅ 유저리스트(랭크 & 일반) 모두 처리
       if (
@@ -472,6 +470,12 @@ const InPlay = () => {
     }
   },[])
 
+  useEffect(() => {
+    if (result) {
+      setResultUsers([...rankedUsers]);
+    }
+  }, [result]); 
+
   // 카테고리 변환
   const setKoreanToCategory = (category) => {
     switch (category) {
@@ -677,7 +681,7 @@ const InPlay = () => {
         }
         {
           result &&
-            <ResultModal users={rankedUsers}
+            <ResultModal users={resultUsers}
               setResult={setResult}
               gameMode={gameMode}
               myElapsedTimes={userElapsedTimes}

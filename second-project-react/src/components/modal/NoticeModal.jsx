@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styles from '../../css/NoticeModal.module.css';
+import styles from '../../css/modal/NoticeModal.module.css';
 import axios from 'axios';
 
 const NoticeModal = ({setNoticeModal, reloadNotices, modalStatus, noticeItem}) => {

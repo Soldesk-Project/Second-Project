@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from '../../css/ChargeModal.module.css';
+import styles from '../../css/modal/ChargeModal.module.css';
 import { useSelector } from 'react-redux';
 import { loadTossPayments } from '@tosspayments/payment-sdk';
 import axios from 'axios';
@@ -7,7 +7,6 @@ import axios from 'axios';
 const ChargeModal = ({ onClose }) => {
   const [amount, setAmount] = useState(1000);
   const userId = useSelector((state) => state.user.user.user_id);
-  console.log(userId);
   
   const tossClientKey = 'test_ck_ALnQvDd2VJ6enAxbomzxVMj7X41m'; // ✅ 토스 클라이언트 키
 
@@ -33,8 +32,8 @@ const ChargeModal = ({ onClose }) => {
         orderId,
         orderName: '포인트 충전',
         customerName: userId,
-        successUrl: `http://localhost:9099/api/pay/toss/success?userId=${userId}`, // ✅ 수정
-        failUrl: 'http://localhost:3000/pay/fail',
+        successUrl: `http://192.168.0.112:9099/api/pay/toss/success?userId=${userId}`, // ✅ 수정
+        failUrl: 'http://192.168.0.112:3000/pay/fail',
       });
     } catch (err) {
       alert('토스 결제 실패');

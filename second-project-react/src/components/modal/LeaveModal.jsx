@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../css/LeaveModal.module.css';
+import styles from '../../css/modal/LeaveModal.module.css';
 
 const LeaveModal = ({ onConfirm, onCancel, gameMode, play }) => {
 

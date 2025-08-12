@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import styles from '../../css/ResultModal.module.css';
+import styles from '../../css/modal/ResultModal.module.css';
 import { WebSocketContext } from '../../util/WebSocketProvider';
 import { useNavigate } from 'react-router-dom';
 

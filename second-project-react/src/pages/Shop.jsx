@@ -28,9 +28,6 @@ const Shop = () => {
     dispatch(fetchUserItems());
   }, [dispatch]);
 
-  console.log(items);
-  
-  
   const fetchGetPoint = async () => {
     if (!userId) return;
     try {

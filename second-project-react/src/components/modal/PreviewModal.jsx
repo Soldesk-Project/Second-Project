@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import styles from '../../css/PreviewModal.module.css';
+import styles from '../../css/modal/PreviewModal.module.css';
 import decoStyles from '../../css/Decorations.module.css';
 import titleTextMap from '../../js/Decorations';
 
@@ -48,7 +48,6 @@ const PreviewModal = ({
       } else if (item.css_class_name?.includes('title')) {
         previewStyle.title_class_name = item.css_class_name; // 콜렉터 같은 칭호
       } else if(item.imgUrl?.includes('/images/syberBackground.png')){
-        console.log(1);
       }
       break;
     default:

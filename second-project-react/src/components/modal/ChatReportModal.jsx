@@ -6,7 +6,6 @@ const ChatReportModal = ({ isOpen, onClose, reportMessage }) => {
     const [reportedReason, setReportedReason] = useState('');
     const token = localStorage.getItem('token');
     if (!isOpen) return null;
-    console.log(reportMessage.mSender);
 
     const handleReportSubmit=async()=>{
         if (reportedReason.length>100) {

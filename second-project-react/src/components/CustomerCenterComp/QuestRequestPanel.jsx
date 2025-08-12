@@ -157,7 +157,6 @@ const QuestRequestPanel = () => {
       }
       
       try {
-        console.log("보내기전 확인 : " , formData);
         const response = await fetch('/api/customer/questRequestWithImage', {
           method: 'POST',
           body: formData, // ✅ Content-Type 자동 설정됨

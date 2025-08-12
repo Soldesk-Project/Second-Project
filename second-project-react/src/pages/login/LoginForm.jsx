@@ -14,12 +14,13 @@ const LoginForm = () => {
   const user = useSelector(state => state.user.user);
 
   const KAKAO_CLIENT_ID = "99ddb7e910a924e51b633490da611ead";
-  const KAKAO_REDIRECT_URI = "http://localhost:3000/kakao/callback";
+  const KAKAO_REDIRECT_URI = "http://192.168.0.112:3000/kakao/callback";
   const GOOGLE_CLIENT_ID = "633570415561-hcl7dpl18608021a7lof369flivcklv7.apps.googleusercontent.com";
-  const GOOGLE_REDIRECT_URI = "http://localhost:3000/google/callback";
+  const GOOGLE_REDIRECT_URI = "https://598e051439bc.ngrok-free.app/google/callback";
 
   const handleGoogleLogin = () => {
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_REDIRECT_URI}&response_type=code&scope=profile email&access_type=offline`;
+    const scope = encodeURIComponent("profile email");
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(GOOGLE_REDIRECT_URI)}&response_type=code&scope=${scope}&access_type=offline`;
     window.location.href = url;
   };
 
@@ -32,7 +33,7 @@ const LoginForm = () => {
     localStorage.setItem('naver_oauth_state', state); // ✅ 저장해두기
 
     const NAVER_CLIENT_ID = "NxeIC3yi_Oc0_aO3Ybv6";
-    const NAVER_REDIRECT_URI = encodeURIComponent("http://localhost:3000/api/naver/callback");
+    const NAVER_REDIRECT_URI = encodeURIComponent("http://192.168.0.112:3000/api/naver/callback");
     const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${NAVER_CLIENT_ID}&redirect_uri=${NAVER_REDIRECT_URI}&state=${state}`;
 
     window.location.href = naverAuthUrl;

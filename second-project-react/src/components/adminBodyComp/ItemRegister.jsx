@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux';
 import { fetchUserItems } from '../../store/shopSlice';
 
 const ItemRegister = () => {
-  console.log("ItemRegister 컴포넌트 렌더링 시작");
   const dispatch = useDispatch();
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);

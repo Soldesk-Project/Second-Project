@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styles from "../../css/UserDetailModal.module.css";
+import styles from "../../css/modal/UserDetailModal.module.css";
 import decoStyles from '../../css/Decorations.module.css'; // 이미 존재하지 않는다면 추가
 import titleTextMap from '../../js/Decorations';
 import { useSelector } from 'react-redux';
@@ -10,10 +10,6 @@ const UserDetailModal = ({ user, onClose, shopItems }) => {
     const { isTop10 } = useSelector((state) => state.ranking);
     const [stats, setStats] = useState(null);
 
-    console.log(user);
-    
-    
-    
     // 상점 아이템 목록 가져오기(유저 프로필 아이템 랜더링)
     const itemMap = React.useMemo(() => {
         return shopItems.reduce((m, it) => {

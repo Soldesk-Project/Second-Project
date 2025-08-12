@@ -82,7 +82,6 @@ function formatTimestamp(timestamp) {
                             hasSentJoinRef.current = false;
                         });
                     } else {
-                        console.log("GameChatbox: setTimeout 시점에 이미 연결 해제됨.");
                     }
                 }, 50); // 짧은 지연 (메시지 전송 시간을 벌기 위함)
 
@@ -143,7 +142,6 @@ function formatTimestamp(timestamp) {
                 }));
                 hasSentJoinRef.current = true;
             } else {
-                console.log("GameChatbox: GAME_JOIN 메시지 이미 전송됨 (hasSentJoinRef). 스킵.");
             }
 
         }, error => {
@@ -171,8 +169,6 @@ function formatTimestamp(timestamp) {
 
     // 메시지 전송 함수
     const sendMessage = () => {
-        console.log(messageInput.length);
-        
         if (messageInput.length>1000) {
             setAlertMessage('채팅이 너무 깁니다. 1,000자 이하로 입력해 주세요.');
             setTimeout(() => {

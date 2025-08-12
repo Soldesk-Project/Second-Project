@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styles from '../../css/FaqModal.module.css';
+import styles from '../../css/modal/FaqModal.module.css';
 import axios from 'axios';
 
 const FaqModal = ({setFaqModal, reloadFaqs, modalStatus, faqItem}) => {
@@ -54,7 +54,6 @@ const FaqModal = ({setFaqModal, reloadFaqs, modalStatus, faqItem}) => {
       closeModal();
       reloadFaqs();
     } catch (error) {
-      console.log(error);
       
       alert('FAQ 등록 에러 발생');      
     }

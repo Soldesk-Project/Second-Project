@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from '../../css/passwordModal.module.css';
+import styles from '../../css/modal/passwordModal.module.css';
 
 const PasswordModal = ({setPassword, setPasswordMadal, selectedRoom, enterRoom}) => {
   const [roomPassword, setRoomPassword] = useState('');

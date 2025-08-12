@@ -21,7 +21,6 @@ const FaqPanel = () => {
     const fetchFaqs = async () => {
       try {
         const res = await axios.get(`/api/customer/faqs?page=${page}&size=${PAGE_SIZE}`);
-        console.log("FAQs data received:", res.data);
         
         setFaqs(res.data.items); 
         setTotalFaqs(res.data.totalCount); 
@@ -41,7 +40,6 @@ const FaqPanel = () => {
 
   // Faq 작성 모달
   const handleOpenFaqModal=(item)=>{
-    console.log(item);
   
     if (item && typeof item === "object") {
       setModalStatus('edit');

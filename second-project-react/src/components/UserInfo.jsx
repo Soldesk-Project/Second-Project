@@ -130,13 +130,9 @@ const UserInfo = ({userRankingList}) => {
         const filename = raw.replace(/^\/images\//, '');
 
         const src = `/images/${filename}`;
-        // console.log('Inventory imgUrl:', src);
-
           return { ...item, imgUrl: src };
         });
         setItems(withImg);
-        console.log(items);
-        
       })
       .catch(() => setItems([]));
     }, [activeTab, user.user_no]);
@@ -186,24 +182,20 @@ const UserInfo = ({userRankingList}) => {
     })();  
 
     const clickItem = async (item) => {
-        // console.log('🔔 clickItem 호출됨', item);
       try {
              const { status } = await axios.post('/user/item/select', {
                 user_no : user.user_no,
                 item_no : item.item_no,
                 item_type : item.item_type
             });
-            // console.log('🔔 POST /user/item/select 리턴 status=', status);
 
             if (status === 200) {
-                // console.log('🔔 여기서 GET 날리기 직전');
                 // 1) 랭킹 업데이트
                 dispatch(triggerRefreshRanking());
                 
                 // 2) 최신 유저 정보 다시 가져오기
                 const res = await axios.get(`/user/${user.user_no}`);
                 
-                // console.log('🔔 GET /user/4 리턴 data=', res.data);
                 dispatch(setUser({
                 user_no:               res.data.user_no,
                 user_nick:             res.data.user_nick,
@@ -327,7 +319,6 @@ const UserInfo = ({userRankingList}) => {
         
         const res = await axios.get(`/user/${user.user_no}`);
                 
-                // console.log('🔔 GET /user/4 리턴 data=', res.data);
         dispatch(setUser({
         user_no:               res.data.user_no,
         user_nick:             res.data.user_nick,

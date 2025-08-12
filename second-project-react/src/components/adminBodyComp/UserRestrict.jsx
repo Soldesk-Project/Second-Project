@@ -146,7 +146,6 @@ const UserRestrict = () => {
         }
 
         const result = await response.json();
-        console.log("Chat ban application result:", result);
         alert(result.message || '채팅금지가 성공적으로 적용되었습니다.');
 
         await handleSearch(); // 변경된 상태를 반영하기 위해 다시 검색
@@ -215,7 +214,6 @@ const UserRestrict = () => {
         }
 
         const result = await response.json();
-        console.log("Chat ban application result:", result);
         alert(result.message || '접속금지가 성공적으로 적용되었습니다.');
 
         await handleSearch(); // 변경된 상태를 반영하기 위해 다시 검색

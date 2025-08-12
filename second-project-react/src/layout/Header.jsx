@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../css/header.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { clearUser, clearServer } from '../store/userSlice';
+import { WebSocketContext } from '../util/WebSocketProvider';
 import axios from 'axios';
 
 const KAKAO_JS_KEY = 'f95efd6df49141c0b98c0463ecfe5d9e';
@@ -16,6 +17,7 @@ const Header = () => {
   const location = useLocation();
   const nav = useNavigate();
   const dispatch = useDispatch();
+  const sockets = useContext(WebSocketContext);
 
   useEffect(() => {
     if (window.Kakao && !window.Kakao.isInitialized()) {
@@ -52,6 +54,7 @@ const Header = () => {
 
   const serverOut = () => {
     dispatch(clearServer());
+    sendLeaveMessage();
     nav('/server');
   };
 
@@ -131,32 +134,47 @@ const Header = () => {
       console.error('구글 로그아웃 실패:', err);
     }
   };
+  
+  const sendLeaveMessage = () => {
+    const socket = sockets.current['server'];
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      const leavePayload = JSON.stringify({
+        action: 'leave',
+        server: server,
+        userNick: user.user_nick, // userNo 또는 userId
+      });
+      socket.send(leavePayload);
+    }
+  };
 
   const logOut = async () => {
     try {
-      if (user.user_id) {
-        await axios.post('/api/logout', { userId: user.user_id });
-      }
-
       if (isKakaoUser()) {
         await logoutKakao();
+        sendLeaveMessage();
         return;
       }
 
       if (isNaverUser()) {
         await logoutNaver();
+        sendLeaveMessage();
         return;
       }
 
       if (isGoogleUser()) {
-      await logoutGoogle();
-      return;
-    }
+        await logoutGoogle();
+        sendLeaveMessage();
+        return;
+      }
 
+      // 일반 로그아웃 (소셜 로그인이 아닌 경우)
+      if (user.user_id) {
+        await axios.post('/api/logout', { userId: user.user_id });
+        sendLeaveMessage();
+      }
     } catch (error) {
       console.error('로그아웃 처리 중 오류:', error);
     } finally {
-      // 일반 사용자 로그아웃 및 공통 처리
       dispatch(clearUser());
       dispatch(clearServer());
       localStorage.clear();

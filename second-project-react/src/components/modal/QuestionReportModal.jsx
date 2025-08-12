@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from '../../css/QuestionReportModal.module.css';
+import styles from '../../css/modal/QuestionReportModal.module.css';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 

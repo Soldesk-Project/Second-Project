@@ -96,7 +96,7 @@ public class ShopController {
             tossPayService.confirmPayment(paymentKey, orderId, amount);
             userservice.addPoint(userId, amount);
 
-            response.sendRedirect("http://localhost:3000/shop");
+            response.sendRedirect("http://192.168.0.112:3000/shop");
         } catch (Exception e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "토스 결제 승인 실패");

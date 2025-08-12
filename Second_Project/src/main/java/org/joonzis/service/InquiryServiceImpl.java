@@ -11,6 +11,7 @@ import org.joonzis.domain.InquiryVO;
 import org.joonzis.mapper.InquiryFileMapper;
 import org.joonzis.mapper.InquiryMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +25,10 @@ public class InquiryServiceImpl implements InquiryService {
     @Autowired
     private InquiryFileMapper fileMapper;  // 파일 메타데이터 저장 매퍼
     
-    private final String BASE_UPLOAD_DIR = "C:/Dev/workspace/workspace_2ndProject/second-project-react/public/";
+//    private final String BASE_UPLOAD_DIR = "C:/Dev/workspace/workspace_2ndProject/second-project-react/public/";
+    
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     @Override
     public Map<String, Object> getInquiries(int page, int size) {
@@ -37,7 +41,7 @@ public class InquiryServiceImpl implements InquiryService {
             List<InquiryFileVO> files = fileMapper.selectFilesByInquiryId(inquiry.getId());
             files.forEach(file -> {
                 String webPath = file.getFilepath()
-                                 .replace(BASE_UPLOAD_DIR.replace("/", File.separator), "/")
+                                 .replace(uploadDir.replace("/", File.separator), "/")
                                  .replace(File.separator, "/");
                 file.setFilepath(webPath);
             });
@@ -67,16 +71,16 @@ public class InquiryServiceImpl implements InquiryService {
             throw new IllegalArgumentException("Inquiry ID was not generated correctly. Cannot proceed with file upload.");
         }
 
-        // 2) 업로드 디렉토리 준비
-        String dirPath = BASE_UPLOAD_DIR + "images/inquiry/" + generatedId;
-        File baseDir = new File(dirPath);
-        if (!baseDir.exists()) {
-            boolean created = baseDir.mkdirs();
-            if (!created) {
-                // 디렉토리 생성 실패 시 예외 처리 (권한 문제 등이 있을 수 있음)
-                throw new IOException("Failed to create directory: " + dirPath + ". Check permissions.");
-            }
-        }
+//        // 2) 업로드 디렉토리 준비
+//        String dirPath = uploadDir + "images/inquiry/" + generatedId;
+//        File baseDir = new File(dirPath);
+////        if (!baseDir.exists()) {
+////            boolean created = baseDir.mkdirs();
+////            if (!created) {
+////                // 디렉토리 생성 실패 시 예외 처리 (권한 문제 등이 있을 수 있음)
+////                throw new IOException("Failed to create directory: " + dirPath + ". Check permissions.");
+////            }
+////        }
 
         // 3) 파일 저장 & 메타데이터 기록
         if (files != null && !files.isEmpty()) {
@@ -85,7 +89,7 @@ public class InquiryServiceImpl implements InquiryService {
 
                 // 충돌 방지를 위해 타임스탬프_원본명
                 String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-                File targetFile = new File(baseDir, filename);
+                File targetFile = new File(uploadDir, filename);
                 file.transferTo(targetFile);  // 디스크에 저장
 
                 // DB 에 메타정보 INSERT

@@ -27,7 +27,6 @@ const KakaoCallback = () => {
            
         })
         .catch(err => {
-          console.log("로그인 실패", err);
         })
     }
   }, [dispatch, navigate]);

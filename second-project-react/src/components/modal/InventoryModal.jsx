@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import styles from '../../css/InventoryModal.module.css';
+import styles from '../../css/modal/InventoryModal.module.css';
 
 const InventoryModal = ({ isOpen, onClose, children }) => {
     useEffect(() => {
