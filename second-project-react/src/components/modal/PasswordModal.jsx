@@ -29,7 +29,7 @@ const PasswordModal = ({setPassword, setPasswordMadal, selectedRoom, enterRoom})
   return (
     <div className={styles.PasswordModalContainer}>
       <div className={styles.modalTitle}>
-        <span>입장하려면 해당 방의 비밀번호를 입력하세요</span> &nbsp;
+        <span>입장하려면 해당 방의 비밀번호를 입력하세요</span>
       </div>
       <div className={styles.modalContent}>
         <input type="password"

@@ -3,13 +3,14 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border: 1px solid #d3e2f1;
+  border: 1px solid #6a5acd; /* 살짝 밝은 보라 테두리 */
   border-radius: 12px;
-  background-color: #fff;
-  box-shadow: 0 8px 32px 0 rgba(30, 64, 175, 0.12);
+  background: linear-gradient(145deg, #2b2b3d, #3e2f56); /* 보라-네이비 그라데이션 배경 */
+  box-shadow: 0 8px 32px 0 rgba(106, 90, 205, 0.4); /* 보라빛 그림자 */
   padding: 10px 20px;
   min-width: 340px;
   z-index: 1000;
+  color: #f0eaff;
 }
 
 .container table {
@@ -19,22 +20,22 @@
 .container td {
   padding: 10px 6px;
   font-size: 1rem;
-  color: #232b44;
+  color: #e5dfff;
 }
 
 .container select {
-  width: 160px;
+  width: 200px;
   padding: 5px 10px;
-  border: 1px solid #b5cbe7;
+  border: 1px solid #8a79ff;
   border-radius: 6px;
-  background-color: #f6faff;
-  color: #234087;
+  background-color: #3b2d4f;
+  color: #fff;
   font-size: 1rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background-color 0.2s;
 }
 .container select:focus {
-  border-color: #457eff;
+  border-color: #b19fff;
 }
 
 .container button {
@@ -61,11 +62,12 @@
 }
 
 .search{
-  background-color: #457eff;
+  background-color: #715aff;
 }
 
 .search:hover {
-  background-color: #2b53b6;
+  background-color: #5a3ee8;
+  transform: scale(1.02); 
 }
 
 .close{
@@ -74,4 +76,5 @@
 
 .close:hover {
   background-color: #d32f2f;
+  transform: scale(1.02); 
 }

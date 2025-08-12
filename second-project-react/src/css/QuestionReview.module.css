@@ -221,6 +221,7 @@
 
 .playBtn:hover {
   background: linear-gradient(to right, #584ad1, #a200b9);
+  transform: scale(1.02); 
 }
 
 /* 기록 리스트 정보 */

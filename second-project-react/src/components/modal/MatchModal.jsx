@@ -72,8 +72,8 @@ const MatchModal = ({ socket, currentUserId, setShowMatchModal, setMatchStatus }
         </div>
 
         <div className={styles.buttons}>
-          <button className={styles.accept} onClick={handleAccept}>✅ 수락</button>
-          <button className={styles.reject} onClick={handleReject}>❌ 거절</button>
+          <button className={styles.reject} onClick={handleReject}>거절</button>
+          <button className={styles.accept} onClick={handleAccept}>수락</button>
         </div>
       </div>
     </div>

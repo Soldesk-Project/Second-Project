@@ -95,6 +95,9 @@
   border-radius: 5px;
   color: white;
 }
+.sendBtn:hover{
+  transform: scale(1.02); 
+}
 
 /* --- 모달 오버레이 --- */
 .modal-overlay {
@@ -114,15 +117,19 @@
 /* --- 모달 내용 컨테이너 --- */
 .chat-modal-content {
   background-color: #fff;
-  padding: 25px;
-  border-radius: 8px;
-  /* color: #235087; */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  width: 90%;
+  width: 100%;
   max-width: 550px; /* 최대 너비 설정 */
-  animation: fadeInScale 0.3s ease-out; /* 등장 애니메이션 */
   display: flex;
   flex-direction: column;
+  border: 1px solid #6a5acd; /* 살짝 밝은 보라 테두리 */
+  border-radius: 12px;
+  background: linear-gradient(145deg, #2b2b3d, #3e2f56); /* 보라-네이비 그라데이션 배경 */
+  box-shadow: 0 8px 32px 0 rgba(106, 90, 205, 0.4); /* 보라빛 그림자 */
+  padding: 10px 20px;
+  min-width: 340px;
+  z-index: 1000;
+  color: #f0eaff;
+  animation: fadeInScale 0.3s ease-out; /* 등장 애니메이션 */
 }
 
 /* 모달 등장 애니메이션 */
@@ -180,13 +187,13 @@
 .report-preview, .reported-reason{
   width: 500px;
   padding: 5px 10px;
-  border: 1px solid #b5cbe7;
+  border: 1px solid #8a79ff;
   border-radius: 6px;
-  background-color: #f6faff;
-  color: #234087;
+  background-color: #3b2d4f;
+  color: #fff;
   font-size: 1rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background-color 0.2s;
   margin: 0;
 }
 .report-preview{
@@ -207,7 +214,7 @@
 .chat-modal-footer {
   display: flex;
   justify-content: center; /* 버튼을 오른쪽으로 정렬 */
-  gap: 10px; /* 버튼 간격 */
+  gap: 20px; /* 버튼 간격 */
 }
 
 .chat-modal-footer button {
@@ -229,7 +236,8 @@
 }
 
 .cancel-btn:hover {
-  background-color: #323232;
+  background-color: #535353;
+  transform: scale(1.02); 
 }
 
 .report-send-btn {
@@ -239,6 +247,7 @@
 
 .report-send-btn:hover {
   background-color: #d32f2f;
+  transform: scale(1.02); 
 }
 
 

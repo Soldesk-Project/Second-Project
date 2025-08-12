@@ -249,6 +249,7 @@
 }
 .chargeBtn:hover {
   background: linear-gradient(90deg, #6c4ec7, #5a3fb8);
+  transform: scale(1.02);
 }
 
 .ownedBadge {

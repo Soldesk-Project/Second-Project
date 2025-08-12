@@ -4,30 +4,49 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(30, 30, 50, 0.75); /* 진한 네이비+보라 반투명 배경 */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
+  backdrop-filter: blur(8px); /* 배경을 흐릿하게 만들어 보라톤 강조 */
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .modal_content {
-  background-color: white;
-  color: black;
-  padding: 1.5rem;
-  border-radius: 8px;
+  background: rgba(43, 43, 61, 0.5); /* 어두운 보라 네이비 반투명 배경 */
+  color: #f0eaff; /* 연한 보라빛 글자 */
+  padding: 2rem;
+  border: 1px solid rgba(106, 90, 205, 0.5); /* 반투명 보라 테두리 */
+  border-radius: 16px;
   width: 950px;
   height: 700px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 12px 48px rgba(106, 90, 205, 0.6); /* 강한 보라빛 그림자 */
   position: relative;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  overflow: auto; /* 내용 넘침시 스크롤 가능 */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .modal_close {
   position: absolute;
-  top: 8px;
-  right: 12px;
-  background: none;
+  top: 12px;
+  right: 16px;
+  background: rgba(106, 90, 205, 0.7);
   border: none;
-  font-size: 1.2rem;
+  color: #f0eaff;
+  font-size: 1.4rem;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(106, 90, 205, 0.7);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.modal_close:hover {
+  background: rgba(138, 121, 255, 0.85);
+  box-shadow: 0 4px 12px rgba(138, 121, 255, 0.9);
 }

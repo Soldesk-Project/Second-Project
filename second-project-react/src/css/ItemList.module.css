@@ -93,6 +93,7 @@
 .owned:hover {
   border-color: #388e3c;
   box-shadow: 0 0 10px #4caf5080;
+  transform: scale(1.02); 
 }
 .rewardButton {
   margin-left: 8px;
@@ -112,6 +113,7 @@
 .rewardButton:hover:not(.rewardButtonDisabled) {
   background: linear-gradient(90deg, #43a047, #357a38);
   box-shadow: 0 6px 14px rgba(41, 139, 41, 0.6);
+  transform: scale(1.02); 
 }
 
 .rewardButtonDisabled {
@@ -122,6 +124,7 @@
   opacity: 0.6;
   pointer-events: none;
 }
+
 .itemImage{
   width: 100%;
 }

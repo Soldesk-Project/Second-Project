@@ -20,13 +20,17 @@
   left: 0;
   transform: none; /* 기존 translate 제거 */
   background-color: #fff; /* 내용 구분 위해 배경색 추가 */
-  border: 1px solid blueviolet;
-  border-radius: 10px;
-  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 1100; /* 오버레이 위에 표시 */
+  border: 1px solid #6a5acd; /* 살짝 밝은 보라 테두리 */
+  border-radius: 12px;
+  background: linear-gradient(145deg, #2b2b3d, #3e2f56); /* 보라-네이비 그라데이션 배경 */
+  box-shadow: 0 8px 32px 0 rgba(106, 90, 205, 0.4); /* 보라빛 그림자 */
+  padding: 10px 20px;
+  min-width: 340px;
+  z-index: 1000;
+  color: #f0eaff;
   animation: fadeIn 0.2s ease-in-out;
 }
 
@@ -38,14 +42,21 @@
 
 /* 닫기 버튼 */
 .modalCloseBtn {
-  width: 60px;
-  height: 40px;
-  border: 1px solid white;
-  border-radius: 20px;
   margin: 10px;
-  color: white;
-  background-color: blueviolet;
+  background-color: #715aff;
   cursor: pointer;
+  padding: 6px 18px;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px 0 rgba(69, 126, 255, 0.08);
+}
+.modalCloseBtn:hover{
+  background-color: #5a3ee8;
+  transform: scale(1.02);
 }
 
 /* 테이블 영역 */

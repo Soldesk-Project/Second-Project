@@ -72,7 +72,7 @@ const NickModal = ({ isOpen, onClose, onSubmit, point }) => {
   return (
     <div className={styles.container} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <h3 style={{color:'black', textAlign:'center'}}>닉네임 변경</h3>
+        <h3>닉네임 변경</h3>
         <input
           type="text"
           placeholder="새 닉네임"
@@ -81,16 +81,18 @@ const NickModal = ({ isOpen, onClose, onSubmit, point }) => {
           onKeyDown={handleKeyDown}
           onChange={(e) => setNickname(e.target.value)}
         />
+        <div className={styles.alert}>
         {
           nickname && (
             nickname.length > 4 ? (
               <p style={{ color: 'red' }}>4글자를 초과한 닉네임입니다.</p>
             ) : isDuplicateNick === true ? 
-              <p style={{ color: 'red' }}>이미 사용 중인 닉네임입니다.</p>
-              : 
-              <p style={{ color: 'green' }}>사용 가능한 닉네임입니다.</p>
+            <p style={{ color: 'red' }}>이미 사용 중인 닉네임입니다.</p>
+            : 
+            <p style={{ color: 'green' }}>사용 가능한 닉네임입니다.</p>
           )
-        }
+        } 
+        </div>
         <div className={styles.point}>
           <p>닉네임 변경시 5000p가 소모됩니다.</p>
           <p>내 보유 포인트 : {point}p</p>

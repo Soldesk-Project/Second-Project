@@ -115,7 +115,7 @@
 
 .userTable th,
 .userTable td {
-  padding: 10px 15px;
+  padding: 10px;
   vertical-align: middle;
   color: #ddd;
   border-bottom: 1px solid #444; /* 셀 아래 구분선 추가 */
@@ -123,6 +123,7 @@
 
 .userTable td {
   font-size: 14px;
+  text-align: center;
 }
 
 .userTable th {
@@ -193,7 +194,6 @@
 .report_count{
   color: red;
   height: 20px;
-  display: inline;
 }
 
 

@@ -100,6 +100,7 @@
   background: linear-gradient(89deg, #4f3ec7, #8e39b8 60%, #e962b7);
   transform: translateY(-1.5px) scale(1.03);
   box-shadow: 0 4px 14px #a876ff38;
+  transform: scale(1.02); 
 }
 
 .allRewardButton {
@@ -127,6 +128,7 @@
   background: #eaeaea !important;
   box-shadow: none;
   transform: none;
+  transform: scale(1.02); 
 }
 
 .rewardedRow td {

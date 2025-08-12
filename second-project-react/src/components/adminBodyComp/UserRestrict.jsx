@@ -342,7 +342,12 @@ const UserRestrict = () => {
               {users.map((user) => (
                 <tr key={user.user_no}>
                   <td className={styles.userId}>{user.user_id}</td>
-                  <td>{user.user_nick} <span className={styles.report_count}>[ {user.report_count} ]</span></td>
+                  <td>{user.user_nick} <span className={styles.report_count}>
+                    {
+                      user.report_count!==0 &&
+                      `[`+user.report_count+`]`
+                    }
+                    </span></td>
                   <td>{user.user_email}</td>
                   <td>
                     {user.user_date ? (() => {
