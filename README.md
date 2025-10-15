@@ -51,7 +51,7 @@
  │  - DispatcherServlet       │
  │  - WebSocketConfig         │
  │  - RoomUserList Broadcast  │
- │  - AI Integration    │
+ │  - AI Integration          │
  └──────────────┬─────────────┘
                 │
                 ▼
