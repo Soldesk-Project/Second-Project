@@ -56,29 +56,29 @@ function App() {
   return (
     // <MemoryRouter initialEntries={["/"]}></MemoryRouter>
     // <Router> 대신 위에거 넣으면 히스토리를 메모리에서만 관리해서 유저가 히스토리 이동이 불가능해짐
-    <Router basename="/Second_Project">
+    <Router basename="/">
       <WebSocketProvider>
       <BanListener/>
         <Routes>
-          <Route path="/Second_Project" element={<LoginForm />} />
-          <Route path="/Second_Project/server" element={<ServerSelect />} />
-          <Route path="/Second_Project/signUp" element={<SignUp />} />
-          <Route path="/Second_Project/findId" element={<FindId />} />
-          <Route path="/Second_Project/findPw" element={<FindPw />} />
-          <Route path="/Second_Project/kakao/callback" element={<KakaoCallback />} />
-          <Route path="/Second_Project/api/naver/callback" element={<NaverCallback />} />
-          <Route path="/Second_Project/google/callback" element={<GoogleCallback />} />
-          <Route path="/Second_Project/main/:serverNo" element={<MainPage />} />
-          <Route path="/Second_Project/shop" element={<Shop />} />
-          <Route path="/Second_Project/gameRoom/:roomNo" element={<InPlay />} />
-          <Route path="/Second_Project/questionReview" element={<QuestionReview />} />
-          <Route path="/Second_Project/inquiries" element={<CustomerServiceCenter />} />
-          <Route path="/Second_Project/inquiry" element={<CustomerProblemSubmit />} />
-          <Route path="/Second_Project/admin" element={<ProtectedRoute requiredRole="ROLE_ADMIN"><AdminPage/></ProtectedRoute>}/>
-          <Route path="/Second_Project/inquiries/:id" element={<InquiryDetail />} />
-          <Route path="/Second_Project/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/Second_Project/403" element={<ErrorEvent403 />} />
-          <Route path="/Second_Project/*" element={<ErrorEvent />} />
+          <Route path="/" element={<LoginForm />} />
+          <Route path="/server" element={<ServerSelect />} />
+          <Route path="/signUp" element={<SignUp />} />
+          <Route path="/findId" element={<FindId />} />
+          <Route path="/findPw" element={<FindPw />} />
+          <Route path="/kakao/callback" element={<KakaoCallback />} />
+          <Route path="/api/naver/callback" element={<NaverCallback />} />
+          <Route path="/google/callback" element={<GoogleCallback />} />
+          <Route path="/main/:serverNo" element={<MainPage />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/gameRoom/:roomNo" element={<InPlay />} />
+          <Route path="/questionReview" element={<QuestionReview />} />
+          <Route path="/inquiries" element={<CustomerServiceCenter />} />
+          <Route path="/inquiry" element={<CustomerProblemSubmit />} />
+          <Route path="/admin" element={<ProtectedRoute requiredRole="ROLE_ADMIN"><AdminPage/></ProtectedRoute>}/>
+          <Route path="/inquiries/:id" element={<InquiryDetail />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/403" element={<ErrorEvent403 />} />
+          <Route path="/*" element={<ErrorEvent />} />
         </Routes>
       </WebSocketProvider>
     </Router>

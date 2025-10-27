@@ -62,10 +62,8 @@
     
     <!-- Redis 연결 설정 -->
 	<bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory">
-
 	    <property name="hostName" value="localhost" />
 	    <property name="port" value="6379" />
-
 	</bean>
 		
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">

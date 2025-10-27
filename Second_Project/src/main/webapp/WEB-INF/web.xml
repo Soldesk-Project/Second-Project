@@ -52,10 +52,6 @@
 		<filter-name>encodingFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	<listener>
-	    <listener-class>org.joonzis.config.RedisAutoStarter</listener-class>
-	</listener>
-	
 	
  	<!-- 스프링 시큐리티 필터 -->
 	<filter>
