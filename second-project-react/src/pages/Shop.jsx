@@ -45,7 +45,7 @@ const Shop = () => {
   const fetchGetItems = async () => {
     if (!user?.user_no) return;
     try {
-      const res = await axios.get(`/user/getItems?user_no=${user.user_no}`);
+      const res = await axios.get(`/api/user/getItems?user_no=${user.user_no}`);
       setOwnedItems(res.data);
     } catch (error) {
       console.error('보유 아이템 불러오기 실패:', error);

@@ -151,7 +151,7 @@ const UserRanking = () => {
                 style={bgStyle}
                 onClick={async () => {
                   try {
-                    const { data } = await axios.get(`/user/${user_no}`);
+                    const { data } = await axios.get(`/api/user/${user_no}`);
                     setSelectedUser({
                       userNo: data.user_no,
                       userNick: data.user_nick,

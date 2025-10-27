@@ -47,7 +47,7 @@ const ItemList = () => {
   // 보유 아이템 가져오기
   useEffect(() => {
     if (user.user_no) {
-      axios.get(`/user/getItems?user_no=${user.user_no}`)
+      axios.get(`/api/user/getItems?user_no=${user.user_no}`)
         .then(res => setOwnedItems(res.data))
         .catch(err => console.error('유저 아이템 불러오기 실패:', err));
     }
@@ -55,7 +55,7 @@ const ItemList = () => {
 
   // 전체 아이템 가져오기
   useEffect(() => {
-    axios.get('/user/item')
+    axios.get('/api/user/item')
       .then(res => {
         const withImg = res.data.map(item => {
           const fileName = item.imageFileName;
@@ -72,7 +72,7 @@ const ItemList = () => {
   // 리워드 상태 가져오기
   useEffect(() => {
     if (user.user_no) {
-      axios.get(`/user/rewardStatus?user_no=${user.user_no}`)
+      axios.get(`/api/user/rewardStatus?user_no=${user.user_no}`)
         .then(res => {
           setRewardReceived(res.data); // ✅ 서버에서 수령 상태 받아옴
         })

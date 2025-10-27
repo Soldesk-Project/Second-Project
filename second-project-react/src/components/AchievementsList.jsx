@@ -22,7 +22,7 @@ const AchievementsList = () => {
 
   const fetchAchievements = async () => {
     try {
-      const { data, status } = await axios.get('/achievements', { params: { user_no } });
+      const { data, status } = await axios.get('/api/achievements', { params: { user_no } });
       if (status === 200) {
         setAchievementsList(data);
       } else {
