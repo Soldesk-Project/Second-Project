@@ -14,7 +14,7 @@ const LoginForm = () => {
   const user = useSelector(state => state.user.user);
 
   const KAKAO_CLIENT_ID = "99ddb7e910a924e51b633490da611ead";
-  const KAKAO_REDIRECT_URI = "http://192.168.0.112:3000/kakao/callback";
+  const KAKAO_REDIRECT_URI = "http://localhost:3000/kakao/callback";
   const GOOGLE_CLIENT_ID = "633570415561-hcl7dpl18608021a7lof369flivcklv7.apps.googleusercontent.com";
   const GOOGLE_REDIRECT_URI = "https://598e051439bc.ngrok-free.app/google/callback";
 
@@ -56,9 +56,9 @@ const LoginForm = () => {
     try {
       localStorage.removeItem('token');
 
-      const res = await axios.post('/api/login', { user_id: id, user_pw: pw });
+      const res = await axios.post('/Second_Project/api/login', { user_id: id, user_pw: pw });
       if (res.data.message) {
-        alert(res.data.messgae);
+        alert(res.data.message);
         return;
       }
 

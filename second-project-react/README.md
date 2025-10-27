@@ -1,70 +1,60 @@
-# Getting Started with Create React App
+# 🎮 CotePlay
+> Spring Legacy 기반 실시간 멀티플레이 퀴즈 게임
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+---
 
-## Available Scripts
+## 🧩 프로젝트 소개
+**CotePlay**는 여러 사용자가 동시에 접속해 퀴즈를 풀고 경쟁하는  
+**Spring MVC 기반 실시간 멀티플레이 게임**입니다.  
 
-In the project directory, you can run:
+사용자가 문제를 풀면 AI가 오답을 분석하여 해설을 제공하고,  
+이미지를 업로드하면 **OCR 인식으로 문제 텍스트를 자동 추출**합니다.  
 
-### `npm start`
+> Spring Boot가 아닌 **Spring Legacy (MVC) 구조**를 사용하며,  
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🚀 주요 기능
+- ✅ Spring WebSocket 기반 **실시간 게임 통신**
+- ✅ 유저 프로필 및 참가자 목록 **실시간 브로드캐스트**
+- ✅ **AI 해설 기능** (Groq API 연동)
+- ✅ **게임 진행 타이머 및 점수 계산**
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## ⚙️ 기술 스택
 
-### `npm run build`
+| 구분 | 기술 |
+|------|------|
+| **Backend** | Spring MVC (Legacy), Java 11, WebSocket, MyBatis |
+| **Frontend** | React, WebSocket 클라이언트 |
+| **AI** | Groq API |
+| **Database** | Oracle 11g |
+| **Server** | Apache Tomcat 9 |
+| **Build Tool** | Maven |
+| **Environment** | Localhost (로컬 실행) |
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🧠 시스템 구조
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```plaintext
+ ┌────────────────────────────┐
+ │        React Frontend      │
+ │ (Lobby, InPlay, Result UI) │
+ └──────────────┬─────────────┘
+                │
+                │ WebSocket / REST API
+                ▼
+ ┌────────────────────────────┐
+ │   Spring Legacy Backend    │
+ │  - DispatcherServlet       │
+ │  - WebSocketConfig         │
+ │  - RoomUserList Broadcast  │
+ │  - AI Integration          │
+ └──────────────┬─────────────┘
+                │
+                ▼
+ ┌────────────────────────────┐
+ │         Oracle DB          │
+ └────────────────────────────┘

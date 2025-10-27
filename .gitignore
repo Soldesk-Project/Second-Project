@@ -119,3 +119,5 @@ build/
 
 # Tomcat 서버 설정 파일 무시
 Servers/Tomcat\ v9.0\ Server\ at\ localhost-config/server.xml
+Servers/
+Second_Project/Servers/

@@ -2,6 +2,7 @@
   "name": "second-project-react",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/Second_Project",
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
     "@stomp/stompjs": "^7.1.1",

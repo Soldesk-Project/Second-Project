@@ -47,7 +47,7 @@ import lombok.extern.log4j.Log4j;
 
 @Log4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/Second_Project/api")
 @CrossOrigin(origins = "*")
 public class LoginController {
 	private static final ConcurrentHashMap<String, HttpSession> loginSessions = new ConcurrentHashMap<>();
