@@ -97,7 +97,7 @@ function formatTimestamp(timestamp) {
         cleanupExistingConnection();
 
         // 새로운 STOMP 연결 시도
-        const socket = new SockJS('http://52.78.25.188:9099/ws-game-chat'); // ⭐ 게임방 채팅 엔드포인트 변경
+        const socket = new SockJS('http://52.78.25.188:9098/ws-game-chat'); // ⭐ 게임방 채팅 엔드포인트 변경
         const client = Stomp.over(() => socket);
         client.debug = () => {};
 

@@ -51,8 +51,8 @@ export const WebSocketProvider = ({ children }) => {
   // room, server 소켓은 앱 시작 시 항상 연결
   useEffect(() => {
     if(token){
-      connectSocket("room", "ws://52.78.25.188:9099/ws/room");
-      connectSocket("server", "ws://52.78.25.188:9099/ws/server");
+      connectSocket("room", "ws://52.78.25.188:9098/ws/room");
+      connectSocket("server", "ws://52.78.25.188:9098/ws/server");
     }
   }, [token]);
 
@@ -72,7 +72,7 @@ export const WebSocketProvider = ({ children }) => {
   useEffect(() => {
     const userInfo = getUserInfoFromToken(token);
     if (userInfo?.userId) {
-      connectSocket("match", `ws://52.78.25.188:9099/ws/match?userId=${userInfo.userId}`);
+      connectSocket("match", `ws://52.78.25.188:9098/ws/match?userId=${userInfo.userId}`);
     }
   }, [token]);
 
@@ -80,7 +80,7 @@ export const WebSocketProvider = ({ children }) => {
   useEffect(() => {
     const userInfo = getUserInfoFromToken(token);
     if (userInfo?.userNo) {
-      connectSocket("ban", `ws://52.78.25.188:9099/ws/ban?userNo=${userInfo.userNo}`);
+      connectSocket("ban", `ws://52.78.25.188:9098/ws/ban?userNo=${userInfo.userNo}`);
     }
   }, [token]);
 
