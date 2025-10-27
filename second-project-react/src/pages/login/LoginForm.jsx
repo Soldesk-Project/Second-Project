@@ -56,7 +56,7 @@ const LoginForm = () => {
     try {
       localStorage.removeItem('token');
 
-      const res = await axios.post('/Second_Project/api/login', { user_id: id, user_pw: pw });
+      const res = await axios.post('/api/login', { user_id: id, user_pw: pw });
       if (res.data.message) {
         alert(res.data.message);
         return;
