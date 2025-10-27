@@ -39,7 +39,7 @@ const UserRanking = () => {
   // 1) 유저 랭킹 불러오기
   const fetchUserRanking = async () => {
     try {
-      const { data, status } = await axios.get('/user/ranking');
+      const { data, status } = await axios.get('/api/user/ranking');
       if (status === 200) {
         setUserRankingList(data);
         setLoading(false);

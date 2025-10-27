@@ -34,7 +34,7 @@ const MainPage = () => {
   
   const fetchUserRanking = async () => {
     try {
-      const { data, status } = await axios.get('/user/ranking');
+      const { data, status } = await axios.get('/api/user/ranking');
       if (status === 200) {
         setUserRankingList(data);
       }

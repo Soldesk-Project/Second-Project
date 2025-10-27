@@ -115,7 +115,7 @@ const UserInfo = ({userRankingList}) => {
     useEffect(() => {
         if (!user.user_no) return;
             axios
-      .get('/user/inventory/category', {
+      .get('/api/user/inventory/category', {
         params: { category: activeTab, user_no: user.user_no }
       })
       .then(({ data }) => {
@@ -254,7 +254,7 @@ const UserInfo = ({userRankingList}) => {
     useEffect(() => {
         if (!user.user_no) return;
         axios
-        .get(`/user/accuracy/${user.user_nick}`)
+        .get(`/api/user/accuracy/${user.user_nick}`)
         .then(res => setStats(res.data))
         
         .catch(err => console.error(err));

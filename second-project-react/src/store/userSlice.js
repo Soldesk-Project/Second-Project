@@ -10,7 +10,7 @@ const initialState = {
 export const fetchUserInfo = createAsyncThunk(
   'user/fetchUserInfo',
   async (userNo, thunkAPI) => {
-    const res = await axios.get(`/user/${userNo}`);
+    const res = await axios.get(`/api/user/${userNo}`);
     return res.data;  // payload 로 넘어갑니다
   }
 );
