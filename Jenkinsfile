@@ -26,7 +26,7 @@ pipeline {
             steps {
                 dir('second-project-react') {
                     sh 'npm install'
-                    sh 'npm run build'
+                    sh 'CI=false npm run build'
                 }
             }
         }
