@@ -7,6 +7,8 @@ import { setUser } from '../../store/userSlice';
 
 
 const LoginForm = () => {
+  console.log("파이프라인 배포 성공");
+  
   const [id, setId] = useState('');
   const [pw, setPw] = useState('');
   const navigate = useNavigate();
