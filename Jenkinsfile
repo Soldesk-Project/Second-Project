@@ -65,11 +65,11 @@ pipeline {
                 sudo chmod -R 755 /opt/tomcat2/webapps/ROOT
 
                 # Ojdbc6.jar 복사
-                sudo cp ~/ojdbc6.jar /opt/tomcat2/webapps/ROOT/WEB-INF/lib/
+                sudo cp /home/ubuntu/ojdbc6.jar /opt/tomcat2/webapps/ROOT/WEB-INF/lib/
                 sudo chmod 644 /opt/tomcat2/webapps/ROOT/WEB-INF/lib/ojdbc6.jar
 
                 #application.properties 복사
-                sudo cp ~/application.properties /opt/tomcat2/webapps/ROOT/WEB-INF/classes/
+                sudo cp /home/ubuntu/application.properties /opt/tomcat2/webapps/ROOT/WEB-INF/classes/
 
                 # 톰캣 재시작
                 sudo /opt/tomcat2/bin/shutdown.sh
