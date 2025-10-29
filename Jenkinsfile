@@ -47,16 +47,15 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sshagent(['DEPLOY_KEY']) {
-                    sh """
-                    scp Second_Project/target/ROOT.war ${DEPLOY_SERVER}:${TOMCAT_WEBAPPS}/
-                    ssh ${DEPLOY_SERVER} '
-                        cd /opt/tomcat2/bin &&
-                        ./shutdown.sh &&
-                        ./startup.sh
-                    '
-                    """
-                }
+                sh """
+                # WAR 파일을 ROOT.war로 복사
+                sudo cp Second_Project/target/controller-1.0.0-BUILD-SNAPSHOT.war /opt/tomcat2/webapps/ROOT.war
+        
+                # 톰캣 재시작
+                cd /opt/tomcat2/bin
+                sudo ./shutdown.sh || true
+                sudo ./startup.sh
+                """
             }
         }
     }
