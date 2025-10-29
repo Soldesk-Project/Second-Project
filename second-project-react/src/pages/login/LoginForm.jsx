@@ -7,7 +7,7 @@ import { setUser } from '../../store/userSlice';
 
 
 const LoginForm = () => {
-  console.log("파이프라인 배포 테스트");
+  console.log("파이프라인 배포");
   
   const [id, setId] = useState('');
   const [pw, setPw] = useState('');
