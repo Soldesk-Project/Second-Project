@@ -6,6 +6,13 @@ pipeline {
         TOMCAT_WEBAPPS = "/opt/tomcat2/webapps" // Tomcat webapps 폴더
     }
 
+    stage('Prepare Workspace') {
+    steps {
+        sh 'sudo chown -R jenkins:jenkins $WORKSPACE'
+        sh 'sudo chmod -R 755 $WORKSPACE'
+        }
+    }
+
     stages {
         // 1. GitHub 레포 체크아웃
         stage('Checkout') {
