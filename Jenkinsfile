@@ -58,7 +58,7 @@ pipeline {
             }
         }
 
-        stage("Permission) {
+        stage("Permission") {
             steps {
                 sh """
                 # 배포 파일 권한 부여
@@ -69,7 +69,7 @@ pipeline {
                 sudo chmod 644 /opt/tomcat2/webapps/ROOT/WEB-INF/lib/ojdbc6.jar
 
                 #application.properties 복사
-                sudo cp ~/application.properties /opt/tomcat2/webapps/ROOT/WEB-INF/lib/classes/
+                sudo cp ~/application.properties /opt/tomcat2/webapps/ROOT/WEB-INF/classes/
 
                 # 톰캣 재시작
                 sudo /opt/tomcat2/bin/shutdown.sh
