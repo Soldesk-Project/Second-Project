@@ -49,9 +49,12 @@ pipeline {
             steps {
                 sshagent(['DEPLOY_KEY']) {
                     sh """
-                    cp Second_Project/target/*.war Second_Project/target/ROOT.war
                     scp Second_Project/target/ROOT.war ${DEPLOY_SERVER}:${TOMCAT_WEBAPPS}/
-                    ssh ${DEPLOY_SERVER} 'sudo systemctl restart tomcat'
+                    ssh ${DEPLOY_SERVER} '
+                        cd /opt/tomcat2/bin &&
+                        ./shutdown.sh &&
+                        ./startup.sh
+                    '
                     """
                 }
             }
