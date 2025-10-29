@@ -183,7 +183,7 @@ const UserInfo = ({userRankingList}) => {
 
     const clickItem = async (item) => {
       try {
-             const { status } = await axios.post('/user/item/select', {
+             const { status } = await axios.post('/api/user/item/select', {
                 user_no : user.user_no,
                 item_no : item.item_no,
                 item_type : item.item_type
@@ -194,7 +194,7 @@ const UserInfo = ({userRankingList}) => {
                 dispatch(triggerRefreshRanking());
                 
                 // 2) 최신 유저 정보 다시 가져오기
-                const res = await axios.get(`/user/${user.user_no}`);
+                const res = await axios.get(`/api/user/${user.user_no}`);
                 
                 dispatch(setUser({
                 user_no:               res.data.user_no,
@@ -269,7 +269,7 @@ const UserInfo = ({userRankingList}) => {
             alert("포인트 부족")
             return;
         }
-        axios.patch(`/user/${user.user_no}/nickname`, { user_nick: newNick, user_id: userId })
+        axios.patch(`/api/user/${user.user_no}/nickname`, { user_nick: newNick, user_id: userId })
             .then(res => {
                 const updatedUser = {
                     ...user,
@@ -315,9 +315,9 @@ const UserInfo = ({userRankingList}) => {
     }, [user.user_id, user.user_email, loading]);
 
     const handleClearStyle=async ()=>{
-        await axios.patch(`/user/${user.user_no}/clearStyle`);
+        await axios.patch(`/api/user/${user.user_no}/clearStyle`);
         
-        const res = await axios.get(`/user/${user.user_no}`);
+        const res = await axios.get(`/api/user/${user.user_no}`);
                 
         dispatch(setUser({
         user_no:               res.data.user_no,
