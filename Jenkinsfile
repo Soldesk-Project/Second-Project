@@ -52,9 +52,28 @@ pipeline {
                 sudo cp Second_Project/target/controller-1.0.0-BUILD-SNAPSHOT.war /opt/tomcat2/webapps/ROOT.war
         
                 # 톰캣 재시작
-                cd /opt/tomcat2/bin
-                sudo ./shutdown.sh || true
-                sudo ./startup.sh
+                sudo /opt/tomcat2/bin/shutdown.sh
+                sudo /opt/tomcat2/bin/startup.sh
+                """
+            }
+        }
+
+        stage("Permission) {
+            steps {
+                sh """
+                # 배포 파일 권한 부여
+                sudo chmod -R 755 /opt/tomcat2/webapps/ROOT
+
+                # Ojdbc6.jar 복사
+                sudo cp ~/ojdbc6.jar /opt/tomcat2/webapps/ROOT/WEB-INF/lib/
+                sudo chmod 644 /opt/tomcat2/webapps/ROOT/WEB-INF/lib/ojdbc6.jar
+
+                #application.properties 복사
+                sudo cp ~/application.properties /opt/tomcat2/webapps/ROOT/WEB-INF/lib/classes/
+
+                # 톰캣 재시작
+                sudo /opt/tomcat2/bin/shutdown.sh
+                sudo /opt/tomcat2/bin/startup.sh
                 """
             }
         }
