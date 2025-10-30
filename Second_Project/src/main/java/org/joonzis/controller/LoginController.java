@@ -617,7 +617,7 @@ public class LoginController {
 	    String token = UUID.randomUUID().toString();
 	    userservice.saveResetToken(userId, token); // DB에 토큰 저장 (만료시간 함께)
 
-	    String resetLink = "http://52.78.25.188:9098/reset-password?token=" + token;
+	    String resetLink = "http://52.78.25.188:9098/api/reset-password?token=" + token;
 
 	    try {
 	        userservice.sendResetLinkEmail(userEmail, resetLink);
@@ -628,8 +628,8 @@ public class LoginController {
 	}
 
 	@GetMapping("/reset-password")
-    public void redirectToIndex(HttpServletResponse response) throws IOException {
-        response.sendRedirect("/index.html"); // 톰캣 ROOT에 있는 React index.html
+    public String forwardResetPassword() {
+        return "forward:/index.html";
     }
 	
 	@PostMapping("/reset-password")
