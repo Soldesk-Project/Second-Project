@@ -23,7 +23,7 @@ const UserDetailModal = ({ user, onClose, shopItems }) => {
     useEffect(() => {
         if (!user.userNo) return;
         axios
-        .get(`/user/accuracy/${user.userNick}`)
+        .get(`/api/user/accuracy/${user.userNick}`)
         .then(res => setStats(res.data))
         
         .catch(err => console.error(err));
