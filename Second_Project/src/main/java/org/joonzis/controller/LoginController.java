@@ -624,6 +624,11 @@ public class LoginController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일 전송 실패");
 	    }
 	}
+
+	@GetMapping("/reset-password")
+	public String index() {
+		return "index"; // 톰캣 ROOT에 있는 index.html 렌더링
+	}
 	
 	@PostMapping("/reset-password")
 	public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
