@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
@@ -18,6 +19,7 @@ import org.joonzis.domain.UsersVO;
 import org.joonzis.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,16 @@ import lombok.extern.log4j.Log4j;
 public class UserServiceImpl implements UserService{
 	
 	private final Map<Integer, String> userServerMap = new ConcurrentHashMap<>();
+
+	@PostConstruct
+    public void init() {
+        if(mailSender instanceof JavaMailSenderImpl) {
+            JavaMailSenderImpl impl = (JavaMailSenderImpl) mailSender;
+            System.out.println("MAIL_USERNAME: " + impl.getUsername());
+            // 비밀번호는 보안상 로그로 안 찍는게 안전
+            System.out.println("MAIL_PASSWORD 존재 여부: " + (impl.getPassword() != null));
+        }
+    }
 	
 	@Autowired
 	private UserMapper mapper;	
