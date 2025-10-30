@@ -2,6 +2,7 @@ package org.joonzis.controller;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.joonzis.domain.ItemVO;
@@ -626,9 +628,9 @@ public class LoginController {
 	}
 
 	@GetMapping("/reset-password")
-	public String index() {
-		return "index"; // 톰캣 ROOT에 있는 index.html 렌더링
-	}
+    public void redirectToIndex(HttpServletResponse response) throws IOException {
+        response.sendRedirect("/index.html"); // 톰캣 ROOT에 있는 React index.html
+    }
 	
 	@PostMapping("/reset-password")
 	public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
