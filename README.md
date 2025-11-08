@@ -34,7 +34,7 @@
 | **Server** | Apache Tomcat 9 |
 | **Authentication** | JWT(JSON Web Token) |
 | **Build Tool** | Maven |
-| **Environment** | Localhost (로컬 실행) |
+| **Environment** | AWS EC2 |
 
 ---
 
