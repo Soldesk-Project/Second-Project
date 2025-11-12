@@ -627,10 +627,10 @@ public class LoginController {
 	    }
 	}
 
-	@GetMapping("/reset-password")
-    public String forwardResetPassword() {
-        return "forward:/index.html";
-    }
+	// @GetMapping("/reset-password")
+    // public String forwardResetPassword() {
+    //     return "index";
+    // }
 	
 	@PostMapping("/reset-password")
 	public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
