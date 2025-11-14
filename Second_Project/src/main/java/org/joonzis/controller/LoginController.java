@@ -617,7 +617,7 @@ public class LoginController {
 	    String token = UUID.randomUUID().toString();
 	    userservice.saveResetToken(userId, token); // DB에 토큰 저장 (만료시간 함께)
 
-	    String resetLink = "http://52.78.25.188:9098/reset-password?token=" + token;
+	    String resetLink = "http://localhost:3000/reset-password?token=" + token;
 
 	    try {
 	        userservice.sendResetLinkEmail(userEmail, resetLink);
