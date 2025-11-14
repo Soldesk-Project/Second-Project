@@ -22,8 +22,8 @@
      
        
       <!-- log4jdbc --> 
-      <property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property>
-      <property name="jdbcUrl" value="jdbc:log4jdbc:oracle:thin:@52.78.25.188:1521:XE"></property>
+      <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"></property>
+      <property name="jdbcUrl" value="jdbc:oracle:thin:@52.78.25.188:1521:XE"></property>
       <property name="username" value="project2"></property>
       <property name="password" value="1234"></property>
 	</bean>
@@ -62,7 +62,7 @@
     
     <!-- Redis 연결 설정 -->
 	<bean id="redisConnectionFactory" class="org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory">
-	    <property name="hostName" value="localhost" />
+	    <property name="hostName" value="52.78.25.188" />
 	    <property name="port" value="6379" />
 	</bean>
 		
