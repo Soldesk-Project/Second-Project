@@ -603,29 +603,32 @@ public class LoginController {
 	    return email;
 	}
 	
-	@PostMapping("/findPw/sendResetLink")
-	public ResponseEntity<?> sendResetLink(@RequestBody Map<String, String> request) {
-	    String userId = request.get("user_id");
-	    String userEmail = request.get("user_email");
-
-	    UserInfoDTO user = userservice.findUserByIdAndEmail(userId, userEmail);
-	    if (user == null) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("정보가 일치하지 않습니다.");
-	    }
-
-	    // 임시 토큰 생성
-	    String token = UUID.randomUUID().toString();
-	    userservice.saveResetToken(userId, token); // DB에 토큰 저장 (만료시간 함께)
-
-	    String resetLink = "http://localhost:3000/reset-password?token=" + token;
-
-	    try {
-	        userservice.sendResetLinkEmail(userEmail, resetLink);
-	        return ResponseEntity.ok(Map.of("success", true, "message", "가입하신 이메일로 비밀번호 재설정 링크를 전송했습니다."));
-	    } catch (Exception e) {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일 전송 실패");
-	    }
-	}
+	
+	
+//	이메일로 비밀번호 변경 페이지 전송 요청
+//	@PostMapping("/findPw/sendResetLink")
+//	public ResponseEntity<?> sendResetLink(@RequestBody Map<String, String> request) {
+//	    String userId = request.get("user_id");
+//	    String userEmail = request.get("user_email");
+//
+//	    UserInfoDTO user = userservice.findUserByIdAndEmail(userId, userEmail);
+//	    if (user == null) {
+//	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("정보가 일치하지 않습니다.");
+//	    }
+//
+//	    // 임시 토큰 생성
+//	    String token = UUID.randomUUID().toString();
+//	    userservice.saveResetToken(userId, token); // DB에 토큰 저장 (만료시간 함께)
+//
+//	    String resetLink = "http://52.78.25.188:9098/reset-password?token=" + token;
+//
+//	    try {
+//	        userservice.sendResetLinkEmail(userEmail, resetLink);
+//	        return ResponseEntity.ok(Map.of("success", true, "message", "가입하신 이메일로 비밀번호 재설정 링크를 전송했습니다."));
+//	    } catch (Exception e) {
+//	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일 전송 실패");
+//	    }
+//	}
 
 	// @GetMapping("/reset-password")
     // public String forwardResetPassword() {

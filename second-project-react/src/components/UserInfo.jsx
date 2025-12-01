@@ -9,6 +9,7 @@ import PreviewModal from './modal/PreviewModal';
 import { WebSocketContext } from '../util/WebSocketProvider';
 import { triggerRefreshRanking } from '../store/rankingSlice';
 import NickModal from './modal/NickModal';
+import PwModal from './modal/PwModal';
 import { setUser, fetchUserInfo } from '../store/userSlice';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,6 +18,7 @@ const TABS = ['테두리', '칭호', '글자색', '명함', '말풍선', '유니
 const UserInfo = ({userRankingList}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isNickModalOpen, setIsNickModalOpen] = useState(false);
+    const [isPwModalOpen, setIsPwModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState(TABS[0]);
     const [items, setItems]   = useState([]);
     const [editMyInfo, setEditMyInfo] = useState(false);
@@ -294,25 +296,29 @@ const UserInfo = ({userRankingList}) => {
             });
     };
 
-    const handleChangePw = useCallback(async () => {
-        if (loading) return;
+    const handleChangePw = () => {
 
-        setLoading(true);
-        try {
-        const { data } = await axios.post('/api/findPw/sendResetLink', {
-            user_id: user.user_id,
-            user_email: user.user_email,
-        });
+    }
+
+    // const handleChangePw = useCallback(async () => {
+    //     if (loading) return;
+
+    //     setLoading(true);
+    //     try {
+    //     const { data } = await axios.post('/api/findPw/sendResetLink', {
+    //         user_id: user.user_id,
+    //         user_email: user.user_email,
+    //     });
         
-        if (data.success) {
-            alert(data.message);
-        }
-        } catch (error) {
-         alert('비밀번호 변경 링크 요청 중 오류가 발생했습니다.');
-        } finally { 
-            setLoading(false);
-        }
-    }, [user.user_id, user.user_email, loading]);
+    //     if (data.success) {
+    //         alert(data.message);
+    //     }
+    //     } catch (error) {
+    //      alert('비밀번호 변경 링크 요청 중 오류가 발생했습니다.');
+    //     } finally { 
+    //         setLoading(false);
+    //     }
+    // }, [user.user_id, user.user_email, loading]);
 
     const handleClearStyle=async ()=>{
         await axios.patch(`/api/user/${user.user_no}/clearStyle`);
@@ -423,7 +429,8 @@ const UserInfo = ({userRankingList}) => {
                 <div className={styles.invenBtnWrapper}>
                     <button className={styles.invenBtn} onClick={() => setIsModalOpen(true)}>Inventory</button>
                     <button className={styles.invenBtn} onClick={() => setIsNickModalOpen(true)}>닉네임 변경</button>
-                    <button className={styles.invenBtn} onClick={handleChangePw} disabled={loading}>{loading ? '요청 중...' : '비밀번호 변경'}</button>
+                    <button className={styles.invenBtn} onClick={() => setIsPwModalOpen(true)}>비밀번호 변경</button>
+                    {/* <button className={styles.invenBtn} onClick={handleChangePw} disabled={loading}>{loading ? '요청 중...' : '비밀번호 변경'}</button> */}
                 </div>
             </>:
             <>
@@ -447,6 +454,9 @@ const UserInfo = ({userRankingList}) => {
         }
 
         <NickModal isOpen={isNickModalOpen} onClose={() => setIsNickModalOpen(false)}  onSubmit={handleNicknameChange} point={point}/>
+        <PwModal isOpen={isPwModalOpen} onClose={() => setIsPwModalOpen(false)}  onSubmit={handleChangePw}/>
+
+
 
       <InventoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div role="tablist" className={styles.subTabContainer}>
