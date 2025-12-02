@@ -157,7 +157,7 @@ const ItemList = () => {
     
     if (!reward) return;
     // API 호출 등 비동기 처리도 가능
-    axios.post('/user/reward', { item_type: reward.item_type, user_no: user.user_no, css_class_name: reward.css_class_name, item_name: reward.item_name })
+    axios.post('/api/user/reward', { item_type: reward.item_type, user_no: user.user_no, css_class_name: reward.css_class_name, item_name: reward.item_name })
     .then(() => {
       const updated = {
         ...rewardReceived,
@@ -166,7 +166,7 @@ const ItemList = () => {
       };
 
       setRewardReceived(updated);
-      axios.post('/user/rewardUpdate', { user_no: updated.user_no, boundary: updated.boundary, title: updated.title, fontColor: updated.fontColor, background: updated.background })
+      axios.post('/api/user/rewardUpdate', { user_no: updated.user_no, boundary: updated.boundary, title: updated.title, fontColor: updated.fontColor, background: updated.background })
       .then(() => {
           setReloadRewardStatus(prev => !prev);
         })
@@ -241,7 +241,7 @@ const ItemList = () => {
                             </span>
                           :
                             <span className={item.item_type !== 'title' ? decoStyles[item.css_class_name] : undefined}>
-                              아이템
+                              가나다abc
                             </span>
                         )
                       }
