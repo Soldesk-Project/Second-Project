@@ -230,9 +230,14 @@
 
 	<!-- 비밀번호 변경 - 임시 토큰 생성 -->
 	<insert id="insertResetToken">
-	    INSERT INTO password_reset_token (id, user_id, token, expiry_date)
-	    VALUES (seq_password_reset_token.NEXTVAL, #{userId}, #{token}, #{expiryDate, jdbcType=TIMESTAMP})
+	    INSERT INTO password_reset_token (id, user_id, token, expiry_date, certification_number)
+	    VALUES (seq_password_reset_token.NEXTVAL, #{userId}, #{token}, #{expiryDate, jdbcType=TIMESTAMP}, #{certificationNumber})
 	</insert>
+	
+	<select id="verifyResetToken" resultType="String">
+		SELECT CERTIFICATION_NUMBER FROM PASSWORD_RESET_TOKEN WHERE TOKEN=#{token}
+	</select>
+	
 	<!-- 비밀번호 변경 - 토큰으로 유저 정보 찾기 -->
 	<select id="findUserByToken" resultType="org.joonzis.domain.UserInfoDTO">
 	    SELECT u.* FROM users u

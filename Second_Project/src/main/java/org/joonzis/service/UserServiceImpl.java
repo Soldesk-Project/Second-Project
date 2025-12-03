@@ -18,6 +18,8 @@ import org.joonzis.domain.UserRewardVO;
 import org.joonzis.domain.UsersVO;
 import org.joonzis.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -161,6 +163,7 @@ public class UserServiceImpl implements UserService{
 	public UserInfoDTO findUserByIdAndEmail(String id, String email) {
 	    return mapper.findUserByIdAndEmail(id, email);
 	}
+	
 	// 비밀번호 변경
 	@Override
 	public void updatePassword(UserInfoDTO user) {
@@ -190,10 +193,19 @@ public class UserServiceImpl implements UserService{
 	
 	// 비밀번호 변경 - 임시 토큰 생성
 	@Override
-	public void saveResetToken(String userId, String token) {
+	public void saveResetToken(String userId, String token, String certificationNumber) {
 	    LocalDateTime expiry = LocalDateTime.now().plusMinutes(30); // 30분 후 만료
-	    mapper.insertResetToken(userId, token, expiry);
+	    mapper.insertResetToken(userId, token, certificationNumber, expiry);
 	}
+	@Override
+	public boolean verifyResetToken(String token, String inputNumber) {
+		String stored = mapper.verifyResetToken(token);
+        if (stored == null || !stored.equals(inputNumber)) {
+            return false;
+        }
+		return true;
+	}
+	
 	// 비밀번호 변경 - 토큰으로 유저 정보 찾기
 	@Override
 	public UserInfoDTO findUserByToken(String token) {
@@ -212,15 +224,17 @@ public class UserServiceImpl implements UserService{
 	}
 	// 이메일로 비밀번호 변경 링크 전송
 	@Override
-	public void sendResetLinkEmail(String toEmail, String resetLink) throws MessagingException {
+	public void sendResetLinkEmail(String toEmail, String certificationNumber) throws MessagingException {
 		MimeMessage message = mailSender.createMimeMessage();
 	    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
 	    helper.setTo(toEmail);
-	    helper.setSubject("[CotePlay] 비밀번호 재설정 링크");
+	    helper.setSubject("[CotePlay] 비밀번호 변경 인증번호");
 	    helper.setText("<p>안녕하세요.</p>"
-	        + "<p>비밀번호 재설정을 위해 아래 링크를 클릭하세요:</p>"
-	        + "<p><a href='" + resetLink + "'>비밀번호 재설정하기</a></p>"
+	        + "<p>비밀번호 재설정을 위해 아래 인증번호를 입력하세요.</p>"
+	        + "<div style='background:#f5f5f5; padding:20px; border-radius:5px; font-size:18px; font-weight:bold; text-align:center;'>"
+	        + certificationNumber 
+	        + "</div>"
 	        + "<p>이 링크는 30분간 유효합니다.</p>", true);
 
 	    mailSender.send(message);
