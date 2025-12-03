@@ -75,7 +75,9 @@ public interface UserService {
 	public void updateNickname(Long user_no, String user_nick);
 	
 	// 비밀번호 변경 - 임시 토큰 생성
-	public void saveResetToken(String userId, String token);
+	public void saveResetToken(String userId, String token, String certificationNumber);
+	// 인증번호 비교
+	public boolean verifyResetToken(String token, String inputNumber);
 	// 비밀번호 변경 - 토큰으로 유저 정보 찾기
 	public UserInfoDTO findUserByToken(String token);
 	// 토큰 유효기간 비교
@@ -83,7 +85,7 @@ public interface UserService {
 	// 비밀번호 변경 성공 후 토큰 삭제
 	public void deleteResetToken(String token);
 	// 이메일로 비밀번호 변경 링크 전송
-	public void sendResetLinkEmail(String toEmail, String resetLink) throws MessagingException;
+	public void sendResetLinkEmail(String toEmail, String certificationNumber) throws MessagingException;
 	
 	// 회원가입
 	void insertMember(UsersVO users);

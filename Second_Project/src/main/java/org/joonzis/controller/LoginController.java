@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,11 +29,13 @@ import org.joonzis.service.UserService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -87,6 +90,9 @@ public class LoginController {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+//    @Autowired
+//    private RedisTemplate<String, String> redisTemplate;
 	
 	@ResponseBody
 	@PostMapping("/kakao/login") 
@@ -630,36 +636,88 @@ public class LoginController {
 //	    }
 //	}
 
-	// @GetMapping("/reset-password")
-    // public String forwardResetPassword() {
-    //     return "index";
-    // }
+	// 비밀번호 변경 요청
+	@PostMapping("/changePw/checkPw")
+	public ResponseEntity<?> checkUserPw(@RequestBody Map<String, String> request) {
+		String userPw = request.get("user_pw");
+		String userId = request.get("user_id");
+	    String userEmail = request.get("user_email");
+	    UserInfoDTO user = userservice.findUserByIdAndEmail(userId, userEmail);
+	    if (user == null) {
+	        return ResponseEntity.ok(Map.of("success", false, "message", "정보가 일치하지 않습니다."));
+	    }
+	    // 비밀번호 비교 -> 틀리면 다시   
+	    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	    
+	    if (!passwordEncoder.matches(userPw, user.getUser_pw())) {
+	    	return ResponseEntity.ok(Map.of("success", false, "message", "입력하신 현재 비밀번호가 올바르지 않습니다"));
+		}
+
+	    // 임시 토큰 생성
+	    String token = UUID.randomUUID().toString();
+	    // 인증번호
+	    Random random = new Random();
+	    int number = 100000 + random.nextInt(900000);
+	    String certificationNumber =String.valueOf(number);	
+	    // DB에 토큰 저장 (만료시간 함께)
+	    userservice.saveResetToken(userId, token, certificationNumber);
+
+
+	    try {
+	        userservice.sendResetLinkEmail(userEmail, certificationNumber);
+	        return ResponseEntity.ok(Map.of("success", true, "message", "가입하신 이메일로 인증번호를 전송했습니다.", "token", token));
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일 전송 실패");
+	    }
 	
-	@PostMapping("/reset-password")
-	public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+	
+	}
+	
+	@PostMapping("/changePw/verifyCertification")
+	public ResponseEntity<Map<String, Object>> verifyCertification(@RequestBody Map<String, String> request) {
 	    String token = request.get("token");
 	    String newPw = request.get("newPw");
+	    String inputNumber = request.get("certificationNumber");
 
-	    if (token == null || newPw == null) {
-	        return ResponseEntity.badRequest().body("token 또는 newPw 누락");
-	    }
-	    
 	    UserInfoDTO user = userservice.findUserByToken(token);
-	    if (user == null || userservice.tokenExpired(token)) {
-	    	Map<String, String> error = new HashMap<>();
-	    	error.put("message", "유효하지 않거나 만료된 링크입니다.");
-	    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+	    
+	    boolean isValid = userservice.verifyResetToken(token, inputNumber);
+	    if (!isValid) {
+	        return ResponseEntity.ok(Map.of("success", false, "message", "인증번호 불일치"));
 	    }
 
-	    // 암호화 및 저장
 	    user.setUser_pw(passwordEncoder.encode(newPw));
 	    userservice.updatePassword(user);
 	    userservice.deleteResetToken(token); // 보안 위해 삭제
-
-	    Map<String, String> response = new HashMap<>();
-	    response.put("message", "비밀번호가 변경되었습니다. 5초 후 페이지를 종료합니다...");
-	    return ResponseEntity.ok(response);
+	    
+	    return ResponseEntity.ok(Map.of("success", true, "message", "인증 성공, 비밀번호가 변경되었습니다"));
 	}
+	
+//	@PostMapping("/reset-password")
+//	public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+//	    String token = request.get("token");
+//	    String newPw = request.get("newPw");
+//
+//	    if (token == null || newPw == null) {
+//	        return ResponseEntity.badRequest().body("token 또는 newPw 누락");
+//	    }
+//	    
+//	    UserInfoDTO user = userservice.findUserByToken(token);
+//	    if (user == null || userservice.tokenExpired(token)) {
+//	    	Map<String, String> error = new HashMap<>();
+//	    	error.put("message", "유효하지 않거나 만료된 링크입니다.");
+//	    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+//	    }
+//
+//	    // 암호화 및 저장
+//	    user.setUser_pw(passwordEncoder.encode(newPw));
+//	    userservice.updatePassword(user);
+//	    userservice.deleteResetToken(token); // 보안 위해 삭제
+//
+//	    Map<String, String> response = new HashMap<>();
+//	    response.put("message", "비밀번호가 변경되었습니다. 5초 후 페이지를 종료합니다...");
+//	    return ResponseEntity.ok(response);
+//	}
 
 	
 	@PostMapping("/findPw/checkIdAndEmail")

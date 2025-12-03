@@ -296,9 +296,9 @@ const UserInfo = ({userRankingList}) => {
             });
     };
 
-    const handleChangePw = () => {
+    // const handleChangePw = () => {
 
-    }
+    // }
 
     // const handleChangePw = useCallback(async () => {
     //     if (loading) return;
@@ -454,7 +454,7 @@ const UserInfo = ({userRankingList}) => {
         }
 
         <NickModal isOpen={isNickModalOpen} onClose={() => setIsNickModalOpen(false)}  onSubmit={handleNicknameChange} point={point}/>
-        <PwModal isOpen={isPwModalOpen} onClose={() => setIsPwModalOpen(false)}  onSubmit={handleChangePw}/>
+        <PwModal isOpen={isPwModalOpen} onClose={() => setIsPwModalOpen(false)}/>
 
 
 

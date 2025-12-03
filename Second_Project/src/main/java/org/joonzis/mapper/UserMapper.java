@@ -80,7 +80,10 @@ public interface UserMapper {
 	// 비밀번호 변경 - 임시 토큰 생성
 	public void insertResetToken(@Param("userId") String userId,
             @Param("token") String token,
+            @Param("certificationNumber") String certificationNumber,
             @Param("expiryDate") LocalDateTime expiryDate);
+	// 토큰으로 인증번호 찾기
+	public String verifyResetToken(String token);
 	// 비밀번호 변경 - 토큰으로 유저 정보 찾기
 	public UserInfoDTO findUserByToken(String token);
 	// 토큰 유효기간 비교
