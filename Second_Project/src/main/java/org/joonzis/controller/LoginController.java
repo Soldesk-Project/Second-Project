@@ -685,7 +685,11 @@ public class LoginController {
 	    if (!isValid) {
 	        return ResponseEntity.ok(Map.of("success", false, "message", "인증번호 불일치"));
 	    }
-
+	    
+	    if (passwordEncoder.matches(newPw, user.getUser_pw())) {
+	    	return ResponseEntity.ok(Map.of("success", false, "message", "새 비밀번호가 현재 비밀번호와 동일합니다"));
+		}
+	    System.out.println("현재, 새 비번 다름");
 	    user.setUser_pw(passwordEncoder.encode(newPw));
 	    userservice.updatePassword(user);
 	    userservice.deleteResetToken(token); // 보안 위해 삭제
