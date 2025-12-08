@@ -14,7 +14,7 @@ const ChatReportModal = ({ isOpen, onClose, reportMessage }) => {
         }
         
         try {
-            const res = await axios.post('/chat/report',{reported_user: reportMessage.mSender, message: reportMessage.mContent, reason: reportedReason, status: 'pending'},{
+            const res = await axios.post('/api/chat/report',{reported_user: reportMessage.mSender, message: reportMessage.mContent, reason: reportedReason, status: 'pending'},{
                 headers: {
                 "Authorization": `Bearer ${token}`,
                 'Content-Type': 'application/json'

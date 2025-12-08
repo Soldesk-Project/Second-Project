@@ -469,8 +469,8 @@ public class AdminPageController {
     // 아이템 등록
     @PostMapping(value = "/registerItem", produces = "application/json; charset=UTF-8")
     public ResponseEntity<?> registerItem(@RequestParam("type") String type,
-            @RequestParam("item_name") String itemName,
-            @RequestParam("item_price") int itemPrice,
+    		@RequestPart("item_name") String itemName,
+            @RequestPart("item_price") int itemPrice,
             @RequestPart(value = "item_image") MultipartFile itemImage
     ) {
         // 1. 필수 입력 필드 검증 (아이템 타입, 이름, 가격, 이미지)

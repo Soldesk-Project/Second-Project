@@ -57,7 +57,7 @@ const AchieveDelete = () => {
     lastSearchQuery.current = searchQuery;
 
     try {
-      const response = await fetch(`/admin/searchAchievements?type=${encodeURIComponent(typeValue)}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`, {
+      const response = await fetch(`api/admin/searchAchievements?type=${encodeURIComponent(typeValue)}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -107,7 +107,7 @@ const AchieveDelete = () => {
     const encodedType = encodeURIComponent(typeValue);
     const encodedTitle = encodeURIComponent(selectedAchData.ach_title);
 
-    const url = `/admin/deleteAchievements?type=${encodedType}&title=${encodedTitle}`;
+    const url = `api/admin/deleteAchievements?type=${encodedType}&title=${encodedTitle}`;
 
     try {
       const response = await fetch(url, {
@@ -147,7 +147,7 @@ const AchieveDelete = () => {
     if (!window.confirm('이 업적을 수정하시겠습니까?')) return;
 
     try {
-      const response = await fetch(`/admin/updateAchievement`, {
+      const response = await fetch(`api/admin/updateAchievement`, {
         method: 'PUT',
         headers: {
           "Authorization": `Bearer ${token}`,

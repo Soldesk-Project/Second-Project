@@ -62,7 +62,7 @@ const QuestDelete = () => {
     lastSearchQuery.current = searchQuery;
 
     try {
-      const response = await fetch(`/admin/searchQuestions?subject=${encodeURIComponent(dbSubjectValue)}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`, {
+      const response = await fetch(`api/admin/searchQuestions?subject=${encodeURIComponent(dbSubjectValue)}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -131,7 +131,7 @@ const QuestDelete = () => {
     try {
       const idsString = Array.from(selectedQuestionsToDelete).join(',');
       const response = await fetch(
-        `/admin/deleteQuestions?subject=${encodeURIComponent(dbSubjectValue)}&ids=${encodeURIComponent(idsString)}`,
+        `api/admin/deleteQuestions?subject=${encodeURIComponent(dbSubjectValue)}&ids=${encodeURIComponent(idsString)}`,
         {
           method: 'DELETE',
           headers: {

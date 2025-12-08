@@ -78,7 +78,7 @@ const ItemRegister = () => {
     formData.append('item_image', selectedImage); // 백엔드 @RequestPart("item_image")에 맞춰 이름 일치
 
     try {
-      const response = await fetch(`/admin/registerItem?type=${encodeURIComponent(tableName)}`, {
+      const response = await fetch(`api/admin/registerItem?type=${encodeURIComponent(tableName)}`, {
         method: 'POST',
         headers: { 
           "Authorization": `Bearer ${token}`,

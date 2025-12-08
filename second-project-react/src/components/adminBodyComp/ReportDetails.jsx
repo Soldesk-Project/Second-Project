@@ -14,7 +14,7 @@ const ReportDetails = () => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const res = await axios.get(`/chat/getReportHistory?page=${page}&size=${PAGE_SIZE}`);
+        const res = await axios.get(`api/chat/getReportHistory?page=${page}&size=${PAGE_SIZE}`);
         setReports(res.data.items || res.data);
         setTotalReports(res.data.totalCount || (res.data.length || 0));
       } catch (error) {
