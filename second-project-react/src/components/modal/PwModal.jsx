@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import styles from '../../css/modal/PwModal.module.css';
 import axios from 'axios';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { createLogoutHandler } from '../../js/logout';
+import { clearUser, clearServer } from '../../store/userSlice';
 
 const PwModal = ({ isOpen, onClose, onSubmit }) => {
     const [pw, setPw] = useState('');
@@ -13,9 +15,11 @@ const PwModal = ({ isOpen, onClose, onSubmit }) => {
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+    
+    const dispatch = useDispatch();
 
     const user = useSelector((state) => state.user);
-
+    
     // 현재 비번 맞는지 확인
     const handleCheckPw = async () => {
         if (loading) return;
@@ -41,8 +45,12 @@ const PwModal = ({ isOpen, onClose, onSubmit }) => {
         }
     }
 
-    // 인증번호 확인
+    // 인증번호 확인, 새 비밀번호 저장
     const handleSubmit = async () => {
+        if (newPw===pw) {
+            alert("새 비밀번호가 현재 비밀번호와 동일합니다");
+            return;
+        }
         try {
             const {data} = await axios.post('/api/changePw/verifyCertification', { 
                 token: token, 
@@ -53,13 +61,24 @@ const PwModal = ({ isOpen, onClose, onSubmit }) => {
             if (data.success) {
                 setPw('');
                 handleClose();
-                navigate('/', { replace: true })
+                logOut();
+                // navigate('/', { replace: true })
             }
         } catch (err) {
             alert('인증번호 확인 중 오류가 발생했습니다.');
         }
     }
-    
+
+    const logOut = createLogoutHandler({
+        dispatch,
+        clearUser,
+        clearServer,
+        nav: navigate,
+        user,
+        sendLeaveMessage: () => {}
+    });
+
+
     const handleClose = () => {
         setPw('');
         setNewPw('');
@@ -81,6 +100,7 @@ const PwModal = ({ isOpen, onClose, onSubmit }) => {
                         className={styles.pwModalInput}
                         value={pw}
                         onChange={(e) => setPw(e.target.value)}
+                        disabled={certification}
                     />
                     {
                         certification && 

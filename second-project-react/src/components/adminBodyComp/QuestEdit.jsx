@@ -89,7 +89,7 @@ const QuestEdit = () => {
     lastSearchQuery.current = searchQuery;
 
     try {
-      const response = await fetch(`/admin/searchQuestions?subject=${encodeURIComponent(dbSubjectValue)}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`, {
+      const response = await fetch(`api/admin/searchQuestions?subject=${encodeURIComponent(dbSubjectValue)}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -185,7 +185,7 @@ const QuestEdit = () => {
     }
 
     try {
-      const response = await fetch(`/admin/editQuestion?`, {
+      const response = await fetch(`api/admin/editQuestion?`, {
         method: 'POST',
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -236,7 +236,7 @@ const QuestEdit = () => {
 
     try {
       const response = await fetch(
-        `/admin/deleteQuestions?subject=${encodeURIComponent(dbSubjectValue)}&ids=${encodeURIComponent(selectedQuestId)}`,
+        `api/admin/deleteQuestions?subject=${encodeURIComponent(dbSubjectValue)}&ids=${encodeURIComponent(selectedQuestId)}`,
         {
           method: 'DELETE',
           headers: {

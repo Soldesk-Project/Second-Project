@@ -2,6 +2,9 @@ package org.joonzis.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
@@ -469,8 +472,8 @@ public class AdminPageController {
     // 아이템 등록
     @PostMapping(value = "/registerItem", produces = "application/json; charset=UTF-8")
     public ResponseEntity<?> registerItem(@RequestParam("type") String type,
-            @RequestParam("item_name") String itemName,
-            @RequestParam("item_price") int itemPrice,
+    		@RequestPart("item_name") String itemName,
+            @RequestPart("item_price") int itemPrice,
             @RequestPart(value = "item_image") MultipartFile itemImage
     ) {
         // 1. 필수 입력 필드 검증 (아이템 타입, 이름, 가격, 이미지)
@@ -493,13 +496,30 @@ public class AdminPageController {
 
         try {
         	
-        	String savedFileName = fileUploadService.saveFile(itemImage);
+//        	String savedFileName = fileUploadService.saveFile(itemImage);
+  
+        	
+        	
+		    // MultipartFile 직접 처리 (원본 파일명 사용)
+		    String uploadDir = "/home/ubuntu/coteplay/Second-Project/second-project-react/public/images";
+		    String originalFilename = itemImage.getOriginalFilename();
+		  
+		    // 파일명 안전성 검증 (공백 제거, 특수문자 제한)
+		    String safeFileName = originalFilename.trim().replaceAll("[^a-zA-Z0-9.-]", "_");
+		    Path filePath = Paths.get(uploadDir + safeFileName);
+		  
+//		    // 디렉토리 생성 (없을 경우)
+//		    Files.createDirectories(filePath.getParent());
+		  
+		    // 파일 저장
+		    itemImage.transferTo(filePath.toFile());
+
 
             ItemVO itemVO = new ItemVO();
             itemVO.setItem_type(type);
             itemVO.setItem_name(itemName);
             itemVO.setItem_price(itemPrice);
-            itemVO.setImageFileName(savedFileName);
+            itemVO.setImageFileName(safeFileName);
 
             // 서비스 계층으로 데이터 전달
             adminService.registerItem(itemVO); 

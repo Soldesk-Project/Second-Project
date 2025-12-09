@@ -4,6 +4,7 @@ import '../css/header.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { clearUser, clearServer } from '../store/userSlice';
 import { WebSocketContext } from '../util/WebSocketProvider';
+import { createLogoutHandler } from '../js/logout';
 import axios from 'axios';
 
 const KAKAO_JS_KEY = 'f95efd6df49141c0b98c0463ecfe5d9e';
@@ -37,9 +38,9 @@ const Header = () => {
     else setActiveTab('문제풀이');
   }, [location]);
 
-  const isKakaoUser = () => user.user_id.startsWith('kakao_');
-  const isNaverUser = () => user.user_id.startsWith('naver_');
-  const isGoogleUser = () => user.user_id.startsWith('google_');
+  // const isKakaoUser = () => user.user_id.startsWith('kakao_');
+  // const isNaverUser = () => user.user_id.startsWith('naver_');
+  // const isGoogleUser = () => user.user_id.startsWith('google_');
 
   const clickToGoMain = () => nav(`/main/${server}`);
 
@@ -58,82 +59,82 @@ const Header = () => {
     nav('/server');
   };
 
-  const logoutKakao = async () => {
-    if (!window.Kakao) {
-      console.warn('카카오 SDK가 로드되지 않았습니다.');
-      return;
-    }
+  // const logoutKakao = async () => {
+  //   if (!window.Kakao) {
+  //     console.warn('카카오 SDK가 로드되지 않았습니다.');
+  //     return;
+  //   }
 
-    if (!window.Kakao.isInitialized()) {
-      window.Kakao.init(KAKAO_JS_KEY);
-    }
+  //   if (!window.Kakao.isInitialized()) {
+  //     window.Kakao.init(KAKAO_JS_KEY);
+  //   }
 
-    const kakaoAccessToken = window.Kakao.Auth.getAccessToken();
-    if (kakaoAccessToken) {
-      await axios.post('/api/kakao/logout', { accessToken: kakaoAccessToken });
-    }
+  //   const kakaoAccessToken = window.Kakao.Auth.getAccessToken();
+  //   if (kakaoAccessToken) {
+  //     await axios.post('/api/kakao/logout', { accessToken: kakaoAccessToken });
+  //   }
 
-    // 카카오 SDK 세션 로그아웃
-    await new Promise(resolve => {
-      window.Kakao.Auth.logout(() => resolve());
-    });
+  //   // 카카오 SDK 세션 로그아웃
+  //   await new Promise(resolve => {
+  //     window.Kakao.Auth.logout(() => resolve());
+  //   });
 
-    // 카카오 계정 로그아웃 페이지로 리다이렉트
-    const logoutUrl = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_CLIENT_ID}&logout_redirect_uri=${encodeURIComponent(LOGOUT_REDIRECT_URI)}`;
-    window.location.href = logoutUrl;
-  };
+  //   // 카카오 계정 로그아웃 페이지로 리다이렉트
+  //   const logoutUrl = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_CLIENT_ID}&logout_redirect_uri=${encodeURIComponent(LOGOUT_REDIRECT_URI)}`;
+  //   window.location.href = logoutUrl;
+  // };
 
-  const logoutNaver = async () => {
-    try {
-      // 1. access_token 삭제
-      await axios.post('/api/naver/logout', {
-        accessToken: user.access_token,
-      });
+  // const logoutNaver = async () => {
+  //   try {
+  //     // 1. access_token 삭제
+  //     await axios.post('/api/naver/logout', {
+  //       accessToken: user.access_token,
+  //     });
 
-      // 2. 네이버 세션 로그아웃 요청을 숨겨서 보냄 (iframe 등)
-      const logoutWin = window.open(
-        'https://nid.naver.com/nidlogin.logout',
-        '_blank',
-        'width=1,height=1,left=-1000,top=-1000'
-      );
+  //     // 2. 네이버 세션 로그아웃 요청을 숨겨서 보냄 (iframe 등)
+  //     const logoutWin = window.open(
+  //       'https://nid.naver.com/nidlogin.logout',
+  //       '_blank',
+  //       'width=1,height=1,left=-1000,top=-1000'
+  //     );
 
-      setTimeout(() => {
-        if (logoutWin) logoutWin.close();
-        // 3. 클라이언트 상태 초기화
-        dispatch(clearUser());
-        dispatch(clearServer());
-        localStorage.clear();
-        nav('/'); // 또는 window.location.href = '/'
-      }, 1000); // 약간의 시간 여유
-    } catch (err) {
-      console.error('네이버 로그아웃 실패:', err);
-    }
-  };
+  //     setTimeout(() => {
+  //       if (logoutWin) logoutWin.close();
+  //       // 3. 클라이언트 상태 초기화
+  //       dispatch(clearUser());
+  //       dispatch(clearServer());
+  //       localStorage.clear();
+  //       nav('/'); // 또는 window.location.href = '/'
+  //     }, 1000); // 약간의 시간 여유
+  //   } catch (err) {
+  //     console.error('네이버 로그아웃 실패:', err);
+  //   }
+  // };
 
-  const logoutGoogle = async () => {
-    try {
-      // 1. 서버 측 로그아웃 처리 (옵션)
-      await axios.post('/api/google/logout', {
-        accessToken: user.access_token, // 서버에서 토큰 무효화 처리
-      });
+  // const logoutGoogle = async () => {
+  //   try {
+  //     // 1. 서버 측 로그아웃 처리 (옵션)
+  //     await axios.post('/api/google/logout', {
+  //       accessToken: user.access_token, // 서버에서 토큰 무효화 처리
+  //     });
 
-      // 2. 구글 로그아웃 URL 호출 (iframe으로)
-      const iframe = document.createElement('iframe');
-      iframe.src = 'https://accounts.google.com/Logout';
-      iframe.style.display = 'none';
-      document.body.appendChild(iframe);
+  //     // 2. 구글 로그아웃 URL 호출 (iframe으로)
+  //     const iframe = document.createElement('iframe');
+  //     iframe.src = 'https://accounts.google.com/Logout';
+  //     iframe.style.display = 'none';
+  //     document.body.appendChild(iframe);
 
-      // 3. 약간의 시간 기다린 후 클라이언트 상태 초기화
-      setTimeout(() => {
-        dispatch(clearUser());
-        dispatch(clearServer());
-        localStorage.clear();
-        nav('/');
-      }, 1000);
-    } catch (err) {
-      console.error('구글 로그아웃 실패:', err);
-    }
-  };
+  //     // 3. 약간의 시간 기다린 후 클라이언트 상태 초기화
+  //     setTimeout(() => {
+  //       dispatch(clearUser());
+  //       dispatch(clearServer());
+  //       localStorage.clear();
+  //       nav('/');
+  //     }, 1000);
+  //   } catch (err) {
+  //     console.error('구글 로그아웃 실패:', err);
+  //   }
+  // };
   
   const sendLeaveMessage = () => {
     const socket = sockets.current['server'];
@@ -147,40 +148,51 @@ const Header = () => {
     }
   };
 
-  const logOut = async () => {
-    try {
-      if (isKakaoUser()) {
-        await logoutKakao();
-        sendLeaveMessage();
-        return;
-      }
+  // const logOut = async () => {
+  //   try {
+  //     if (isKakaoUser()) {
+  //       await logoutKakao();
+  //       sendLeaveMessage();
+  //       return;
+  //     }
 
-      if (isNaverUser()) {
-        await logoutNaver();
-        sendLeaveMessage();
-        return;
-      }
+  //     if (isNaverUser()) {
+  //       await logoutNaver();
+  //       sendLeaveMessage();
+  //       return;
+  //     }
 
-      if (isGoogleUser()) {
-        await logoutGoogle();
-        sendLeaveMessage();
-        return;
-      }
+  //     if (isGoogleUser()) {
+  //       await logoutGoogle();
+  //       sendLeaveMessage();
+  //       return;
+  //     }
 
-      // 일반 로그아웃 (소셜 로그인이 아닌 경우)
-      if (user.user_id) {
-        await axios.post('/api/logout', { userId: user.user_id });
-        sendLeaveMessage();
-      }
-    } catch (error) {
-      console.error('로그아웃 처리 중 오류:', error);
-    } finally {
-      dispatch(clearUser());
-      dispatch(clearServer());
-      localStorage.clear();
-      nav('/');
-    }
-  };
+  //     // 일반 로그아웃 (소셜 로그인이 아닌 경우)
+  //     if (user.user_id) {
+  //       await axios.post('/api/logout', { userId: user.user_id });
+  //       sendLeaveMessage();
+  //     }
+  //   } catch (error) {
+  //     console.error('로그아웃 처리 중 오류:', error);
+  //   } finally {
+  //     dispatch(clearUser());
+  //     dispatch(clearServer());
+  //     localStorage.clear();
+  //     nav('/');
+  //   }
+  // };
+
+
+  const logOut = createLogoutHandler({
+    dispatch,
+    clearUser,
+    clearServer,
+    nav,
+    sendLeaveMessage,
+    user
+  });
+
 
   return (
     <div className='header'>

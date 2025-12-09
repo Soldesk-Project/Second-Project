@@ -63,7 +63,7 @@ const QuestErrRepoManage = () => {
   const saveEdit = async () => {
     try {
       await axios.post(
-        '/admin/editQuestion',
+        'api/admin/editQuestion',
         {
           id: editReport.question_id,
           subject: editReport.subject,

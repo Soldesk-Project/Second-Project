@@ -103,7 +103,7 @@ const QuestRegister = () => {
     };
 
     try {
-      const response = await fetch(`/admin/registerQuestion?`, {
+      const response = await fetch(`api/admin/registerQuestion?`, {
         method: 'POST',
         headers: {
           "Authorization": `Bearer ${token}`,

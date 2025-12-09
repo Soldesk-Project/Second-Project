@@ -53,7 +53,7 @@ const AchRegister = () => {
     };
 
     try {
-      const response = await fetch(`/admin/registerAchievement?`, {
+      const response = await fetch(`api/admin/registerAchievement?`, {
         method: 'POST',
         headers: {
           "Authorization": `Bearer ${token}`,

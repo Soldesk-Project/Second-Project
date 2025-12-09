@@ -62,7 +62,7 @@ const ItemDelete = () => {
     lastSearchQuery.current = searchQuery;
 
     try {
-      const response = await fetch(`/admin/searchItems?type=${tableName}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`, {
+      const response = await fetch(`api/admin/searchItems?type=${tableName}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -131,7 +131,7 @@ const ItemDelete = () => {
     }
 
     try {
-      const response = await fetch(`/admin/deleteItems?type=${encodeURIComponent(tableName)}&itemNos=${Array.from(selectedItemsToDelete).join(',')}`, {
+      const response = await fetch(`api/admin/deleteItems?type=${encodeURIComponent(tableName)}&itemNos=${Array.from(selectedItemsToDelete).join(',')}`, {
         method: 'DELETE',
         headers: {
           "Authorization": `Bearer ${token}`,

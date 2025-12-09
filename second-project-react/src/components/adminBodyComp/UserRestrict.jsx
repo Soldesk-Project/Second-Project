@@ -46,7 +46,7 @@ const UserRestrict = () => {
       const encodedSearchType = encodeURIComponent(searchConditions.searchType);
       const encodedSearchValue = encodeURIComponent(searchConditions.searchValue);
       // ischatbanned 컬럼도 백엔드에서 함께 가져오도록 API 수정 필요
-      const apiUrl = `/admin/users/search?searchType=${encodedSearchType}&searchValue=${encodedSearchValue}&page=${page}&size=${PAGE_SIZE}`;
+      const apiUrl = `api/admin/users/search?searchType=${encodedSearchType}&searchValue=${encodedSearchValue}&page=${page}&size=${PAGE_SIZE}`;
         
       const token = localStorage.getItem('token');
       
@@ -131,7 +131,7 @@ const UserRestrict = () => {
       setError(null);
 
       try {
-        const response = await fetch('/admin/users/ban-chat', {
+        const response = await fetch('api/admin/users/ban-chat', {
           method: 'POST',
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -199,7 +199,7 @@ const UserRestrict = () => {
       setError(null);
 
       try {
-        const response = await fetch('/admin/users/ban-login', {
+        const response = await fetch('api/admin/users/ban-login', {
           method: 'POST',
           headers: {
             "Authorization": `Bearer ${token}`,

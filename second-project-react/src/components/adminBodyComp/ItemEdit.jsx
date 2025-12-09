@@ -69,7 +69,7 @@ const ItemEdit = () => {
     lastSearchQuery.current = searchQuery;
 
     try {
-      const response = await fetch(`/admin/searchItems?type=${tableName}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`, {
+      const response = await fetch(`api/admin/searchItems?type=${tableName}&query=${encodeURIComponent(searchQuery)}&page=${page}&limit=${itemsPerPage}`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -126,7 +126,7 @@ const ItemEdit = () => {
 
     const tableName = typeTableMap[type];
     try {
-      const response = await fetch(`/admin/deleteItems?type=${encodeURIComponent(tableName)}&itemNo=${selectedItemNo}`, {
+      const response = await fetch(`api/admin/deleteItems?type=${encodeURIComponent(tableName)}&itemNo=${selectedItemNo}`, {
         method: 'DELETE',
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -168,7 +168,7 @@ const ItemEdit = () => {
     formData.append('original_image_file_name', currentImageFileName || '');
 
     try {
-      const response = await fetch(`/admin/editItem`, {
+      const response = await fetch(`api/admin/editItem`, {
         method: 'POST',
         headers: {
           "Authorization": `Bearer ${token}`,

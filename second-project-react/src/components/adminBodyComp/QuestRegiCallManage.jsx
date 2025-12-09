@@ -36,7 +36,7 @@ const QuestRegiCallManage = () => {
             }).toString();
 
             // 백엔드 엔드포인트에 맞게 URL 수정
-            const response = await fetch(`/admin/questRequests?${queryParams}`, {
+            const response = await fetch(`api/admin/questRequests?${queryParams}`, {
                 method: 'GET',
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -91,7 +91,7 @@ const QuestRegiCallManage = () => {
 
     // 상세 정보만 불러오는 함수 (이미지 제외)
   const fetchDetailInfo = async (callId) => {
-    const response = await fetch(`/admin/questRequests/${callId}/info`, {
+    const response = await fetch(`api/admin/questRequests/${callId}/info`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -105,7 +105,7 @@ const QuestRegiCallManage = () => {
 
   // 이미지 데이터만 불러오는 함수
   const fetchDetailImage = async (callId) => {
-  const response = await fetch(`/admin/questRequests/${callId}/image`, {
+  const response = await fetch(`api/admin/questRequests/${callId}/image`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -139,7 +139,7 @@ const QuestRegiCallManage = () => {
             await Promise.all(selectedCalls.map(async (callId) => {
                 const callToUpdate = calls.find(call => call.id === callId);
                 if (callToUpdate) {
-                    const response = await fetch(`/admin/questRequests/${callId}`, { // API 엔드포인트 수정
+                    const response = await fetch(`api/admin/questRequests/${callId}`, { // API 엔드포인트 수정
                         method: 'PUT',
                         headers: {
                             "Authorization": `Bearer ${token}`,
@@ -202,7 +202,7 @@ const QuestRegiCallManage = () => {
         try {
             if (selectedCall.status === '처리 완료') {
                 // 1) 문제 등록
-                const registerResponse = await fetch(`/admin/questions`, {
+                const registerResponse = await fetch(`api/admin/questions`, {
                     method: 'POST',
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -217,7 +217,7 @@ const QuestRegiCallManage = () => {
                 }
 
                 // 2) 상태 업데이트
-                const response = await fetch(`/admin/questRequests/${selectedCall.id}`, {
+                const response = await fetch(`api/admin/questRequests/${selectedCall.id}`, {
                     method: 'PUT',
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -233,7 +233,7 @@ const QuestRegiCallManage = () => {
             } 
             else if (selectedCall.status === '반려') {
                 // 반려 처리 전용 API 호출
-                const rejectResponse = await fetch(`/admin/questRequests/${selectedCall.id}/reject`, {
+                const rejectResponse = await fetch(`api/admin/questRequests/${selectedCall.id}/reject`, {
                     method: 'PUT',
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -249,7 +249,7 @@ const QuestRegiCallManage = () => {
             } 
             else {
                 // 그 외 상태일 경우 일반 상태 업데이트만
-                const response = await fetch(`/admin/questRequests/${selectedCall.id}`, {
+                const response = await fetch(`api/admin/questRequests/${selectedCall.id}`, {
                     method: 'PUT',
                     headers: {
                         "Authorization": `Bearer ${token}`,

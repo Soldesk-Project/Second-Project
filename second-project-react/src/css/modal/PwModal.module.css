@@ -63,6 +63,12 @@
   border-color: #b19fff;
 }
 
+.pwModalInput:disabled {
+  background-color: #9f8cea; 
+  border-color: #b8a6ff;
+  color: #6d6291;
+}
+
 .alert{
   height: 30px;
 }
