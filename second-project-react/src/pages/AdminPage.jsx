@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Header from '../layout/Header';
 import QuestAdminSidebar from '../layout/QuestAdminSidebar';
 import UserAdminSidebar from '../layout/UserAdminSidebar';
+import ServerAdminSidebar from '../layout/ServerAdminSidebar';
 import Headerstyles from '../css/MainPage.module.css';
 import styles from '../css/adminPage/AdminPage.module.css';
 import { useSelector } from 'react-redux';
@@ -18,6 +19,7 @@ import ItemRegister from '../components/adminBodyComp/ItemRegister';
 import ItemEdit from '../components/adminBodyComp/ItemEdit';
 import ItemDelete from '../components/adminBodyComp/ItemDelete';
 import ReportDetails from '../components/adminBodyComp/ReportDetails';
+import ServerMetaData from '../components/adminBodyComp/ServerMetaData';
 
 const AdminPage = () => {
   const currentUser = useSelector((state) => state.user.user);
@@ -27,6 +29,7 @@ const AdminPage = () => {
   const [activeQuestMenu, setActiveQuestMenu] = useState('default');
   const [activeUserMenu, setActiveUserMenu] = useState('default');
   const [activeAchMenu, setActiveAchMenu] = useState('default');
+  const [activeServerMenu, setActiveServerMenu] = useState('default');
   const [activeTab, setActiveTab] = useState('quest');
 
   const setPageQuestAdmin = () => {
@@ -40,6 +43,10 @@ const AdminPage = () => {
   const setPageAchAdmin = () => {
     setActiveSidebar('achievement');
     setActiveAchMenu('default');
+  }
+  const setPageServerAdmin = () => {
+    setActiveSidebar('server');
+    setActiveServerMenu('default');
   }
 
   // activeQuestMenu 값에 따라 렌더링할 컴포넌트를 결정하는 함수
@@ -89,6 +96,20 @@ const AdminPage = () => {
         return <AchRegister/>;
     }
   }
+  
+  //activeServerMenu 값에 따라 렌더링할 컴포넌트를 결정하는 함수
+  const renderServerContent = () => {
+    switch (activeServerMenu){
+      case 'meta-data' :
+        return <ServerMetaData/>;
+      case 'dynamic-data' :
+        return <ServerMetaData/>;
+      case 'user-data' : 
+        return <ServerMetaData/>;
+      default:
+        return <ServerMetaData/>;
+    }
+  }
 
   return (
     <div className={styles.container}>
@@ -105,6 +126,9 @@ const AdminPage = () => {
             <button className={`${styles.top_nav_button} ${activeTab === 'ach' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('ach'); setPageAchAdmin(); }}>
               업적/상점관리
             </button>
+            <button className={`${styles.top_nav_button} ${activeTab === 'server' ? styles.activeTab : ''}`} onClick={() => { setActiveTab('server'); setPageServerAdmin(); }}>
+              서버 관리
+            </button>
           </div>
         </div>
       {/*메인 바디 */}
@@ -115,12 +139,14 @@ const AdminPage = () => {
           {activeSidebar === 'quest' && <QuestAdminSidebar setActiveQuestMenu={setActiveQuestMenu} />}
           {activeSidebar === 'user' && <UserAdminSidebar setActiveUserMenu={setActiveUserMenu}/>}
           {activeSidebar === 'achievement' && <AchAdminSidebar setActiveAchMenu={setActiveAchMenu}/>}
+          {activeSidebar === 'server' && <ServerAdminSidebar setActiveServerMenu={setActiveServerMenu}/>}
         </div>
         {/* 우측 본문*/}
         <div className={styles.body_content}>
           {activeSidebar === 'quest' && renderQuestContent()}
           {activeSidebar === 'user' && renderUserContent()}
           {activeSidebar === 'achievement' && renderAchContent()}
+          {activeSidebar === 'server' && renderServerContent()}
         </div>
       </div>
     </div>

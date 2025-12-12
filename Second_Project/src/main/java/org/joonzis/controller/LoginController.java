@@ -841,8 +841,15 @@ public class LoginController {
 	    
 	    // 중복 로그인 방지: 이미 로그인 되어있는 세션이 있으면 무효화
         HttpSession existingSession = loginSessions.put(inputId, session);
-        if (existingSession != null && !existingSession.isNew()) {
-        	existingSession.invalidate();
+//        if (existingSession != null && !existingSession.isNew()) {
+    	if (existingSession != null) {
+    		try {
+    			if (!existingSession.isNew()) {
+    				existingSession.invalidate();
+				}
+			} catch (IllegalStateException ignored) {
+
+			}
 //            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 로그인된 계정입니다.");
         }
 
