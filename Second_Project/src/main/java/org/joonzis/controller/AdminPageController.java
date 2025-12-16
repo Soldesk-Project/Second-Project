@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.joonzis.domain.AchievementDTO;
 import org.joonzis.domain.FaqVO;
 import org.joonzis.domain.ItemVO;
@@ -25,8 +27,12 @@ import org.joonzis.service.FileUploadService;
 import org.joonzis.service.UserService;
 import org.joonzis.websocket.UserBanWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -678,4 +685,70 @@ public class AdminPageController {
     		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     	}
     }
+    
+    
+    
+    
+    //ec2 server data
+    @ResponseBody
+    @GetMapping(value = "/ec2-info/meta-data", produces = "application/json; charset=UTF-8")
+    public Map<String, String> ec2Info(HttpServletRequest request) {
+    	System.out.println("🔥 EC2 메타데이터 요청 시작");
+        Map<String, String> info = new HashMap<>();
+        
+        try {
+            // 타임아웃 설정
+            SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+            factory.setConnectTimeout(10000);
+            factory.setReadTimeout(5000);
+            RestTemplate rest = new RestTemplate(factory);
+            
+            // 1. 토큰 발급
+            HttpHeaders tokenHeaders = new HttpHeaders();
+            tokenHeaders.set("X-aws-ec2-metadata-token-ttl-seconds", "21600");
+            HttpEntity<String> tokenEntity = new HttpEntity<>(tokenHeaders);
+            
+            String token = rest.exchange(
+                "http://169.254.169.254/latest/api/token",
+                HttpMethod.PUT, tokenEntity, String.class).getBody();
+            
+            System.out.println("✅ 토큰 발급 성공 (길이: " + token.length() + ")");
+            
+            // 2. 메타데이터들
+            HttpHeaders dataHeaders = new HttpHeaders();
+            dataHeaders.set("X-aws-ec2-metadata-token", token);
+            HttpEntity<String> dataEntity = new HttpEntity<>(dataHeaders);
+            
+            info.put("instanceId", rest.exchange(
+                "http://169.254.169.254/latest/meta-data/instance-id",
+                HttpMethod.GET, dataEntity, String.class).getBody());
+                
+            info.put("instanceType", rest.exchange(
+                "http://169.254.169.254/latest/meta-data/instance-type",
+                HttpMethod.GET, dataEntity, String.class).getBody());
+                
+            info.put("publicIp", rest.exchange(
+                "http://169.254.169.254/latest/meta-data/public-ipv4",
+                HttpMethod.GET, dataEntity, String.class).getBody());
+            
+            System.out.println("🎉 완전 성공: " + info);
+            
+        } catch (Exception e) {
+            info.put("error", "실패: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return info;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
