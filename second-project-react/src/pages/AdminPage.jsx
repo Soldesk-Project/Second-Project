@@ -20,6 +20,8 @@ import ItemEdit from '../components/adminBodyComp/ItemEdit';
 import ItemDelete from '../components/adminBodyComp/ItemDelete';
 import ReportDetails from '../components/adminBodyComp/ReportDetails';
 import ServerMetaData from '../components/adminBodyComp/ServerMetaData';
+import ServerDynamicData from '../components/adminBodyComp/ServerDynamicData';
+import ServerUserData from '../components/adminBodyComp/ServerUserData';
 
 const AdminPage = () => {
   const currentUser = useSelector((state) => state.user.user);
@@ -103,9 +105,9 @@ const AdminPage = () => {
       case 'meta-data' :
         return <ServerMetaData/>;
       case 'dynamic-data' :
-        return <ServerMetaData/>;
+        return <ServerDynamicData/>;
       case 'user-data' : 
-        return <ServerMetaData/>;
+        return <ServerUserData/>;
       default:
         return <ServerMetaData/>;
     }

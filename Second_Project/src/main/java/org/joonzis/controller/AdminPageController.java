@@ -65,6 +65,11 @@ public class AdminPageController {
     @Autowired
     private UserBanWebSocketHandler userBanWebSocketHandler;
     
+    // 토큰 재활용, 생성
+    private volatile String cachedImdsToken;
+    private volatile long imdsTokenExpireAt; 
+    
+    
     // 문제 등록
     @PostMapping("/registerQuestion")
     public ResponseEntity<?> registerQuestion(@RequestBody QuestionDTO questionDTO) {
@@ -688,11 +693,36 @@ public class AdminPageController {
     
     
     
+    //ec2 server data token
+    private String getImdsToken(RestTemplate rest) {
+        long now = System.currentTimeMillis();
+        // 아직 유효한 토큰이면 재사용
+        if (cachedImdsToken != null && now < imdsTokenExpireAt) {
+            return cachedImdsToken;
+        }
+
+        HttpHeaders tokenHeaders = new HttpHeaders();
+        tokenHeaders.set("X-aws-ec2-metadata-token-ttl-seconds", "21600"); // 6시간
+        HttpEntity<String> tokenEntity = new HttpEntity<>(tokenHeaders);
+
+        String token = rest.exchange(
+            "http://169.254.169.254/latest/api/token",
+            HttpMethod.PUT, tokenEntity, String.class
+        ).getBody();
+
+        // 토큰 + 만료 시간 캐싱 (조금 여유 두고 싶으면 -1~2분 빼도 됨)
+        cachedImdsToken = token;
+        imdsTokenExpireAt = now + 21_600_000L; // 21600초 * 1000
+        System.out.println("✅ IMDS 토큰 발급/갱신 (길이: " + token.length() + ")");
+        return token;
+    }
+    
+    
     
     //ec2 server data
     @ResponseBody
     @GetMapping(value = "/ec2-info/meta-data", produces = "application/json; charset=UTF-8")
-    public Map<String, String> ec2Info(HttpServletRequest request) {
+    public Map<String, String> ec2MetaInfo(HttpServletRequest request) {
     	System.out.println("🔥 EC2 메타데이터 요청 시작");
         Map<String, String> info = new HashMap<>();
         
@@ -703,33 +733,108 @@ public class AdminPageController {
             factory.setReadTimeout(5000);
             RestTemplate rest = new RestTemplate(factory);
             
-            // 1. 토큰 발급
-            HttpHeaders tokenHeaders = new HttpHeaders();
-            tokenHeaders.set("X-aws-ec2-metadata-token-ttl-seconds", "21600");
-            HttpEntity<String> tokenEntity = new HttpEntity<>(tokenHeaders);
-            
-            String token = rest.exchange(
-                "http://169.254.169.254/latest/api/token",
-                HttpMethod.PUT, tokenEntity, String.class).getBody();
-            
-            System.out.println("✅ 토큰 발급 성공 (길이: " + token.length() + ")");
+            String token = getImdsToken(rest);
             
             // 2. 메타데이터들
             HttpHeaders dataHeaders = new HttpHeaders();
             dataHeaders.set("X-aws-ec2-metadata-token", token);
             HttpEntity<String> dataEntity = new HttpEntity<>(dataHeaders);
             
-            info.put("instanceId", rest.exchange(
+            // ami-id - 인스턴스를 시작하기 위해 사용된 AMI ID
+            info.put("ami-id", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/ami-id",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+
+            // instance-id
+            info.put("instance-id", rest.exchange(
                 "http://169.254.169.254/latest/meta-data/instance-id",
                 HttpMethod.GET, dataEntity, String.class).getBody());
-                
-            info.put("instanceType", rest.exchange(
+            
+            // instance-type
+            info.put("instance-type", rest.exchange(
                 "http://169.254.169.254/latest/meta-data/instance-type",
                 HttpMethod.GET, dataEntity, String.class).getBody());
-                
-            info.put("publicIp", rest.exchange(
-                "http://169.254.169.254/latest/meta-data/public-ipv4",
-                HttpMethod.GET, dataEntity, String.class).getBody());
+            
+            // events/recommendations/rebalance - 인스턴스의 리밸런싱 권고 알림이 생성되는 대략적인 시간 UTC / 알람 생성 후에만 사용 가능
+            info.put("rebalance", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/events/recommendations/rebalance",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+            
+            // mac - 인스턴스의 미디어 액세스 제어 주소
+            info.put("mac", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/mac",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+            
+            // local-hostname
+            info.put("local-hostname", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/local-hostname",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+            
+            // local-ipv4 - IPv6 전용 인스턴스인 경우 이 항목이 설정되지 않고 HTTP 404 응답이 발생
+            info.put("local-ipv4", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/local-ipv4",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+
+            // public-hostname -  enableDnsHostnames 속성이 true로 설정된 경우에만 반환
+            info.put("public-hostname", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/public-hostname",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+
+            // public-ipv4 - 인스턴스와 탄력적 IP 주소가 연결된 경우 반환된 값은 탄력적 IP 주소
+            info.put("public-ipv4", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/public-ipv4",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+
+            // placement/availability-zone - 인스턴스가 시작된 가용 영역
+            info.put("availability-zone", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/placement/availability-zone",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+
+            // placement/availability-zone-id - 정적 가용 영역 ID
+            info.put("availability-zone-id", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/placement/availability-zone-id",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+
+            // placement/region - 인스턴스가 시작된 AWS 리전
+            info.put("region", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/placement/region",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+            
+            // network/interfaces/macs/mac/device-number - 해당 인터페이스와 연결된 고유한 디바이스 번호
+            info.put("device-number", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/device-number",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+            
+            // network/interfaces/macs/mac/interface-id - 네트워크 인터페이스의 ID 
+            info.put("mac/interface-id", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/interface-id",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+            
+            // network/interfaces/macs/mac/owner-id - 네트워크 인터페이스 소유자 ID
+            info.put("owner-id", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/owner-id",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+
+            // network/interfaces/macs/mac/vpc-id - 인터페이스가 위치하는 VPC의 ID
+            info.put("vpc-id", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/vpc-id",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+            
+            // iam/security-credentials/role-name - IAM 역할 정보 role-name에 역할 이름 (임시 보안 자격 증명 포함)
+            info.put("role-name", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/iam/security-credentials/role-name",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+
+            // identity-credentials/ec2/info - 보안 인증에 대한 정보
+            info.put("credentials", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/identity-credentials/ec2/info",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+            
+            // services/domain - 리전의 AWS 리소스에 대한 도메인
+            info.put("domain", rest.exchange(
+        		"http://169.254.169.254/latest/meta-data/services/domain",
+        		HttpMethod.GET, dataEntity, String.class).getBody());
+
             
             System.out.println("🎉 완전 성공: " + info);
             
@@ -742,7 +847,103 @@ public class AdminPageController {
     }
     
     
+    @ResponseBody
+    @GetMapping(value = "/ec2-info/dynamic-data", produces = "application/json; charset=UTF-8")
+    public Map<String, String> ec2DynamicInfo(HttpServletRequest request) {
+    	System.out.println("🔥 EC2 다이나믹데이터 요청 시작");
+    	Map<String, String> info = new HashMap<>();
+    	
+    	try {
+    		// 타임아웃 설정
+    		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+    		factory.setConnectTimeout(10000);
+    		factory.setReadTimeout(5000);
+    		RestTemplate rest = new RestTemplate(factory);
+    		
+    		
+//    		// 1. 토큰 발급
+    		String token = getImdsToken(rest);
+    		
+    		// 2. 다이나믹 데이터
+    		HttpHeaders dataHeaders = new HttpHeaders();
+    		dataHeaders.set("X-aws-ec2-metadata-token", token);
+    		HttpEntity<String> dataEntity = new HttpEntity<>(dataHeaders);
+    		
+    		// instance-identity/document - 인스턴스 ID, 프라이빗 IP 주소 등 인스턴스 속성을 포함하는 JSON
+    		info.put("document", rest.exchange(
+    				"http://169.254.169.254/latest/dynamic/instance-identity/document",
+    				HttpMethod.GET, dataEntity, String.class).getBody());
+    		
+    		// instance-identity/pkcs7 - 문서의 신뢰성 및 서명 내용을 검증하는 데 사용
+    		info.put("pkcs7", rest.exchange(
+    				"http://169.254.169.254/latest/dynamic/instance-identity/pkcs7",
+    				HttpMethod.GET, dataEntity, String.class).getBody());
+    		
+    		// instance-identity/signature - 출처 및 신뢰성을 검증하기 위해 다른 사용자가 사용할 수 있는 데이터
+    		info.put("signature", rest.exchange(
+    				"http://169.254.169.254/latest/dynamic/instance-identity/signature",
+    				HttpMethod.GET, dataEntity, String.class).getBody());
+    		
+    		System.out.println("🎉 완전 성공: " + info);
+    		
+    	} catch (Exception e) {
+    		info.put("error", "실패: " + e.getMessage());
+    		e.printStackTrace();
+    	}
+    	
+    	return info;
+    }
     
+    
+    @ResponseBody
+    @GetMapping(value = "/ec2-info/user-data", produces = "application/json; charset=UTF-8")
+    public Map<String, String> ec2UserInfo(HttpServletRequest request) {
+    	System.out.println("🔥 EC2 유저데이터 요청 시작");
+    	Map<String, String> info = new HashMap<>();
+    	
+    	try {
+    		// 타임아웃 설정
+    		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+    		factory.setConnectTimeout(10000);
+    		factory.setReadTimeout(5000);
+    		RestTemplate rest = new RestTemplate(factory);
+    		
+//    		// 1. 토큰 발급
+    		String token = getImdsToken(rest);
+//    		HttpHeaders tokenHeaders = new HttpHeaders();
+//    		tokenHeaders.set("X-aws-ec2-metadata-token-ttl-seconds", "21600");
+//    		HttpEntity<String> tokenEntity = new HttpEntity<>(tokenHeaders);
+//    		
+//    		String token = rest.exchange(
+//    				"http://169.254.169.254/latest/api/token",
+//    				HttpMethod.PUT, tokenEntity, String.class).getBody();
+//    		
+//    		System.out.println("✅ 토큰 발급 성공 (길이: " + token.length() + ")");
+    		
+    		// 2. user 데이터
+    		HttpHeaders dataHeaders = new HttpHeaders();
+    		dataHeaders.set("X-aws-ec2-metadata-token", token);
+    		HttpEntity<String> dataEntity = new HttpEntity<>(dataHeaders);
+    		
+    		// user-data - 전체 base64 인코딩된 스크립트
+    		info.put("user-data", rest.exchange(
+    				"http://169.254.169.254/latest/user-data",
+    				HttpMethod.GET, dataEntity, String.class).getBody());
+    		
+    		// user-data - 처음 8바이트만ㄴ
+    		info.put("user-data/8", rest.exchange(
+    				"http://169.254.169.254/latest/user-data/8",
+    				HttpMethod.GET, dataEntity, String.class).getBody());
+    		
+    		System.out.println("🎉 완전 성공: " + info);
+    		
+    	} catch (Exception e) {
+    		info.put("error", "실패: " + e.getMessage());
+    		e.printStackTrace();
+    	}
+    	
+    	return info;
+    }
     
     
     
