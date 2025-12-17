@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect } from 'react';
 
-const ServerMetaData = () => {
+const ServerDynamicData = () => {
     const [serverInfo, setServerInfo] = React.useState(null);
 
     useEffect(() => {
@@ -9,15 +9,15 @@ const ServerMetaData = () => {
     }, []);
 
     const handelMetaDataFetch = async () => {
-        // 서버 메타데이터를 가져오는 로직 작성
+        // 서버 유저데이터를 가져오는 로직 작성
         try {
             
-            const response = await axios.get('/api/admin/ec2-info/meta-data');
+            const response = await axios.get('/api/admin/ec2-info/user-data');
             if (response.status === 200) {
-                console.log('서버 메타데이터:', response.data);
+                console.log('서버 유저데이터:', response.data);
                 setServerInfo(response.data);
             } else {
-                console.error('서버 메타데이터 가져오기 실패:', response.status);
+                console.error('서버 유저데이터 가져오기 실패:', response.status);
             }
 
         } catch (error) {
@@ -27,9 +27,9 @@ const ServerMetaData = () => {
 
     return (
         <div>
-            serverInfo: {serverInfo ? JSON.stringify(serverInfo) : '로딩 중...'}
+            dynamicData: {serverInfo ? JSON.stringify(serverInfo) : '로딩 중...'}
         </div>
     );
 };
 
-export default ServerMetaData;
+export default ServerDynamicData;
