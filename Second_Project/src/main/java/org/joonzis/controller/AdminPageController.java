@@ -800,10 +800,10 @@ public class AdminPageController {
         		"http://169.254.169.254/latest/meta-data/placement/region",
         		HttpMethod.GET, dataEntity, String.class).getBody());
             
-            // network/interfaces/macs/mac/device-number - 해당 인터페이스와 연결된 고유한 디바이스 번호
-            info.put("device-number", rest.exchange(
-        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/device-number",
-        		HttpMethod.GET, dataEntity, String.class).getBody());
+//            // network/interfaces/macs/mac/device-number - 해당 인터페이스와 연결된 고유한 디바이스 번호
+//            info.put("device-number", rest.exchange(
+//        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/device-number",
+//        		HttpMethod.GET, dataEntity, String.class).getBody());
             
             // network/interfaces/macs/mac/interface-id - 네트워크 인터페이스의 ID 
             info.put("mac/interface-id", rest.exchange(
