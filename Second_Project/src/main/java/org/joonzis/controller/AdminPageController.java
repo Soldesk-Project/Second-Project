@@ -805,10 +805,10 @@ public class AdminPageController {
 //        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/device-number",
 //        		HttpMethod.GET, dataEntity, String.class).getBody());
             
-            // network/interfaces/macs/mac/interface-id - 네트워크 인터페이스의 ID 
-            info.put("mac/interface-id", rest.exchange(
-        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/interface-id",
-        		HttpMethod.GET, dataEntity, String.class).getBody());
+//            // network/interfaces/macs/mac/interface-id - 네트워크 인터페이스의 ID 
+//            info.put("mac/interface-id", rest.exchange(
+//        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/interface-id",
+//        		HttpMethod.GET, dataEntity, String.class).getBody());
             
             // network/interfaces/macs/mac/owner-id - 네트워크 인터페이스 소유자 ID
             info.put("owner-id", rest.exchange(
