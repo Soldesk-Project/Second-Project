@@ -810,30 +810,30 @@ public class AdminPageController {
 //        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/interface-id",
 //        		HttpMethod.GET, dataEntity, String.class).getBody());
             
-            // network/interfaces/macs/mac/owner-id - 네트워크 인터페이스 소유자 ID
-            info.put("owner-id", rest.exchange(
-        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/owner-id",
-        		HttpMethod.GET, dataEntity, String.class).getBody());
-
-            // network/interfaces/macs/mac/vpc-id - 인터페이스가 위치하는 VPC의 ID
-            info.put("vpc-id", rest.exchange(
-        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/vpc-id",
-        		HttpMethod.GET, dataEntity, String.class).getBody());
-            
-            // iam/security-credentials/role-name - IAM 역할 정보 role-name에 역할 이름 (임시 보안 자격 증명 포함)
-            info.put("role-name", rest.exchange(
-        		"http://169.254.169.254/latest/meta-data/iam/security-credentials/role-name",
-        		HttpMethod.GET, dataEntity, String.class).getBody());
-
-            // identity-credentials/ec2/info - 보안 인증에 대한 정보
-            info.put("credentials", rest.exchange(
-        		"http://169.254.169.254/latest/meta-data/identity-credentials/ec2/info",
-        		HttpMethod.GET, dataEntity, String.class).getBody());
-            
-            // services/domain - 리전의 AWS 리소스에 대한 도메인
-            info.put("domain", rest.exchange(
-        		"http://169.254.169.254/latest/meta-data/services/domain",
-        		HttpMethod.GET, dataEntity, String.class).getBody());
+//            // network/interfaces/macs/mac/owner-id - 네트워크 인터페이스 소유자 ID
+//            info.put("owner-id", rest.exchange(
+//        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/owner-id",
+//        		HttpMethod.GET, dataEntity, String.class).getBody());
+//
+//            // network/interfaces/macs/mac/vpc-id - 인터페이스가 위치하는 VPC의 ID
+//            info.put("vpc-id", rest.exchange(
+//        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/vpc-id",
+//        		HttpMethod.GET, dataEntity, String.class).getBody());
+//            
+//            // iam/security-credentials/role-name - IAM 역할 정보 role-name에 역할 이름 (임시 보안 자격 증명 포함)
+//            info.put("role-name", rest.exchange(
+//        		"http://169.254.169.254/latest/meta-data/iam/security-credentials/role-name",
+//        		HttpMethod.GET, dataEntity, String.class).getBody());
+//
+//            // identity-credentials/ec2/info - 보안 인증에 대한 정보
+//            info.put("credentials", rest.exchange(
+//        		"http://169.254.169.254/latest/meta-data/identity-credentials/ec2/info",
+//        		HttpMethod.GET, dataEntity, String.class).getBody());
+//            
+//            // services/domain - 리전의 AWS 리소스에 대한 도메인
+//            info.put("domain", rest.exchange(
+//        		"http://169.254.169.254/latest/meta-data/services/domain",
+//        		HttpMethod.GET, dataEntity, String.class).getBody());
 
             
             System.out.println("🎉 완전 성공: " + info);
@@ -893,63 +893,5 @@ public class AdminPageController {
     	
     	return info;
     }
-    
-    
-    @ResponseBody
-    @GetMapping(value = "/ec2-info/user-data", produces = "application/json; charset=UTF-8")
-    public Map<String, String> ec2UserInfo(HttpServletRequest request) {
-    	System.out.println("🔥 EC2 유저데이터 요청 시작");
-    	Map<String, String> info = new HashMap<>();
-    	
-    	try {
-    		// 타임아웃 설정
-    		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-    		factory.setConnectTimeout(10000);
-    		factory.setReadTimeout(5000);
-    		RestTemplate rest = new RestTemplate(factory);
-    		
-//    		// 1. 토큰 발급
-    		String token = getImdsToken(rest);
-//    		HttpHeaders tokenHeaders = new HttpHeaders();
-//    		tokenHeaders.set("X-aws-ec2-metadata-token-ttl-seconds", "21600");
-//    		HttpEntity<String> tokenEntity = new HttpEntity<>(tokenHeaders);
-//    		
-//    		String token = rest.exchange(
-//    				"http://169.254.169.254/latest/api/token",
-//    				HttpMethod.PUT, tokenEntity, String.class).getBody();
-//    		
-//    		System.out.println("✅ 토큰 발급 성공 (길이: " + token.length() + ")");
-    		
-    		// 2. user 데이터
-    		HttpHeaders dataHeaders = new HttpHeaders();
-    		dataHeaders.set("X-aws-ec2-metadata-token", token);
-    		HttpEntity<String> dataEntity = new HttpEntity<>(dataHeaders);
-    		
-    		// user-data - 전체 base64 인코딩된 스크립트
-    		info.put("user-data", rest.exchange(
-    				"http://169.254.169.254/latest/user-data",
-    				HttpMethod.GET, dataEntity, String.class).getBody());
-    		
-    		// user-data - 처음 8바이트만ㄴ
-    		info.put("user-data/8", rest.exchange(
-    				"http://169.254.169.254/latest/user-data/8",
-    				HttpMethod.GET, dataEntity, String.class).getBody());
-    		
-    		System.out.println("🎉 완전 성공: " + info);
-    		
-    	} catch (Exception e) {
-    		info.put("error", "실패: " + e.getMessage());
-    		e.printStackTrace();
-    	}
-    	
-    	return info;
-    }
-    
-    
-    
-    
-    
-    
-    
     
 }
