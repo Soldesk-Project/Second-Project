@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../layout/Header';
 import QuestAdminSidebar from '../layout/QuestAdminSidebar';
 import UserAdminSidebar from '../layout/UserAdminSidebar';
@@ -112,6 +112,10 @@ const AdminPage = () => {
         return <ServerMetaData/>;
     }
   }
+  
+  useEffect(() => {
+    console.log('activeServerMenu 변경:', activeServerMenu);
+  }, [activeServerMenu]);
 
   return (
     <div className={styles.container}>

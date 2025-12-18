@@ -27,7 +27,7 @@ const ServerDynamicData = () => {
 
     return (
         <div>
-            dynami  cData: {serverInfo ? JSON.stringify(serverInfo) : '로딩 중...'}
+            dynamicData: {serverInfo ? JSON.stringify(serverInfo) : '로딩 중...'}
         </div>
     );
 };
