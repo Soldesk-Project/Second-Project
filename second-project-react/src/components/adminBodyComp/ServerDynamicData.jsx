@@ -74,10 +74,6 @@ const ServerDynamicData = () => {
         
                     {!loading && !error && serverInfo && (
                         <div className={styles.metaCard}>
-                            <div className={styles.metaSummary}>
-                                <span className={styles.summaryLabel}>pkcs7</span>
-                                <span className={styles.summaryValue}>{serverInfo['pkcs7']}</span>
-                            </div>
                             <div className={styles.metaTableWrapper}>
                                 {renderTable()}
                             </div>
