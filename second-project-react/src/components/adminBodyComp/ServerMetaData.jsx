@@ -1,8 +1,8 @@
 import axios from 'axios';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const ServerMetaData = () => {
-    const [serverInfo, setServerInfo] = React.useState(null);
+    const [serverInfo, setServerInfo] = useState(null);
 
     useEffect(() => {
         handelMetaDataFetch();
