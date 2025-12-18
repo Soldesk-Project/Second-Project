@@ -15,7 +15,6 @@ const ServerAdminSidebar = ({setActiveServerMenu}) => {
         <ul className="submenu-list">
           <li><button className="achRegisterBtn" onClick={()=> setActiveServerMenu('meta-data')}>meta-data</button></li>
           <li><button className="achRegisterBtn" onClick={()=> setActiveServerMenu('dynamic-data')}>dynamic-data</button></li>
-          <li><button className="achRegisterBtn" onClick={()=> setActiveServerMenu('user-data')}>user-data</button></li>
         </ul>
       )}
     </div>

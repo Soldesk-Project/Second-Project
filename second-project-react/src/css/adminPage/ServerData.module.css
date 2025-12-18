@@ -1,0 +1,121 @@
+.serverMetaContainer {
+    /* padding: 20px; */
+    color: #333;
+    }
+
+.serverMetaTitle {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2em;
+}
+
+.serverDataHr {
+    border: 0;
+    height: 1px;
+    background: #eee;
+    margin: 20px 0;
+}
+
+.refreshButton {
+    padding: 10px 20px;
+    background-color: #35373d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.refreshButton:hover {
+    background-color: #5a6268;
+}
+
+.metaStatus {
+    padding: 10px 12px;
+    border-radius: 4px;
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.metaLoading {
+    background: #f0f4ff;
+    color: #184fa8;
+}
+
+.metaError {
+    background: #ffe5e5;
+    color: #b00020;
+}
+
+.metaCard {
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.metaSummary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px 16px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.summaryLabel {
+    display: inline-block;
+    min-width: 90px;
+    color: #555;
+    font-weight: 500;
+}
+
+.summaryValue {
+    margin-left: 8px;
+    font-weight: 600;
+}
+
+.metaDetailTitle {
+    margin: 8px 0;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.metaTableWrapper {
+    max-height: 320px;
+    overflow: auto;
+    border-radius: 4px;
+    border: 1px solid #eee;
+}
+
+.metaTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.metaTable thead {
+    background: #fafafa;
+}
+
+.metaTable th,
+.metaTable td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #444;
+    text-align: left;
+    vertical-align: top;
+}
+
+.metaKey {
+    width: 30%;
+    font-weight: 600;
+    color: #444;
+}
+
+.metaValue {
+    word-break: break-all;
+    color: #333;
+}
