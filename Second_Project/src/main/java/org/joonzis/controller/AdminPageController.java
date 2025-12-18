@@ -755,10 +755,10 @@ public class AdminPageController {
                 "http://169.254.169.254/latest/meta-data/instance-type",
                 HttpMethod.GET, dataEntity, String.class).getBody());
             
-            // events/recommendations/rebalance - 인스턴스의 리밸런싱 권고 알림이 생성되는 대략적인 시간 UTC / 알람 생성 후에만 사용 가능
-            info.put("rebalance", rest.exchange(
-        		"http://169.254.169.254/latest/meta-data/events/recommendations/rebalance",
-        		HttpMethod.GET, dataEntity, String.class).getBody());
+//            // events/recommendations/rebalance - 인스턴스의 리밸런싱 권고 알림이 생성되는 대략적인 시간 UTC / 알람 생성 후에만 사용 가능
+//            info.put("rebalance", rest.exchange(
+//        		"http://169.254.169.254/latest/meta-data/events/recommendations/rebalance",
+//        		HttpMethod.GET, dataEntity, String.class).getBody());
             
             // mac - 인스턴스의 미디어 액세스 제어 주소
             info.put("mac", rest.exchange(

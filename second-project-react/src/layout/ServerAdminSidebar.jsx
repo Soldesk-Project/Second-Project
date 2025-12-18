@@ -13,9 +13,9 @@ const ServerAdminSidebar = ({setActiveServerMenu}) => {
       <button className='AchMenu' onClick={toggleServerMenu}>서버 데이터 {isServerMenuOpen ? '▼' : '▶'}</button><br/>
       {isServerMenuOpen && (
         <ul className="submenu-list">
-          <li><button className="achRegisterBtn" onClick={()=> setActiveServerMenu('achRegister')}>meta-data</button></li>
-          <li><button className="achRegisterBtn" onClick={()=> setActiveServerMenu('achDelete')}>dynamic-data</button></li>
-          <li><button className="achRegisterBtn" onClick={()=> setActiveServerMenu('achDelete')}>user-data</button></li>
+          <li><button className="achRegisterBtn" onClick={()=> setActiveServerMenu('meta-data')}>meta-data</button></li>
+          <li><button className="achRegisterBtn" onClick={()=> setActiveServerMenu('dynamic-data')}>dynamic-data</button></li>
+          <li><button className="achRegisterBtn" onClick={()=> setActiveServerMenu('user-data')}>user-data</button></li>
         </ul>
       )}
     </div>
