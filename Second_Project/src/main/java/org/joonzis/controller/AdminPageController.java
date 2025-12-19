@@ -713,7 +713,6 @@ public class AdminPageController {
         // 토큰 + 만료 시간 캐싱 (조금 여유 두고 싶으면 -1~2분 빼도 됨)
         cachedImdsToken = token;
         imdsTokenExpireAt = now + 21_600_000L; // 21600초 * 1000
-        System.out.println("✅ IMDS 토큰 발급/갱신 (길이: " + token.length() + ")");
         return token;
     }
     
@@ -723,7 +722,6 @@ public class AdminPageController {
     @ResponseBody
     @GetMapping(value = "/ec2-info/meta-data", produces = "application/json; charset=UTF-8")
     public Map<String, String> ec2MetaInfo(HttpServletRequest request) {
-    	System.out.println("🔥 EC2 메타데이터 요청 시작");
         Map<String, String> info = new HashMap<>();
         
         try {
@@ -754,11 +752,6 @@ public class AdminPageController {
             info.put("instance-type", rest.exchange(
                 "http://169.254.169.254/latest/meta-data/instance-type",
                 HttpMethod.GET, dataEntity, String.class).getBody());
-            
-//            // events/recommendations/rebalance - 인스턴스의 리밸런싱 권고 알림이 생성되는 대략적인 시간 UTC / 알람 생성 후에만 사용 가능
-//            info.put("rebalance", rest.exchange(
-//        		"http://169.254.169.254/latest/meta-data/events/recommendations/rebalance",
-//        		HttpMethod.GET, dataEntity, String.class).getBody());
             
             // mac - 인스턴스의 미디어 액세스 제어 주소
             info.put("mac", rest.exchange(
@@ -800,44 +793,6 @@ public class AdminPageController {
         		"http://169.254.169.254/latest/meta-data/placement/region",
         		HttpMethod.GET, dataEntity, String.class).getBody());
             
-//            // network/interfaces/macs/mac/device-number - 해당 인터페이스와 연결된 고유한 디바이스 번호
-//            info.put("device-number", rest.exchange(
-//        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/device-number",
-//        		HttpMethod.GET, dataEntity, String.class).getBody());
-            
-//            // network/interfaces/macs/mac/interface-id - 네트워크 인터페이스의 ID 
-//            info.put("mac/interface-id", rest.exchange(
-//        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/interface-id",
-//        		HttpMethod.GET, dataEntity, String.class).getBody());
-            
-//            // network/interfaces/macs/mac/owner-id - 네트워크 인터페이스 소유자 ID
-//            info.put("owner-id", rest.exchange(
-//        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/owner-id",
-//        		HttpMethod.GET, dataEntity, String.class).getBody());
-//
-//            // network/interfaces/macs/mac/vpc-id - 인터페이스가 위치하는 VPC의 ID
-//            info.put("vpc-id", rest.exchange(
-//        		"http://169.254.169.254/latest/meta-data/network/interfaces/macs/mac/vpc-id",
-//        		HttpMethod.GET, dataEntity, String.class).getBody());
-//            
-//            // iam/security-credentials/role-name - IAM 역할 정보 role-name에 역할 이름 (임시 보안 자격 증명 포함)
-//            info.put("role-name", rest.exchange(
-//        		"http://169.254.169.254/latest/meta-data/iam/security-credentials/role-name",
-//        		HttpMethod.GET, dataEntity, String.class).getBody());
-//
-//            // identity-credentials/ec2/info - 보안 인증에 대한 정보
-//            info.put("credentials", rest.exchange(
-//        		"http://169.254.169.254/latest/meta-data/identity-credentials/ec2/info",
-//        		HttpMethod.GET, dataEntity, String.class).getBody());
-//            
-//            // services/domain - 리전의 AWS 리소스에 대한 도메인
-//            info.put("domain", rest.exchange(
-//        		"http://169.254.169.254/latest/meta-data/services/domain",
-//        		HttpMethod.GET, dataEntity, String.class).getBody());
-
-            
-            System.out.println("🎉 완전 성공: " + info);
-            
         } catch (Exception e) {
             info.put("error", "실패: " + e.getMessage());
             e.printStackTrace();
@@ -850,7 +805,6 @@ public class AdminPageController {
     @ResponseBody
     @GetMapping(value = "/ec2-info/dynamic-data", produces = "application/json; charset=UTF-8")
     public Map<String, String> ec2DynamicInfo(HttpServletRequest request) {
-    	System.out.println("🔥 EC2 다이나믹데이터 요청 시작");
     	Map<String, String> info = new HashMap<>();
     	
     	try {
@@ -883,8 +837,6 @@ public class AdminPageController {
     		info.put("signature", rest.exchange(
     				"http://169.254.169.254/latest/dynamic/instance-identity/signature",
     				HttpMethod.GET, dataEntity, String.class).getBody());
-    		
-    		System.out.println("🎉 완전 성공: " + info);
     		
     	} catch (Exception e) {
     		info.put("error", "실패: " + e.getMessage());

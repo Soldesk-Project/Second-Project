@@ -44,7 +44,7 @@ const FaqModal = ({setFaqModal, reloadFaqs, modalStatus, faqItem}) => {
       return;
     }
     try {
-      const res = await axios.post('/admin/registerFaq',{question: faqTitle, answer: faqContent, category: faqCategory},{
+      const res = await axios.post('api/admin/registerFaq',{question: faqTitle, answer: faqContent, category: faqCategory},{
         headers: {
           "Authorization": `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -74,7 +74,7 @@ const FaqModal = ({setFaqModal, reloadFaqs, modalStatus, faqItem}) => {
       return;
     }
     try {
-      const res = await axios.post('/admin/editFaq',{id: faqItem.id, question: faqTitle, answer: faqContent, category: faqCategory},{
+      const res = await axios.post('api/admin/editFaq',{id: faqItem.id, question: faqTitle, answer: faqContent, category: faqCategory},{
         headers: {
           "Authorization": `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -93,7 +93,7 @@ const FaqModal = ({setFaqModal, reloadFaqs, modalStatus, faqItem}) => {
     // eslint-disable-next-line no-restricted-globals
     if (confirm('FAQ를 삭제하시겠습니까?')) {
       try {
-        const res = await axios.post('/admin/deleteFaq', {id: faqItem.id},{
+        const res = await axios.post('api/admin/deleteFaq', {id: faqItem.id},{
           headers: {
             "Authorization": `Bearer ${token}`,
             'Content-Type': 'application/json'

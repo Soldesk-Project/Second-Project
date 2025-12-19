@@ -37,7 +37,7 @@ const NoticeModal = ({setNoticeModal, reloadNotices, modalStatus, noticeItem}) =
       return;
     }
     try {
-      const res = await axios.post('/admin/registerNotice',{subject: noticeTitle, message: noticeContent},{
+      const res = await axios.post('api/admin/registerNotice',{subject: noticeTitle, message: noticeContent},{
         headers: {
           "Authorization": `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -62,7 +62,7 @@ const NoticeModal = ({setNoticeModal, reloadNotices, modalStatus, noticeItem}) =
       return;
     }
     try {
-      const res = await axios.post('/admin/editNotice',{id: noticeItem.id, subject: noticeTitle, message: noticeContent},{
+      const res = await axios.post('api/admin/editNotice',{id: noticeItem.id, subject: noticeTitle, message: noticeContent},{
         headers: {
           "Authorization": `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -81,7 +81,7 @@ const NoticeModal = ({setNoticeModal, reloadNotices, modalStatus, noticeItem}) =
     // eslint-disable-next-line no-restricted-globals
     if (confirm('공지사항을 삭제하시겠습니까?')) {
       try {
-        const res = await axios.post('/admin/deleteNotice', {id: noticeItem.id},{
+        const res = await axios.post('api/admin/deleteNotice', {id: noticeItem.id},{
           headers: {
             "Authorization": `Bearer ${token}`,
             'Content-Type': 'application/json'

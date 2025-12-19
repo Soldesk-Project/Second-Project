@@ -29,7 +29,7 @@ import lombok.extern.log4j.Log4j;
 @Log4j
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/customer")
+@RequestMapping("/customer")
 public class CustomerController {
 	
     @Autowired
